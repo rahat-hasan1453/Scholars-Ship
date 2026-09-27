@@ -1,0 +1,135 @@
+// Prisma Schema for HighScholar Portal
+// Matches PRD: Users, UserProfiles, Scholarships, Professors, Applications, Tasks
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum DegreeLevel {
+  BACHELORS
+  MASTERS
+  PHD
+}
+
+enum ApplicationStatus {
+  WISHLIST
+  PREPARING
+  SUBMITTED
+  UNDER_REVIEW
+  DECIDED
+}
+
+enum DecisionResult {
+  PENDING
+  ACCEPTED
+  REJECTED
+  WAITLISTED
+}
+
+model User {
+  id        String       @id @default(uuid())
+  email     String       @unique
+  name      String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  profile   UserProfile?
+}
+
+model UserProfile {
+  id              String        @id @default(uuid())
+  userId          String        @unique
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  degreeLevel     DegreeLevel
+  specializations String[]
+  targetCountries String[]
+  cgpa            Decimal?
+  testScores      Json?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  applications    Application[]
+  followedProfs   ProfFollow[]
+}
+
+model Scholarship {
+  id               String        @id @default(uuid())
+  title            String
+  provider         String
+  deadline         DateTime
+  fundingAmount    String
+  fundingType      String        @default("FULL")
+  degreeLevels     DegreeLevel[]
+  countries        String[]
+  specializations  String[]
+  requirementsJson Json?
+  officialUrl      String
+  description      String
+  featured         Boolean       @default(false)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  applications     Application[]
+}
+
+model Professor {
+  id              String       @id @default(uuid())
+  name            String
+  title           String
+  university      String
+  department      String
+  country         String
+  labName         String?
+  researchTags    String[]
+  openPositions   Boolean      @default(true)
+  recentGrants    String?
+  email           String?
+  linkedInUrl     String?
+  googleScholar   String?
+  labWebsite      String?
+  avatarUrl       String?
+  acceptingTerms  String[]
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  followers       ProfFollow[]
+}
+
+model ProfFollow {
+  id          String      @id @default(uuid())
+  profileId   String
+  professorId String
+  profile     UserProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  professor   Professor   @relation(fields: [professorId], references: [id], onDelete: Cascade)
+  createdAt   DateTime    @default(now())
+
+  @@unique([profileId, professorId])
+}
+
+model Application {
+  id            String            @id @default(uuid())
+  profileId     String
+  scholarshipId String
+  status        ApplicationStatus @default(WISHLIST)
+  decision      DecisionResult    @default(PENDING)
+  notes         String?
+  deadline      DateTime?
+  orderIndex    Int               @default(0)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  profile       UserProfile       @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  scholarship   Scholarship       @relation(fields: [scholarshipId], references: [id], onDelete: Cascade)
+  tasks         ApplicationTask[]
+}
+
+model ApplicationTask {
+  id            String      @id @default(uuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  title         String
+  isCompleted   Boolean     @default(false)
+  dueDate       DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
