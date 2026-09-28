@@ -208,56 +208,56 @@ export const OpportunitiesFeed: React.FC = () => {
   return (
     <div className="space-y-6">
       
-      {/* Figma Top Intro (Node 116:3082) */}
+      {/* Figma Top Intro (Node 122:3185) */}
       <div className="space-y-1">
-        <h1 className="text-xl sm:text-[22px] font-bold text-[#101828] tracking-tight">
-          Find Your Desired Scholarship, Lab & Safe Universities
+        <h1 className="text-base sm:text-lg font-semibold text-[#101828] tracking-tight leading-6">
+          Find Your Desired Scholarship, Lab &amp; Safe Universities
         </h1>
-        <p className="text-xs sm:text-sm text-[#475467] font-normal">
+        <p className="text-xs sm:text-sm text-[#475467] font-normal leading-5">
           A quick search links you to scholarships, expert professors, and trusted regional universities.
         </p>
       </div>
 
-      {/* Figma 4-Column Floating-Label Filter Inputs (Node 116:2392) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 relative z-30">
+      {/* Figma 4-Column Floating-Label Filter Inputs (Node 122:3188) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 relative z-30">
         
         {/* 1. SUBJECT FILTER FIELD */}
         <div ref={subjectRef} className="relative">
           {/* Floating Label */}
-          <span className="absolute -top-2 left-3 bg-white px-1.5 text-[11px] italic font-normal text-[#90A0B9] z-10 pointer-events-none select-none">
+          <span className="absolute -top-[9px] left-2.5 bg-white px-1 text-[11px] italic font-normal text-[#90A0B9] z-10 pointer-events-none select-none">
             Subject
           </span>
 
           {/* Trigger Box */}
           <div 
             onClick={() => setIsSubjectOpen(prev => !prev)}
-            className={`w-full h-12 bg-white rounded-xl border px-3 flex items-center justify-between cursor-pointer transition-all shadow-2xs ${
-              isSubjectOpen ? 'border-[#7150E7] ring-2 ring-[#EDE9FC]' : 'border-[#E1E7F0] hover:border-[#CBD5E1]'
+            className={`w-full h-12 bg-white rounded-lg border px-2 py-1 flex items-center justify-between cursor-pointer transition-all ${
+              isSubjectOpen ? 'border-[#7150E7] ring-2 ring-[#EDE9FC]' : 'border-[#E1E8F0] hover:border-[#CBD5E1]'
             }`}
           >
             {/* Chips Container */}
-            <div className="flex items-center gap-1.5 overflow-hidden flex-1 mr-2">
+            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar flex-1 min-w-0 mr-1.5">
               {selectedSubjects.length === 0 ? (
-                <span className="text-xs text-[#98A2B3] italic">Select Subjects...</span>
+                <span className="text-xs text-[#98A2B3] italic pl-1">Select Subjects...</span>
               ) : (
                 <>
                   {selectedSubjects.slice(0, 2).map(sub => (
                     <span 
                       key={sub}
-                      className="bg-[#F0F3F4] text-[#212B36] text-[11px] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1 shrink-0"
+                      className="bg-[#F0F3F4] text-[#212B36] text-[12px] font-medium h-[22px] px-2 rounded-full inline-flex items-center gap-1 shrink-0 select-none"
                     >
-                      <span className="max-w-[85px] truncate">{sub}</span>
+                      <span className="whitespace-nowrap">{sub}</span>
                       <button 
                         type="button"
                         onClick={(e) => removeSubject(sub, e)}
-                        className="text-[#98A2B3] hover:text-[#475467] cursor-pointer"
+                        className="text-[#919EAB] hover:text-[#475467] cursor-pointer"
                       >
-                        <X className="w-2.5 h-2.5" />
+                        <X className="w-3 h-3" />
                       </button>
                     </span>
                   ))}
                   {selectedSubjects.length > 2 && (
-                    <span className="bg-[#F0F3F4] text-[#212B36] text-[11px] italic font-medium px-1.5 py-0.5 rounded-full shrink-0">
+                    <span className="bg-[#F0F3F4] text-[#212B36] text-[12px] italic font-medium h-[22px] px-2 rounded-full inline-flex items-center shrink-0">
                       +{selectedSubjects.length - 2}
                     </span>
                   )}
@@ -265,7 +265,7 @@ export const OpportunitiesFeed: React.FC = () => {
               )}
             </div>
 
-            <ChevronDown className={`w-4 h-4 text-[#98A2B3] shrink-0 transition-transform ${isSubjectOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-3.5 h-3.5 text-[#667085] shrink-0 transition-transform ${isSubjectOpen ? 'rotate-180' : ''}`} />
           </div>
 
           {/* Popover Dropdown */}
@@ -306,38 +306,38 @@ export const OpportunitiesFeed: React.FC = () => {
 
         {/* 2. DEGREE FILTER FIELD */}
         <div ref={degreeRef} className="relative">
-          <span className="absolute -top-2 left-3 bg-white px-1.5 text-[11px] italic font-normal text-[#90A0B9] z-10 pointer-events-none select-none">
+          <span className="absolute -top-[9px] left-2.5 bg-white px-1 text-[11px] italic font-normal text-[#90A0B9] z-10 pointer-events-none select-none">
             Degree
           </span>
 
           <div 
             onClick={() => setIsDegreeOpen(prev => !prev)}
-            className={`w-full h-12 bg-white rounded-xl border px-3 flex items-center justify-between cursor-pointer transition-all shadow-2xs ${
-              isDegreeOpen ? 'border-[#7150E7] ring-2 ring-[#EDE9FC]' : 'border-[#E1E7F0] hover:border-[#CBD5E1]'
+            className={`w-full h-12 bg-white rounded-lg border px-2 py-1 flex items-center justify-between cursor-pointer transition-all ${
+              isDegreeOpen ? 'border-[#7150E7] ring-2 ring-[#EDE9FC]' : 'border-[#E1E8F0] hover:border-[#CBD5E1]'
             }`}
           >
-            <div className="flex items-center gap-1.5 overflow-hidden flex-1 mr-2">
+            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar flex-1 min-w-0 mr-1.5">
               {selectedDegrees.length === 0 ? (
-                <span className="text-xs text-[#98A2B3] italic">Select Degrees...</span>
+                <span className="text-xs text-[#98A2B3] italic pl-1">Select Degrees...</span>
               ) : (
                 <>
                   {selectedDegrees.slice(0, 2).map(deg => (
                     <span 
                       key={deg}
-                      className="bg-[#F0F3F4] text-[#212B36] text-[11px] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1 shrink-0"
+                      className="bg-[#F0F3F4] text-[#212B36] text-[12px] font-medium h-[22px] px-2 rounded-full inline-flex items-center gap-1 shrink-0 select-none"
                     >
-                      <span>{deg}</span>
+                      <span className="whitespace-nowrap">{deg}</span>
                       <button 
                         type="button"
                         onClick={(e) => removeDegree(deg, e)}
-                        className="text-[#98A2B3] hover:text-[#475467] cursor-pointer"
+                        className="text-[#919EAB] hover:text-[#475467] cursor-pointer"
                       >
-                        <X className="w-2.5 h-2.5" />
+                        <X className="w-3 h-3" />
                       </button>
                     </span>
                   ))}
                   {selectedDegrees.length > 2 && (
-                    <span className="bg-[#F0F3F4] text-[#212B36] text-[11px] italic font-medium px-1.5 py-0.5 rounded-full shrink-0">
+                    <span className="bg-[#F0F3F4] text-[#212B36] text-[12px] italic font-medium h-[22px] px-2 rounded-full inline-flex items-center shrink-0">
                       +{selectedDegrees.length - 2}
                     </span>
                   )}
@@ -345,7 +345,7 @@ export const OpportunitiesFeed: React.FC = () => {
               )}
             </div>
 
-            <ChevronDown className={`w-4 h-4 text-[#98A2B3] shrink-0 transition-transform ${isDegreeOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-3.5 h-3.5 text-[#667085] shrink-0 transition-transform ${isDegreeOpen ? 'rotate-180' : ''}`} />
           </div>
 
           {isDegreeOpen && (
@@ -374,38 +374,38 @@ export const OpportunitiesFeed: React.FC = () => {
 
         {/* 3. COUNTRY FILTER FIELD */}
         <div ref={countryRef} className="relative">
-          <span className="absolute -top-2 left-3 bg-white px-1.5 text-[11px] italic font-normal text-[#90A0B9] z-10 pointer-events-none select-none">
+          <span className="absolute -top-[9px] left-2.5 bg-white px-1 text-[11px] italic font-normal text-[#90A0B9] z-10 pointer-events-none select-none">
             Country
           </span>
 
           <div 
             onClick={() => setIsCountryOpen(prev => !prev)}
-            className={`w-full h-12 bg-white rounded-xl border px-3 flex items-center justify-between cursor-pointer transition-all shadow-2xs ${
-              isCountryOpen ? 'border-[#7150E7] ring-2 ring-[#EDE9FC]' : 'border-[#E1E7F0] hover:border-[#CBD5E1]'
+            className={`w-full h-12 bg-white rounded-lg border px-2 py-1 flex items-center justify-between cursor-pointer transition-all ${
+              isCountryOpen ? 'border-[#7150E7] ring-2 ring-[#EDE9FC]' : 'border-[#E1E8F0] hover:border-[#CBD5E1]'
             }`}
           >
-            <div className="flex items-center gap-1.5 overflow-hidden flex-1 mr-2">
+            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar flex-1 min-w-0 mr-1.5">
               {selectedCountries.length === 0 ? (
-                <span className="text-xs text-[#98A2B3] italic">Select Country...</span>
+                <span className="text-xs text-[#98A2B3] italic pl-1">Select Country...</span>
               ) : (
                 <>
                   {selectedCountries.slice(0, 2).map(c => (
                     <span 
                       key={c}
-                      className="bg-[#F0F3F4] text-[#212B36] text-[11px] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1 shrink-0"
+                      className="bg-[#F0F3F4] text-[#212B36] text-[12px] font-medium h-[22px] px-2 rounded-full inline-flex items-center gap-1 shrink-0 select-none"
                     >
-                      <span>{c}</span>
+                      <span className="whitespace-nowrap">{c}</span>
                       <button 
                         type="button"
                         onClick={(e) => removeCountry(c, e)}
-                        className="text-[#98A2B3] hover:text-[#475467] cursor-pointer"
+                        className="text-[#919EAB] hover:text-[#475467] cursor-pointer"
                       >
-                        <X className="w-2.5 h-2.5" />
+                        <X className="w-3 h-3" />
                       </button>
                     </span>
                   ))}
                   {selectedCountries.length > 2 && (
-                    <span className="bg-[#F0F3F4] text-[#212B36] text-[11px] italic font-medium px-1.5 py-0.5 rounded-full shrink-0">
+                    <span className="bg-[#F0F3F4] text-[#212B36] text-[12px] italic font-medium h-[22px] px-2 rounded-full inline-flex items-center shrink-0">
                       +{selectedCountries.length - 2}
                     </span>
                   )}
@@ -413,7 +413,7 @@ export const OpportunitiesFeed: React.FC = () => {
               )}
             </div>
 
-            <ChevronDown className={`w-4 h-4 text-[#98A2B3] shrink-0 transition-transform ${isCountryOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-3.5 h-3.5 text-[#667085] shrink-0 transition-transform ${isCountryOpen ? 'rotate-180' : ''}`} />
           </div>
 
           {isCountryOpen && (
@@ -453,38 +453,38 @@ export const OpportunitiesFeed: React.FC = () => {
 
         {/* 4. ACCEPTANCE & FUNDING FILTER FIELD */}
         <div ref={fundingRef} className="relative">
-          <span className="absolute -top-2 left-3 bg-white px-1.5 text-[11px] italic font-normal text-[#90A0B9] z-10 pointer-events-none select-none">
-            Acceptance & Funding
+          <span className="absolute -top-[9px] left-2.5 bg-white px-1 text-[11px] italic font-normal text-[#90A0B9] z-10 pointer-events-none select-none">
+            Acceptance &amp; Funding
           </span>
 
           <div 
             onClick={() => setIsFundingOpen(prev => !prev)}
-            className={`w-full h-12 bg-white rounded-xl border px-3 flex items-center justify-between cursor-pointer transition-all shadow-2xs ${
+            className={`w-full h-12 bg-white rounded-lg border px-2 py-1 flex items-center justify-between cursor-pointer transition-all ${
               isFundingOpen ? 'border-[#7150E7] ring-2 ring-[#EDE9FC]' : 'border-[#E1E7F0] hover:border-[#CBD5E1]'
             }`}
           >
-            <div className="flex items-center gap-1.5 overflow-hidden flex-1 mr-2">
+            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar flex-1 min-w-0 mr-1.5">
               {selectedFunding.length === 0 ? (
-                <span className="text-xs text-[#98A2B3] italic">Select Criteria...</span>
+                <span className="text-xs text-[#98A2B3] italic pl-1">Select Criteria...</span>
               ) : (
                 <>
                   {selectedFunding.slice(0, 1).map(f => (
                     <span 
                       key={f}
-                      className="bg-[#F0F3F4] text-[#212B36] text-[11px] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1 shrink-0"
+                      className="bg-[#F0F3F4] text-[#212B36] text-[12px] font-medium h-[22px] px-2 rounded-full inline-flex items-center gap-1 shrink-0 select-none"
                     >
-                      <span className="max-w-[105px] truncate">{f}</span>
+                      <span className="whitespace-nowrap">{f}</span>
                       <button 
                         type="button"
                         onClick={(e) => removeFunding(f, e)}
-                        className="text-[#98A2B3] hover:text-[#475467] cursor-pointer"
+                        className="text-[#919EAB] hover:text-[#475467] cursor-pointer"
                       >
-                        <X className="w-2.5 h-2.5" />
+                        <X className="w-3 h-3" />
                       </button>
                     </span>
                   ))}
                   {selectedFunding.length > 1 && (
-                    <span className="bg-[#F0F3F4] text-[#212B36] text-[11px] italic font-medium px-1.5 py-0.5 rounded-full shrink-0">
+                    <span className="bg-[#F0F3F4] text-[#212B36] text-[12px] italic font-medium h-[22px] px-2 rounded-full inline-flex items-center shrink-0">
                       +{selectedFunding.length - 1}
                     </span>
                   )}
@@ -492,7 +492,7 @@ export const OpportunitiesFeed: React.FC = () => {
               )}
             </div>
 
-            <ChevronDown className={`w-4 h-4 text-[#98A2B3] shrink-0 transition-transform ${isFundingOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-3.5 h-3.5 text-[#667085] shrink-0 transition-transform ${isFundingOpen ? 'rotate-180' : ''}`} />
           </div>
 
           {isFundingOpen && (
@@ -533,7 +533,7 @@ export const OpportunitiesFeed: React.FC = () => {
             </span>
           </div>
           <p className="text-xs text-[#667085] mt-0.5">
-            Safe-Bet Universities with Guaranteed Funding & Assistantships
+            Safe-Bet Universities with Guaranteed Funding &amp; Assistantships
           </p>
         </div>
 
@@ -552,7 +552,7 @@ export const OpportunitiesFeed: React.FC = () => {
               onClick={() => setViewMode('grid')}
               className={`p-1 rounded-md text-xs transition-colors cursor-pointer ${
                 viewMode === 'grid' 
-                  ? 'bg-[#EDE9FC] text-[#6941C6]' 
+                  ? 'bg-[#F4F3FE] text-[#7150E7]' 
                   : 'text-[#98A2B3] hover:text-[#344054]'
               }`}
               title="Grid View"
@@ -564,7 +564,7 @@ export const OpportunitiesFeed: React.FC = () => {
               onClick={() => setViewMode('list')}
               className={`p-1 rounded-md text-xs transition-colors cursor-pointer ${
                 viewMode === 'list' 
-                  ? 'bg-[#EDE9FC] text-[#6941C6]' 
+                  ? 'bg-[#F4F3FE] text-[#7150E7]' 
                   : 'text-[#98A2B3] hover:text-[#344054]'
               }`}
               title="List View"
@@ -574,55 +574,6 @@ export const OpportunitiesFeed: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* Active Filter Tags Row (if any filter active) */}
-      {(selectedSubjects.length > 0 || selectedDegrees.length > 0 || selectedCountries.length > 0 || selectedFunding.length > 0 || globalSearchQuery.trim()) && (
-        <div className="flex flex-wrap items-center gap-2 pt-0.5">
-          <span className="text-xs text-[#667085] font-medium">Active Filters:</span>
-          
-          {selectedSubjects.map(s => (
-            <span key={s} className="bg-slate-100 text-slate-700 text-xs px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
-              <span>{s}</span>
-              <button type="button" onClick={(e) => removeSubject(s, e)} className="hover:text-red-500 cursor-pointer">
-                <X className="w-2.5 h-2.5" />
-              </button>
-            </span>
-          ))}
-
-          {selectedDegrees.map(d => (
-            <span key={d} className="bg-purple-50 text-purple-700 text-xs px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
-              <span>{d}</span>
-              <button type="button" onClick={(e) => removeDegree(d, e)} className="hover:text-red-500 cursor-pointer">
-                <X className="w-2.5 h-2.5" />
-              </button>
-            </span>
-          ))}
-
-          {selectedCountries.map(c => (
-            <span key={c} className="bg-emerald-50 text-emerald-700 text-xs px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
-              <span>{c}</span>
-              <button type="button" onClick={(e) => removeCountry(c, e)} className="hover:text-red-500 cursor-pointer">
-                <X className="w-2.5 h-2.5" />
-              </button>
-            </span>
-          ))}
-
-          {globalSearchQuery.trim() && (
-            <span className="bg-amber-50 text-amber-800 text-xs px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
-              <span>Search: &ldquo;{globalSearchQuery}&rdquo;</span>
-            </span>
-          )}
-
-          <button
-            type="button"
-            onClick={resetAllFilters}
-            className="text-xs text-[#6941C6] hover:underline font-semibold ml-1 inline-flex items-center gap-1 cursor-pointer"
-          >
-            <RotateCcw className="w-3 h-3" />
-            <span>Reset All</span>
-          </button>
-        </div>
-      )}
 
       {/* Grid or List of Opportunity Cards (Populated from System Data) */}
       {filteredOpportunities.length === 0 ? (

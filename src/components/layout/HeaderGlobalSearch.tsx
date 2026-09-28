@@ -170,14 +170,14 @@ export const HeaderGlobalSearch: React.FC<HeaderGlobalSearchProps> = ({
   };
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-[520px]">
-      {/* Search Input matching Figma Node 96:6267 Frame 2147226745 */}
+    <div ref={containerRef} className="relative w-full">
+      {/* Search Input matching Figma Node 122:3166 Frame 2147226771 */}
       <div 
-        className={`w-full h-11 bg-white rounded-full border transition-all flex items-center justify-between px-4 shadow-2xs ${
-          isOpen ? 'border-[#7150E7] ring-2 ring-purple-100' : 'border-[#D0D5DD] hover:border-[#7150E7]'
+        className={`w-full h-11 bg-[#F7F7F7] rounded-lg transition-all flex items-center justify-between px-3.5 ${
+          isOpen ? 'ring-2 ring-[#7150E7]/20 bg-white border border-[#7150E7]' : 'border-none'
         }`}
       >
-        <div className="flex items-center gap-2 flex-1 min-w-0 mr-2">
+        <div className="flex items-center gap-2.5 flex-1 min-w-0 mr-2">
           <Search className="w-4 h-4 text-[#90A1B9] shrink-0" />
           <input
             type="text"
@@ -193,23 +193,18 @@ export const HeaderGlobalSearch: React.FC<HeaderGlobalSearchProps> = ({
           />
         </div>
 
-        <div className="flex items-center gap-1.5 shrink-0">
-          {globalSearchQuery && (
-            <button
-              type="button"
-              onClick={() => {
-                setGlobalSearchQuery('');
-                setIsOpen(false);
-              }}
-              className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
-          <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-semibold text-slate-400 bg-slate-100 rounded border border-slate-200">
-            ⌘K
-          </kbd>
-        </div>
+        {globalSearchQuery && (
+          <button
+            type="button"
+            onClick={() => {
+              setGlobalSearchQuery('');
+              setIsOpen(false);
+            }}
+            className="p-1 text-[#90A1B9] hover:text-[#475467] cursor-pointer shrink-0"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        )}
       </div>
 
       {/* Intelligent Semantic Autocomplete Dropdown Modal */}

@@ -160,9 +160,9 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({ opportunity })
           </div>
         </div>
 
-        {/* Mint Green Acceptance Badge (Figma Node 116:2531) */}
-        <div className="mt-3.5 mb-3.5 bg-[#ECFDF3] border border-[#D1FADF] rounded-lg py-1.5 px-3 text-center">
-          <span className="text-xs font-semibold text-[#027A48] tracking-tight">
+        {/* Mint Green Acceptance Badge (Figma Frame 2147226703) */}
+        <div className="mt-3 mb-3">
+          <span className="bg-[#ECFDF5] border border-[#A7F3D0] text-[#009966] text-[11px] font-semibold px-3 py-1 rounded-full inline-block select-none">
             {rankText} • High Acceptance ({acceptancePercent})
           </span>
         </div>
@@ -172,43 +172,49 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({ opportunity })
         {/* Bottom Separator Line */}
         <hr className="border-[#F2F4F7] mb-3" />
 
-        {/* Footer Action Buttons Row (Figma Node 116:2535) */}
-        <div className="flex items-center gap-2">
+        {/* Footer Action Buttons Row (Figma Frame 2147226704) */}
+        <div className="flex items-center gap-3">
           {/* Bookmark Button */}
           <button
             type="button"
             onClick={handleBookmarkToggle}
-            className={`w-9 h-9 rounded-xl border flex items-center justify-center transition-all cursor-pointer shrink-0 ${
+            className={`w-10 h-10 rounded-full border border-[#EAECF0] flex items-center justify-center transition-all cursor-pointer shrink-0 ${
               isSaved 
-                ? 'bg-[#EDE9FE] border-[#D6BBFB] text-[#6941C6]' 
-                : 'bg-white hover:bg-slate-50 border-[#EAECF0] text-[#667085] hover:text-[#101828]'
+                ? 'bg-[#EDE9FE] border-[#D6BBFB] text-[#7050E6]' 
+                : 'bg-white hover:bg-slate-50 text-[#98A2B3] hover:text-[#7050E6]'
             }`}
             title={isSaved ? 'Saved to Wishlist' : 'Save to Wishlist'}
           >
-            <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-[#6941C6] text-[#6941C6]' : ''}`} />
+            <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-[#7050E6] text-[#7050E6]' : ''}`} />
           </button>
 
-          {/* Official Link Button */}
-          <button
-            type="button"
-            onClick={handleOfficialLink}
-            className="flex-1 h-9 px-3 rounded-xl border border-[#7150E7] text-[#7150E7] hover:bg-[#F9F5FF] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-            title="Open official university / program link"
-          >
-            <span>Official Link</span>
-            <ArrowUpRight className="w-3.5 h-3.5 text-[#7150E7]" />
-          </button>
+          {/* Vertical Divider */}
+          <div className="h-4 w-[1px] bg-[#D9D9D9] shrink-0" />
 
-          {/* See Details Button */}
-          <button
-            type="button"
-            onClick={handleSeeDetails}
-            className="flex-1 h-9 px-3 rounded-xl bg-[#6941C6] hover:bg-[#5925DC] text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
-            title="See details & prepare outreach email"
-          >
-            <span>See Details</span>
-            <ChevronRight className="w-3.5 h-3.5 text-white" />
-          </button>
+          {/* Official Link & See Details Button Group */}
+          <div className="flex items-center gap-2.5 flex-1">
+            {/* Official Link Button */}
+            <button
+              type="button"
+              onClick={handleOfficialLink}
+              className="flex-1 h-10 px-3 rounded-full border border-[#7050E6] bg-[#F8FAFC] hover:bg-slate-100 text-[#7050E6] text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+              title="Open official university / program link"
+            >
+              <span>Official Link</span>
+              <ArrowUpRight className="w-3.5 h-3.5 text-[#7050E6]" />
+            </button>
+
+            {/* See Details Button */}
+            <button
+              type="button"
+              onClick={handleSeeDetails}
+              className="flex-1 h-10 px-3 rounded-full bg-[#7050E6] hover:bg-[#5E3CD4] text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer"
+              title="See details & prepare outreach email"
+            >
+              <span>See Details</span>
+              <ChevronRight className="w-3.5 h-3.5 text-white" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

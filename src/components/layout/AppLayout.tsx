@@ -257,9 +257,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                 className="w-9 h-9 rounded-full object-cover shrink-0 border border-[#EAECF0]"
               />
               <div className="min-w-0 text-left">
-                <div className="text-xs font-semibold text-[#101828] leading-tight truncate">{profile.name || 'User'}</div>
+                <div className="text-xs font-semibold text-[#101828] leading-tight truncate">{profile.name || 'Alex Mercer'}</div>
                 <div className="text-[11px] text-[#64748B] leading-tight mt-0.5 truncate">
-                  {profile.degreeLevel || 'Masters'} • {profile.specializations?.[0] || 'Scholar'}
+                  {profile.degreeLevel || 'Masters'} • {profile.specializations?.[0] || 'UX & HCI'}
                 </div>
               </div>
             </div>
@@ -280,53 +280,51 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         
-        {/* Figma Header (HighScholar | Global Scholarship & Professor Finder Portal) */}
-        <header className="sticky top-0 z-40 h-16 bg-white/95 backdrop-blur-md border-b border-[#eaecf0] px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setIsSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100"
-            >
-              <HugeiconsIcon icon={Menu01Icon} size={20} />
-            </button>
+        {/* Figma Header matching Node 122:3164 (Header - HighScholar | Global Scholarship & Professor Finder Portal) */}
+        <header className="sticky top-0 z-40 h-[72px] bg-white/95 backdrop-blur-md border-b border-[#EAECF0] px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-5">
+          {/* Mobile Menu Toggle */}
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 shrink-0"
+          >
+            <HugeiconsIcon icon={Menu01Icon} size={20} />
+          </button>
 
-            {/* Breadcrumb path matching Figma Node 89:4385 */}
-            <div className="flex items-center gap-1.5 text-xs shrink-0">
-              <span className="text-[#667085] font-medium">HighScholar</span>
-              <ChevronRight className="w-3.5 h-3.5 text-[#CBD5E1]" />
-              <span className="font-bold italic text-[#101828]">
-                {activeTab === 'opportunities' ? 'Opportunity Feed' : 
-                 activeTab === 'scholarships' ? 'Scholarship Radar' : 
-                 activeTab === 'professors' ? 'Faculty & Research Labs' : 
-                 activeTab === 'research' ? 'Research Paper' : 
-                 activeTab === 'tracker' ? 'Applications & Outreach' : 'Opportunity Feed'}
-              </span>
-            </div>
-          </div>
-
-          {/* Center: Global Omnisearch matching Figma Node 96:6267 Frame 2147226745 */}
-          <div className="hidden md:flex flex-1 items-center justify-center px-4 max-w-[540px]">
+          {/* Global Omnisearch matching Figma Node 122:3165 Frame 2147226771 */}
+          <div className="flex-1 min-w-0">
             <HeaderGlobalSearch
               onNavigateToTab={(tab) => setActiveTab(tab)}
             />
           </div>
 
-          {/* Right: User Profile Pill matching Figma Node 89:4385 exactly */}
-          <div className="flex items-center gap-3">
-            <div ref={profileMenuRef} className="relative">
-              <button
-                type="button"
-                onClick={() => setIsProfileMenuOpen((prev) => !prev)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-[#F8FAFC] hover:bg-[#F1F5F9] rounded-full border border-[#EAECF0] transition-colors cursor-pointer shadow-2xs"
-                title="User Profile"
-              >
+          {/* Right: User Profile matching Figma Node 122:3174 Frame 2147226782 */}
+          <div ref={profileMenuRef} className="relative shrink-0">
+            <button
+              type="button"
+              onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+              className="flex items-center gap-2.5 p-1 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer text-left"
+              title="User Profile"
+            >
+              {/* 32x32 Avatar with Green Online Status Dot */}
+              <div className="relative shrink-0">
                 <img
                   src={profile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80'}
                   alt={profile.name || 'User'}
-                  className="w-7 h-7 rounded-full object-cover border border-[#EAECF0]"
+                  className="w-8 h-8 rounded-full object-cover border border-[#F4F6F8]"
                 />
-                <span className="text-xs font-bold text-[#101828] max-w-[120px] truncate">{profile.name || 'User'}</span>
-              </button>
+                <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-[#36B37E] ring-1.5 ring-white" />
+              </div>
+
+              {/* User Name & Degree Subtitle matching Figma 122:3181 */}
+              <div className="hidden sm:flex flex-col text-left">
+                <span className="text-xs font-bold text-[#101828] leading-tight">
+                  {profile.name || 'Ingrid Bergman'}
+                </span>
+                <span className="text-xs italic text-[#90A1B9] leading-tight mt-0.5">
+                  {profile.degreeLevel || 'Masters'} • {profile.specializations?.[0] || 'UX & HCI'}
+                </span>
+              </div>
+            </button>
 
                 {/* Profile Small Modal (Figma Node 49-648 - Compact) */}
                 {isProfileMenuOpen && (
@@ -409,7 +407,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                   </div>
                 )}
               </div>
-            </div>
         </header>
 
         {/* Dynamic Page Content */}
