@@ -23,13 +23,17 @@ import {
   ChevronUp,
   FileText,
   CheckCircle2,
-  Share2
+  Share2,
+  LayoutGrid,
+  List,
+  Check
 } from 'lucide-react';
 
 export const ResearchPapersView: React.FC = () => {
   const { savedPaperIds, toggleSavePaper, isPaperSaved } = useApp();
 
   const [papers, setPapers] = useState<ResearchPaper[]>(initialResearchPapers);
+  const [viewLayout, setViewLayout] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDiscipline, setSelectedDiscipline] = useState<'ALL' | 'UX' | 'AI' | 'Biotech' | 'Robotics' | 'Economics'>('ALL');
   const [openAccessOnly, setOpenAccessOnly] = useState(false);
@@ -152,191 +156,200 @@ export const ResearchPapersView: React.FC = () => {
   return (
     <div className="space-y-6">
       
-      {/* Hero Banner Header */}
-      <div className="bg-white rounded-2xl border border-[#EAECF0] shadow-2xs relative z-20">
+      {/* FIGMA NODE 102:265 - Unified Research Papers Header & Filter Hero Card */}
+      <div className="bg-white rounded-3xl border border-[#EAECF0] shadow-sm relative z-10 mb-6 overflow-hidden">
+        {/* Top White Section matching Figma Node 102:266 */}
         <div className="p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2.5">
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#EDE9FC] text-[#7150E7] inline-flex items-center gap-1.5">
-                <BookOpen className="w-3.5 h-3.5 text-[#7150E7]" />
-                <span>Scholar Research Explorer</span>
-              </span>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                250M+ Works Indexed
-              </span>
-            </div>
-
-            <h1 className="text-2xl sm:text-[28px] font-bold text-[#101828] tracking-tight">
-              Global Research Papers & AI Assistant Hub
+          <div className="space-y-1">
+            <h1 className="text-xl sm:text-2xl lg:text-[26px] font-bold text-[#101828] tracking-tight">
+              Global Research Papers &amp; AI Assistant Hub
             </h1>
-            <p className="text-xs sm:text-sm text-[#475467] mt-1 max-w-2xl">
+            <p className="text-xs sm:text-sm text-[#475467] font-normal">
               Search papers across major disciplines, download full-text PDFs, export citations, and query our AI Assistant to break down complex papers.
             </p>
           </div>
 
-          {/* AI Bot Quick Launch CTA */}
-          {papers.length > 0 && (
-            <button
-              type="button"
-              onClick={() => handleOpenBot(papers[0])}
-              className="h-11 px-5 rounded-full bg-gradient-to-r from-[#7150E7] via-purple-600 to-[#5b38d6] hover:from-[#5e3cd4] hover:to-purple-700 text-white font-semibold text-xs sm:text-sm shadow-md shadow-purple-200 inline-flex items-center gap-2.5 transition-all cursor-pointer shrink-0"
-            >
-              <Bot className="w-4 h-4 text-amber-300" />
-              <span>Launch AI Research Bot</span>
-            </button>
-          )}
-        </div>
-
-        {/* Filter Section */}
-        <div className="bg-[#EDE9FC] px-6 sm:px-7 py-5 border-t border-[#E4DEF7] rounded-b-2xl space-y-4">
-          
-          {/* Row 1: Search Input & Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-            <div className="relative flex-1">
-              <Search className="w-4 h-4 text-[#98A2B3] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search papers by title, author, keyword, DOI, or abstract (e.g. UX Design, Transformers, CRISPR, HCI)..."
-                className="w-full h-10 bg-white border-0 focus:ring-2 focus:ring-[#7150E7] text-[#101828] text-xs sm:text-sm rounded-full pl-10 pr-4 placeholder:text-[#98A2B3] placeholder:italic shadow-2xs focus:outline-hidden transition-all"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-[#98A2B3] hover:text-[#344054] cursor-pointer"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
+          <div className="flex flex-col items-end justify-center gap-2.5 shrink-0">
+            {/* Grid / List View Toggle */}
+            <div className="flex items-center p-1 bg-white border border-[#D0D5DD] rounded-full shadow-2xs">
+              <button
+                type="button"
+                onClick={() => setViewLayout('grid')}
+                className={`p-1.5 rounded-full transition-all cursor-pointer ${
+                  viewLayout === 'grid' 
+                    ? 'bg-[#F4F3FE] text-[#7150E7]' 
+                    : 'text-[#98A2B3] hover:text-[#475467]'
+                }`}
+                title="Grid View"
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewLayout('list')}
+                className={`p-1.5 rounded-full transition-all cursor-pointer ${
+                  viewLayout === 'list' 
+                    ? 'bg-[#F4F3FE] text-[#7150E7]' 
+                    : 'text-[#98A2B3] hover:text-[#475467]'
+                }`}
+                title="List View"
+              >
+                <List className="w-4 h-4" />
+              </button>
             </div>
 
-            {/* Live OpenAlex Search Button */}
-            <button
-              onClick={handleLiveSearch}
-              disabled={isSearchingLive}
-              className="h-10 px-4 rounded-full text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-all cursor-pointer inline-flex items-center gap-2 disabled:opacity-60 shrink-0"
-            >
-              {isSearchingLive ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Globe2 className="w-4 h-4" />
-              )}
-              <span>{isSearchingLive ? 'Searching...' : '🌐 Search Live DB'}</span>
-            </button>
+            {/* Live Indicator matching Figma */}
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-[#027A48]">
+              <span className="w-2 h-2 rounded-full bg-[#12B76A] animate-pulse" />
+              <span>Curated Papers &amp; AI Bot</span>
+            </div>
           </div>
+        </div>
 
-          {/* Row 2: Discipline Filter Chips & Saved Tabs */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                onClick={() => setSelectedDiscipline('ALL')}
-                className={`h-8 px-4 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                  selectedDiscipline === 'ALL'
-                    ? 'bg-[#6941C6] text-white shadow-xs'
-                    : 'bg-white text-[#344054] hover:bg-slate-50 font-medium shadow-2xs'
-                }`}
-              >
-                ALL
-              </button>
+        {/* Bottom Lavender Filter Section matching Figma Node 102:292 */}
+        <div className="bg-[#EDE9FC] px-5 sm:px-7 py-3.5 sm:py-4 border-t border-[#E4DEF7] rounded-b-3xl">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            
+            {/* Left Controls: Integrated Search + Category Filter Pills */}
+            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+              
+              {/* Integrated Left Composite Search Input: Joined ALL Button + Search Box */}
+              <div className="inline-flex items-center shadow-2xs">
+                {/* ALL Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedDiscipline('ALL');
+                    setActiveTab('all');
+                  }}
+                  className={`h-9 px-3.5 rounded-l-full text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center justify-center ${
+                    selectedDiscipline === 'ALL' && activeTab === 'all'
+                      ? 'bg-[#6941C6] text-white'
+                      : 'bg-[#5b36ad] hover:bg-[#6941C6] text-white/90'
+                  }`}
+                >
+                  ALL
+                </button>
 
+                {/* Input connected with rounded right */}
+                <div className="relative flex items-center">
+                  <Search className="w-3.5 h-3.5 text-[#98A2B3] absolute left-3 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        handleLiveSearch();
+                      }
+                    }}
+                    placeholder="Search /Select papers by title, author..."
+                    className="h-9 bg-white border border-[#D0D5DD] border-l-0 focus:border-[#7150E7] focus:ring-1 focus:ring-[#7150E7] text-[#101828] text-xs rounded-r-full pl-8 pr-7 placeholder:text-[#98A2B3] placeholder:italic shadow-2xs focus:outline-hidden transition-all w-48 sm:w-64"
+                  />
+                  {searchQuery ? (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-2.5 text-[#98A2B3] hover:text-[#344054] cursor-pointer"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  ) : (
+                    <ChevronDown className="w-3.5 h-3.5 text-[#98A2B3] absolute right-2.5 pointer-events-none" />
+                  )}
+                </div>
+              </div>
+
+              {/* Category Pills matching image */}
               <button
+                type="button"
                 onClick={() => setSelectedDiscipline(selectedDiscipline === 'UX' ? 'ALL' : 'UX')}
-                className={`h-8 px-3.5 rounded-full text-xs transition-all cursor-pointer inline-flex items-center gap-1.5 ${
+                className={`h-9 px-3.5 rounded-full text-xs font-medium transition-all cursor-pointer inline-flex items-center gap-1.5 shadow-2xs ${
                   selectedDiscipline === 'UX'
                     ? 'bg-[#6941C6] text-white font-semibold shadow-xs ring-2 ring-purple-300'
-                    : 'bg-white text-[#344054] hover:bg-purple-50 font-medium shadow-2xs'
+                    : 'bg-white text-[#344054] hover:bg-slate-50 border border-transparent'
                 }`}
               >
-                <span>🎨 UX & HCI</span>
+                <span>🎨 UX &amp; HCI</span>
               </button>
 
               <button
+                type="button"
                 onClick={() => setSelectedDiscipline(selectedDiscipline === 'AI' ? 'ALL' : 'AI')}
-                className={`h-8 px-3.5 rounded-full text-xs transition-all cursor-pointer inline-flex items-center gap-1.5 ${
+                className={`h-9 px-3.5 rounded-full text-xs font-medium transition-all cursor-pointer inline-flex items-center gap-1.5 shadow-2xs ${
                   selectedDiscipline === 'AI'
                     ? 'bg-[#6941C6] text-white font-semibold shadow-xs ring-2 ring-purple-300'
-                    : 'bg-white text-[#344054] hover:bg-purple-50 font-medium shadow-2xs'
+                    : 'bg-white text-[#344054] hover:bg-slate-50 border border-transparent'
                 }`}
               >
-                <span>🤖 AI & ML</span>
+                <span>🤖 AI &amp; ML</span>
               </button>
 
               <button
+                type="button"
                 onClick={() => setSelectedDiscipline(selectedDiscipline === 'Biotech' ? 'ALL' : 'Biotech')}
-                className={`h-8 px-3.5 rounded-full text-xs transition-all cursor-pointer inline-flex items-center gap-1.5 ${
+                className={`h-9 px-3.5 rounded-full text-xs font-medium transition-all cursor-pointer inline-flex items-center gap-1.5 shadow-2xs ${
                   selectedDiscipline === 'Biotech'
                     ? 'bg-[#6941C6] text-white font-semibold shadow-xs ring-2 ring-purple-300'
-                    : 'bg-white text-[#344054] hover:bg-purple-50 font-medium shadow-2xs'
+                    : 'bg-white text-[#344054] hover:bg-slate-50 border border-transparent'
                 }`}
               >
                 <span>🧬 Biotech</span>
               </button>
 
               <button
+                type="button"
                 onClick={() => setSelectedDiscipline(selectedDiscipline === 'Robotics' ? 'ALL' : 'Robotics')}
-                className={`h-8 px-3.5 rounded-full text-xs transition-all cursor-pointer inline-flex items-center gap-1.5 ${
+                className={`h-9 px-3.5 rounded-full text-xs font-medium transition-all cursor-pointer inline-flex items-center gap-1.5 shadow-2xs ${
                   selectedDiscipline === 'Robotics'
                     ? 'bg-[#6941C6] text-white font-semibold shadow-xs ring-2 ring-purple-300'
-                    : 'bg-white text-[#344054] hover:bg-purple-50 font-medium shadow-2xs'
+                    : 'bg-white text-[#344054] hover:bg-slate-50 border border-transparent'
                 }`}
               >
                 <span>⚡ Robotics</span>
               </button>
 
               <button
+                type="button"
                 onClick={() => setSelectedDiscipline(selectedDiscipline === 'Economics' ? 'ALL' : 'Economics')}
-                className={`h-8 px-3.5 rounded-full text-xs transition-all cursor-pointer inline-flex items-center gap-1.5 ${
+                className={`h-9 px-3.5 rounded-full text-xs font-medium transition-all cursor-pointer inline-flex items-center gap-1.5 shadow-2xs ${
                   selectedDiscipline === 'Economics'
                     ? 'bg-[#6941C6] text-white font-semibold shadow-xs ring-2 ring-purple-300'
-                    : 'bg-white text-[#344054] hover:bg-purple-50 font-medium shadow-2xs'
+                    : 'bg-white text-[#344054] hover:bg-slate-50 border border-transparent'
                 }`}
               >
                 <span>📈 Economics</span>
               </button>
 
-              {/* Open access filter toggle */}
-              <button
-                onClick={() => setOpenAccessOnly(!openAccessOnly)}
-                className={`h-8 px-3.5 rounded-full text-xs font-medium transition-all cursor-pointer inline-flex items-center gap-1.5 ${
-                  openAccessOnly
-                    ? 'bg-emerald-700 text-white shadow-xs font-bold'
-                    : 'bg-white text-slate-700 hover:bg-slate-50 shadow-2xs'
-                }`}
-              >
-                <Download className="w-3.5 h-3.5 text-emerald-400" />
-                <span>PDF Downloadable Only</span>
-              </button>
             </div>
 
-            {/* Saved Library Toggle Pill */}
-            <div className="flex items-center gap-1 p-1 bg-white rounded-full border border-slate-200 shadow-2xs">
+            {/* Right Controls: Divider + Saved Library Pill */}
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <div className="h-6 w-px bg-[#D0D5DD] hidden sm:block" />
+
+              {/* Saved Library Pill matching screenshot */}
               <button
-                onClick={() => setActiveTab('all')}
-                className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                  activeTab === 'all'
-                    ? 'bg-[#7150E7] text-white shadow-2xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                All Papers ({papers.length})
-              </button>
-              <button
-                onClick={() => setActiveTab('saved')}
-                className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer inline-flex items-center gap-1.5 ${
+                type="button"
+                onClick={() => setActiveTab(activeTab === 'saved' ? 'all' : 'saved')}
+                className={`h-9 px-3.5 rounded-full text-xs font-medium transition-all cursor-pointer inline-flex items-center gap-2 shadow-2xs ${
                   activeTab === 'saved'
-                    ? 'bg-[#7150E7] text-white shadow-2xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-[#6941C6] text-white font-semibold shadow-xs ring-2 ring-purple-300'
+                    : 'bg-white text-[#344054] hover:bg-slate-50 border border-transparent'
                 }`}
               >
-                <BookmarkCheck className="w-3.5 h-3.5" />
+                <span className={`w-3.5 h-3.5 rounded-xs border flex items-center justify-center transition-colors ${
+                  activeTab === 'saved' ? 'border-white bg-white/20' : 'border-[#98A2B3]'
+                }`}>
+                  {activeTab === 'saved' && <Check className="w-2.5 h-2.5 text-white stroke-[3]" />}
+                </span>
                 <span>Saved Library ({savedPaperIds.length})</span>
               </button>
             </div>
+
           </div>
 
           {liveSearchError && (
-            <div className="text-xs bg-rose-50 text-rose-700 border border-rose-200 rounded-xl px-4 py-2">
+            <div className="text-xs bg-rose-50 text-rose-700 border border-rose-200 rounded-xl px-4 py-2 mt-2">
               {liveSearchError}
             </div>
           )}
@@ -363,7 +376,7 @@ export const ResearchPapersView: React.FC = () => {
             <span>Reset All Filters</span>
           </button>
         </div>
-      ) : (
+      ) : viewLayout === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {filteredPapers.map((paper) => {
             const isSaved = isPaperSaved(paper.id);
@@ -505,6 +518,93 @@ export const ResearchPapersView: React.FC = () => {
                   </button>
                 </div>
 
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="bg-white border border-[#EAECF0] rounded-2xl overflow-hidden divide-y divide-[#F2F4F7] shadow-xs">
+          {filteredPapers.map((paper) => {
+            const isSaved = isPaperSaved(paper.id);
+            return (
+              <div
+                key={paper.id}
+                className="p-4 sm:p-5 hover:bg-slate-50/70 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4 group"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#EDE9FC] text-[#7150E7]">
+                      {paper.venue} ({paper.year})
+                    </span>
+                    {paper.isOpenAccess && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                        <span>Open Access</span>
+                      </span>
+                    )}
+                    <span className="text-[11px] font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md">
+                      📊 {paper.citationCount.toLocaleString()} Citations
+                    </span>
+                  </div>
+
+                  <h3 className="text-sm sm:text-base font-bold text-slate-900 group-hover:text-[#7150E7] transition-colors leading-snug">
+                    {paper.title}
+                  </h3>
+
+                  <div className="text-xs text-slate-500 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <span className="font-medium text-slate-400">Authors:</span>
+                    {paper.authors.map((author, aIdx) => (
+                      <span key={aIdx} className="text-slate-700">
+                        {author.name}
+                        {aIdx < paper.authors.length - 1 && <span className="text-slate-300 ml-1.5">•</span>}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  {paper.pdfUrl ? (
+                    <a
+                      href={paper.pdfUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-2xs inline-flex items-center gap-1.5 transition-all cursor-pointer"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>PDF</span>
+                    </a>
+                  ) : (
+                    <a
+                      href={paper.googleScholarUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="h-8 px-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs inline-flex items-center gap-1 transition-all"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Find PDF</span>
+                    </a>
+                  )}
+
+                  <button
+                    onClick={() => handleOpenBot(paper)}
+                    className="h-8 px-3 rounded-lg bg-[#EDE9FC] hover:bg-[#7150E7] text-[#7150E7] hover:text-white font-semibold text-xs inline-flex items-center gap-1.5 transition-all cursor-pointer border border-[#DDD7FA]"
+                  >
+                    <Bot className="w-3.5 h-3.5" />
+                    <span>AI Bot</span>
+                  </button>
+
+                  <button
+                    onClick={() => toggleSavePaper(paper.id)}
+                    className={`p-2 rounded-lg transition-all cursor-pointer ${
+                      isSaved
+                        ? 'bg-[#7150E7] text-white shadow-2xs'
+                        : 'bg-slate-100 text-slate-400 hover:text-[#7150E7] hover:bg-[#EDE9FC]'
+                    }`}
+                    title={isSaved ? 'Remove from Saved' : 'Save Paper'}
+                  >
+                    {isSaved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
             );
           })}

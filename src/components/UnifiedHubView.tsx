@@ -955,7 +955,8 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
     <div className="space-y-6 pb-12 animate-in fade-in duration-300">
       
       {/* FIGMA NODE 60-798: Unified Discovery Hero Card with Integrated Category Tabs */}
-      <div className="bg-white rounded-3xl border border-[#EAECF0] shadow-sm relative z-10 mb-6">
+      {activeSection !== 'research_papers' && (
+        <div className="bg-white rounded-3xl border border-[#EAECF0] shadow-sm relative z-10 mb-6">
         
         {/* Top White Section */}
         <div className="p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-t-3xl">
@@ -1087,6 +1088,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
 
         </div>
       </div>
+      )}
 
       {/* 3. UNIFIED SECTION 1: SAFE REGIONAL UNIVERSITIES (RANK 1,000 – 5,000+) matching Figma Node 89:4385 */}
       {(activeSection === 'all' || activeSection === 'safe_unis') && safeUniversities.length > 0 && (
