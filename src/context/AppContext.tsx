@@ -42,18 +42,26 @@ interface AppContextType {
   lastSyncedAt: string | null;
   syncLiveOpportunities: (tag?: string) => Promise<{ count: number; newFound: number }>;
   importOpportunityManual: (data: any) => Promise<HiringOpportunity>;
+  savedPaperIds: string[];
+  toggleSavePaper: (paperId: string) => void;
+  isPaperSaved: (paperId: string) => boolean;
+  globalSearchQuery: string;
+  setGlobalSearchQuery: (q: string) => void;
+  activeNavTab: 'opportunities' | 'scholarships' | 'professors' | 'research' | 'tracker' | 'profile';
+  setActiveNavTab: (tab: 'opportunities' | 'scholarships' | 'professors' | 'research' | 'tracker' | 'profile') => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const STORAGE_KEYS = {
   PROFILE: 'highscholar_profile_v2',
-  SCHOLARSHIPS: 'highscholar_scholarships_v2',
-  PROFESSORS: 'highscholar_professors_v2',
+  SCHOLARSHIPS: 'highscholar_scholarships_v5',
+  PROFESSORS: 'highscholar_professors_v4',
   APPLICATIONS: 'highscholar_applications_v2',
   OUTREACH: 'highscholar_outreach_v2',
-  OPPORTUNITIES: 'highscholar_opportunities_v2',
+  OPPORTUNITIES: 'highscholar_opportunities_v4',
   THEME: 'highscholar_theme_v2',
+  RESEARCH_PAPERS: 'highscholar_saved_papers_v1',
 };
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -63,6 +71,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [applications, setApplications] = useState<Application[]>(initialApplications);
   const [opportunities, setOpportunities] = useState<HiringOpportunity[]>(mockOpportunities);
   const [outreachRecords, setOutreachRecords] = useState<OutreachRecord[]>(initialOutreachRecords);
+  const [savedPaperIds, setSavedPaperIds] = useState<string[]>([]);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [selectedScholarship, setSelectedScholarship] = useState<Scholarship | null>(null);
   const [selectedOpportunityForEmail, setSelectedOpportunityForEmail] = useState<HiringOpportunity | null>(null);
@@ -71,6 +80,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isMounted, setIsMounted] = useState(false);
   const [isSyncingOpportunities, setIsSyncingOpportunities] = useState(false);
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
+  const [globalSearchQuery, setGlobalSearchQuery] = useState('');
+  const [activeNavTab, setActiveNavTab] = useState<'opportunities' | 'scholarships' | 'professors' | 'research' | 'tracker' | 'profile'>('opportunities');
 
   // Hydrate from localStorage on client mount with automatic schema migration
   useEffect(() => {
@@ -100,7 +111,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const savedProfessors = localStorage.getItem(STORAGE_KEYS.PROFESSORS);
       if (savedProfessors) {
         const parsed = JSON.parse(savedProfessors);
-        if (!Array.isArray(parsed) || parsed.length < 10 || !parsed.some((p: any) => p.id === 'prof_james_landay_01')) {
+        if (!Array.isArray(parsed) || parsed.length < 20 || !parsed.some((p: any) => p.id === 'prof_rosalind_picard_13')) {
           setProfessors(mockProfessors);
         } else {
           setProfessors(parsed);
@@ -136,7 +147,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const savedOpportunities = localStorage.getItem(STORAGE_KEYS.OPPORTUNITIES);
       if (savedOpportunities) {
         const parsed = JSON.parse(savedOpportunities);
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        if (Array.isArray(parsed) && parsed.length >= 25 && parsed.some((o: any) => o.id === 'opp_mit_affective_13')) {
           setOpportunities(parsed);
         } else {
           setOpportunities(mockOpportunities);
@@ -452,6 +463,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     throw new Error(json.error || 'Failed to import opportunity');
   };
 
+  const toggleSavePaper = (paperId: string) => {
+    setSavedPaperIds((prev) => {
+      const next = prev.includes(paperId) ? prev.filter((id) => id !== paperId) : [...prev, paperId];
+      try {
+        localStorage.setItem(STORAGE_KEYS.RESEARCH_PAPERS, JSON.stringify(next));
+      } catch (e) {
+        console.error(e);
+      }
+      return next;
+    });
+  };
+
+  const isPaperSaved = (paperId: string) => savedPaperIds.includes(paperId);
+
   return (
     <AppContext.Provider
       value={{
@@ -463,6 +488,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         applications,
         opportunities,
         outreachRecords,
+        savedPaperIds,
+        toggleSavePaper,
+        isPaperSaved,
         isOnboardingOpen,
         setIsOnboardingOpen,
         saveScholarshipToTracker,
@@ -492,6 +520,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         lastSyncedAt,
         syncLiveOpportunities,
         importOpportunityManual,
+        globalSearchQuery,
+        setGlobalSearchQuery,
+        activeNavTab,
+        setActiveNavTab,
       }}
     >
       {children}

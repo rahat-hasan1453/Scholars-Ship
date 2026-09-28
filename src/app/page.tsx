@@ -17,6 +17,7 @@ import { OutreachKanban } from '@/components/OutreachKanban';
 import { AdvancedFilterModal, FilterState, initialFilterState } from '@/components/AdvancedFilterModal';
 import { SmartProfileMatcherModal } from '@/components/SmartProfileMatcherModal';
 import { UnifiedHubView } from '@/components/UnifiedHubView';
+import { ResearchPapersView } from '@/components/ResearchPapersView';
 import { getCountryOptions } from '@/data/countries';
 import { calculateCountdown, calculateMatchScore } from '@/lib/utils';
 import { 
@@ -62,8 +63,8 @@ export default function HomePage() {
     setSelectedScholarship 
   } = useApp();
 
-  const [activeTab, setActiveTab] = useState<'scholarships' | 'opportunities' | 'professors' | 'tracker' | 'profile'>('opportunities');
-  const [viewMode, setViewMode] = useState<'classic' | 'unified'>('classic');
+  const [activeTab, setActiveTab] = useState<'scholarships' | 'opportunities' | 'professors' | 'research' | 'tracker' | 'profile'>('opportunities');
+  const [viewMode, setViewMode] = useState<'classic' | 'unified'>('unified');
   const [trackerMode, setTrackerMode] = useState<'outreach' | 'scholarships'>('outreach');
   const [isExtensionDrawerOpen, setIsExtensionDrawerOpen] = useState(false);
 
@@ -254,40 +255,7 @@ export default function HomePage() {
       viewMode={viewMode}
       onToggleViewMode={() => setViewMode(prev => prev === 'classic' ? 'unified' : 'classic')}
     >
-      {viewMode === 'unified' ? (
-        <UnifiedHubView
-          onSwitchToClassic={() => setViewMode('classic')}
-          onOpenScholarshipDetail={(sch) => setSelectedScholarship(sch)}
-        />
-      ) : (
-        <>
-          {/* Senior UX Redesign Preview Notification Banner */}
-          <div className="bg-gradient-to-r from-[#EDE9FC] via-[#F4F3FE] to-[#E0EAFF] border border-[#DDD7FA] rounded-2xl p-4 sm:p-5 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
-            <div className="flex items-start sm:items-center gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-[#7150E7] text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5 sm:mt-0">
-                <Sparkles className="w-5 h-5 text-amber-300 fill-amber-300" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-sm sm:text-base font-bold text-[#101828]">Senior UX Redesign: Unified Discovery Hub</h2>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#7150E7] text-white tracking-wide uppercase">New Preview</span>
-                </div>
-                <p className="text-xs text-[#475467] mt-0.5">
-                  Tired of switching between 4 separate tabs? Switch to the unified view with Safe Universities (Rank 1,000–5,000+), 100% Free Tuition &amp; Hiring Professors together.
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setViewMode('unified')}
-              className="h-9 px-4.5 rounded-xl bg-[#7150E7] hover:bg-[#5E3CD4] text-white font-bold text-xs shadow-sm inline-flex items-center gap-2 transition-all cursor-pointer select-none shrink-0"
-            >
-              <span>✨ Switch to Unified Hub</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {/* Dynamic View Header for tracker */}
+      {/* Dynamic View Header for tracker */}
       {activeTab === 'tracker' && (
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-1">
           <div>
@@ -316,13 +284,23 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* TAB 0: LIVE OPPORTUNITIES FEED (ApplyKite & Linear Style) */}
-      {activeTab === 'opportunities' && (
+      {/* 4 DISCOVERY TABS: All 4 tabs share the exact same Figma Node 89:4385 Hero Card */}
+      {(viewMode === 'unified' && ['opportunities', 'scholarships', 'professors', 'research'].includes(activeTab)) && (
+        <UnifiedHubView
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          onSwitchToClassic={() => setViewMode('classic')}
+          onOpenScholarshipDetail={(sch) => setSelectedScholarship(sch)}
+        />
+      )}
+
+      {/* CLASSIC FALLBACK TABS */}
+      {viewMode === 'classic' && activeTab === 'opportunities' && (
         <OpportunitiesFeed />
       )}
 
-      {/* TAB 1: SCHOLARSHIPS */}
-      {activeTab === 'scholarships' && (
+      {/* TAB 1: SCHOLARSHIPS (Classic Fallback) */}
+      {viewMode === 'classic' && activeTab === 'scholarships' && (
         <div className="space-y-6">
           
           {/* Figma Node 25-4268 Hero Banner */}
@@ -526,8 +504,8 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* TAB 2: PROFESSORS & LABS (Figma Node 26-6797) */}
-      {activeTab === 'professors' && (
+      {/* TAB 2: PROFESSORS & LABS (Classic Fallback) */}
+      {viewMode === 'classic' && activeTab === 'professors' && (
         <div className="space-y-6">
           
           {/* Figma Node 26-6797 Hero Banner Card */}
@@ -747,6 +725,11 @@ export default function HomePage() {
         </div>
       )}
 
+      {/* TAB 2.5: RESEARCH PAPERS (Classic Fallback) */}
+      {viewMode === 'classic' && activeTab === 'research' && (
+        <ResearchPapersView />
+      )}
+
       {/* TAB 3: DUAL-MODE APPLICATION & OUTREACH TRACKER */}
       {activeTab === 'tracker' && (
         <div className="space-y-5">
@@ -790,8 +773,6 @@ export default function HomePage() {
       {/* TAB 4: MY SCHOLAR PROFILE & CREDENTIALS */}
       {activeTab === 'profile' && (
         <ProfileView onNavigateToTracker={() => setActiveTab('tracker')} />
-      )}
-        </>
       )}
 
       {/* MODALS */}

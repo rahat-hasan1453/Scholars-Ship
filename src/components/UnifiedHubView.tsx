@@ -1,13 +1,16 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '@/context/AppContext';
 import { Scholarship, Professor, HiringOpportunity } from '@/types';
 import { ScholarshipCard } from '@/components/ScholarshipCard';
 import { ProfessorCard } from '@/components/ProfessorCard';
+import { ResearchPapersView } from '@/components/ResearchPapersView';
 import { WORLD_COUNTRIES, getCountryOptions } from '@/data/countries';
 import { getSubjectOptions, matchesSelectedSubjects } from '@/data/subjects';
 import { CustomDropdown, DropdownOption } from '@/components/ui/CustomDropdown';
+import { OpportunityCard } from '@/components/OpportunityCard';
+import { parseNaturalLanguageQuery, matchItemSemantically } from '@/lib/semanticSearch';
 import { 
   Search, 
   Sparkles, 
@@ -28,7 +31,13 @@ import {
   Check,
   LayoutGrid,
   List,
-  ChevronDown
+  ChevronDown,
+  BookOpen,
+  ArrowUpRight,
+  Bookmark,
+  BookmarkCheck,
+  Loader2,
+  RefreshCw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -36,14 +45,34 @@ interface UnifiedHubViewProps {
   onSwitchToClassic: () => void;
   onOpenColdEmail?: (prof: Professor) => void;
   onOpenScholarshipDetail: (sch: Scholarship) => void;
+  activeTab?: string;
+  setActiveTab?: (tab: 'scholarships' | 'opportunities' | 'professors' | 'research' | 'tracker' | 'profile') => void;
 }
 
 export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
   onSwitchToClassic,
   onOpenColdEmail,
   onOpenScholarshipDetail,
+  activeTab,
+  setActiveTab,
 }) => {
-  const { profile, scholarships, professors, opportunities } = useApp();
+  const { 
+    profile, 
+    scholarships, 
+    professors, 
+    opportunities,
+    syncLiveOpportunities,
+    isSyncingOpportunities,
+    lastSyncedAt,
+    globalSearchQuery,
+    setGlobalSearchQuery
+  } = useApp();
+
+  // Live Internet / OpenAlex & Web Search States
+  const [isLiveWebActive, setIsLiveWebActive] = useState(true);
+  const [isLiveSearchingProfessors, setIsLiveSearchingProfessors] = useState(false);
+  const [liveProfessors, setLiveProfessors] = useState<Professor[]>([]);
+  const [liveSyncMessage, setLiveSyncMessage] = useState<string | null>(null);
 
   // View Layout State (Grid vs List)
   const [viewLayout, setViewLayout] = useState<'grid' | 'list'>('grid');
@@ -53,7 +82,105 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
   const [selectedDegree, setSelectedDegree] = useState('Masters');
   const [selectedCountry, setSelectedCountry] = useState<string[]>(['ALL']);
   const [fundingPreference, setFundingPreference] = useState<'FREE_ONLY' | 'SAFE_GEMS' | 'ALL'>('SAFE_GEMS');
-  const [keywordQuery, setKeywordQuery] = useState('');
+  const [keywordQuery, setKeywordQuery] = useState(globalSearchQuery || '');
+  const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
+
+  // Sync with Global Header Search
+  useEffect(() => {
+    if (globalSearchQuery !== keywordQuery) {
+      setKeywordQuery(globalSearchQuery);
+    }
+  }, [globalSearchQuery]);
+
+  const handleKeywordChange = (val: string) => {
+    setKeywordQuery(val);
+    setGlobalSearchQuery(val);
+  };
+
+  // Parse natural language query intent
+  const parsedIntent = useMemo(() => {
+    return parseNaturalLanguageQuery(keywordQuery);
+  }, [keywordQuery]);
+
+  const toggleBookmark = (id: string) => {
+    setBookmarkedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  };
+
+  const renderCountryFlag = (country: string, id: string) => {
+    const c = country.toLowerCase();
+    if (c.includes('germany') || c.includes('de')) {
+      return (
+        <svg className="w-7 h-[18px] rounded-[4px] shrink-0 shadow-2xs" viewBox="0 0 28 18" fill="none">
+          <clipPath id={`flag-de-${id}`}><rect width="28" height="18" rx="4" fill="white"/></clipPath>
+          <g clipPath={`url(#flag-de-${id})`}>
+            <rect width="28" height="6" fill="#000000"/>
+            <rect y="6" width="28" height="6" fill="#DD0000"/>
+            <rect y="12" width="28" height="6" fill="#FFCE00"/>
+          </g>
+        </svg>
+      );
+    }
+    if (c.includes('usa') || c.includes('united states') || c.includes('us')) {
+      return (
+        <svg className="w-7 h-[18px] rounded-[4px] shrink-0 shadow-2xs" viewBox="0 0 28 18" fill="none">
+          <clipPath id={`flag-us-${id}`}><rect width="28" height="18" rx="4" fill="white"/></clipPath>
+          <g clipPath={`url(#flag-us-${id})`}>
+            <rect width="28" height="18" fill="#B22234"/>
+            <rect y="2" width="28" height="2" fill="white"/>
+            <rect y="5" width="28" height="2" fill="white"/>
+            <rect y="8" width="28" height="2" fill="white"/>
+            <rect y="11" width="28" height="2" fill="white"/>
+            <rect y="14" width="28" height="2" fill="white"/>
+            <rect width="12" height="9" fill="#3C3B6E"/>
+            <circle cx="3" cy="2.5" r="0.8" fill="white"/>
+            <circle cx="6" cy="2.5" r="0.8" fill="white"/>
+            <circle cx="9" cy="2.5" r="0.8" fill="white"/>
+            <circle cx="4.5" cy="4.5" r="0.8" fill="white"/>
+            <circle cx="7.5" cy="4.5" r="0.8" fill="white"/>
+            <circle cx="3" cy="6.5" r="0.8" fill="white"/>
+            <circle cx="6" cy="6.5" r="0.8" fill="white"/>
+            <circle cx="9" cy="6.5" r="0.8" fill="white"/>
+          </g>
+        </svg>
+      );
+    }
+    if (c.includes('canada') || c.includes('ca')) {
+      return (
+        <svg className="w-7 h-[18px] rounded-[4px] shrink-0 shadow-2xs" viewBox="0 0 28 18" fill="none">
+          <clipPath id={`flag-ca-${id}`}><rect width="28" height="18" rx="4" fill="white"/></clipPath>
+          <g clipPath={`url(#flag-ca-${id})`}>
+            <rect width="28" height="18" fill="#FF0000"/>
+            <rect x="7" width="14" height="18" fill="#FFFFFF"/>
+            <path d="M14 4L15 7L18 6L16.5 9L19 11L16 11.5L16.5 14L14 12.5L11.5 14L12 11.5L9 11L11.5 9L10 6L13 7L14 4Z" fill="#FF0000"/>
+          </g>
+        </svg>
+      );
+    }
+    if (c.includes('switzerland') || c.includes('ch')) {
+      return (
+        <svg className="w-7 h-[18px] rounded-[4px] shrink-0 shadow-2xs" viewBox="0 0 28 18" fill="none">
+          <clipPath id={`flag-ch-${id}`}><rect width="28" height="18" rx="4" fill="white"/></clipPath>
+          <g clipPath={`url(#flag-ch-${id})`}>
+            <rect width="28" height="18" fill="#D52B1E"/>
+            <rect x="12" y="4" width="4" height="10" fill="white"/>
+            <rect x="9" y="7" width="10" height="4" fill="white"/>
+          </g>
+        </svg>
+      );
+    }
+    return (
+      <svg className="w-7 h-[18px] rounded-[4px] shrink-0 shadow-2xs" viewBox="0 0 28 18" fill="none">
+        <clipPath id={`flag-uk-${id}`}><rect width="28" height="18" rx="4" fill="white"/></clipPath>
+        <g clipPath={`url(#flag-uk-${id})`}>
+          <rect width="28" height="18" fill="#012169"/>
+          <path d="M0 0L28 18M28 0L0 18" stroke="white" strokeWidth="3"/>
+          <path d="M0 0L28 18M28 0L0 18" stroke="#C8102E" strokeWidth="1.8"/>
+          <path d="M14 0V18M0 9H28" stroke="white" strokeWidth="5"/>
+          <path d="M14 0V18M0 9H28" stroke="#C8102E" strokeWidth="3"/>
+        </g>
+      </svg>
+    );
+  };
 
   // Dropdown Options adhering to system CustomDropdown specification (40+ categorized subjects)
   const subjectOptions = useMemo<DropdownOption[]>(() => getSubjectOptions(), []);
@@ -72,18 +199,30 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
     { label: '🌐 All Options & Tiers', value: 'ALL' },
   ], []);
 
-  // Active Tab within Unified Results: 'safe_unis' | 'scholarships' | 'professors' | 'all'
-  const [activeSection, setActiveSection] = useState<'safe_unis' | 'scholarships' | 'professors' | 'all'>('safe_unis');
+  // Active Tab within Unified Results: 'safe_unis' | 'scholarships' | 'professors' | 'research_papers' | 'all'
+  const [activeSection, setActiveSection] = useState<'safe_unis' | 'scholarships' | 'professors' | 'research_papers' | 'all'>('safe_unis');
 
-  // Filtered Scholarships based on Omnisearch
+  useEffect(() => {
+    if (activeTab === 'scholarships') {
+      setActiveSection('scholarships');
+    } else if (activeTab === 'professors') {
+      setActiveSection('professors');
+    } else if (activeTab === 'research') {
+      setActiveSection('research_papers');
+    } else if (activeTab === 'opportunities') {
+      setActiveSection('safe_unis');
+    }
+  }, [activeTab]);
+
+  // Filtered Scholarships based on Omnisearch & Semantic Intent
   const filteredScholarships = useMemo(() => {
     return scholarships.filter((s) => {
-      const text = (s.title + ' ' + s.specializations.join(' ') + ' ' + s.tags.join(' ') + ' ' + s.description).toLowerCase();
+      const text = `${s.title} ${s.provider} ${s.specializations.join(' ')} ${s.tags.join(' ')} ${s.description} ${s.countries.join(' ')} ${s.fundingAmount} ${s.fundingType}`;
       
-      // Keyword or Field match
+      // Semantic Keyword or Field match
       if (keywordQuery.trim()) {
-        const q = keywordQuery.toLowerCase();
-        if (!text.includes(q) && !s.countries.some(c => c.toLowerCase().includes(q))) return false;
+        const { matches } = matchItemSemantically(text, s.countries, parsedIntent);
+        if (!matches) return false;
       } else if (!matchesSelectedSubjects(text, [...s.specializations, ...s.tags], selectedField)) {
         return false;
       }
@@ -120,17 +259,49 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
 
       return true;
     });
-  }, [scholarships, selectedField, selectedDegree, selectedCountry, fundingPreference, keywordQuery]);
+  }, [scholarships, selectedField, selectedDegree, selectedCountry, fundingPreference, keywordQuery, parsedIntent]);
 
-  // Filtered Professors based on Omnisearch
-  const filteredProfessors = useMemo(() => {
-    return professors.filter((p) => {
-      const text = (p.name + ' ' + p.university + ' ' + p.department + ' ' + (p.labName || '') + ' ' + p.researchTags.join(' ') + ' ' + (p.bio || '')).toLowerCase();
+  // Query OpenAlex Global API in real-time when Live Internet is ON
+  useEffect(() => {
+    if (!isLiveWebActive) {
+      setLiveProfessors([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      const q = keywordQuery.trim();
+      const f = selectedField.includes('ALL') ? '' : selectedField.join(' ');
       
-      // Keyword or Field match
+      if (!q && !f) return;
+
+      setIsLiveSearchingProfessors(true);
+      try {
+        const res = await fetch(`/api/professors/search?query=${encodeURIComponent(q)}&field=${encodeURIComponent(f)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.professors)) {
+            setLiveProfessors(data.professors);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch from OpenAlex:', err);
+      } finally {
+        setIsLiveSearchingProfessors(false);
+      }
+    }, 450);
+
+    return () => clearTimeout(timer);
+  }, [keywordQuery, selectedField, isLiveWebActive]);
+
+  // Filtered Professors based on Omnisearch + Live OpenAlex
+  const filteredProfessors = useMemo(() => {
+    const localFiltered = professors.filter((p) => {
+      const text = `${p.name} ${p.university} ${p.department} ${p.labName || ''} ${p.country} ${p.researchTags.join(' ')} ${p.bio || ''}`;
+      
+      // Semantic Keyword or Field match
       if (keywordQuery.trim()) {
-        const q = keywordQuery.toLowerCase();
-        if (!text.includes(q) && !p.country.toLowerCase().includes(q)) return false;
+        const { matches } = matchItemSemantically(text, p.country, parsedIntent);
+        if (!matches) return false;
       } else if (!matchesSelectedSubjects(text, p.researchTags, selectedField)) {
         return false;
       }
@@ -151,58 +322,549 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
 
       return true;
     });
-  }, [professors, selectedField, selectedCountry, keywordQuery]);
 
-  // Safe Bet Universities tailored for Rank 1,000 – 5,000+ with 100% Free Tuition / TA-RA
+    if (!isLiveWebActive || liveProfessors.length === 0) {
+      return localFiltered;
+    }
+
+    const existingNames = new Set(localFiltered.map(p => p.name.toLowerCase()));
+    const additional = liveProfessors.filter(lp => !existingNames.has(lp.name.toLowerCase()));
+    return [...localFiltered, ...additional];
+  }, [professors, liveProfessors, isLiveWebActive, selectedField, selectedCountry, keywordQuery, parsedIntent]);
+
+  // Safe Bet Universities & Fully Funded Faculty Lab Opportunities Populated from Academic Database
   const safeUniversities = useMemo(() => {
     const list = [
       {
         id: 'safe_astate_01',
-        name: 'Arkansas State University / Lamar University',
-        country: 'USA 🇺🇸',
+        name: 'Arkansas State University',
+        country: 'USA',
         field: 'UX Design, CS & Digital Media',
         rankBadge: 'Rank 1,200 – 1,800 • High Acceptance (88%)',
-        cost: 'Low Cost College Town ($650/mo)',
-        fundingBenefit: 'Automatic In-State Tuition Waiver + $1,400/mo Graduate Assistantship (TA/RA)',
-        requirements: 'Accepts CGPA 2.65+, No GRE required, 4+ Years Study Gap Accepted',
+        financialBase: 'In-State Tuition Waiver ',
+        financialHighlight: '+ $1,400/mo',
+        financialSuffix: ' Graduate Assistantship (TA/RA)',
+        admission: 'Accepts CGPA 2.65+, No GRE required, 4+ Years Study Gap Accepted',
+        living: 'Jonesboro AR Low Cost College Town ($650/mo)',
         officialLink: 'https://www.astate.edu/graduate-school',
+        degrees: ['Masters', 'PhD'],
+        fieldTags: ['UX Design', 'Computer Science', 'Digital Media', 'Human-Computer Interaction'],
       },
       {
-        id: 'safe_mun_02',
-        name: 'Memorial University of Newfoundland',
-        country: 'Canada 🇨🇦',
-        field: 'Computer Science, HCI & Applied Computing',
-        rankBadge: 'Rank 700 – 900 • Canadian Atlantic PNP PR Bonus',
-        cost: 'Lowest Tuition in Canada ($3,500/yr or 100% Free with Faculty Fellowship)',
-        fundingBenefit: 'Dean’s Doctoral & Masters Award + Atlantic Immigration Program (AIP) fast PR pathway',
-        requirements: 'No GRE, Accepts Duolingo, Flexible CGPA assessment',
-        officialLink: 'https://www.mun.ca/sgs',
+        id: 'safe_lamar_02',
+        name: 'Lamar University',
+        country: 'USA',
+        field: 'Informatics, Applied CS & HCI',
+        rankBadge: 'Rank 1,400+ • High Acceptance (84%)',
+        financialBase: 'Out-of-State Waiver ',
+        financialHighlight: '+ $1,550/mo',
+        financialSuffix: ' Departmental Teaching Assistantship',
+        admission: 'Accepts CGPA 2.50+, No GRE required for STEM, 5+ Years Study Gap Accepted',
+        living: 'Beaumont TX Affordable Living ($620/mo)',
+        officialLink: 'https://www.lamar.edu/graduate-admissions',
+        degrees: ['Masters', 'PhD'],
+        fieldTags: ['UX Design', 'Informatics', 'Computer Science', 'Data Science', 'Human-Computer Interaction'],
       },
       {
         id: 'safe_bremen_03',
-        name: 'University of Bremen & HfK Bremen',
-        country: 'Germany 🇩🇪',
+        name: 'University of Bremen',
+        country: 'Germany',
         field: 'Digital Media, UX & Interaction Design',
-        rankBadge: 'Public University • 100% Tuition Free (€0)',
-        cost: 'Affordable Living (€750 - €850/mo) • Free Regional Transit',
-        fundingBenefit: 'Zero Tuition Fees + High Demand for English Digital Media / UX / CS Students',
-        requirements: 'No Tuition, 18 Months Stay-Back Job Visa, Accepts English MOI',
+        rankBadge: 'Public University • 100% Free Tuition (€0)',
+        financialBase: 'Zero Tuition Fees (€0) ',
+        financialHighlight: '+ Free Transit',
+        financialSuffix: ' Semesterticket + €14/hr Student HiWi Jobs',
+        admission: 'Zero Tuition for All, 18 Months Stay-Back Job Visa, English MOI Accepted',
+        living: 'Bremen Student Dorms (€750 - €850/mo)',
         officialLink: 'https://www.uni-bremen.de/en/studies/international',
+        degrees: ['Masters'],
+        fieldTags: ['UX Design', 'Interaction Design', 'Digital Media', 'Human-Computer Interaction'],
       },
       {
-        id: 'safe_usm_04',
-        name: 'University of Southern Mississippi / South Dakota Mines',
-        country: 'USA 🇺🇸',
+        id: 'safe_mun_04',
+        name: 'Memorial University of Newfoundland',
+        country: 'Canada',
+        field: 'Computer Science, HCI & Applied Computing',
+        rankBadge: 'Rank 700 – 900 • Canadian Atlantic PNP PR Bonus',
+        financialBase: 'Graduate Fellowship ',
+        financialHighlight: '+ $1,750/mo',
+        financialSuffix: ' Baseline Graduate Funding Guarantee',
+        admission: 'No GRE, Flexible CGPA assessment (2.75+), Fast Atlantic PNP PR Pathway',
+        living: 'St. John\'s NL Student Housing ($680/mo)',
+        officialLink: 'https://www.mun.ca/sgs',
+        degrees: ['Masters', 'PhD'],
+        fieldTags: ['Computer Science', 'Human-Computer Interaction', 'UX Design', 'Applied Computing'],
+      },
+      {
+        id: 'safe_usm_05',
+        name: 'University of Southern Mississippi',
+        country: 'USA',
         field: 'Informatics, UX & Computational Science',
         rankBadge: 'Rank 1,500+ • 92% Graduate Admission Rate',
-        cost: 'Super Low Living Cost ($550/mo)',
-        fundingBenefit: '100% Tuition Remission with Departmental Teaching Assistantship',
-        requirements: 'Low CGPA friendly (2.50+), GRE waived upon inquiry, Fast I-20 Issuance',
+        financialBase: 'Full Tuition Remission ',
+        financialHighlight: '+ $1,350/mo',
+        financialSuffix: ' Graduate Assistant Stipend',
+        admission: 'Low CGPA Friendly (2.50+), GRE Waived upon Inquiry, Fast I-20 Issuance',
+        living: 'Hattiesburg MS Low Cost Living ($550/mo)',
         officialLink: 'https://www.usm.edu/graduate-admissions',
+        degrees: ['Masters'],
+        fieldTags: ['UX Design', 'Informatics', 'Computer Science', 'Human-Computer Interaction'],
+      },
+      {
+        id: 'opp_cmu_hcii_06',
+        name: 'Carnegie Mellon University',
+        country: 'USA',
+        field: 'Human-Computer Interaction Institute (HCII)',
+        rankBadge: 'Top 10 Global CS • 100% Full Ride Call',
+        financialBase: '100% Full Tuition Remission ',
+        financialHighlight: '+ $3,833/mo',
+        financialSuffix: ' Research Assistant Stipend ($46k/yr)',
+        admission: 'CGPA 3.4+, Portfolio or Coding Background, Direct Lab Interview',
+        living: 'Pittsburgh Urban Campus ($950/mo)',
+        officialLink: 'https://hcii.cmu.edu/academics/phd',
+        degrees: ['PhD', 'Masters'],
+        fieldTags: ['UX Design', 'Human-Computer Interaction', 'Artificial Intelligence', 'Software Engineering'],
+      },
+      {
+        id: 'opp_ucsd_designlab_07',
+        name: 'UC San Diego',
+        country: 'USA',
+        field: 'The Design Lab & Cognitive Science',
+        rankBadge: 'Rank 30 Global • High Funding Allocation',
+        financialBase: 'Full Tuition Waiver ',
+        financialHighlight: '+ $3,708/mo',
+        financialSuffix: ' Graduate Fellowship ($44.5k/yr)',
+        admission: 'CGPA 3.2+, GRE Not Required, Interdisciplinary Backgrounds Welcome',
+        living: 'La Jolla Subsidized Graduate Housing ($920/mo)',
+        officialLink: 'https://designlab.ucsd.edu',
+        degrees: ['PhD', 'Masters'],
+        fieldTags: ['UX Design', 'Cognitive Science', 'Interaction Design', 'Product Design', 'Human-Computer Interaction'],
+      },
+      {
+        id: 'opp_ucl_uclic_08',
+        name: 'University College London (UCL)',
+        country: 'United Kingdom',
+        field: 'UCL Interaction Centre (UCLIC)',
+        rankBadge: 'Top 10 UK • EPSRC Direct Studentship',
+        financialBase: '100% UK/International Tuition Coverage ',
+        financialHighlight: '+ £1,856/mo',
+        financialSuffix: ' Tax-Free London Living Grant',
+        admission: 'UK 2:1 Honours or 3.2+ CGPA, IELTS 7.0, No GRE Required',
+        living: 'Bloomsbury Central London (£1,100/mo)',
+        officialLink: 'https://uclic.ucl.ac.uk',
+        degrees: ['PhD'],
+        fieldTags: ['UX Design', 'Human-Computer Interaction', 'Interaction Design', 'Cognitive Ergonomics'],
+      },
+      {
+        id: 'opp_hpi_potsdam_09',
+        name: 'Hasso Plattner Institute',
+        country: 'Germany',
+        field: 'HPI Human Computer Interaction Lab',
+        rankBadge: 'Rank 150 Global • Official TV-L E13 Scale',
+        financialBase: 'Zero Tuition Fees (€0) ',
+        financialHighlight: '+ €4,500/mo',
+        financialSuffix: ' German TV-L E13 Government Salary',
+        admission: 'Master in CS/Design, Study Gap Allowed, Zero Tuition for All',
+        living: 'Potsdam / Berlin Metro ($800/mo)',
+        officialLink: 'https://hpi.de/baudisch/home.html',
+        degrees: ['PhD', 'Masters'],
+        fieldTags: ['UX Design', 'Human-Computer Interaction', 'Interactive Systems', 'Computer Science'],
+      },
+      {
+        id: 'safe_tum_10',
+        name: 'Technical University of Munich (TUM)',
+        country: 'Germany',
+        field: 'Department of Informatics & UX Research',
+        rankBadge: 'Rank 30 Global • Top German Technical University',
+        financialBase: 'Zero Tuition Fees (€0) ',
+        financialHighlight: '+ €2,600/mo',
+        financialSuffix: ' Max Planck / TUM Research Salary',
+        admission: 'Bachelor in CS/Engineering, VPD & Aptitude Assessment, No Tuition',
+        living: 'Munich Student Dorms / WG (€850/mo)',
+        officialLink: 'https://www.tum.de/en',
+        degrees: ['Masters', 'PhD'],
+        fieldTags: ['Human-Computer Interaction', 'UX Design', 'Computer Science', 'Artificial Intelligence'],
+      },
+      {
+        id: 'safe_herts_11',
+        name: 'University of Hertfordshire',
+        country: 'United Kingdom',
+        field: 'Creative Tech, Digital Media & Interaction',
+        rankBadge: 'UK Top Post-92 • High International Intake',
+        financialBase: 'Dean Graduate Scholarship ',
+        financialHighlight: '+ £1,200/mo',
+        financialSuffix: ' International Merit Discount',
+        admission: 'CGPA 2.80+, IELTS 6.0, UK Graduate Visa 2-Year Route',
+        living: 'Hatfield Suburb (£720/mo)',
+        officialLink: 'https://www.herts.ac.uk',
+        degrees: ['Masters'],
+        fieldTags: ['UX Design', 'Digital Media', 'Computer Science', 'Interaction Design'],
+      },
+      {
+        id: 'safe_ilmenau_12',
+        name: 'TU Ilmenau',
+        country: 'Germany',
+        field: 'Media Technology, HCI & Audio Informatics',
+        rankBadge: 'German Excellence • Lowest Living Cost in Germany',
+        financialBase: 'Zero Tuition (€0) ',
+        financialHighlight: '+ €1,300/mo',
+        financialSuffix: ' Thuringian Research Scholarship',
+        admission: 'Bachelor in Media/CS, English B2, No Tuition, Friendly Visa Process',
+        living: 'Thuringia Affordable Dorms (€450 - €550/mo)',
+        officialLink: 'https://www.tu-ilmenau.de',
+        degrees: ['Masters'],
+        fieldTags: ['UX Design', 'Digital Media', 'Human-Computer Interaction', 'Computer Science'],
+      },
+      {
+        id: 'opp_stanford_ai_13',
+        name: 'Stanford University',
+        country: 'USA',
+        field: 'Stanford AI Lab (SAIL) & NLP Group',
+        rankBadge: 'Top 3 Global • Stanford Graduate Fellow',
+        financialBase: '100% Full Tuition Remission ',
+        financialHighlight: '+ $4,500/mo',
+        financialSuffix: ' Fellowship + Summer Health Insurance',
+        admission: 'CGPA 3.6+, Strong Math & ML Background, GRE Optional',
+        living: 'Palo Alto On-Campus Graduate Residence ($1,250/mo)',
+        officialLink: 'https://ai.stanford.edu',
+        degrees: ['PhD', 'Masters'],
+        fieldTags: ['Artificial Intelligence', 'Computer Science', 'Machine Learning', 'Data Science', 'Human-Computer Interaction', 'UX Design'],
+      },
+      {
+        id: 'opp_harvard_wyss_14',
+        name: 'Harvard University & Wyss Institute',
+        country: 'USA',
+        field: 'Synthetic Biology & Molecular Informatics',
+        rankBadge: 'Top 5 Global • NIH Direct Research Assistantship',
+        financialBase: 'Full NIH Grant ',
+        financialHighlight: '+ $4,041/mo',
+        financialSuffix: ' Living Allowance ($48.5k/yr)',
+        admission: 'CGPA 3.5+, Lab Research Experience in Molecular/Bio or CS',
+        living: 'Cambridge MA Student Apartments ($1,180/mo)',
+        officialLink: 'https://wyss.harvard.edu',
+        degrees: ['PhD'],
+        fieldTags: ['Biotechnology', 'Biomedical Engineering', 'Data Science', 'Computer Science'],
+      },
+      {
+        id: 'opp_eth_zurich_15',
+        name: 'ETH Zurich',
+        country: 'Switzerland',
+        field: 'Materials & Clean Energy Laboratory',
+        rankBadge: 'Rank 7 Global • Swiss SNSF Salary Scale',
+        financialBase: 'Zero Tuition (0 CHF) ',
+        financialHighlight: '+ CHF 4,666/mo',
+        financialSuffix: ' Official Swiss Doctoral Salary',
+        admission: 'Masters in Engineering/Physics, IELTS/TOEFL Accepted, No GRE',
+        living: 'Zurich Student Living ($1,350/mo)',
+        officialLink: 'https://ethz.ch',
+        degrees: ['PhD', 'Masters'],
+        fieldTags: ['Renewable Energy', 'Chemical Engineering', 'Materials Science', 'Physics'],
+      },
+      {
+        id: 'opp_cambridge_quantum_16',
+        name: 'University of Cambridge',
+        country: 'United Kingdom',
+        field: 'Cavendish Laboratory Quantum Optics',
+        rankBadge: 'Top 5 Global • EPSRC Fully Funded',
+        financialBase: 'Full University Course Fees Paid ',
+        financialHighlight: '+ £1,833/mo',
+        financialSuffix: ' Tax-Free UKRI Research Stipend',
+        admission: 'UK 1st Class Honours or CGPA 3.5+, Direct Lab Call',
+        living: 'Cambridge College Accommodation (£750/mo)',
+        officialLink: 'https://www.phy.cam.ac.uk',
+        degrees: ['PhD'],
+        fieldTags: ['Physics', 'Quantum Computing', 'Electrical Engineering', 'Nanotechnology'],
+      },
+      {
+        id: 'opp_berkeley_robotics_17',
+        name: 'UC Berkeley',
+        country: 'USA',
+        field: 'AUTOLAB Robotics & AI Manipulation',
+        rankBadge: 'Rank 4 Global • GSR Full Remission',
+        financialBase: 'Full Fee Remission ',
+        financialHighlight: '+ $3,900/mo',
+        financialSuffix: ' GSR Graduate Researcher Salary',
+        admission: 'CGPA 3.3+, Python/Robotics Skills, GRE Waived',
+        living: 'Berkeley Co-op / Graduate Apartments ($980/mo)',
+        officialLink: 'https://autolab.berkeley.edu',
+        degrees: ['PhD', 'Masters'],
+        fieldTags: ['Robotics', 'Computer Science', 'Artificial Intelligence', 'Mechanical Engineering', 'Human-Computer Interaction', 'UX Design'],
+      },
+      {
+        id: 'opp_toronto_met_18',
+        name: 'Toronto Metropolitan University',
+        country: 'Canada',
+        field: 'CarAI Research Laboratory & HCI',
+        rankBadge: 'Rank 600 • High Acceptance (82%)',
+        financialBase: 'Full Tuition Grant ',
+        financialHighlight: '+ $2,333/mo',
+        financialSuffix: ' NSERC Graduate Living Stipend',
+        admission: 'Accepts CGPA 3.0+, Study Gap 3+ Years Accepted, No GRE Needed',
+        living: 'Downtown Toronto Transit Corridor ($880/mo)',
+        officialLink: 'https://www.torontomu.ca',
+        degrees: ['Masters', 'PhD'],
+        fieldTags: ['Computer Science', 'Artificial Intelligence', 'Human-Computer Interaction', 'UX Design'],
+      },
+      {
+        id: 'opp_jhu_biomed_19',
+        name: 'Johns Hopkins University',
+        country: 'USA',
+        field: 'Center for Imaging Science, BME Department',
+        rankBadge: 'Top 10 Global • BME Top Ranked',
+        financialBase: 'Full Tuition Waiver ',
+        financialHighlight: '+ $3,750/mo',
+        financialSuffix: ' NIH Graduate Fellowship ($45k/yr)',
+        admission: 'CGPA 3.4+, BME/CS Background, Full 5-Year NIH Guarantee',
+        living: 'Baltimore Graduate Housing ($890/mo)',
+        officialLink: 'https://bme.jhu.edu',
+        degrees: ['PhD'],
+        fieldTags: ['Biomedical Engineering', 'Neuroscience', 'Artificial Intelligence', 'Computer Vision', 'Data Science'],
+      },
+      {
+        id: 'opp_oxford_econ_20',
+        name: 'University of Oxford',
+        country: 'United Kingdom',
+        field: 'Department of Economics & Global Trade Analytics',
+        rankBadge: 'Top 2 Global • Clarendon Fully Funded',
+        financialBase: 'Clarendon Full Ride ',
+        financialHighlight: '+ £1,625/mo',
+        financialSuffix: ' Course Fee + Tax-Free Living',
+        admission: 'UK 1st Class / CGPA 3.7+, Quantitative Research Proposal',
+        living: 'Oxford College Rooms (£800/mo)',
+        officialLink: 'https://www.economics.ox.ac.uk',
+        degrees: ['PhD', 'Masters'],
+        fieldTags: ['Economics', 'Data Science', 'Public Policy', 'Finance', 'Statistics'],
+      },
+      {
+        id: 'safe_wichita_21',
+        name: 'Wichita State University',
+        country: 'USA',
+        field: 'Computer Science, Aerospace & Industrial Engineering',
+        rankBadge: 'Rank 800 – 1,000 • High Acceptance (85%)',
+        financialBase: 'In-State Tuition Waiver ',
+        financialHighlight: '+ $1,450/mo',
+        financialSuffix: ' Graduate Teaching Assistantship (GTA)',
+        admission: 'Accepts CGPA 2.65+, GRE Waived for STEM, Study Gap 4+ Years Accepted',
+        living: 'Wichita KS Affordable Living ($640/mo)',
+        officialLink: 'https://www.wichita.edu/academics/graduate_school',
+        degrees: ['Masters', 'PhD'],
+        fieldTags: ['Computer Science', 'Aerospace Engineering', 'Mechanical Engineering', 'Data Science'],
+      },
+      {
+        id: 'safe_sd_mines_22',
+        name: 'South Dakota Mines',
+        country: 'USA',
+        field: 'Mechanical, Materials Science & Computer Engineering',
+        rankBadge: 'Top Regional STEM • High Acceptance (83%)',
+        financialBase: 'Reduced STEM Rate ',
+        financialHighlight: '+ $1,600/mo',
+        financialSuffix: ' Graduate Research Assistantship',
+        admission: 'Accepts CGPA 2.75+, Low Tuition ($5,500/semester), No GRE Required',
+        living: 'Rapid City SD Low Cost Student Housing ($610/mo)',
+        officialLink: 'https://www.sdsmt.edu/GradEd',
+        degrees: ['Masters', 'PhD'],
+        fieldTags: ['Materials Science', 'Mechanical Engineering', 'Computer Science', 'Civil Engineering'],
+      },
+      {
+        id: 'safe_mnsu_23',
+        name: 'Minnesota State University, Mankato',
+        country: 'USA',
+        field: 'Data Science, Software Engineering & Applied HCI',
+        rankBadge: 'Rank 1,200+ • High Acceptance (80%)',
+        financialBase: 'Non-Resident Waiver ',
+        financialHighlight: '+ $1,350/mo',
+        financialSuffix: ' Departmental Graduate Assistantship',
+        admission: 'Accepts CGPA 2.60+, 5+ Years Study Gap Accepted, No GRE Needed',
+        living: 'Mankato MN Student Apartments ($630/mo)',
+        officialLink: 'https://grad.mnsu.edu',
+        degrees: ['Masters'],
+        fieldTags: ['Data Science', 'Software Engineering', 'Computer Science', 'UX Design'],
+      },
+      {
+        id: 'safe_nwmissouri_24',
+        name: 'Northwest Missouri State University',
+        country: 'USA',
+        field: 'Applied Computer Science & Information Systems',
+        rankBadge: 'Rank 1,400+ • High Acceptance (86%)',
+        financialBase: 'In-State Tuition Match ',
+        financialHighlight: '+ $1,250/mo',
+        financialSuffix: ' Campus Graduate Assistantship',
+        admission: 'Accepts CGPA 2.50+, No GRE Required for CS, Fast I-20 Processing',
+        living: 'Maryville MO Safe Rural Living ($590/mo)',
+        officialLink: 'https://www.nwmissouri.edu/graduate',
+        degrees: ['Masters'],
+        fieldTags: ['Computer Science', 'Information Systems', 'Data Science', 'Software Engineering'],
+      },
+      {
+        id: 'safe_tamucc_25',
+        name: 'Texas A&M University–Corpus Christi',
+        country: 'USA',
+        field: 'Geospatial Computing, Marine Data Science & CS',
+        rankBadge: 'Tier 2 Research • High Acceptance (82%)',
+        financialBase: 'Texas Out-of-State Waiver ',
+        financialHighlight: '+ $1,500/mo',
+        financialSuffix: ' Graduate Assistantship Package',
+        admission: 'Accepts CGPA 2.70+, $1,000 Competitive Scholarship unlocks In-State Tuition',
+        living: 'Corpus Christi TX Coastal Living ($680/mo)',
+        officialLink: 'https://gradschool.tamucc.edu',
+        degrees: ['Masters', 'PhD'],
+        fieldTags: ['Computer Science', 'Geospatial Data', 'Marine Science', 'Data Science'],
+      },
+      {
+        id: 'safe_uncw_26',
+        name: 'University of North Carolina Wilmington',
+        country: 'USA',
+        field: 'Data Science, Coastal Environmental Systems & CS',
+        rankBadge: 'Rank 700 • Acceptance (74%)',
+        financialBase: 'Tuition Remission ',
+        financialHighlight: '+ $1,400/mo',
+        financialSuffix: ' Departmental TA / Lab Assistant',
+        admission: 'Accepts CGPA 2.80+, Holistic Evaluation, No GRE Required',
+        living: 'Wilmington NC Student Housing ($720/mo)',
+        officialLink: 'https://uncw.edu/gradschool',
+        degrees: ['Masters', 'PhD'],
+        fieldTags: ['Data Science', 'Computer Science', 'Environmental Science', 'Bioinformatics'],
+      },
+      {
+        id: 'safe_brandon_27',
+        name: 'Brandon University',
+        country: 'Canada',
+        field: 'Environmental Science, Mathematics & Computing',
+        rankBadge: 'Low Cost Public Canadian Uni • High Acceptance (82%)',
+        financialBase: 'Low Tuition (CAD $8,400/yr) ',
+        financialHighlight: '+ CAD $1,200/mo',
+        financialSuffix: ' Graduate Teaching Stipend',
+        admission: 'Accepts CGPA 2.80+ (B- average), Fast Visa Processing in Manitoba',
+        living: 'Brandon MB Affordable Community Living ($650 CAD/mo)',
+        officialLink: 'https://www.brandonu.ca/graduate-studies',
+        degrees: ['Masters'],
+        fieldTags: ['Computer Science', 'Environmental Science', 'Mathematics', 'Data Science'],
+      },
+      {
+        id: 'safe_unbc_28',
+        name: 'University of Northern British Columbia',
+        country: 'Canada',
+        field: 'Natural Resources, Environmental CS & Health Sciences',
+        rankBadge: 'Ranked Top 3 Primarily Undergrad Canada • Acceptance (78%)',
+        financialBase: 'BC Graduate Scholarship ',
+        financialHighlight: '+ CAD $1,500/mo',
+        financialSuffix: ' NSERC/SSHRC RA Funding',
+        admission: 'Accepts CGPA 3.0+, Direct Supervisor Nomination Pathway',
+        living: 'Prince George BC University Residence ($750 CAD/mo)',
+        officialLink: 'https://www.unbc.ca/graduate-programs',
+        degrees: ['Masters', 'PhD'],
+        fieldTags: ['Environmental Science', 'Computer Science', 'Public Health', 'Data Science'],
+      },
+      {
+        id: 'safe_upei_29',
+        name: 'University of Prince Edward Island',
+        country: 'Canada',
+        field: 'Sustainable Design Engineering, Analytics & CS',
+        rankBadge: 'Atlantic Canada Public • High Acceptance (80%)',
+        financialBase: 'Low Atlantic Tuition ',
+        financialHighlight: '+ CAD $1,100/mo',
+        financialSuffix: ' Departmental TA Assistance',
+        admission: 'Accepts CGPA 2.70+, Easy Provincial Nominee Program (PNP) Route',
+        living: 'Charlottetown PEI Island Living ($700 CAD/mo)',
+        officialLink: 'https://www.upei.ca/graduatestudies',
+        degrees: ['Masters'],
+        fieldTags: ['Design Engineering', 'Computer Science', 'Data Science', 'Civil Engineering'],
+      },
+      {
+        id: 'safe_fhdortmund_30',
+        name: 'Fachhochschule Dortmund',
+        country: 'Germany',
+        field: 'Digital Transformation, Applied UX & Embedded Systems',
+        rankBadge: 'Public University • 100% Free Tuition (€0)',
+        financialBase: 'Zero Tuition (€0) ',
+        financialHighlight: '+ NRW Transit Pass',
+        financialSuffix: ' Free Travel + €14.50/hr Student HiWi Jobs',
+        admission: 'Accepts German Grade 2.5 (US ~2.8+), 100% English-Taught, No GRE',
+        living: 'Dortmund Student Dormitory (€680/mo)',
+        officialLink: 'https://www.fh-dortmund.de/en',
+        degrees: ['Masters'],
+        fieldTags: ['UX Design', 'Embedded Systems', 'Computer Science', 'Software Engineering'],
+      },
+      {
+        id: 'safe_dit_31',
+        name: 'Deggendorf Institute of Technology',
+        country: 'Germany',
+        field: 'Artificial Intelligence, Applied CS & Mechatronics',
+        rankBadge: 'Public Bavarian Institute • 100% Free Tuition (€0)',
+        financialBase: 'Zero Tuition (€0) ',
+        financialHighlight: '+ Bavaria Silicon Valley',
+        financialSuffix: ' Campus High-Tech Lab HiWi Positions',
+        admission: 'Accepts CGPA 2.7+, English-Taught Master’s, High Visa Approval Rate',
+        living: 'Deggendorf Bavaria Low Cost Living (€650/mo)',
+        officialLink: 'https://www.th-deg.de/en',
+        degrees: ['Masters'],
+        fieldTags: ['Artificial Intelligence', 'Mechatronics', 'Computer Science', 'Robotics'],
+      },
+      {
+        id: 'safe_oulu_32',
+        name: 'University of Oulu',
+        country: 'Finland',
+        field: '6G Wireless Communications, Software & Health AI',
+        rankBadge: 'European 6G Hub • 50-70% Tuition Waiver',
+        financialBase: '70% Tuition Scholarship ',
+        financialHighlight: '+ €1,300/mo',
+        financialSuffix: ' Funded Nokia/EU Research Assistantship',
+        admission: 'Accepts CGPA 2.8+, Direct English Degree, Spouse Work Permit Allowed',
+        living: 'Oulu Student Housing (PSOAS) (€450/mo)',
+        officialLink: 'https://www.oulu.fi/en',
+        degrees: ['Masters', 'PhD'],
+        fieldTags: ['Telecommunications', 'Computer Science', 'Artificial Intelligence', 'Electrical Engineering'],
+      },
+      {
+        id: 'safe_greenwich_33',
+        name: 'University of Greenwich',
+        country: 'United Kingdom',
+        field: 'Computing, Data Science & Built Environment',
+        rankBadge: 'London Maritime Campus • High Acceptance (77%)',
+        financialBase: '£3,000 International Bursary ',
+        financialHighlight: '+ £13.50/hr',
+        financialSuffix: ' On-Campus Student Ambassador Roles',
+        admission: 'Accepts CGPA 2.6+, 4+ Years Gap Accepted, 2-Year Graduate Route Visa',
+        living: 'London Student Residence (£720/mo)',
+        officialLink: 'https://www.gre.ac.uk/postgraduate',
+        degrees: ['Masters'],
+        fieldTags: ['Computer Science', 'Data Science', 'Civil Engineering', 'UX Design'],
+      },
+      {
+        id: 'safe_teesside_34',
+        name: 'Teesside University',
+        country: 'United Kingdom',
+        field: 'Games Computing, Digital Media & Applied AI',
+        rankBadge: 'Top Modern University UK • High Acceptance (84%)',
+        financialBase: '£4,000 Global Excellence Award ',
+        financialHighlight: '+ UK Lowest Living Cost',
+        financialSuffix: ' Affordable Living Package',
+        admission: 'Accepts CGPA 2.5+, Study Gap 5+ Years Accepted, Quick CAS Turnaround',
+        living: 'Middlesbrough Living (One of UK’s Lowest, £520/mo)',
+        officialLink: 'https://www.tees.ac.uk/postgraduate',
+        degrees: ['Masters'],
+        fieldTags: ['Computer Science', 'Digital Media', 'Artificial Intelligence', 'UX Design'],
+      },
+      {
+        id: 'safe_ecu_35',
+        name: 'Edith Cowan University',
+        country: 'Australia',
+        field: 'Cyber Security, Computer Science & Petroleum Engineering',
+        rankBadge: 'Global Cyber Hub • High Acceptance (81%)',
+        financialBase: '20% Tuition Fee Discount ',
+        financialHighlight: '+ 5-Year PSW Visa',
+        financialSuffix: ' Regional Australia Extended Work Rights',
+        admission: 'Accepts CGPA 2.65+, Direct Entry without GRE, High Visa Success',
+        living: 'Perth Shared Apartments ($750 AUD/mo)',
+        officialLink: 'https://www.ecu.edu.au',
+        degrees: ['Masters', 'PhD'],
+        fieldTags: ['Cybersecurity', 'Computer Science', 'Data Science', 'Engineering'],
       },
     ];
 
     let filtered = list;
+
+    // 1. Country Filter
     if (selectedCountry.length > 0 && !selectedCountry.includes('ALL')) {
       filtered = filtered.filter((u) => {
         const uc = u.country.toLowerCase();
@@ -211,99 +873,143 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
           return uc.includes(target) ||
                  target.includes(uc.slice(0, 3)) ||
                  (target === 'usa' && (uc.includes('usa') || uc.includes('united states'))) ||
+                 (target === 'uk' && (uc.includes('uk') || uc.includes('united kingdom'))) ||
                  (target === 'canada' && uc.includes('canada')) ||
-                 (target === 'germany' && uc.includes('germany'));
+                 (target === 'germany' && uc.includes('germany')) ||
+                 (target === 'switzerland' && uc.includes('switzerland'));
         });
       });
     }
 
+    // 2. Degree Filter
+    if (selectedDegree !== 'ALL') {
+      filtered = filtered.filter((u) => u.degrees.includes(selectedDegree as any));
+    }
+
+    // 3. Subject / Field Filter
     if (selectedField.length > 0 && !selectedField.includes('ALL')) {
-      filtered = filtered.filter((u) => matchesSelectedSubjects(u.field + ' ' + u.name, [u.field], selectedField));
+      filtered = filtered.filter((u) => 
+        matchesSelectedSubjects(u.field + ' ' + u.name + ' ' + u.fieldTags.join(' '), u.fieldTags, selectedField)
+      );
+    }
+
+    // 4. Keyword / Semantic Query Filter
+    if (keywordQuery.trim()) {
+      filtered = filtered.filter((u) => {
+        const text = `${u.name} ${u.field} ${u.country} ${u.admission} ${u.financialBase} ${u.financialHighlight} ${u.financialSuffix} ${u.living} ${u.fieldTags.join(' ')}`;
+        const { matches } = matchItemSemantically(text, u.country, parsedIntent);
+        return matches;
+      });
     }
 
     return filtered;
-  }, [selectedCountry, selectedField]);
+  }, [selectedCountry, selectedDegree, selectedField, keywordQuery, parsedIntent]);
 
   // Live Hiring Opportunities in this field
   const fieldOpportunities = useMemo(() => {
     return opportunities.filter((opp) => {
-      const text = (opp.title + ' ' + opp.fieldTags.join(' ') + ' ' + opp.content).toLowerCase();
+      const text = `${opp.title} ${opp.institution} ${opp.country} ${opp.funding} ${opp.fieldTags.join(' ')} ${opp.content}`;
       if (keywordQuery.trim()) {
-        return text.includes(keywordQuery.toLowerCase());
+        const { matches } = matchItemSemantically(text, opp.country, parsedIntent);
+        return matches;
       }
       return matchesSelectedSubjects(text, opp.fieldTags, selectedField);
     });
-  }, [opportunities, selectedField, keywordQuery]);
+  }, [opportunities, selectedCountry, selectedField, keywordQuery, parsedIntent]);
+
+  const { headerTitle, headerSubtitle, countBadgeText, searchPlaceholder } = useMemo(() => {
+    switch (activeSection) {
+      case 'scholarships':
+        return {
+          headerTitle: 'Personalized Scholarship Radar & Global Grants',
+          headerSubtitle: 'Discover full-ride, tuition waiver, and research scholarships matched to your academic profile',
+          countBadgeText: `${filteredScholarships.length} Available Scholarships`,
+          searchPlaceholder: 'Search scholarships by title, provider, country...',
+        };
+      case 'professors':
+        return {
+          headerTitle: 'Graduate Faculty & Research Lab Supervisors',
+          headerSubtitle: 'Connect with professors and lab directors actively seeking Masters & PhD researchers',
+          countBadgeText: `${filteredProfessors.length} Hiring Professors`,
+          searchPlaceholder: 'Search professors by name, lab, university, HCI, AI...',
+        };
+      case 'research_papers':
+        return {
+          headerTitle: 'Academic Research Papers & AI Explorer',
+          headerSubtitle: 'Search peer-reviewed publications, extract methodology insights, and chat with AI research assistant',
+          countBadgeText: 'Curated Papers & AI Bot',
+          searchPlaceholder: 'Search research papers by topic, DOI, author...',
+        };
+      case 'safe_unis':
+      default:
+        return {
+          headerTitle: 'Find Your Desired Scholarship, Lab & Safe Universities',
+          headerSubtitle: 'One simple search connects you to Scholarships, qualified professors, and secure regional universities',
+          countBadgeText: `${safeUniversities.length} Live Openings`,
+          searchPlaceholder: 'Search scholarships',
+        };
+    }
+  }, [activeSection, filteredScholarships.length, filteredProfessors.length, safeUniversities.length]);
 
   return (
     <div className="space-y-6 pb-12 animate-in fade-in duration-300">
       
       {/* FIGMA NODE 60-798: Unified Discovery Hero Card with Integrated Category Tabs */}
-      <div className="bg-white rounded-3xl border border-[#EAECF0] shadow-sm relative z-30 mb-6">
+      <div className="bg-white rounded-3xl border border-[#EAECF0] shadow-sm relative z-10 mb-6">
         
         {/* Top White Section */}
         <div className="p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-t-3xl">
           <div className="space-y-1">
             <h1 className="text-xl sm:text-2xl lg:text-[26px] font-bold text-[#101828] tracking-tight">
-              Find Your Desired Scholarship, Lab &amp; Safe Universities
+              {headerTitle}
             </h1>
             <p className="text-xs sm:text-sm text-[#475467] font-normal">
-              One simple search connects you to Scholarships, qualified professors, and secure regional universities
+              {headerSubtitle}
             </p>
           </div>
 
-          <div className="flex flex-row sm:flex-col sm:items-end justify-between sm:justify-center gap-2.5 shrink-0">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col items-end justify-center gap-2.5 shrink-0">
+            {/* Grid / List View Toggle matching Figma Node 89:4385 */}
+            <div className="flex items-center p-0.5 bg-white border border-[#D0D5DD] rounded-xl shadow-2xs">
               <button
                 type="button"
-                onClick={onSwitchToClassic}
-                className="text-xs text-[#475467] hover:text-[#101828] font-semibold bg-[#F8FAFC] hover:bg-slate-100 border border-[#D0D5DD] px-3 py-1.5 rounded-full transition-all cursor-pointer shadow-2xs shrink-0"
+                onClick={() => setViewLayout('grid')}
+                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                  viewLayout === 'grid' ? 'bg-[#F4F3FE] text-[#7150E7]' : 'text-[#667085] hover:text-[#101828]'
+                }`}
+                title="Grid View"
               >
-                ← Classic View
+                <LayoutGrid className="w-4 h-4" />
               </button>
-
-              {/* Grid / List View Toggle matching Figma Node 60-798 */}
-              <div className="flex items-center p-0.5 bg-white border border-[#D0D5DD] rounded-xl shadow-2xs">
-                <button
-                  type="button"
-                  onClick={() => setViewLayout('grid')}
-                  className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                    viewLayout === 'grid' ? 'bg-[#F4F3FE] text-[#7150E7]' : 'text-[#667085] hover:text-[#101828]'
-                  }`}
-                  title="Grid View"
-                >
-                  <LayoutGrid className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewLayout('list')}
-                  className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                    viewLayout === 'list' ? 'bg-[#F4F3FE] text-[#7150E7]' : 'text-[#667085] hover:text-[#101828]'
-                  }`}
-                  title="List View"
-                >
-                  <List className="w-4 h-4" />
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setViewLayout('list')}
+                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                  viewLayout === 'list' ? 'bg-[#F4F3FE] text-[#7150E7]' : 'text-[#667085] hover:text-[#101828]'
+                }`}
+                title="List View"
+              >
+                <List className="w-4 h-4" />
+              </button>
             </div>
 
-            {/* Live Openings Indicator matching Figma Node 60-798 */}
+            {/* Live Openings Indicator matching Figma Node 89:4385 */}
             <div className="flex items-center gap-1.5 text-xs font-semibold text-[#027A48]">
               <span className="w-2 h-2 rounded-full bg-[#12B76A] animate-pulse" />
-              <span>{opportunities.length || 58} Live Openings</span>
+              <span>{countBadgeText}</span>
             </div>
           </div>
         </div>
 
-        {/* Bottom Lavender Filter Section matching Figma Node 60-798 */}
-        <div className="bg-[#EDE9FC] px-6 sm:px-7 pt-5 pb-0 border-t border-[#E4DEF7] rounded-b-3xl space-y-4">
+        {/* Bottom Lavender Filter Section matching Figma Node 89:4385 */}
+        <div className="bg-[#EDE9FC] px-5 sm:px-7 pt-5 pb-5 sm:pb-6 border-t border-[#E4DEF7] rounded-b-3xl">
           
-          {/* Row 1: The 4 Dropdown Pills with small labels above */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {/* Row matching Figma Frame 2147226737: 4 Dropdowns + Integrated Search Bar on the SAME horizontal row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 items-end">
             
             {/* 1. Subject */}
-            <div className="space-y-1">
-              <label className="text-[11px] font-medium text-[#475467] pl-1">
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-semibold text-[#475467] pl-1 block">
                 Subject
               </label>
               <CustomDropdown
@@ -321,8 +1027,8 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
             </div>
 
             {/* 2. Degree */}
-            <div className="space-y-1">
-              <label className="text-[11px] font-medium text-[#475467] pl-1">
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-semibold text-[#475467] pl-1 block">
                 Degree
               </label>
               <CustomDropdown
@@ -338,8 +1044,8 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
             </div>
 
             {/* 3. Country (Searchable CustomDropdown with 50+ countries) */}
-            <div className="space-y-1">
-              <label className="text-[11px] font-medium text-[#475467] pl-1">
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-semibold text-[#475467] pl-1 block">
                 Country
               </label>
               <CustomDropdown
@@ -357,8 +1063,8 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
             </div>
 
             {/* 4. Acceptance & Funding */}
-            <div className="space-y-1">
-              <label className="text-[11px] font-medium text-[#475467] pl-1">
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-semibold text-[#475467] pl-1 block">
                 Acceptance &amp; Funding
               </label>
               <CustomDropdown
@@ -373,213 +1079,277 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
               />
             </div>
 
-          </div>
+            {/* Live Global Internet Engine Indicator & Switch */}
+            <div className="w-full flex flex-wrap items-center justify-between gap-2 px-1 pt-1">
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isLiveWebActive ? 'bg-emerald-400 opacity-75' : 'bg-slate-300'}`}></span>
+                  <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${isLiveWebActive ? 'bg-emerald-500' : 'bg-slate-400'}`}></span>
+                </span>
+                <span className="text-[12px] font-semibold text-[#344054]">
+                  {isLiveWebActive ? 'Live Global Academic Web Search Active' : 'Local Seed Data Only'}
+                </span>
+                <span className="hidden sm:inline-block text-[11px] text-[#98A2B3]">
+                  • OpenAlex (250M+ Papers &amp; 30M+ Researchers) • Live Fediverse
+                </span>
+              </div>
 
-          {/* Row 2: Search Input + Explore Results Button matching Figma Node 60-798 */}
-          <div className="flex flex-col sm:flex-row items-center gap-3 pt-1">
-            <div className="relative flex-1 w-full">
-              <Search className="w-4 h-4 text-[#98A2B3] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <input
-                type="text"
-                value={keywordQuery}
-                onChange={(e) => setKeywordQuery(e.target.value)}
-                placeholder="Type any keyword (e.g. Stanford, Interaction Design, Germany, Chevening, Arkansas, Full Ride)..."
-                className="w-full h-11 pl-10 pr-9 text-xs sm:text-sm bg-transparent border-none text-[#101828] placeholder:text-[#98A2B3] placeholder:italic focus:outline-hidden"
-              />
-              {keywordQuery && (
+              <div className="flex items-center gap-2">
+                {isLiveSearchingProfessors && (
+                  <span className="text-[11px] font-medium text-[#7150E7] animate-pulse flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" /> Fetching OpenAlex live...
+                  </span>
+                )}
                 <button
                   type="button"
-                  onClick={() => setKeywordQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                  onClick={() => setIsLiveWebActive(!isLiveWebActive)}
+                  className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full border transition-all cursor-pointer ${
+                    isLiveWebActive 
+                      ? 'bg-[#F9F5FF] text-[#7150E7] border-[#D6BBFB] hover:bg-[#F4EBFF]' 
+                      : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
+                  }`}
+                  title={isLiveWebActive ? "Switch to local curated database" : "Enable Live Global Web Search via OpenAlex"}
                 >
-                  <X className="w-3.5 h-3.5" />
+                  {isLiveWebActive ? '🌐 Live Web ON' : '⚙️ Local Seed'}
                 </button>
-              )}
+              </div>
             </div>
 
-            <button
-              type="button"
-              className="h-10 px-6 rounded-full bg-[#7150E7] hover:bg-[#5E3CD4] text-white font-semibold text-xs sm:text-sm shadow-xs transition-all cursor-pointer shrink-0"
-            >
-              Explore Results
-            </button>
-          </div>
+            {/* 5. Search Input + Filter Button matching Figma Node 89:4385 Frame 2147226745 */}
+            <div className="w-full">
+              <div className="w-full h-11 bg-white rounded-full border border-[#D0D5DD] hover:border-[#7150E7] px-4 flex items-center justify-between shadow-2xs transition-colors">
+                <div className="flex items-center gap-2 flex-1 min-w-0 mr-2">
+                  <Search className="w-4 h-4 text-[#90A1B9] shrink-0" />
+                  <input
+                    type="text"
+                    value={keywordQuery}
+                    onChange={(e) => handleKeywordChange(e.target.value)}
+                    placeholder={searchPlaceholder}
+                    className="w-full text-xs sm:text-[13px] bg-transparent border-none text-[#101828] placeholder:text-[#90A1B9] focus:outline-hidden"
+                  />
+                  {keywordQuery && (
+                    <button
+                      type="button"
+                      onClick={() => handleKeywordChange('')}
+                      className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
 
-          {/* Dotted Divider matching Figma Node 60-798 */}
-          <div className="border-t border-dashed border-[#D6BBFB]/80 pt-2" />
+                {/* Vertical line divider (Vector 3) */}
+                <div className="h-4 w-[1px] bg-[#E2E8F0] shrink-0 mx-1.5" />
 
-          {/* Row 3: Integrated Category Tabs matching Figma Node 60-798 */}
-          <div className="flex flex-wrap sm:flex-nowrap items-center gap-6 sm:gap-10 pt-1">
-            {/* Tab 1: Safe-Bet Universities */}
-            <button
-              type="button"
-              onClick={() => setActiveSection('safe_unis')}
-              className={`pb-3 text-left transition-all cursor-pointer relative group select-none ${
-                activeSection === 'safe_unis'
-                  ? 'text-[#101828]'
-                  : 'text-[#475467] hover:text-[#101828]'
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <span className="text-xs sm:text-sm font-bold">Safe-Bet Universities</span>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                  activeSection === 'safe_unis'
-                    ? 'bg-[#7150E7] text-white'
-                    : 'bg-white/80 text-[#7150E7]'
-                }`}>
-                  {safeUniversities.length}
-                </span>
+                {/* Filter button */}
+                <button
+                  type="button"
+                  className="text-[#90A1B9] hover:text-[#475467] font-medium text-xs inline-flex items-center gap-1.5 cursor-pointer shrink-0 transition-colors"
+                >
+                  <span>Filter</span>
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-[#90A1B9]" />
+                </button>
               </div>
-              <p className="text-[11px] text-[#64748B] mt-0.5 font-normal">
-                High Acceptance &amp; $0 Tuition
-              </p>
-              
-              {/* Active Indicator Underline */}
-              {activeSection === 'safe_unis' && (
-                <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#7150E7] rounded-t-full" />
-              )}
-            </button>
-
-            {/* Tab 2: Full-Ride Scholarships */}
-            <button
-              type="button"
-              onClick={() => setActiveSection('scholarships')}
-              className={`pb-3 text-left transition-all cursor-pointer relative group select-none ${
-                activeSection === 'scholarships'
-                  ? 'text-[#101828]'
-                  : 'text-[#475467] hover:text-[#101828]'
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <span className="text-xs sm:text-sm font-bold">Full-Ride Scholarships</span>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                  activeSection === 'scholarships'
-                    ? 'bg-[#7150E7] text-white'
-                    : 'bg-white/80 text-[#7150E7]'
-                }`}>
-                  {filteredScholarships.length}
-                </span>
-              </div>
-              <p className="text-[11px] text-[#64748B] mt-0.5 font-normal">
-                100% Free Tuition Waivers
-              </p>
-              
-              {activeSection === 'scholarships' && (
-                <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#7150E7] rounded-t-full" />
-              )}
-            </button>
-
-            {/* Tab 3: Professors & Labs */}
-            <button
-              type="button"
-              onClick={() => setActiveSection('professors')}
-              className={`pb-3 text-left transition-all cursor-pointer relative group select-none ${
-                activeSection === 'professors'
-                  ? 'text-[#101828]'
-                  : 'text-[#475467] hover:text-[#101828]'
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <span className="text-xs sm:text-sm font-bold">Professors &amp; Labs</span>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                  activeSection === 'professors'
-                    ? 'bg-[#7150E7] text-white'
-                    : 'bg-white/80 text-[#7150E7]'
-                }`}>
-                  {filteredProfessors.length}
-                </span>
-              </div>
-              <p className="text-[11px] text-[#64748B] mt-0.5 font-normal truncate max-w-[200px]">
-                Hiring in {selectedField.includes('ALL') || selectedField.length === 0 ? 'All Fields' : selectedField.length > 2 ? `${selectedField.slice(0, 2).join(', ')} +${selectedField.length - 2}` : selectedField.join(', ')}
-              </p>
-              
-              {activeSection === 'professors' && (
-                <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#7150E7] rounded-t-full" />
-              )}
-            </button>
-
-            {/* Optional: View All Combined Pill on Far Right */}
-            <div className="ml-auto hidden md:block pb-3">
-              <button
-                type="button"
-                onClick={() => setActiveSection(activeSection === 'all' ? 'safe_unis' : 'all')}
-                className={`text-xs px-3 py-1 rounded-full font-medium transition-colors cursor-pointer ${
-                  activeSection === 'all'
-                    ? 'bg-[#101828] text-white font-bold'
-                    : 'text-[#64748B] hover:text-[#101828] bg-white/60 hover:bg-white'
-                }`}
-              >
-                {activeSection === 'all' ? '✓ Showing All' : 'View All Combined'}
-              </button>
             </div>
+
           </div>
 
         </div>
       </div>
 
-      {/* 3. UNIFIED SECTION 1: SAFE REGIONAL UNIVERSITIES (RANK 1,000 – 5,000+) */}
+      {/* 3. UNIFIED SECTION 1: SAFE REGIONAL UNIVERSITIES (RANK 1,000 – 5,000+) matching Figma Node 89:4385 */}
       {(activeSection === 'all' || activeSection === 'safe_unis') && safeUniversities.length > 0 && (
         <section className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/60 pb-3">
+          {/* Section Header matching Figma Frame 2147226741 */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3">
             <div>
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-700">
-                <Building2 className="w-4 h-4 text-emerald-600" />
-                <span>Highest Acceptance &amp; Zero Tuition Gems (Rank 1,000 – 5,000+)</span>
-              </div>
-              <h2 className="text-lg sm:text-xl font-bold text-slate-900 mt-0.5">
+              <h2 className="text-lg sm:text-xl font-bold text-[#101828]">
                 Safe-Bet Universities with Guaranteed Funding &amp; Assistantships
               </h2>
+              <p className="text-xs text-[#90A1B9] font-medium mt-0.5">
+                High Acceptance &amp; $0 Tuition
+              </p>
             </div>
-            <span className="text-xs text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full font-bold border border-emerald-200 self-start sm:self-auto">
+            <span className="text-xs text-[#006045] bg-[#ECFDF5] px-3.5 py-1 rounded-full font-bold border border-[#A7F3D0] self-start sm:self-auto">
               ✓ 85% – 95% Acceptance Rate
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {safeUniversities.map((uni) => (
               <div 
                 key={uni.id}
-                className="bg-white rounded-2xl border border-emerald-100 p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-3"
+                className="bg-white rounded-[16px] border border-[#F1F5F9] p-4 flex flex-col justify-between gap-3 shadow-2xs hover:shadow-md transition-all group"
               >
-                <div className="space-y-2">
+                {/* Header (Frame 2147226739) */}
+                <div className="space-y-3">
                   <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <h3 className="text-sm sm:text-base font-bold text-slate-900 leading-snug">{uni.name}</h3>
-                      <p className="text-xs text-slate-500 font-medium">{uni.field}</p>
+                    <div className="min-w-0">
+                      <h3 className="text-base font-bold text-[#101828] leading-snug group-hover:text-[#7050E6] transition-colors truncate">
+                        {uni.name}
+                      </h3>
+                      <p className="text-xs text-[#919EAB] font-medium mt-0.5 truncate">
+                        {uni.field}
+                      </p>
                     </div>
-                    <span className="text-xs font-bold bg-slate-100 px-2 py-0.5 rounded-full shrink-0">{uni.country}</span>
+                    {/* Standalone 28x18 Flag Graphic matching Figma Frame 2147226739 */}
+                    {renderCountryFlag(uni.country, uni.id)}
                   </div>
 
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full inline-block">
-                    {uni.rankBadge}
-                  </span>
+                  {/* Divider Line 1 (Vector 1) */}
+                  <div className="h-[1px] bg-[#F1F5F9] w-full" />
 
-                  <div className="bg-emerald-50/40 rounded-xl p-3 text-xs space-y-1.5 border border-emerald-100">
-                    <p className="text-slate-800 font-semibold flex items-center gap-1.5">
-                      <DollarSign className="w-3.5 h-3.5 text-emerald-600" />
-                      <span><strong>Financial:</strong> {uni.fundingBenefit}</span>
+                  {/* Middle Details Container (Frame 2147226738) */}
+                  <div className="bg-[#F8FAFC] rounded-lg p-3 text-xs space-y-1.5">
+                    <p className="text-xs leading-snug">
+                      <span className="font-bold text-[#101828]">💰 Financial: </span>
+                      <span className="text-[#101828]">{uni.financialBase}</span>
+                      <span className="font-bold italic text-[#101828]">{uni.financialHighlight}</span>
+                      <span className="text-[#101828]">{uni.financialSuffix}</span>
                     </p>
-                    <p className="text-slate-600">
-                      🏡 <strong>Living:</strong> {uni.cost}
+                    <p className="text-xs leading-snug">
+                      <span className="font-bold text-[#101828]">🎓 Admission: </span>
+                      <span className="text-[#919EAB]">{uni.admission}</span>
                     </p>
-                    <p className="text-slate-600">
-                      🎓 <strong>Admission:</strong> {uni.requirements}
+                    <p className="text-xs leading-snug">
+                      <span className="font-bold text-[#101828]">🏡 Living: </span>
+                      <span className="text-[#919EAB]">{uni.living}</span>
                     </p>
+                  </div>
+
+                  {/* Rank Chip (Frame 2147226703) */}
+                  <div className="pt-0.5">
+                    <span className="bg-[#ECFDF5] border border-[#A7F3D0] text-[#009966] text-[11px] font-semibold px-2.5 py-0.5 rounded-full inline-block">
+                      {uni.rankBadge}
+                    </span>
                   </div>
                 </div>
 
-                <a
-                  href={uni.officialLink}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="h-9 px-4 rounded-xl text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 inline-flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-                >
-                  <span>Official Admissions &amp; Funding Details</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
+                {/* Bottom Actions Row (Frame 2147226704) */}
+                <div className="space-y-3 pt-1">
+                  {/* Divider Line 2 (Vector 3) */}
+                  <div className="h-[1px] bg-[#F1F5F9] w-full" />
+
+                  <div className="flex items-center gap-4">
+                    {/* Left: Bookmark Button matching Figma Frame 2147226704 Button (no border, rounded-full) */}
+                    <button
+                      type="button"
+                      onClick={() => toggleBookmark(uni.id)}
+                      className="w-10 h-10 rounded-full bg-white flex items-center justify-center hover:bg-slate-50 text-[#98A2B3] hover:text-[#7050E6] transition-colors cursor-pointer shrink-0 shadow-2xs"
+                      title={bookmarkedIds.includes(uni.id) ? "Remove Bookmark" : "Bookmark University"}
+                    >
+                      <Bookmark className={`w-4.5 h-4.5 ${bookmarkedIds.includes(uni.id) ? 'text-[#7050E6] fill-[#7050E6]' : 'text-[#98A2B3]'}`} />
+                    </button>
+
+                    {/* Subtle Vertical Divider (Vector 3: height 15.5px, #D9D9D9) */}
+                    <div className="h-4 w-[1px] bg-[#D9D9D9] shrink-0" />
+
+                    {/* Right: Official Link & See Details Button Group (Frame 2147226705: gap-4, flex-1 equal width) */}
+                    <div className="flex items-center gap-4 flex-1">
+                      <a
+                        href={uni.officialLink}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="h-10 px-4 rounded-full bg-[#F8FAFC] hover:bg-slate-100 text-[#7050E6] border border-[#7050E6] text-xs font-bold flex-1 inline-flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                      >
+                        <span>Official Link</span>
+                        <ArrowUpRight className="w-3.5 h-3.5 text-[#7050E6]" />
+                      </a>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const matchingSch = scholarships.find(s => s.provider.toLowerCase().includes(uni.name.toLowerCase()) || uni.name.toLowerCase().includes(s.provider.toLowerCase()));
+                          if (matchingSch) {
+                            onOpenScholarshipDetail(matchingSch);
+                          } else {
+                            onOpenScholarshipDetail({
+                              id: uni.id,
+                              title: `${uni.name} - ${uni.field} Graduate Assistantship`,
+                              provider: uni.name,
+                              countries: [uni.country],
+                              degreeLevels: uni.degrees as any,
+                              fundingType: 'TUITION_WAIVER',
+                              fundingAmount: `${uni.financialBase}${uni.financialHighlight}${uni.financialSuffix}`,
+                              deadline: '2026-12-15T00:00:00.000Z',
+                              description: `Guaranteed graduate funding opportunity at ${uni.name}. Admission requirements: ${uni.admission}. Living & housing: ${uni.living}.`,
+                              requirements: {
+                                notes: uni.admission
+                              },
+                              officialUrl: uni.officialLink,
+                              specializations: uni.fieldTags,
+                              tags: ['Guaranteed Funding', 'Safe University', 'Assistantship', ...uni.fieldTags],
+                              featured: true
+                            });
+                          }
+                        }}
+                        className="h-10 px-4 rounded-full bg-[#7050E6] hover:bg-[#5E3CD4] text-white text-xs font-bold flex-1 inline-flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                      >
+                        <span>See Details</span>
+                        <ArrowRight className="w-3.5 h-3.5 text-white" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             ))}
           </div>
+        </section>
+      )}
+
+      {/* 3.5. UNIFIED SECTION 1.5: LAB HIRING NOTICES & LIVE PHD/RA OPENINGS */}
+      {(activeSection === 'all' || activeSection === 'safe_unis') && (
+        <section className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#F1F5F9] pb-3">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#7150E7]">
+                <Zap className="w-4 h-4 text-[#7150E7]" />
+                <span>Live Lab Hiring &amp; Graduate Research Assistantships</span>
+              </div>
+              <h2 className="text-lg sm:text-xl font-bold text-[#101828] mt-0.5">
+                Active Lab Openings with Stipend &amp; Tuition Remission ({fieldOpportunities.length})
+              </h2>
+            </div>
+
+            {/* Live Web Sync Button */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={async () => {
+                  const res = await syncLiveOpportunities();
+                  setLiveSyncMessage(`Fetched ${res.newFound} new live postings from global academic web!`);
+                  setTimeout(() => setLiveSyncMessage(null), 4000);
+                }}
+                disabled={isSyncingOpportunities}
+                className="h-9 px-4 rounded-full bg-[#7150E7] hover:bg-[#5E3CD4] disabled:opacity-50 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer select-none"
+              >
+                <Zap className={`w-3.5 h-3.5 ${isSyncingOpportunities ? 'animate-spin' : ''}`} />
+                <span>{isSyncingOpportunities ? 'Crawling Academic Web...' : 'Fetch Live Web Postings (PhD/RA)'}</span>
+              </button>
+            </div>
+          </div>
+
+          {liveSyncMessage && (
+            <div className="p-3 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-semibold flex items-center justify-between">
+              <span>✓ {liveSyncMessage}</span>
+              <button onClick={() => setLiveSyncMessage(null)} className="text-emerald-600 hover:text-emerald-900 cursor-pointer">
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+
+          {fieldOpportunities.length === 0 ? (
+            <div className="p-8 bg-white rounded-2xl border border-slate-200 text-center text-xs text-slate-500">
+              No direct lab openings matched this query. Try selecting "All Fields" or clicking "Fetch Live Web Postings".
+            </div>
+          ) : (
+            <div className={viewLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" : "flex flex-col gap-4"}>
+              {fieldOpportunities.map((opp) => (
+                <OpportunityCard key={opp.id} opportunity={opp} />
+              ))}
+            </div>
+          )}
         </section>
       )}
 
@@ -624,10 +1394,45 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-purple-700">
                 <GraduationCap className="w-4 h-4 text-purple-600" />
                 <span>Faculty &amp; Research Supervisors</span>
+                {isLiveSearchingProfessors && (
+                  <span className="inline-flex items-center gap-1 text-[11px] text-[#7150E7] font-semibold lowercase bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200 animate-pulse">
+                    <Loader2 className="w-3 h-3 animate-spin" /> querying OpenAlex (30M+ Researchers)...
+                  </span>
+                )}
               </div>
               <h2 className="text-lg sm:text-xl font-bold text-slate-900 mt-0.5">
                 Professors &amp; Labs with Open Positions in {selectedField.includes('ALL') || selectedField.length === 0 ? 'All Fields' : selectedField.join(', ')} ({filteredProfessors.length})
               </h2>
+            </div>
+
+            {/* Quick Live Refresh Button */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={async () => {
+                  const q = keywordQuery.trim();
+                  const f = selectedField.includes('ALL') ? '' : selectedField.join(' ');
+                  setIsLiveSearchingProfessors(true);
+                  try {
+                    const res = await fetch(`/api/professors/search?query=${encodeURIComponent(q || 'Computer Science AI')}&field=${encodeURIComponent(f)}`);
+                    if (res.ok) {
+                      const data = await res.json();
+                      if (data.success && Array.isArray(data.professors)) {
+                        setLiveProfessors(data.professors);
+                      }
+                    }
+                  } catch (e) {
+                    console.error(e);
+                  } finally {
+                    setIsLiveSearchingProfessors(false);
+                  }
+                }}
+                disabled={isLiveSearchingProfessors}
+                className="h-8 px-3 rounded-full bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-semibold inline-flex items-center gap-1.5 transition-all cursor-pointer select-none"
+              >
+                <Globe2 className={`w-3.5 h-3.5 ${isLiveSearchingProfessors ? 'animate-spin' : ''}`} />
+                <span>{isLiveSearchingProfessors ? 'Searching OpenAlex...' : 'Search Global OpenAlex Web'}</span>
+              </button>
             </div>
           </div>
 
@@ -646,6 +1451,11 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
             </div>
           )}
         </section>
+      )}
+
+      {/* 6. UNIFIED SECTION 4: RESEARCH PAPERS & AI BOT EXPLORER */}
+      {(activeSection === 'all' || activeSection === 'research_papers') && (
+        <ResearchPapersView />
       )}
 
     </div>

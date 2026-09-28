@@ -47,12 +47,19 @@ export const ProfessorCard: React.FC<ProfessorCardProps> = ({ professor }) => {
             </div>
           </div>
 
-          {/* Open Positions Badge */}
-          {professor.openPositions && (
-            <span className="bg-[#E8FAF0] text-[#12B76A] border border-[#A6F4C5] text-[11px] font-semibold px-2.5 py-0.5 rounded-full shrink-0 select-none">
-              Open Positions
-            </span>
-          )}
+          {/* Open Positions & Live Index Badges */}
+          <div className="flex flex-col items-end gap-1 shrink-0">
+            {professor.openPositions && (
+              <span className="bg-[#E8FAF0] text-[#12B76A] border border-[#A6F4C5] text-[11px] font-semibold px-2.5 py-0.5 rounded-full select-none">
+                Open Positions
+              </span>
+            )}
+            {professor.id?.startsWith('openalex_') && (
+              <span className="bg-[#F9F5FF] text-[#7150E7] border border-[#D6BBFB] text-[10px] font-semibold px-2 py-0.5 rounded-full select-none flex items-center gap-1">
+                <span>🌐</span> OpenAlex Verified
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Full-width Stacked Information Boxes (Figma Node 26-5404) */}

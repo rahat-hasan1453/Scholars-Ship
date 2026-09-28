@@ -142,3 +142,29 @@ export interface OutreachRecord {
   sourceUrl?: string;
 }
 
+export interface ResearchPaperAuthor {
+  name: string;
+  institution?: string;
+  googleScholarUrl?: string;
+}
+
+export interface ResearchPaper {
+  id: string;
+  title: string;
+  authors: ResearchPaperAuthor[];
+  abstract: string;
+  publicationDate: string;
+  year: number;
+  venue: string;
+  citationCount: number;
+  fieldsOfStudy: string[];
+  tags: string[];
+  doi?: string;
+  pdfUrl?: string;
+  googleScholarUrl: string;
+  semanticScholarUrl?: string;
+  isOpenAccess: boolean;
+  isSaved?: boolean;
+}
+
+

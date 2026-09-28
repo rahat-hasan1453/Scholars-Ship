@@ -19,13 +19,14 @@ import {
   CheckmarkCircle01Icon,
   PuzzleIcon
 } from '@hugeicons/core-free-icons';
-import { ChevronRight, Zap, LogOut, Settings, User, Sparkles } from 'lucide-react';
+import { ChevronRight, Zap, LogOut, Settings, User, Sparkles, BookOpen } from 'lucide-react';
 import { HighScholarLogo } from './HighScholarLogo';
+import { HeaderGlobalSearch } from './HeaderGlobalSearch';
 
 interface AppLayoutProps {
   children: React.ReactNode;
-  activeTab: 'scholarships' | 'opportunities' | 'professors' | 'tracker' | 'profile';
-  setActiveTab: (tab: 'scholarships' | 'opportunities' | 'professors' | 'tracker' | 'profile') => void;
+  activeTab: 'scholarships' | 'opportunities' | 'professors' | 'research' | 'tracker' | 'profile';
+  setActiveTab: (tab: 'scholarships' | 'opportunities' | 'professors' | 'research' | 'tracker' | 'profile') => void;
   onOpenExtension: () => void;
   viewMode?: 'classic' | 'unified';
   onToggleViewMode?: () => void;
@@ -119,45 +120,13 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
 
           {/* Navigation Groups */}
           <nav className="space-y-5 text-sm">
-            {/* Senior UX Suggested Design Preview Switcher */}
-            {onToggleViewMode && (
-              <div className="p-2.5 rounded-2xl bg-gradient-to-br from-[#F4F3FE] via-[#EDE9FC] to-[#E0EAFF] border border-[#DDD7FA] shadow-2xs">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#7150E7]">
-                    UX Redesign
-                  </span>
-                  <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-[#7150E7] text-white">
-                    Preview
-                  </span>
-                </div>
-                <p className="text-[11px] text-[#475467] leading-snug mb-2 font-normal">
-                  Unified view for Safe Universities, Free Tuition &amp; Labs.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    onToggleViewMode();
-                    setIsSidebarOpen(false);
-                  }}
-                  className={`w-full py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs ${
-                    viewMode === 'unified'
-                      ? 'bg-[#7150E7] hover:bg-[#5e3cd4] text-white shadow-purple-200'
-                      : 'bg-white hover:bg-[#FAF9FF] text-[#7150E7] border border-[#DDD7FA]'
-                  }`}
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                  <span>{viewMode === 'unified' ? '← Back to Classic' : '✨ Try Unified Hub'}</span>
-                </button>
-              </div>
-            )}
-
             {/* Section 1: Discover & Opportunities */}
             <div>
               <div className="px-2 text-xs font-medium text-[#64748B] mb-2">
-                Discover & Opportunities
+                Discover &amp; Opportunities
               </div>
               <div className="space-y-1">
-                {/* Day Planning (Active) */}
+                {/* Opportunity Feed */}
                 <button
                   onClick={() => {
                     setActiveTab('opportunities');
@@ -181,14 +150,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                       className={activeTab === 'opportunities' ? 'text-[#7150E7]' : 'text-[#64748B]'} 
                     />
                     <span className={activeTab === 'opportunities' ? 'text-[#101828] font-semibold' : 'text-[#475467]'}>
-                      Opportunities Feed
+                      Opportunity Feed
                     </span>
                   </div>
-                  
-                  {/* Badge '1' */}
-                  <span className="w-5 h-5 rounded-full bg-[#7150E7] text-white text-[11px] font-semibold flex items-center justify-center">
-                    1
-                  </span>
                 </button>
 
                 {/* Scholarship Radar */}
@@ -242,56 +206,42 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                       className={activeTab === 'professors' ? 'text-[#7150E7]' : 'text-[#64748B]'} 
                     />
                     <span className={activeTab === 'professors' ? 'text-[#101828] font-semibold' : 'text-[#475467]'}>
-                      Faculty & Research Labs
+                      Faculty &amp; Research Labs
                     </span>
                   </div>
                 </button>
-              </div>
-            </div>
 
-            {/* Section 2: Application Pipelines */}
-            <div>
-              <div className="px-2 text-xs font-medium text-[#64748B] mb-2">
-                Application Pipelines
-              </div>
-              <div className="space-y-1">
-                {/* Kanban Pipelines */}
+                {/* Research Paper */}
                 <button
                   onClick={() => {
-                    setActiveTab('tracker');
+                    setActiveTab('research');
                     setIsSidebarOpen(false);
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium transition-all cursor-pointer relative overflow-hidden ${
-                    activeTab === 'tracker'
+                    activeTab === 'research'
                       ? 'bg-[#F4F3FE] text-[#101828] font-semibold'
                       : 'text-[#475467] hover:bg-[#F8FAFC] hover:text-[#101828]'
                   }`}
                 >
-                  {activeTab === 'tracker' && (
+                  {activeTab === 'research' && (
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#7150E7] rounded-r-md" />
                   )}
 
                   <div className="flex items-center gap-3">
-                    <HugeiconsIcon 
-                      icon={KanbanIcon} 
-                      size={18} 
-                      className={activeTab === 'tracker' ? 'text-[#7150E7]' : 'text-[#64748B]'} 
+                    <BookOpen 
+                      className={`w-4 h-4 ${activeTab === 'research' ? 'text-[#7150E7]' : 'text-[#64748B]'}`} 
                     />
-                    <span className={activeTab === 'tracker' ? 'text-[#101828] font-semibold' : 'text-[#475467]'}>
-                      Kanban Pipelines
+                    <span className={activeTab === 'research' ? 'text-[#101828] font-semibold' : 'text-[#475467]'}>
+                      Research Paper
                     </span>
                   </div>
-
-                  <span className="w-5 h-5 rounded-full bg-[#7150E7] text-white text-[11px] font-semibold flex items-center justify-center">
-                    1
-                  </span>
                 </button>
               </div>
             </div>
           </nav>
         </div>
 
-        {/* User profile row at bottom matching image */}
+        {/* User profile row at bottom matching Figma exactly */}
         <div className="p-3 border-t border-[#F1F5F9] bg-white">
           <div 
             onClick={() => {
@@ -304,12 +254,12 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
               <img
                 src="/alex-avatar.png"
                 alt="Alex Mercer"
-                className="w-9 h-9 rounded-full object-cover shrink-0"
+                className="w-9 h-9 rounded-full object-cover shrink-0 border border-[#EAECF0]"
               />
               <div className="min-w-0 text-left">
-                <div className="text-xs font-semibold text-[#101828] leading-tight">{profile.name}</div>
-                <div className="text-[11px] text-[#64748B] leading-tight mt-0.5 truncate max-w-[140px]">
-                  {profile.degreeLevel} • {profile.specializations[0] || 'Computer Science'}
+                <div className="text-xs font-semibold text-[#101828] leading-tight">Alex Mercer</div>
+                <div className="text-[11px] text-[#64748B] leading-tight mt-0.5 truncate">
+                  Masters • UX &amp; HCI
                 </div>
               </div>
             </div>
@@ -318,7 +268,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                 e.stopPropagation();
                 setIsOnboardingOpen(true);
               }}
-              className="p-1 rounded-md text-[#94A3B8] hover:text-[#7150E7] hover:bg-[#EDE9FE] transition-colors"
+              className="p-1 rounded-md text-[#94A3B8] hover:text-[#7150E7] hover:bg-[#EDE9FE] transition-colors cursor-pointer"
               title="Edit Profile Wizard"
             >
               <HugeiconsIcon icon={PreferenceHorizontalIcon} size={18} />
@@ -330,8 +280,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         
-        {/* Uxcel Top Header Bar */}
-        <header className="sticky top-0 z-30 h-16 bg-white/95 backdrop-blur-md border-b border-[#eaecf0] px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+        {/* Figma Header (HighScholar | Global Scholarship & Professor Finder Portal) */}
+        <header className="sticky top-0 z-40 h-16 bg-white/95 backdrop-blur-md border-b border-[#eaecf0] px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsSidebarOpen(true)}
@@ -340,98 +290,43 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
               <HugeiconsIcon icon={Menu01Icon} size={20} />
             </button>
 
-            {/* Breadcrumb path */}
-            <div className="flex items-center gap-1.5 text-xs">
+            {/* Breadcrumb path matching Figma Node 89:4385 */}
+            <div className="flex items-center gap-1.5 text-xs shrink-0">
               <span className="text-[#667085] font-medium">HighScholar</span>
-              <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
-              <span className="font-bold text-[#101828]">
-                {activeTab === 'opportunities'
-                  ? 'Opportunities Feed'
-                  : activeTab === 'scholarships'
-                  ? 'Scholarship Radar'
-                  : activeTab === 'professors'
-                  ? 'Faculty & Research Labs'
-                  : activeTab === 'tracker'
-                  ? 'Kanban Pipelines'
-                  : 'Scholar Profile & Credentials'}
+              <ChevronRight className="w-3.5 h-3.5 text-[#CBD5E1]" />
+              <span className="font-bold italic text-[#101828]">
+                {activeTab === 'opportunities' ? 'Opportunity Feed' : 
+                 activeTab === 'scholarships' ? 'Scholarship Radar' : 
+                 activeTab === 'professors' ? 'Faculty & Research Labs' : 
+                 activeTab === 'research' ? 'Research Paper' : 
+                 activeTab === 'tracker' ? 'Applications & Outreach' : 'Opportunity Feed'}
               </span>
             </div>
           </div>
 
-          {/* Quick Metrics Bar in Uxcel Aesthetic */}
+          {/* Center: Global Omnisearch matching Figma Node 96:6267 Frame 2147226745 */}
+          <div className="hidden md:flex flex-1 items-center justify-center px-4 max-w-[540px]">
+            <HeaderGlobalSearch
+              onNavigateToTab={(tab) => setActiveTab(tab)}
+            />
+          </div>
+
+          {/* Right: User Profile Pill matching Figma Node 89:4385 exactly */}
           <div className="flex items-center gap-3">
-            {/* Live Count Pill */}
-            <div className="hidden sm:flex items-center gap-2">
-              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#eef2ff] border border-[#c7d2fe] text-xs font-semibold text-[#4338ca]">
-                <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                <span>{opportunities.length} Live Openings</span>
-              </div>
-
-              {urgentCount > 0 && (
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-700">
-                  <HugeiconsIcon icon={Clock01Icon} size={14} className="text-rose-500" />
-                  <span>{urgentCount} Urgent (≤7d)</span>
-                </div>
-              )}
-
-              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-700">
-                <HugeiconsIcon icon={CheckmarkCircle01Icon} size={14} className="text-emerald-600" />
-                <span>{applications.length + outreachRecords.length} Tracked</span>
-              </div>
-            </div>
-
-            {/* Suggested Design Preview Switcher in Header */}
-            {onToggleViewMode && (
+            <div ref={profileMenuRef} className="relative">
               <button
                 type="button"
-                onClick={onToggleViewMode}
-                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer border ${
-                  viewMode === 'unified'
-                    ? 'bg-[#7150E7] text-white border-[#7150E7] hover:bg-[#5e3cd4] shadow-purple-200 ring-2 ring-purple-300/40'
-                    : 'bg-[#F4F3FE] hover:bg-[#EDE9FE] text-[#7150E7] border-[#DDD7FA] hover:border-[#C4B9F5]'
-                }`}
-                title="Toggle between Classic View and Senior UX Unified Hub"
+                onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+                className="flex items-center gap-2 px-3 py-1.5 bg-[#F8FAFC] hover:bg-[#F1F5F9] rounded-full border border-[#EAECF0] transition-colors cursor-pointer shadow-2xs"
+                title="User Profile"
               >
-                <Sparkles className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                <span>{viewMode === 'unified' ? '← Back to Classic View' : '✨ Try Unified Hub (Preview)'}</span>
+                <img
+                  src="/alex-avatar.png"
+                  alt="Alex Mercer"
+                  className="w-7 h-7 rounded-full object-cover border border-[#EAECF0]"
+                />
+                <span className="text-xs font-bold text-[#101828]">Alex Mercer</span>
               </button>
-            )}
-
-            {/* Extension API CTA */}
-            <button
-              onClick={onOpenExtension}
-              className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white hover:bg-slate-50 text-[#344054] border border-[#d0d5dd] transition-colors shadow-xs cursor-pointer"
-            >
-              <HugeiconsIcon icon={PuzzleIcon} size={14} className="text-[#4f46e5]" />
-              <span>Extension API</span>
-            </button>
-
-            {/* Profile Avatar Pill & Login in Header */}
-            <div className="flex items-center gap-2">
-              <Link
-                href="/login"
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-[#5E43D8] bg-[#F4F3FE] hover:bg-[#EDE9FE] border border-[#DDD7FA] transition-colors"
-                title="Sign In / Switch Account"
-              >
-                <span>Login</span>
-              </Link>
-
-              <div ref={profileMenuRef} className="relative">
-                <button
-                  type="button"
-                  onClick={() => setIsProfileMenuOpen((prev) => !prev)}
-                  className={`flex items-center gap-2 p-1 pl-2.5 bg-[#f8fafc] hover:bg-[#f1f5f9] rounded-full transition-colors border shadow-2xs cursor-pointer ${
-                    isProfileMenuOpen ? 'border-[#6941C6] ring-2 ring-[#6941C6]/15' : 'border-[#eaecf0]'
-                  }`}
-                  title="Open User Profile Menu"
-                >
-                  <span className="text-xs font-bold text-[#101828] hidden sm:inline">{profile.name.split(' ')[0]}</span>
-                  <img
-                    src={profile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80'}
-                    alt={profile.name}
-                    className="w-7 h-7 rounded-full object-cover border border-[#eaecf0]"
-                  />
-                </button>
 
                 {/* Profile Small Modal (Figma Node 49-648) */}
                 {isProfileMenuOpen && (
@@ -512,7 +407,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                 )}
               </div>
             </div>
-          </div>
         </header>
 
         {/* Dynamic Page Content */}
