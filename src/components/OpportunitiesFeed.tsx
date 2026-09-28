@@ -374,10 +374,10 @@ export const OpportunitiesFeed: React.FC = () => {
 
         {/* ROW 2: Title + Subtitle (Figma Frame 2147226783 Node 122:3185) */}
         <div className="space-y-0.5">
-          <h1 className="text-base sm:text-lg font-bold text-[#101828] tracking-tight leading-6">
+          <h1 className="text-base font-semibold text-[#101828] tracking-tight leading-6">
             Find Your Desired Scholarship, Lab &amp; Safe Universities
           </h1>
-          <p className="text-xs sm:text-sm text-[#475467] font-normal leading-5">
+          <p className="text-sm text-[#475467] font-normal leading-5">
             A quick search links you to scholarships, expert professors, and trusted regional universities.
           </p>
         </div>
@@ -715,97 +715,106 @@ export const OpportunitiesFeed: React.FC = () => {
         - Opportunity List Bar (48 items, acceptance rate badge, view toggle)
         - 3-Column Opportunity Cards Grid
         ========================================================================
-      */}
-      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
+      {/* Fix #9: Body white background wrapper matching Figma Node 116:1921 (fills: white, padding: 20px) */}
+      <div className="bg-white flex-1">
+        <div className="p-5 max-w-[1172px] mx-auto w-full space-y-5">
         
-        {/* Opportunity List Sub-Bar (Figma Frame 2147226741 Node 116:1923) */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
-          {/* Left Title & Subtitle */}
-          <div>
-            <div className="flex items-center">
-              <h2 className="text-base sm:text-lg font-bold text-[#101828] leading-tight">
-                Opportunity List
-              </h2>
-              <span className="text-xs sm:text-sm font-semibold text-[#98A2B3] ml-1.5">
-                / {filteredOpportunities.length} Items
+          {/* Opportunity List Sub-Bar (Figma Frame 2147226741 Node 116:1923) */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            {/* Left Title & Subtitle */}
+            <div>
+              <div className="flex items-baseline gap-1">
+                {/* Fix #8: Figma fontSize:16, fontWeight:590 → text-base font-semibold */}
+                <h2 className="text-base font-semibold text-[#101828] leading-tight">
+                  Opportunity List
+                </h2>
+                {/* Figma: fontSize:12, fontWeight:400, color: rgb(145,158,171) */}
+                <span className="text-xs font-normal text-[#919EAB]">
+                  / {filteredOpportunities.length} Items
+                </span>
+              </div>
+              {/* Figma: fontSize:12, fontWeight:400, color: rgb(144,161,185) */}
+              <p className="text-xs text-[#90A1B9] mt-0.5">
+                Safe-Bet Universities with Guaranteed Funding &amp; Assistantships
+              </p>
+            </div>
+
+            {/* Right: Acceptance Rate Text + Grid/List View Toggle */}
+            <div className="flex items-center gap-3 shrink-0">
+              {/* Figma: plain text, fontSize:12, fontWeight:700, color: rgb(0,153,102) — no pill/bg */}
+              <span className="text-xs font-bold text-[#009966] select-none">
+                ✓ 85% – 95% Acceptance Rate
               </span>
-            </div>
-            <p className="text-xs text-[#667085] mt-0.5">
-              Safe-Bet Universities with Guaranteed Funding &amp; Assistantships
-            </p>
-          </div>
 
-          {/* Right: Acceptance Rate Pill + Grid/List View Toggle */}
-          <div className="flex items-center gap-3 shrink-0">
-            {/* Green Acceptance Rate Badge */}
-            <span className="bg-[#ECFDF3] border border-[#A6F4C5] text-[#027A48] text-xs font-semibold px-3 py-1.5 rounded-full inline-flex items-center gap-1 select-none">
-              <span>✓ 85% – 95% Acceptance Rate</span>
-            </span>
-
-            {/* View Mode Switcher Container (Figma Container 116:2372) */}
-            <div className="bg-[#F8FAFC] border border-[#EAECF0] rounded-xl p-0.5 flex items-center gap-0.5">
-              <button
-                type="button"
-                onClick={() => setViewMode('grid')}
-                className={`p-1.5 rounded-lg transition-all cursor-pointer ${
-                  viewMode === 'grid'
-                    ? 'text-[#7050E6] bg-white shadow-2xs'
-                    : 'text-[#98A2B3] hover:text-[#475467] hover:bg-white/50'
-                }`}
-                title="Grid view"
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('list')}
-                className={`p-1.5 rounded-lg transition-all cursor-pointer ${
-                  viewMode === 'list'
-                    ? 'text-[#7050E6] bg-white shadow-2xs'
-                    : 'text-[#98A2B3] hover:text-[#475467] hover:bg-white/50'
-                }`}
-                title="List view"
-              >
-                <List className="w-4 h-4" />
-              </button>
+              {/* Fix #6: View Mode Switcher Container (Figma 116:2372) 
+                   bg=white, border=rgb(208,213,221), cornerRadius=20, padding=2px
+                   Active button: bg=#F4F3FE (lavender), icon #7150E7
+                   Inactive button: no bg, icon #667085 */}
+              <div className="bg-white border border-[#D0D5DD] rounded-[20px] p-0.5 flex items-center">
+                <button
+                  type="button"
+                  onClick={() => setViewMode('grid')}
+                  className={`p-1.5 rounded-2xl transition-all cursor-pointer ${
+                    viewMode === 'grid'
+                      ? 'text-[#7050E6] bg-[#F4F3FE] shadow-xs'
+                      : 'text-[#667085] hover:text-[#475467]'
+                  }`}
+                  title="Grid view"
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('list')}
+                  className={`p-1.5 rounded-2xl transition-all cursor-pointer ${
+                    viewMode === 'list'
+                      ? 'text-[#7050E6] bg-[#F4F3FE] shadow-xs'
+                      : 'text-[#667085] hover:text-[#475467]'
+                  }`}
+                  title="List view"
+                >
+                  <List className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
+
+          {/* Opportunities Grid / List (Figma Frame 2147226740 Node 116:1930) */}
+          {filteredOpportunities.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-[#EAECF0] p-12 text-center space-y-3">
+              <div className="w-12 h-12 rounded-full bg-[#EDE9FE] text-[#7150E7] flex items-center justify-center mx-auto">
+                <HugeiconsIcon icon={FilterIcon} size={24} />
+              </div>
+              <h3 className="text-base font-bold text-[#101828]">No matching opportunities found</h3>
+              <p className="text-xs text-[#667085] max-w-md mx-auto">
+                Try removing some subject or country filters to view more scholarship and funding opportunities.
+              </p>
+              <button
+                onClick={() => {
+                  setSelectedSubjects(['UX & Product Design', 'HCI']);
+                  setSelectedDegrees(['Masters', 'PhD']);
+                  setSelectedCountries(['USA', 'Germany']);
+                  setSelectedFunding(['Safe Regional']);
+                }}
+                className="px-4 py-2 bg-[#7050E6] text-white text-xs font-semibold rounded-full hover:bg-[#5D3FD3] transition-colors cursor-pointer"
+              >
+                Reset to Default Filters
+              </button>
+            </div>
+          ) : (
+            /* Fix #3: grid gap-5 → gap-4 (Figma itemSpacing:16) */
+            <div className={
+              viewMode === 'grid' 
+                ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" 
+                : "space-y-4"
+            }>
+              {filteredOpportunities.map((opp) => (
+                <OpportunityCard key={opp.id} opportunity={opp} />
+              ))}
+            </div>
+          )}
+
         </div>
-
-        {/* Opportunities Grid / List (Figma Frame 2147226740 Node 116:1930) */}
-        {filteredOpportunities.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-[#EAECF0] p-12 text-center space-y-3">
-            <div className="w-12 h-12 rounded-full bg-[#EDE9FE] text-[#7150E7] flex items-center justify-center mx-auto">
-              <HugeiconsIcon icon={FilterIcon} size={24} />
-            </div>
-            <h3 className="text-base font-bold text-[#101828]">No matching opportunities found</h3>
-            <p className="text-xs text-[#667085] max-w-md mx-auto">
-              Try removing some subject or country filters to view more scholarship and funding opportunities.
-            </p>
-            <button
-              onClick={() => {
-                setSelectedSubjects(['UX & Product Design', 'HCI']);
-                setSelectedDegrees(['Masters', 'PhD']);
-                setSelectedCountries(['USA', 'Germany']);
-                setSelectedFunding(['Safe Regional']);
-              }}
-              className="px-4 py-2 bg-[#7050E6] text-white text-xs font-semibold rounded-full hover:bg-[#5D3FD3] transition-colors cursor-pointer"
-            >
-              Reset to Default Filters
-            </button>
-          </div>
-        ) : (
-          <div className={
-            viewMode === 'grid' 
-              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" 
-              : "space-y-4"
-          }>
-            {filteredOpportunities.map((opp) => (
-              <OpportunityCard key={opp.id} opportunity={opp} />
-            ))}
-          </div>
-        )}
-
       </div>
     </div>
   );

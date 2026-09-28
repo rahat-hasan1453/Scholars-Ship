@@ -154,7 +154,7 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({ opportunity })
   };
 
   return (
-    <div className="group bg-white rounded-2xl border border-[#EAECF0] hover:border-[#D0D5DD] hover:shadow-lg transition-all duration-200 p-4 sm:p-5 flex flex-col justify-between">
+    <div className="group bg-white rounded-2xl border border-[#EAECF0] hover:border-[#D0D5DD] hover:shadow-lg transition-all duration-200 p-4 flex flex-col justify-between">
       <div>
         {/* Top Header Row: University Name, Subtitle, Crisp SVG Flag */}
         <div className="flex items-start justify-between gap-3">
@@ -177,13 +177,20 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({ opportunity })
         <hr className="border-[#F2F4F7] my-3" />
 
         {/* Middle Structured 3-Bullet Points enclosed in Container bg-[#F8FAFC] matching Figma Frame 2147226738 */}
-        <div className="bg-[#F8FAFC] rounded-xl p-3 text-xs space-y-2 border border-[#F1F5F9] my-2">
-          {/* Financial Item */}
+        <div className="bg-[#F8FAFC] rounded-lg p-3 text-xs space-y-2 my-2">
+          {/* Financial Item — Figma: 'Financial:' weight=700, amounts weight=700 italic, rest weight=400 */}
           <div className="leading-snug flex items-start gap-1.5">
             <span className="shrink-0 text-xs select-none">💰</span>
             <div className="min-w-0">
-              <span className="font-semibold text-[#101828]">Financial: </span>
-              <span className="font-bold italic text-[#101828]">{financialText}</span>
+              <span className="font-bold text-[#101828]">Financial: </span>
+              <span className="text-[#101828]">{financialText.split('+').map((part, i) => {
+                const trimmed = part.trim();
+                // Dollar amounts and key figures in bold italic
+                if (trimmed.match(/\$[\d,]+/) || trimmed.match(/€[\d,]+/)) {
+                  return <span key={i}>{i > 0 ? '+ ' : ''}<strong className="font-bold italic">{trimmed}</strong> </span>;
+                }
+                return <span key={i}>{i > 0 ? '+ ' : ''}{trimmed} </span>;
+              })}</span>
             </div>
           </div>
 
@@ -220,14 +227,14 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({ opportunity })
 
         {/* Footer Action Buttons Row matching Figma Frame 2147226704 */}
         <div className="flex items-center gap-2.5">
-          {/* Circular Bookmark Button */}
+          {/* Circular Bookmark Button — Figma: 42×40, cornerRadius 20, no visible border in default */}
           <button
             type="button"
             onClick={handleBookmarkToggle}
-            className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all cursor-pointer shrink-0 ${
+            className={`w-[42px] h-10 rounded-[20px] flex items-center justify-center transition-all cursor-pointer shrink-0 ${
               isSaved 
-                ? 'bg-[#EDE9FE] border-[#D6BBFB] text-[#7050E6]' 
-                : 'bg-white hover:bg-slate-50 border-[#EAECF0] text-[#667085] hover:text-[#7050E6]'
+                ? 'bg-[#EDE9FE] border border-[#D6BBFB] text-[#7050E6]' 
+                : 'bg-white hover:bg-slate-50 text-[#667085] hover:text-[#7050E6]'
             }`}
             title={isSaved ? 'Saved to Wishlist' : 'Save to Wishlist'}
           >
@@ -237,13 +244,13 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({ opportunity })
           {/* Vertical Divider */}
           <div className="h-4 w-[1px] bg-[#EAECF0] shrink-0 mx-0.5" />
 
-          {/* Action Buttons Group */}
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            {/* Official Link Button */}
+          {/* Action Buttons Group — Figma itemSpacing: 16 */}
+          <div className="flex items-center gap-4 flex-1 min-w-0">
+            {/* Official Link Button — Figma: bg=#F8FAFC, border=#7050E6, radius=20 */}
             <button
               type="button"
               onClick={handleOfficialLink}
-              className="flex-1 h-10 px-3 rounded-full bg-[#F8FAFC] border border-[#EAECF0] hover:bg-[#EDE9FE] text-[#7050E6] text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer whitespace-nowrap"
+              className="flex-1 h-10 px-3 rounded-[20px] bg-[#F8FAFC] border border-[#7050E6] hover:bg-[#EDE9FE] text-[#7050E6] text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer whitespace-nowrap"
               title="Open official university link"
             >
               <span>Official Link</span>
@@ -254,7 +261,7 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({ opportunity })
             <button
               type="button"
               onClick={handleSeeDetails}
-              className="flex-1 h-10 px-3 rounded-full bg-[#7050E6] hover:bg-[#5D3FD3] text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer whitespace-nowrap"
+              className="flex-1 h-10 px-3 rounded-[20px] bg-[#7050E6] hover:bg-[#5D3FD3] text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer whitespace-nowrap"
               title="See details & outreach"
             >
               <span>See Details</span>
