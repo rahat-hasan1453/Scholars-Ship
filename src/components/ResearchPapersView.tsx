@@ -385,68 +385,37 @@ export const ResearchPapersView: React.FC = () => {
             return (
               <div
                 key={paper.id}
-                className="bg-white rounded-2xl border border-slate-200 hover:border-[#7150E7]/40 transition-all shadow-xs hover:shadow-md p-6 flex flex-col justify-between group"
+                className="bg-white rounded-2xl border border-[#EAECF0] hover:border-[#7150E7]/40 transition-all shadow-xs hover:shadow-md p-4 sm:p-5 flex flex-col justify-between group space-y-3.5"
               >
-                <div>
-                  {/* Top Badges Row */}
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#EDE9FC] text-[#7150E7] border border-[#DDD7FA]">
-                        {paper.venue} ({paper.year})
+                <div className="space-y-3">
+                  {/* Venue & Open Access Badges */}
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[11px] font-bold text-[#7150E7] bg-[#EDE9FC] px-2.5 py-0.5 rounded-full border border-[#DDD7FA]">
+                      {paper.venue} ({paper.year})
+                    </span>
+                    {paper.isOpenAccess && (
+                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                        <span>Open Access PDF</span>
                       </span>
-                      {paper.isOpenAccess && (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                          <span>Open Access PDF</span>
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Bookmark Toggle Button */}
-                    <button
-                      onClick={() => toggleSavePaper(paper.id)}
-                      className={`p-2 rounded-xl transition-all cursor-pointer ${
-                        isSaved
-                          ? 'bg-[#7150E7] text-white shadow-2xs'
-                          : 'bg-slate-100 text-slate-400 hover:text-[#7150E7] hover:bg-[#EDE9FC]'
-                      }`}
-                      title={isSaved ? 'Remove from Saved Library' : 'Save Paper to Library'}
-                    >
-                      {isSaved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
-                    </button>
+                    )}
                   </div>
 
-                  {/* Title */}
-                  <h3 className="text-base font-bold text-slate-900 group-hover:text-[#7150E7] transition-colors leading-snug mb-2">
+                  {/* Section 1: Title matching Figma 102:625 */}
+                  <h3 className="text-sm sm:text-[15px] font-semibold text-[#101828] group-hover:text-[#7150E7] transition-colors leading-snug">
                     {paper.title}
                   </h3>
 
-                  {/* Authors List with Google Scholar URL */}
-                  <div className="text-xs text-slate-600 mb-3 flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <span className="font-semibold text-slate-400">Authors:</span>
-                    {paper.authors.map((author, aIdx) => (
-                      <a
-                        key={aIdx}
-                        href={author.googleScholarUrl || `https://scholar.google.com/scholar?q=${encodeURIComponent(author.name)}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="hover:text-[#7150E7] hover:underline font-medium flex items-center gap-1 text-slate-700"
-                      >
-                        <span>{author.name}</span>
-                        {aIdx < paper.authors.length - 1 && <span className="text-slate-300">•</span>}
-                      </a>
-                    ))}
-                  </div>
-
-                  {/* Abstract Snippet with Expand */}
-                  <div className="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3.5 rounded-xl border border-slate-100 mb-4 relative">
+                  {/* Abstract Snippet with Expand matching Figma 102:714 */}
+                  <div className="text-xs sm:text-sm text-[#475467] leading-relaxed">
                     <p className={isExpanded ? '' : 'line-clamp-3'}>
                       {paper.abstract}
                     </p>
-                    {paper.abstract.length > 150 && (
+                    {paper.abstract.length > 140 && (
                       <button
+                        type="button"
                         onClick={() => toggleAbstractExpand(paper.id)}
-                        className="text-[11px] font-bold text-[#7150E7] hover:underline mt-1 flex items-center gap-1 cursor-pointer"
+                        className="text-[11px] font-bold text-[#7150E7] hover:underline mt-1 inline-flex items-center gap-1 cursor-pointer"
                       >
                         <span>{isExpanded ? 'Show less' : 'Read full abstract'}</span>
                         {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
@@ -454,68 +423,121 @@ export const ResearchPapersView: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Tags & Citations */}
-                  <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-                    <div className="flex flex-wrap gap-1.5">
+                  {/* Section 2: Authors matching Figma 102:698 */}
+                  <div className="text-xs text-[#475467] flex flex-wrap items-center gap-x-2 gap-y-1 pt-0.5">
+                    <span className="font-semibold text-[#98A2B3]">Authors:</span>
+                    {paper.authors.map((author, aIdx) => (
+                      <React.Fragment key={aIdx}>
+                        <a
+                          href={author.googleScholarUrl || `https://scholar.google.com/scholar?q=${encodeURIComponent(author.name)}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="hover:text-[#7150E7] hover:underline font-medium text-[#101828] transition-colors"
+                        >
+                          {author.name}
+                        </a>
+                        {aIdx < paper.authors.length - 1 && <span className="text-[#CBD5E1]">•</span>}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-3.5 pt-1">
+                  {/* Section 3: Divider Line 1 matching Figma 102:643 */}
+                  <hr className="border-t border-[#F2F4F7]" />
+
+                  {/* Section 4: Tags & Citations Row matching Figma 102:718 */}
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    {/* Left Chips matching Figma 102:644 */}
+                    <div className="flex flex-wrap items-center gap-1.5">
                       {paper.fieldsOfStudy.slice(0, 3).map((f, fIdx) => (
-                        <span key={fIdx} className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-600">
+                        <span
+                          key={fIdx}
+                          className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#F2F4F7] text-[#344054]"
+                        >
                           #{f}
                         </span>
                       ))}
                     </div>
-                    <span className="text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+
+                    {/* Right Citations Badge matching Figma 102:715 */}
+                    <span className="text-[11px] font-bold text-[#B54708] bg-[#FFFBEB] px-2.5 py-1 rounded-xl border border-[#FDE047]/60 shrink-0">
                       📊 {paper.citationCount.toLocaleString()} Citations
                     </span>
                   </div>
-                </div>
 
-                {/* Footer Action Buttons */}
-                <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    {/* PDF Download Link */}
-                    {paper.pdfUrl ? (
-                      <a
-                        href={paper.pdfUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="h-9 px-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs inline-flex items-center gap-1.5 transition-all cursor-pointer"
+                  {/* Section 5: Divider Line 2 matching Figma 102:658 */}
+                  <hr className="border-t border-[#F2F4F7]" />
+
+                  {/* Section 6: Footer Action Buttons matching Figma 102:659 */}
+                  <div className="flex items-center justify-between gap-2.5">
+                    {/* Left Bookmark Button + Divider */}
+                    <div className="flex items-center gap-2.5 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => toggleSavePaper(paper.id)}
+                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+                          isSaved
+                            ? 'bg-[#7150E7] text-white shadow-2xs'
+                            : 'bg-[#F2F4F7] text-[#667085] hover:text-[#7150E7] hover:bg-[#EDE9FC]'
+                        }`}
+                        title={isSaved ? 'Remove from Saved Library' : 'Save Paper to Library'}
                       >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>Download PDF</span>
-                      </a>
-                    ) : (
+                        {isSaved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+                      </button>
+
+                      <div className="h-4 w-px bg-[#EAECF0]" />
+                    </div>
+
+                    {/* Middle / Right Action Buttons matching Figma 102:665 */}
+                    <div className="flex items-center gap-2 flex-1 justify-end">
+                      {/* Google Scholar Button matching Figma 103:727 */}
                       <a
                         href={paper.googleScholarUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="h-9 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs inline-flex items-center gap-1.5 transition-all"
+                        className="h-8 px-3.5 rounded-full border border-[#7150E7] bg-white hover:bg-[#F9F8FE] text-[#7150E7] font-semibold text-xs inline-flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+                        title="View citations on Google Scholar"
                       >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                        <span>Find PDF</span>
+                        <Globe2 className="w-3.5 h-3.5 text-[#7150E7]" />
+                        <span>Google Scholar</span>
                       </a>
-                    )}
 
-                    {/* Google Scholar Button */}
-                    <a
-                      href={paper.googleScholarUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="h-9 px-3 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs inline-flex items-center gap-1.5 transition-all shadow-2xs"
-                      title="View paper citations on Google Scholar"
-                    >
-                      <Globe2 className="w-3.5 h-3.5 text-blue-600" />
-                      <span className="hidden sm:inline">Google Scholar</span>
-                    </a>
+                      {/* Download PDF Button matching Figma 103:719 */}
+                      {paper.pdfUrl ? (
+                        <a
+                          href={paper.pdfUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="h-8 px-3.5 rounded-full bg-[#7150E7] hover:bg-[#5e3cd4] text-white font-bold text-xs shadow-xs inline-flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>Download PDF</span>
+                        </a>
+                      ) : (
+                        <a
+                          href={paper.googleScholarUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="h-8 px-3 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs inline-flex items-center justify-center gap-1.5 transition-all"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          <span>Find PDF</span>
+                        </a>
+                      )}
+
+                      {/* Ask AI Bot Button */}
+                      <button
+                        type="button"
+                        onClick={() => handleOpenBot(paper)}
+                        className="h-8 px-2.5 rounded-full bg-[#EDE9FC] hover:bg-[#7150E7] text-[#7150E7] hover:text-white font-semibold text-xs inline-flex items-center justify-center gap-1 transition-all cursor-pointer border border-[#DDD7FA]"
+                        title="Ask AI Assistant about this paper"
+                      >
+                        <Bot className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">AI Bot</span>
+                      </button>
+                    </div>
                   </div>
-
-                  {/* Ask AI Bot Button */}
-                  <button
-                    onClick={() => handleOpenBot(paper)}
-                    className="h-9 px-3.5 rounded-xl bg-[#EDE9FC] hover:bg-[#7150E7] text-[#7150E7] hover:text-white font-bold text-xs inline-flex items-center gap-1.5 transition-all cursor-pointer border border-[#DDD7FA]"
-                  >
-                    <Bot className="w-3.5 h-3.5" />
-                    <span>Ask AI Bot</span>
-                  </button>
                 </div>
 
               </div>
