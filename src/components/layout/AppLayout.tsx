@@ -397,7 +397,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                     {/* Logout Button */}
                     <Link
                       href="/login"
-                      onClick={() => setIsProfileMenuOpen(false)}
+                      onClick={() => {
+                        setIsProfileMenuOpen(false);
+                        fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+                      }}
                       className="w-full h-8 sm:h-8.5 bg-[#FEF3F2] hover:bg-[#FEE4E2] text-[#F04438] rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
                     >
                       <LogOut className="w-3.5 h-3.5 text-[#F04438]" />

@@ -89,14 +89,65 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Hydrate from localStorage on client mount with automatic schema migration
   useEffect(() => {
     try {
+      let currentProfile = initialUserProfile;
       const savedProfile = localStorage.getItem(STORAGE_KEYS.PROFILE);
       if (savedProfile) {
         const parsed = JSON.parse(savedProfile);
         if (parsed.specializations && !parsed.specializations.includes('UX Design')) {
           setProfile(initialUserProfile);
+          currentProfile = initialUserProfile;
         } else {
           setProfile(parsed);
+          currentProfile = parsed;
         }
+      }
+
+      // Check URL parameters if redirected from Google OAuth callback
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search);
+        const authProvider = urlParams.get('auth_provider');
+        if (authProvider === 'google') {
+          const rawName = urlParams.get('user_name');
+          const rawEmail = urlParams.get('user_email');
+          const rawAvatar = urlParams.get('user_avatar');
+
+          const googleName = rawName ? decodeURIComponent(rawName) : undefined;
+          const googleEmail = rawEmail ? decodeURIComponent(rawEmail) : undefined;
+          const googleAvatar = rawAvatar ? decodeURIComponent(rawAvatar) : undefined;
+
+          const updatedProfile = {
+            ...currentProfile,
+            ...(googleName ? { name: googleName } : {}),
+            ...(googleEmail ? { email: googleEmail } : {}),
+            ...(googleAvatar ? { avatar: googleAvatar } : {}),
+          };
+
+          setProfile(updatedProfile);
+          localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(updatedProfile));
+
+          // Clean URL without reloading page
+          const cleanUrl = window.location.pathname;
+          window.history.replaceState({}, document.title, cleanUrl);
+        }
+
+        // Also sync from backend session cookie
+        fetch('/api/auth/me')
+          .then((res) => (res.ok ? res.json() : null))
+          .then((data) => {
+            if (data?.authenticated && data?.user) {
+              setProfile((prev) => {
+                const synced = {
+                  ...prev,
+                  name: data.user.name || prev.name,
+                  email: data.user.email || prev.email,
+                  avatar: data.user.avatar || prev.avatar,
+                };
+                localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(synced));
+                return synced;
+              });
+            }
+          })
+          .catch(() => {});
       }
 
       const savedScholarships = localStorage.getItem(STORAGE_KEYS.SCHOLARSHIPS);

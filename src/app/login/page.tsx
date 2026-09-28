@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff, ChevronDown, Check } from 'lucide-react';
@@ -18,6 +18,18 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const err = params.get('error');
+      if (err === 'google_config_missing') {
+        setError('Google OAuth credentials not configured in .env.local yet. See .env.example for quick setup.');
+      } else if (err) {
+        setError(`Authentication error: ${err.replace(/_/g, ' ')}`);
+      }
+    }
+  }, []);
 
   const languages = [
     { code: 'en', name: 'English', flag: '🇬🇧' },
@@ -47,16 +59,7 @@ export default function LoginPage() {
   const handleGoogleAuth = () => {
     setIsGoogleLoading(true);
     setError('');
-
-    setTimeout(() => {
-      updateProfile({
-        name: 'Google Scholar User',
-        email: 'scholar@gmail.com',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
-      });
-      setIsGoogleLoading(false);
-      router.push('/');
-    }, 500);
+    window.location.href = '/api/auth/google';
   };
 
   return (
