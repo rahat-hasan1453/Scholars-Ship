@@ -1004,8 +1004,8 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
         {/* Bottom Lavender Filter Section matching Figma Node 89:4385 */}
         <div className="bg-[#EDE9FC] px-5 sm:px-7 pt-5 pb-5 sm:pb-6 border-t border-[#E4DEF7] rounded-b-3xl">
           
-          {/* Row matching Figma Frame 2147226737: 4 Dropdowns + Integrated Search Bar on the SAME horizontal row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 items-end">
+          {/* Row matching Figma: 4 Dropdowns distributed cleanly across the row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end">
             
             {/* 1. Subject */}
             <div className="space-y-1.5">
@@ -1077,45 +1077,6 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                 options={fundingOptions}
                 showSearch={false}
               />
-            </div>
-
-
-
-            {/* 5. Search Input + Filter Button matching Figma Node 89:4385 Frame 2147226745 */}
-            <div className="w-full">
-              <div className="w-full h-11 bg-white rounded-full border border-[#D0D5DD] hover:border-[#7150E7] px-4 flex items-center justify-between shadow-2xs transition-colors">
-                <div className="flex items-center gap-2 flex-1 min-w-0 mr-2">
-                  <Search className="w-4 h-4 text-[#90A1B9] shrink-0" />
-                  <input
-                    type="text"
-                    value={keywordQuery}
-                    onChange={(e) => handleKeywordChange(e.target.value)}
-                    placeholder={searchPlaceholder}
-                    className="w-full text-xs sm:text-[13px] bg-transparent border-none text-[#101828] placeholder:text-[#90A1B9] focus:outline-hidden"
-                  />
-                  {keywordQuery && (
-                    <button
-                      type="button"
-                      onClick={() => handleKeywordChange('')}
-                      className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                </div>
-
-                {/* Vertical line divider (Vector 3) */}
-                <div className="h-4 w-[1px] bg-[#E2E8F0] shrink-0 mx-1.5" />
-
-                {/* Filter button */}
-                <button
-                  type="button"
-                  className="text-[#90A1B9] hover:text-[#475467] font-medium text-xs inline-flex items-center gap-1.5 cursor-pointer shrink-0 transition-colors"
-                >
-                  <span>Filter</span>
-                  <SlidersHorizontal className="w-3.5 h-3.5 text-[#90A1B9]" />
-                </button>
-              </div>
             </div>
 
           </div>
