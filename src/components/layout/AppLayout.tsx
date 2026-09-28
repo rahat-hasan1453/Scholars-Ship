@@ -328,35 +328,35 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                 <span className="text-xs font-bold text-[#101828]">Alex Mercer</span>
               </button>
 
-                {/* Profile Small Modal (Figma Node 49-648) */}
+                {/* Profile Small Modal (Figma Node 49-648 - Compact) */}
                 {isProfileMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-white rounded-[28px] border border-[#EAECF0] shadow-2xl p-5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                  <div className="absolute right-0 top-full mt-2 w-60 sm:w-64 bg-white rounded-2xl border border-[#EAECF0] shadow-xl p-3.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                     {/* User Header Row */}
-                    <div className="flex items-center gap-3.5 pb-2">
+                    <div className="flex items-center gap-3 pb-1">
                       <div className="relative shrink-0">
                         <img
                           src={profile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80'}
                           alt={profile.name}
-                          className="w-14 h-14 rounded-full object-cover border border-[#EAECF0]"
+                          className="w-10 h-10 rounded-full object-cover border border-[#EAECF0]"
                         />
                         {/* Green Active Status Dot */}
-                        <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#12B76A] rounded-full border-2 border-white" />
+                        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#12B76A] rounded-full border-2 border-white" />
                       </div>
 
                       <div className="min-w-0">
-                        <div className="text-lg sm:text-xl font-bold text-[#101828] leading-tight truncate">
+                        <div className="text-sm font-bold text-[#101828] leading-tight truncate">
                           {profile.name}
                         </div>
-                        <div className="text-sm text-[#667085] font-normal leading-tight mt-1">
-                          Poweruser
+                        <div className="text-xs text-[#667085] font-normal leading-tight mt-0.5 truncate">
+                          {profile.email || 'Poweruser'}
                         </div>
                       </div>
                     </div>
 
-                    <hr className="border-[#F2F4F7] my-3" />
+                    <hr className="border-[#F2F4F7] my-2" />
 
                     {/* Menu Items */}
-                    <div className="space-y-1">
+                    <div className="space-y-0.5">
                       {/* Profile Action */}
                       <button
                         type="button"
@@ -364,12 +364,12 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                           setActiveTab('profile');
                           setIsProfileMenuOpen(false);
                         }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#F8F9FA] transition-colors text-left cursor-pointer group"
+                        className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-[#F8F9FA] transition-colors text-left cursor-pointer group"
                       >
-                        <div className="w-8 h-8 rounded-lg bg-[#F8FAFC] group-hover:bg-[#EDE9FE] flex items-center justify-center text-[#344054] group-hover:text-[#6941C6] transition-colors">
-                          <User className="w-4 h-4" />
+                        <div className="w-7 h-7 rounded-md bg-[#F8FAFC] group-hover:bg-[#EDE9FE] flex items-center justify-center text-[#344054] group-hover:text-[#6941C6] transition-colors">
+                          <User className="w-3.5 h-3.5" />
                         </div>
-                        <span className="text-base font-semibold text-[#101828] group-hover:text-[#6941C6] transition-colors">
+                        <span className="text-xs font-semibold text-[#101828] group-hover:text-[#6941C6] transition-colors">
                           Profile
                         </span>
                       </button>
@@ -381,26 +381,26 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                           setIsOnboardingOpen(true);
                           setIsProfileMenuOpen(false);
                         }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#F8F9FA] transition-colors text-left cursor-pointer group"
+                        className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-[#F8F9FA] transition-colors text-left cursor-pointer group"
                       >
-                        <div className="w-8 h-8 rounded-lg bg-[#F8FAFC] group-hover:bg-[#EDE9FE] flex items-center justify-center text-[#344054] group-hover:text-[#6941C6] transition-colors">
-                          <Settings className="w-4 h-4" />
+                        <div className="w-7 h-7 rounded-md bg-[#F8FAFC] group-hover:bg-[#EDE9FE] flex items-center justify-center text-[#344054] group-hover:text-[#6941C6] transition-colors">
+                          <Settings className="w-3.5 h-3.5" />
                         </div>
-                        <span className="text-base font-semibold text-[#101828] group-hover:text-[#6941C6] transition-colors">
+                        <span className="text-xs font-semibold text-[#101828] group-hover:text-[#6941C6] transition-colors">
                           Settings
                         </span>
                       </button>
                     </div>
 
-                    <hr className="border-[#F2F4F7] my-3" />
+                    <hr className="border-[#F2F4F7] my-2" />
 
-                    {/* Logout Button (Figma Node 49-648) */}
+                    {/* Logout Button */}
                     <Link
                       href="/login"
                       onClick={() => setIsProfileMenuOpen(false)}
-                      className="w-full h-11 bg-[#FEF3F2] hover:bg-[#FEE4E2] text-[#F04438] rounded-2xl font-bold text-base flex items-center justify-center gap-2.5 transition-colors cursor-pointer mt-1"
+                      className="w-full h-8 sm:h-8.5 bg-[#FEF3F2] hover:bg-[#FEE4E2] text-[#F04438] rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
                     >
-                      <LogOut className="w-4.5 h-4.5 text-[#F04438]" />
+                      <LogOut className="w-3.5 h-3.5 text-[#F04438]" />
                       <span>Logout</span>
                     </Link>
                   </div>
