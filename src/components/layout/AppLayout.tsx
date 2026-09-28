@@ -67,6 +67,13 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isProfileMenuOpen]);
 
+  // Support mobile sidebar opening from custom components like OpportunitiesFeed
+  useEffect(() => {
+    const handleOpenSidebar = () => setIsSidebarOpen(true);
+    window.addEventListener('open-sidebar', handleOpenSidebar);
+    return () => window.removeEventListener('open-sidebar', handleOpenSidebar);
+  }, []);
+
   const isGradStudent = profile.degreeLevel === 'Masters' || profile.degreeLevel === 'PhD';
   const urgentCount = scholarships.filter((s) => {
     const diff = new Date(s.deadline).getTime() - new Date().getTime();
@@ -281,136 +288,139 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
       <div className="flex-1 flex flex-col min-w-0">
         
         {/* Figma Header matching Node 122:3164 (Header - HighScholar | Global Scholarship & Professor Finder Portal) */}
-        <header className="sticky top-0 z-40 h-[72px] bg-white/95 backdrop-blur-md border-b border-[#EAECF0] px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-5">
-          {/* Mobile Menu Toggle */}
-          <button
-            onClick={() => setIsSidebarOpen(true)}
-            className="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 shrink-0"
-          >
-            <HugeiconsIcon icon={Menu01Icon} size={20} />
-          </button>
-
-          {/* Global Omnisearch matching Figma Node 122:3165 Frame 2147226771 */}
-          <div className="flex-1 min-w-0">
-            <HeaderGlobalSearch
-              onNavigateToTab={(tab) => setActiveTab(tab)}
-            />
-          </div>
-
-          {/* Right: User Profile matching Figma Node 122:3174 Frame 2147226782 */}
-          <div ref={profileMenuRef} className="relative shrink-0">
+        {/* On 'opportunities' tab, Node 122:3164 is rendered inside OpportunitiesFeed as the single unified header container */}
+        {activeTab !== 'opportunities' && (
+          <header className="sticky top-0 z-40 h-[72px] bg-white/95 backdrop-blur-md border-b border-[#EAECF0] px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-5">
+            {/* Mobile Menu Toggle */}
             <button
-              type="button"
-              onClick={() => setIsProfileMenuOpen((prev) => !prev)}
-              className="flex items-center gap-2.5 p-1 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer text-left"
-              title="User Profile"
+              onClick={() => setIsSidebarOpen(true)}
+              className="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 shrink-0"
             >
-              {/* 32x32 Avatar with Green Online Status Dot */}
-              <div className="relative shrink-0">
-                <img
-                  src={profile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80'}
-                  alt={profile.name || 'User'}
-                  className="w-8 h-8 rounded-full object-cover border border-[#F4F6F8]"
-                />
-                <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-[#36B37E] ring-1.5 ring-white" />
-              </div>
-
-              {/* User Name & Degree Subtitle matching Figma 122:3181 */}
-              <div className="hidden sm:flex flex-col text-left">
-                <span className="text-xs font-bold text-[#101828] leading-tight">
-                  {profile.name || 'Ingrid Bergman'}
-                </span>
-                <span className="text-xs italic text-[#90A1B9] leading-tight mt-0.5">
-                  {profile.degreeLevel || 'Masters'} • {profile.specializations?.[0] || 'UX & HCI'}
-                </span>
-              </div>
+              <HugeiconsIcon icon={Menu01Icon} size={20} />
             </button>
 
-                {/* Profile Small Modal (Figma Node 49-648 - Compact) */}
-                {isProfileMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-60 sm:w-64 bg-white rounded-2xl border border-[#EAECF0] shadow-xl p-3.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                    {/* User Header Row */}
-                    <div className="flex items-center gap-3 pb-1">
-                      <div className="relative shrink-0">
-                        <img
-                          src={profile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80'}
-                          alt={profile.name}
-                          className="w-10 h-10 rounded-full object-cover border border-[#EAECF0]"
-                        />
-                        {/* Green Active Status Dot */}
-                        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#12B76A] rounded-full border-2 border-white" />
-                      </div>
+            {/* Global Omnisearch matching Figma Node 122:3165 Frame 2147226771 */}
+            <div className="flex-1 min-w-0">
+              <HeaderGlobalSearch
+                onNavigateToTab={(tab) => setActiveTab(tab)}
+              />
+            </div>
 
-                      <div className="min-w-0">
-                        <div className="text-sm font-bold text-[#101828] leading-tight truncate">
-                          {profile.name}
-                        </div>
-                        <div className="text-xs text-[#667085] font-normal leading-tight mt-0.5 truncate">
-                          {profile.email || 'Poweruser'}
-                        </div>
-                      </div>
+            {/* Right: User Profile matching Figma Node 122:3174 Frame 2147226782 */}
+            <div ref={profileMenuRef} className="relative shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+                className="flex items-center gap-2.5 p-1 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer text-left"
+                title="User Profile"
+              >
+                {/* 32x32 Avatar with Green Online Status Dot */}
+                <div className="relative shrink-0">
+                  <img
+                    src={profile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80'}
+                    alt={profile.name || 'User'}
+                    className="w-8 h-8 rounded-full object-cover border border-[#F4F6F8]"
+                  />
+                  <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-[#36B37E] ring-1.5 ring-white" />
+                </div>
+
+                {/* User Name & Degree Subtitle matching Figma 122:3181 */}
+                <div className="hidden sm:flex flex-col text-left">
+                  <span className="text-xs font-bold text-[#101828] leading-tight">
+                    {profile.name || 'Ingrid Bergman'}
+                  </span>
+                  <span className="text-xs italic text-[#90A1B9] leading-tight mt-0.5">
+                    {profile.degreeLevel || 'Masters'} • {profile.specializations?.[0] || 'UX & HCI'}
+                  </span>
+                </div>
+              </button>
+
+              {/* Profile Small Modal (Figma Node 49-648 - Compact) */}
+              {isProfileMenuOpen && (
+                <div className="absolute right-0 top-full mt-2 w-60 sm:w-64 bg-white rounded-2xl border border-[#EAECF0] shadow-xl p-3.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                  {/* User Header Row */}
+                  <div className="flex items-center gap-3 pb-1">
+                    <div className="relative shrink-0">
+                      <img
+                        src={profile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80'}
+                        alt={profile.name}
+                        className="w-10 h-10 rounded-full object-cover border border-[#EAECF0]"
+                      />
+                      {/* Green Active Status Dot */}
+                      <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#12B76A] rounded-full border-2 border-white" />
                     </div>
 
-                    <hr className="border-[#F2F4F7] my-2" />
-
-                    {/* Menu Items */}
-                    <div className="space-y-0.5">
-                      {/* Profile Action */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setActiveTab('profile');
-                          setIsProfileMenuOpen(false);
-                        }}
-                        className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-[#F8F9FA] transition-colors text-left cursor-pointer group"
-                      >
-                        <div className="w-7 h-7 rounded-md bg-[#F8FAFC] group-hover:bg-[#EDE9FE] flex items-center justify-center text-[#344054] group-hover:text-[#6941C6] transition-colors">
-                          <User className="w-3.5 h-3.5" />
-                        </div>
-                        <span className="text-xs font-semibold text-[#101828] group-hover:text-[#6941C6] transition-colors">
-                          Profile
-                        </span>
-                      </button>
-
-                      {/* Settings Action */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsOnboardingOpen(true);
-                          setIsProfileMenuOpen(false);
-                        }}
-                        className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-[#F8F9FA] transition-colors text-left cursor-pointer group"
-                      >
-                        <div className="w-7 h-7 rounded-md bg-[#F8FAFC] group-hover:bg-[#EDE9FE] flex items-center justify-center text-[#344054] group-hover:text-[#6941C6] transition-colors">
-                          <Settings className="w-3.5 h-3.5" />
-                        </div>
-                        <span className="text-xs font-semibold text-[#101828] group-hover:text-[#6941C6] transition-colors">
-                          Settings
-                        </span>
-                      </button>
+                    <div className="min-w-0">
+                      <div className="text-sm font-bold text-[#101828] leading-tight truncate">
+                        {profile.name}
+                      </div>
+                      <div className="text-xs text-[#667085] font-normal leading-tight mt-0.5 truncate">
+                        {profile.email || 'Poweruser'}
+                      </div>
                     </div>
-
-                    <hr className="border-[#F2F4F7] my-2" />
-
-                    {/* Logout Button */}
-                    <Link
-                      href="/login"
-                      onClick={() => {
-                        setIsProfileMenuOpen(false);
-                        fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
-                      }}
-                      className="w-full h-8 sm:h-8.5 bg-[#FEF3F2] hover:bg-[#FEE4E2] text-[#F04438] rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
-                    >
-                      <LogOut className="w-3.5 h-3.5 text-[#F04438]" />
-                      <span>Logout</span>
-                    </Link>
                   </div>
-                )}
-              </div>
-        </header>
+
+                  <hr className="border-[#F2F4F7] my-2" />
+
+                  {/* Menu Items */}
+                  <div className="space-y-0.5">
+                    {/* Profile Action */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTab('profile');
+                        setIsProfileMenuOpen(false);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-[#F8F9FA] transition-colors text-left cursor-pointer group"
+                    >
+                      <div className="w-7 h-7 rounded-md bg-[#F8FAFC] group-hover:bg-[#EDE9FE] flex items-center justify-center text-[#344054] group-hover:text-[#6941C6] transition-colors">
+                        <User className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="text-xs font-semibold text-[#101828] group-hover:text-[#6941C6] transition-colors">
+                        Profile
+                      </span>
+                    </button>
+
+                    {/* Settings Action */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsOnboardingOpen(true);
+                        setIsProfileMenuOpen(false);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-[#F8F9FA] transition-colors text-left cursor-pointer group"
+                    >
+                      <div className="w-7 h-7 rounded-md bg-[#F8FAFC] group-hover:bg-[#EDE9FE] flex items-center justify-center text-[#344054] group-hover:text-[#6941C6] transition-colors">
+                        <Settings className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="text-xs font-semibold text-[#101828] group-hover:text-[#6941C6] transition-colors">
+                        Settings
+                      </span>
+                    </button>
+                  </div>
+
+                  <hr className="border-[#F2F4F7] my-2" />
+
+                  {/* Logout Button */}
+                  <Link
+                    href="/login"
+                    onClick={() => {
+                      setIsProfileMenuOpen(false);
+                      fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+                    }}
+                    className="w-full h-8 sm:h-8.5 bg-[#FEF3F2] hover:bg-[#FEE4E2] text-[#F04438] rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                  >
+                    <LogOut className="w-3.5 h-3.5 text-[#F04438]" />
+                    <span>Logout</span>
+                  </Link>
+                </div>
+              )}
+            </div>
+          </header>
+        )}
 
         {/* Dynamic Page Content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+        <main className={activeTab === 'opportunities' ? "flex-1 flex flex-col min-w-0" : "flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6"}>
           {children}
         </main>
       </div>

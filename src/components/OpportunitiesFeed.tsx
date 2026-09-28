@@ -1,38 +1,50 @@
 'use client';
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import Link from 'next/link';
 import { useApp } from '@/context/AppContext';
-import { OpportunityCard } from './OpportunityCard';
-import { DegreeLevel, HiringOpportunity } from '@/types';
+import { OpportunityCard } from '@/components/OpportunityCard';
+import { HeaderGlobalSearch } from '@/components/layout/HeaderGlobalSearch';
+import { HugeiconsIcon } from '@hugeicons/react';
+import {
+  Menu01Icon,
+  ArrowDown01Icon,
+  Cancel01Icon,
+  Search01Icon,
+  CheckmarkCircle02Icon,
+  FilterIcon,
+} from '@hugeicons/core-free-icons';
 import { 
   LayoutGrid, 
   List, 
-  ChevronDown, 
-  Check, 
-  X, 
-  Search,
-  RotateCcw,
-  Sparkles
+  User, 
+  Settings, 
+  LogOut,
+  Sparkles,
+  RefreshCw,
+  ExternalLink
 } from 'lucide-react';
 
 const ALL_SUBJECTS = [
   'UX & Product Design',
   'HCI',
-  'Human-Computer Interaction (HCI)',
   'Computer Science',
   'Artificial Intelligence',
-  'Data Science & Analytics',
+  'Data Science',
   'Machine Learning',
-  'Biotechnology',
-  'Biomedical Engineering',
-  'Electrical Engineering',
-  'Mechanical Engineering',
-  'Renewable Energy',
-  'Physics & Quantum Computing',
-  'Economics & Econometrics',
-  'Public Health & Epidemiology',
-  'Robotics & Autonomous Systems',
-  'Software Engineering'
+  'Human Factors',
+  'Robotics',
+  'Information Systems',
+  'Cybersecurity',
+  'Biomedical Informatics',
+  'Electrical Engineering'
+];
+
+const ALL_DEGREES = [
+  'Masters',
+  'PhD',
+  'Bachelors',
+  'Postdoc'
 ];
 
 const ALL_COUNTRIES = [
@@ -46,17 +58,16 @@ const ALL_COUNTRIES = [
   'Sweden',
   'France',
   'Japan',
-  'South Korea',
   'Singapore'
 ];
 
-const ALL_DEGREES: DegreeLevel[] = ['Masters', 'PhD', 'Bachelors'];
-
-const ALL_FUNDING_TYPES = [
+const ALL_FUNDING = [
   'Safe Regional',
-  'Full Funding',
   'Tuition Waiver',
+  'Full Funding',
   'Graduate Assistantship (TA/RA)',
+  'Stipend / Living Allowance',
+  'High Acceptance (85%+)',
   'University Fellowship'
 ];
 
@@ -64,20 +75,39 @@ export const OpportunitiesFeed: React.FC = () => {
   const { 
     opportunities, 
     profile, 
-    globalSearchQuery 
+    globalSearchQuery,
+    setActiveNavTab,
+    setIsOnboardingOpen,
   } = useApp();
 
-  // Multi-select Filter States initialized from Figma defaults / user profile
-  const [selectedSubjects, setSelectedSubjects] = useState<string[]>(['UX & Product Design', 'HCI']);
+  // Multi-select Filter States initialized from Figma Node 122:3164 defaults
+  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([
+    'UX & Product Design', 
+    'HCI', 
+    'Computer Science', 
+    'Artificial Intelligence'
+  ]);
   const [selectedDegrees, setSelectedDegrees] = useState<string[]>(['Masters', 'PhD']);
-  const [selectedCountries, setSelectedCountries] = useState<string[]>(['USA', 'Germany']);
-  const [selectedFunding, setSelectedFunding] = useState<string[]>(['Safe Regional']);
+  const [selectedCountries, setSelectedCountries] = useState<string[]>([
+    'USA', 
+    'Germany', 
+    'United Kingdom', 
+    'Canada'
+  ]);
+  const [selectedFunding, setSelectedFunding] = useState<string[]>([
+    'Safe Regional', 
+    'Tuition Waiver', 
+    'Full Funding'
+  ]);
 
   // Popover open states
   const [isSubjectOpen, setIsSubjectOpen] = useState(false);
   const [isDegreeOpen, setIsDegreeOpen] = useState(false);
   const [isCountryOpen, setIsCountryOpen] = useState(false);
   const [isFundingOpen, setIsFundingOpen] = useState(false);
+
+  // Profile Menu Dropdown State
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   // Search inside popovers
   const [subjectSearch, setSubjectSearch] = useState('');
@@ -91,6 +121,7 @@ export const OpportunitiesFeed: React.FC = () => {
   const degreeRef = useRef<HTMLDivElement>(null);
   const countryRef = useRef<HTMLDivElement>(null);
   const fundingRef = useRef<HTMLDivElement>(null);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -99,6 +130,7 @@ export const OpportunitiesFeed: React.FC = () => {
       if (degreeRef.current && !degreeRef.current.contains(target)) setIsDegreeOpen(false);
       if (countryRef.current && !countryRef.current.contains(target)) setIsCountryOpen(false);
       if (fundingRef.current && !fundingRef.current.contains(target)) setIsFundingOpen(false);
+      if (profileMenuRef.current && !profileMenuRef.current.contains(target)) setIsProfileMenuOpen(false);
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -137,35 +169,28 @@ export const OpportunitiesFeed: React.FC = () => {
     setSelectedFunding(prev => prev.filter(x => x !== f));
   };
 
-  const resetAllFilters = () => {
-    setSelectedSubjects([]);
-    setSelectedDegrees([]);
-    setSelectedCountries([]);
-    setSelectedFunding([]);
-  };
-
   // Filtered Opportunities
   const filteredOpportunities = useMemo(() => {
     return opportunities.filter((opp) => {
       // 1. Global search query
       if (globalSearchQuery.trim()) {
         const q = globalSearchQuery.toLowerCase();
-        const inTitle = opp.title.toLowerCase().includes(q);
-        const inInst = opp.institution.toLowerCase().includes(q);
+        const inTitle = opp.title?.toLowerCase().includes(q);
+        const inInst = opp.institution?.toLowerCase().includes(q);
         const inAuthor = opp.authorName?.toLowerCase().includes(q);
-        const inTags = opp.fieldTags.some(t => t.toLowerCase().includes(q));
+        const inTags = opp.fieldTags?.some(t => t.toLowerCase().includes(q));
         if (!inTitle && !inInst && !inAuthor && !inTags) return false;
       }
 
       // 2. Degree filter
       if (selectedDegrees.length > 0) {
-        const matchesDegree = opp.degrees.some(d => selectedDegrees.includes(d));
+        const matchesDegree = opp.degrees?.some(d => selectedDegrees.includes(d));
         if (!matchesDegree) return false;
       }
 
       // 3. Country filter
       if (selectedCountries.length > 0) {
-        const oppCountry = opp.country.toLowerCase();
+        const oppCountry = opp.country?.toLowerCase() || '';
         const matchesCountry = selectedCountries.some(c => {
           const sc = c.toLowerCase();
           return oppCountry.includes(sc) || sc.includes(oppCountry);
@@ -175,14 +200,14 @@ export const OpportunitiesFeed: React.FC = () => {
 
       // 4. Subject filter
       if (selectedSubjects.length > 0) {
-        const matchesSubject = opp.fieldTags.some(tag => 
+        const matchesSubject = opp.fieldTags?.some(tag => 
           selectedSubjects.some(sub => {
             const t = tag.toLowerCase().trim();
             const s = sub.toLowerCase().trim();
             if (t.includes(s) || s.includes(t)) return true;
-            if (s.includes('ux') && t.includes('design')) return true;
-            if (s.includes('cs') && t.includes('computer')) return true;
-            if (s.includes('hci') && (t.includes('interaction') || t.includes('human'))) return true;
+            if (s.includes('ux') && (t.includes('design') || t.includes('ux'))) return true;
+            if (s.includes('hci') && (t.includes('hci') || t.includes('interaction'))) return true;
+            if (s.includes('computer') && t.includes('cs')) return true;
             return false;
           })
         );
@@ -206,407 +231,582 @@ export const OpportunitiesFeed: React.FC = () => {
   }, [countrySearch]);
 
   return (
-    <div className="space-y-6">
+    <div className="flex-1 flex flex-col min-w-0 bg-[#f8fafc]">
       
-      {/* Figma Top Intro (Node 122:3185) */}
-      <div className="space-y-1">
-        <h1 className="text-base sm:text-lg font-semibold text-[#101828] tracking-tight leading-6">
-          Find Your Desired Scholarship, Lab &amp; Safe Universities
-        </h1>
-        <p className="text-xs sm:text-sm text-[#475467] font-normal leading-5">
-          A quick search links you to scholarships, expert professors, and trusted regional universities.
-        </p>
-      </div>
-
-      {/* Figma 4-Column Floating-Label Filter Inputs (Node 122:3188) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 relative z-30">
+      {/* 
+        ========================================================================
+        FIGMA NODE 122:3164: SINGLE UNIFIED HEADER CONTAINER
+        "Header (HighScholar | Global Scholarship & Professor Finder Portal)"
+        - Fills: Solid White (#FFFFFF) 95% opacity with backdrop-blur
+        - Padding: 16px vertical, 20px-32px horizontal
+        - Spacing: 16px between children
+        - Bottom Border: #EAECF0
+        ========================================================================
+      */}
+      <header className="w-full bg-white/95 backdrop-blur-md border-b border-[#EAECF0] px-4 sm:px-6 lg:px-8 py-4 space-y-4 shrink-0 shadow-2xs">
         
-        {/* 1. SUBJECT FILTER FIELD */}
-        <div ref={subjectRef} className="relative">
-          {/* Floating Label */}
-          <span className="absolute -top-[9px] left-2.5 bg-white px-1 text-[11px] italic font-normal text-[#90A0B9] z-10 pointer-events-none select-none">
-            Subject
-          </span>
-
-          {/* Trigger Box */}
-          <div 
-            onClick={() => setIsSubjectOpen(prev => !prev)}
-            className={`w-full h-12 bg-white rounded-lg border px-2 py-1 flex items-center justify-between cursor-pointer transition-all ${
-              isSubjectOpen ? 'border-[#7150E7] ring-2 ring-[#EDE9FC]' : 'border-[#E1E8F0] hover:border-[#CBD5E1]'
-            }`}
-          >
-            {/* Chips Container */}
-            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar flex-1 min-w-0 mr-1.5">
-              {selectedSubjects.length === 0 ? (
-                <span className="text-xs text-[#98A2B3] italic pl-1">Select Subjects...</span>
-              ) : (
-                <>
-                  {selectedSubjects.slice(0, 2).map(sub => (
-                    <span 
-                      key={sub}
-                      className="bg-[#F0F3F4] text-[#212B36] text-[12px] font-medium h-[22px] px-2 rounded-full inline-flex items-center gap-1 shrink-0 select-none"
-                    >
-                      <span className="whitespace-nowrap">{sub}</span>
-                      <button 
-                        type="button"
-                        onClick={(e) => removeSubject(sub, e)}
-                        className="text-[#919EAB] hover:text-[#475467] cursor-pointer"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                  {selectedSubjects.length > 2 && (
-                    <span className="bg-[#F0F3F4] text-[#212B36] text-[12px] italic font-medium h-[22px] px-2 rounded-full inline-flex items-center shrink-0">
-                      +{selectedSubjects.length - 2}
-                    </span>
-                  )}
-                </>
-              )}
-            </div>
-
-            <ChevronDown className={`w-3.5 h-3.5 text-[#667085] shrink-0 transition-transform ${isSubjectOpen ? 'rotate-180' : ''}`} />
-          </div>
-
-          {/* Popover Dropdown */}
-          {isSubjectOpen && (
-            <div className="absolute left-0 top-full mt-1.5 w-full sm:w-72 bg-white rounded-xl border border-[#EAECF0] shadow-xl p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-              <div className="relative mb-2">
-                <Search className="w-3.5 h-3.5 text-[#98A2B3] absolute left-2.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search subjects..."
-                  value={subjectSearch}
-                  onChange={(e) => setSubjectSearch(e.target.value)}
-                  className="w-full h-8 pl-8 pr-3 text-xs bg-[#F8FAFC] border border-[#EAECF0] rounded-lg focus:outline-none focus:border-[#7150E7]"
-                />
-              </div>
-
-              <div className="max-h-52 overflow-y-auto space-y-0.5">
-                {filteredSubjectOptions.map(sub => {
-                  const isChecked = selectedSubjects.includes(sub);
-                  return (
-                    <button
-                      key={sub}
-                      type="button"
-                      onClick={() => toggleSubject(sub)}
-                      className="w-full flex items-center justify-between px-2.5 py-1.5 text-xs rounded-lg hover:bg-[#F8F9FA] transition-colors text-left cursor-pointer"
-                    >
-                      <span className={isChecked ? 'font-semibold text-[#6941C6]' : 'text-[#344054]'}>
-                        {sub}
-                      </span>
-                      {isChecked && <Check className="w-3.5 h-3.5 text-[#6941C6]" />}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* 2. DEGREE FILTER FIELD */}
-        <div ref={degreeRef} className="relative">
-          <span className="absolute -top-[9px] left-2.5 bg-white px-1 text-[11px] italic font-normal text-[#90A0B9] z-10 pointer-events-none select-none">
-            Degree
-          </span>
-
-          <div 
-            onClick={() => setIsDegreeOpen(prev => !prev)}
-            className={`w-full h-12 bg-white rounded-lg border px-2 py-1 flex items-center justify-between cursor-pointer transition-all ${
-              isDegreeOpen ? 'border-[#7150E7] ring-2 ring-[#EDE9FC]' : 'border-[#E1E8F0] hover:border-[#CBD5E1]'
-            }`}
-          >
-            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar flex-1 min-w-0 mr-1.5">
-              {selectedDegrees.length === 0 ? (
-                <span className="text-xs text-[#98A2B3] italic pl-1">Select Degrees...</span>
-              ) : (
-                <>
-                  {selectedDegrees.slice(0, 2).map(deg => (
-                    <span 
-                      key={deg}
-                      className="bg-[#F0F3F4] text-[#212B36] text-[12px] font-medium h-[22px] px-2 rounded-full inline-flex items-center gap-1 shrink-0 select-none"
-                    >
-                      <span className="whitespace-nowrap">{deg}</span>
-                      <button 
-                        type="button"
-                        onClick={(e) => removeDegree(deg, e)}
-                        className="text-[#919EAB] hover:text-[#475467] cursor-pointer"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                  {selectedDegrees.length > 2 && (
-                    <span className="bg-[#F0F3F4] text-[#212B36] text-[12px] italic font-medium h-[22px] px-2 rounded-full inline-flex items-center shrink-0">
-                      +{selectedDegrees.length - 2}
-                    </span>
-                  )}
-                </>
-              )}
-            </div>
-
-            <ChevronDown className={`w-3.5 h-3.5 text-[#667085] shrink-0 transition-transform ${isDegreeOpen ? 'rotate-180' : ''}`} />
-          </div>
-
-          {isDegreeOpen && (
-            <div className="absolute left-0 top-full mt-1.5 w-full bg-white rounded-xl border border-[#EAECF0] shadow-xl p-2.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-              <div className="space-y-0.5">
-                {ALL_DEGREES.map(deg => {
-                  const isChecked = selectedDegrees.includes(deg);
-                  return (
-                    <button
-                      key={deg}
-                      type="button"
-                      onClick={() => toggleDegree(deg)}
-                      className="w-full flex items-center justify-between px-2.5 py-1.5 text-xs rounded-lg hover:bg-[#F8F9FA] transition-colors text-left cursor-pointer"
-                    >
-                      <span className={isChecked ? 'font-semibold text-[#6941C6]' : 'text-[#344054]'}>
-                        {deg}
-                      </span>
-                      {isChecked && <Check className="w-3.5 h-3.5 text-[#6941C6]" />}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* 3. COUNTRY FILTER FIELD */}
-        <div ref={countryRef} className="relative">
-          <span className="absolute -top-[9px] left-2.5 bg-white px-1 text-[11px] italic font-normal text-[#90A0B9] z-10 pointer-events-none select-none">
-            Country
-          </span>
-
-          <div 
-            onClick={() => setIsCountryOpen(prev => !prev)}
-            className={`w-full h-12 bg-white rounded-lg border px-2 py-1 flex items-center justify-between cursor-pointer transition-all ${
-              isCountryOpen ? 'border-[#7150E7] ring-2 ring-[#EDE9FC]' : 'border-[#E1E8F0] hover:border-[#CBD5E1]'
-            }`}
-          >
-            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar flex-1 min-w-0 mr-1.5">
-              {selectedCountries.length === 0 ? (
-                <span className="text-xs text-[#98A2B3] italic pl-1">Select Country...</span>
-              ) : (
-                <>
-                  {selectedCountries.slice(0, 2).map(c => (
-                    <span 
-                      key={c}
-                      className="bg-[#F0F3F4] text-[#212B36] text-[12px] font-medium h-[22px] px-2 rounded-full inline-flex items-center gap-1 shrink-0 select-none"
-                    >
-                      <span className="whitespace-nowrap">{c}</span>
-                      <button 
-                        type="button"
-                        onClick={(e) => removeCountry(c, e)}
-                        className="text-[#919EAB] hover:text-[#475467] cursor-pointer"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                  {selectedCountries.length > 2 && (
-                    <span className="bg-[#F0F3F4] text-[#212B36] text-[12px] italic font-medium h-[22px] px-2 rounded-full inline-flex items-center shrink-0">
-                      +{selectedCountries.length - 2}
-                    </span>
-                  )}
-                </>
-              )}
-            </div>
-
-            <ChevronDown className={`w-3.5 h-3.5 text-[#667085] shrink-0 transition-transform ${isCountryOpen ? 'rotate-180' : ''}`} />
-          </div>
-
-          {isCountryOpen && (
-            <div className="absolute left-0 top-full mt-1.5 w-full sm:w-64 bg-white rounded-xl border border-[#EAECF0] shadow-xl p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-              <div className="relative mb-2">
-                <Search className="w-3.5 h-3.5 text-[#98A2B3] absolute left-2.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search countries..."
-                  value={countrySearch}
-                  onChange={(e) => setCountrySearch(e.target.value)}
-                  className="w-full h-8 pl-8 pr-3 text-xs bg-[#F8FAFC] border border-[#EAECF0] rounded-lg focus:outline-none focus:border-[#7150E7]"
-                />
-              </div>
-
-              <div className="max-h-52 overflow-y-auto space-y-0.5">
-                {filteredCountryOptions.map(c => {
-                  const isChecked = selectedCountries.includes(c);
-                  return (
-                    <button
-                      key={c}
-                      type="button"
-                      onClick={() => toggleCountry(c)}
-                      className="w-full flex items-center justify-between px-2.5 py-1.5 text-xs rounded-lg hover:bg-[#F8F9FA] transition-colors text-left cursor-pointer"
-                    >
-                      <span className={isChecked ? 'font-semibold text-[#6941C6]' : 'text-[#344054]'}>
-                        {c}
-                      </span>
-                      {isChecked && <Check className="w-3.5 h-3.5 text-[#6941C6]" />}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* 4. ACCEPTANCE & FUNDING FILTER FIELD */}
-        <div ref={fundingRef} className="relative">
-          <span className="absolute -top-[9px] left-2.5 bg-white px-1 text-[11px] italic font-normal text-[#90A0B9] z-10 pointer-events-none select-none">
-            Acceptance &amp; Funding
-          </span>
-
-          <div 
-            onClick={() => setIsFundingOpen(prev => !prev)}
-            className={`w-full h-12 bg-white rounded-lg border px-2 py-1 flex items-center justify-between cursor-pointer transition-all ${
-              isFundingOpen ? 'border-[#7150E7] ring-2 ring-[#EDE9FC]' : 'border-[#E1E7F0] hover:border-[#CBD5E1]'
-            }`}
-          >
-            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar flex-1 min-w-0 mr-1.5">
-              {selectedFunding.length === 0 ? (
-                <span className="text-xs text-[#98A2B3] italic pl-1">Select Criteria...</span>
-              ) : (
-                <>
-                  {selectedFunding.slice(0, 1).map(f => (
-                    <span 
-                      key={f}
-                      className="bg-[#F0F3F4] text-[#212B36] text-[12px] font-medium h-[22px] px-2 rounded-full inline-flex items-center gap-1 shrink-0 select-none"
-                    >
-                      <span className="whitespace-nowrap">{f}</span>
-                      <button 
-                        type="button"
-                        onClick={(e) => removeFunding(f, e)}
-                        className="text-[#919EAB] hover:text-[#475467] cursor-pointer"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                  {selectedFunding.length > 1 && (
-                    <span className="bg-[#F0F3F4] text-[#212B36] text-[12px] italic font-medium h-[22px] px-2 rounded-full inline-flex items-center shrink-0">
-                      +{selectedFunding.length - 1}
-                    </span>
-                  )}
-                </>
-              )}
-            </div>
-
-            <ChevronDown className={`w-3.5 h-3.5 text-[#667085] shrink-0 transition-transform ${isFundingOpen ? 'rotate-180' : ''}`} />
-          </div>
-
-          {isFundingOpen && (
-            <div className="absolute right-0 top-full mt-1.5 w-full sm:w-64 bg-white rounded-xl border border-[#EAECF0] shadow-xl p-2.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-              <div className="space-y-0.5">
-                {ALL_FUNDING_TYPES.map(f => {
-                  const isChecked = selectedFunding.includes(f);
-                  return (
-                    <button
-                      key={f}
-                      type="button"
-                      onClick={() => toggleFunding(f)}
-                      className="w-full flex items-center justify-between px-2.5 py-1.5 text-xs rounded-lg hover:bg-[#F8F9FA] transition-colors text-left cursor-pointer"
-                    >
-                      <span className={isChecked ? 'font-semibold text-[#6941C6]' : 'text-[#344054]'}>
-                        {f}
-                      </span>
-                      {isChecked && <Check className="w-3.5 h-3.5 text-[#6941C6]" />}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-
-      </div>
-
-      {/* Figma Opportunity List Bar (Node 116:2391 / Section Header) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-        <div>
-          <div className="flex items-baseline gap-1.5">
-            <h2 className="text-base sm:text-lg font-bold text-[#101828]">
-              Opportunity List
-            </h2>
-            <span className="text-xs italic text-[#98A2B3] font-normal">
-              / {filteredOpportunities.length} Items
-            </span>
-          </div>
-          <p className="text-xs text-[#667085] mt-0.5">
-            Safe-Bet Universities with Guaranteed Funding &amp; Assistantships
-          </p>
-        </div>
-
-        {/* Right Controls: Acceptance Rate Badge & Grid/List View Mode */}
-        <div className="flex items-center gap-3.5 self-end sm:self-center">
-          {/* Acceptance Rate Badge (Figma Style) */}
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-[#027A48] select-none">
-            <span className="text-[#12B76A] font-bold text-sm">✓</span>
-            <span>85% – 95% Acceptance Rate</span>
-          </div>
-
-          {/* Grid / List Switcher */}
-          <div className="h-8 p-0.5 bg-white border border-[#E1E7F0] rounded-lg inline-flex items-center gap-0.5 shadow-2xs">
-            <button
-              type="button"
-              onClick={() => setViewMode('grid')}
-              className={`p-1 rounded-md text-xs transition-colors cursor-pointer ${
-                viewMode === 'grid' 
-                  ? 'bg-[#F4F3FE] text-[#7150E7]' 
-                  : 'text-[#98A2B3] hover:text-[#344054]'
-              }`}
-              title="Grid View"
-            >
-              <LayoutGrid className="w-3.5 h-3.5" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('list')}
-              className={`p-1 rounded-md text-xs transition-colors cursor-pointer ${
-                viewMode === 'list' 
-                  ? 'bg-[#F4F3FE] text-[#7150E7]' 
-                  : 'text-[#98A2B3] hover:text-[#344054]'
-              }`}
-              title="List View"
-            >
-              <List className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Grid or List of Opportunity Cards (Populated from System Data) */}
-      {filteredOpportunities.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-[#EAECF0] p-12 text-center space-y-3">
-          <div className="w-12 h-12 bg-[#EDE9FE] text-[#6941C6] rounded-full flex items-center justify-center mx-auto">
-            <Sparkles className="w-6 h-6" />
-          </div>
-          <h3 className="font-bold text-base text-[#101828]">No Matching Opportunities Found</h3>
-          <p className="text-xs text-[#667085] max-w-md mx-auto">
-            We couldn&apos;t find opportunities matching your selected combination of subjects, degrees, and countries. Try adjusting your filters.
-          </p>
+        {/* ROW 1: Omnisearch Input + User Profile (Figma Frame 2147226771) */}
+        <div className="flex items-center justify-between gap-4">
+          
+          {/* Mobile Menu Toggle button */}
           <button
             type="button"
-            onClick={resetAllFilters}
-            className="h-9 px-4 rounded-xl bg-[#6941C6] text-white text-xs font-semibold hover:bg-[#5925DC] transition-colors cursor-pointer"
+            onClick={() => window.dispatchEvent(new CustomEvent('open-sidebar'))}
+            className="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 shrink-0 cursor-pointer"
+            title="Open navigation menu"
           >
-            Reset Filters
+            <HugeiconsIcon icon={Menu01Icon} size={20} />
           </button>
-        </div>
-      ) : viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredOpportunities.map((opp) => (
-            <OpportunityCard key={opp.id} opportunity={opp} />
-          ))}
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {filteredOpportunities.map((opp) => (
-            <OpportunityCard key={opp.id} opportunity={opp} />
-          ))}
-        </div>
-      )}
 
+          {/* Omnisearch Box (Figma Node 122:3166) */}
+          <div className="flex-1 min-w-0">
+            <HeaderGlobalSearch onNavigateToTab={(tab) => setActiveNavTab(tab)} />
+          </div>
+
+          {/* User Profile Badge (Figma Node 122:3174 Frame 2147226782) */}
+          <div ref={profileMenuRef} className="relative shrink-0">
+            <button
+              type="button"
+              onClick={() => setIsProfileMenuOpen(prev => !prev)}
+              className="flex items-center gap-2.5 p-1 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer text-left"
+              title="User Profile"
+            >
+              {/* 32x32 Avatar with Green Online Status Dot (Figma 122:3175) */}
+              <div className="relative shrink-0">
+                <img
+                  src={profile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80'}
+                  alt={profile.name || 'User'}
+                  className="w-8 h-8 rounded-full object-cover border border-[#F4F6F8]"
+                />
+                <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-[#36B37E] ring-1.5 ring-white" />
+              </div>
+
+              {/* User Name & Degree Subtitle matching Figma Node 122:3181 */}
+              <div className="hidden sm:flex flex-col text-left">
+                <span className="text-xs font-bold text-[#101828] leading-tight">
+                  {profile.name || 'Ingrid Bergman'}
+                </span>
+                <span className="text-xs italic text-[#90A1B9] leading-tight mt-0.5">
+                  {profile.degreeLevel || 'Masters'} • {profile.specializations?.[0] || 'UX & HCI'}
+                </span>
+              </div>
+            </button>
+
+            {/* Profile Dropdown Menu (Figma Node 49:648) */}
+            {isProfileMenuOpen && (
+              <div className="absolute right-0 top-full mt-2 w-60 sm:w-64 bg-white rounded-2xl border border-[#EAECF0] shadow-xl p-3.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                {/* User Header Row */}
+                <div className="flex items-center gap-3 pb-1">
+                  <div className="relative shrink-0">
+                    <img
+                      src={profile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80'}
+                      alt={profile.name}
+                      className="w-10 h-10 rounded-full object-cover border border-[#EAECF0]"
+                    />
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#12B76A] rounded-full border-2 border-white" />
+                  </div>
+
+                  <div className="min-w-0">
+                    <div className="text-sm font-bold text-[#101828] leading-tight truncate">
+                      {profile.name || 'Ingrid Bergman'}
+                    </div>
+                    <div className="text-xs text-[#667085] font-normal leading-tight mt-0.5 truncate">
+                      {profile.email || 'ingrid.bergman@example.com'}
+                    </div>
+                  </div>
+                </div>
+
+                <hr className="border-[#F2F4F7] my-2" />
+
+                {/* Menu Items */}
+                <div className="space-y-0.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveNavTab('profile');
+                      setIsProfileMenuOpen(false);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-[#F8F9FA] transition-colors text-left cursor-pointer group"
+                  >
+                    <div className="w-7 h-7 rounded-md bg-[#F8FAFC] group-hover:bg-[#EDE9FE] flex items-center justify-center text-[#344054] group-hover:text-[#6941C6] transition-colors">
+                      <User className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-semibold text-[#101828] group-hover:text-[#6941C6] transition-colors">
+                      Profile
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsOnboardingOpen(true);
+                      setIsProfileMenuOpen(false);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-[#F8F9FA] transition-colors text-left cursor-pointer group"
+                  >
+                    <div className="w-7 h-7 rounded-md bg-[#F8FAFC] group-hover:bg-[#EDE9FE] flex items-center justify-center text-[#344054] group-hover:text-[#6941C6] transition-colors">
+                      <Settings className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-semibold text-[#101828] group-hover:text-[#6941C6] transition-colors">
+                      Settings
+                    </span>
+                  </button>
+                </div>
+
+                <hr className="border-[#F2F4F7] my-2" />
+
+                {/* Logout Button */}
+                <Link
+                  href="/login"
+                  onClick={() => {
+                    setIsProfileMenuOpen(false);
+                    fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+                  }}
+                  className="w-full h-8 sm:h-8.5 bg-[#FEF3F2] hover:bg-[#FEE4E2] text-[#F04438] rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                >
+                  <LogOut className="w-3.5 h-3.5 text-[#F04438]" />
+                  <span>Logout</span>
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ROW 2: Title + Subtitle (Figma Frame 2147226783 Node 122:3185) */}
+        <div className="space-y-0.5">
+          <h1 className="text-base sm:text-lg font-bold text-[#101828] tracking-tight leading-6">
+            Find Your Desired Scholarship, Lab &amp; Safe Universities
+          </h1>
+          <p className="text-xs sm:text-sm text-[#475467] font-normal leading-5">
+            A quick search links you to scholarships, expert professors, and trusted regional universities.
+          </p>
+        </div>
+
+        {/* ROW 3: 4 Selection/Filter Fields (Figma Frame 2147226775 Node 122:3188) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
+          
+          {/* 1. SUBJECT SELECTION (Figma Group 3 Node 122:3191) */}
+          <div className="relative" ref={subjectRef}>
+            {/* Floating Label */}
+            <div className="absolute -top-2.5 left-3 px-1.5 bg-white text-[11px] font-semibold text-[#344054] flex items-center gap-1 z-10 rounded-sm">
+              <span>Subject</span>
+            </div>
+
+            {/* Selection Trigger Box */}
+            <div 
+              onClick={() => setIsSubjectOpen(prev => !prev)}
+              className="h-12 border border-[#EAECF0] hover:border-[#D0D5DD] rounded-xl px-3 flex items-center justify-between bg-white cursor-pointer transition-all"
+            >
+              <div className="flex items-center gap-1.5 overflow-hidden flex-1 mr-2">
+                {selectedSubjects.length === 0 ? (
+                  <span className="text-xs text-[#98A2B3]">Select subjects...</span>
+                ) : (
+                  <>
+                    {selectedSubjects.slice(0, 2).map((s) => (
+                      <span 
+                        key={s} 
+                        className="bg-[#F2F4F7] text-[#344054] text-xs font-medium px-2 py-0.5 rounded-md flex items-center gap-1 shrink-0"
+                      >
+                        <span className="whitespace-nowrap">{s}</span>
+                        <span 
+                          onClick={(e) => removeSubject(s, e)}
+                          className="p-0.5 hover:text-red-500 rounded-xs cursor-pointer"
+                          title={`Remove ${s}`}
+                        >
+                          <HugeiconsIcon icon={Cancel01Icon} size={11} />
+                        </span>
+                      </span>
+                    ))}
+                    {selectedSubjects.length > 2 && (
+                      <span className="bg-[#F2F4F7] text-[#344054] text-xs font-semibold px-1.5 py-0.5 rounded-md shrink-0">
+                        +{selectedSubjects.length - 2}
+                      </span>
+                    )}
+                  </>
+                )}
+              </div>
+
+              <HugeiconsIcon 
+                icon={ArrowDown01Icon} 
+                size={16} 
+                className={`text-[#667085] shrink-0 transition-transform ${isSubjectOpen ? 'rotate-180' : ''}`} 
+              />
+            </div>
+
+            {/* Subject Popover Dropdown */}
+            {isSubjectOpen && (
+              <div className="absolute left-0 top-full mt-1.5 w-72 bg-white rounded-xl border border-[#EAECF0] shadow-xl p-3 z-50 space-y-2.5 animate-in fade-in slide-in-from-top-1">
+                {/* Search */}
+                <div className="relative">
+                  <HugeiconsIcon icon={Search01Icon} size={14} className="text-[#98A2B3] absolute left-2.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={subjectSearch}
+                    onChange={(e) => setSubjectSearch(e.target.value)}
+                    placeholder="Search subject..."
+                    className="w-full h-8 pl-8 pr-3 text-xs bg-[#F8FAFC] border border-[#EAECF0] rounded-lg focus:outline-hidden focus:border-[#7150E7]"
+                    autoFocus
+                  />
+                </div>
+
+                {/* Options List */}
+                <div className="max-h-48 overflow-y-auto space-y-1 pr-1">
+                  {filteredSubjectOptions.map((s) => {
+                    const isChecked = selectedSubjects.includes(s);
+                    return (
+                      <div
+                        key={s}
+                        onClick={() => toggleSubject(s)}
+                        className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs cursor-pointer transition-colors ${
+                          isChecked ? 'bg-[#EDE9FE] text-[#7150E7] font-semibold' : 'hover:bg-slate-50 text-[#344054]'
+                        }`}
+                      >
+                        <span>{s}</span>
+                        {isChecked && (
+                          <HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} className="text-[#7150E7]" />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 2. DEGREE SELECTION (Figma Group 4 Node 122:3209) */}
+          <div className="relative" ref={degreeRef}>
+            {/* Floating Label */}
+            <div className="absolute -top-2.5 left-3 px-1.5 bg-white text-[11px] font-semibold text-[#344054] flex items-center gap-1 z-10 rounded-sm">
+              <span>Degree</span>
+            </div>
+
+            {/* Selection Trigger Box */}
+            <div 
+              onClick={() => setIsDegreeOpen(prev => !prev)}
+              className="h-12 border border-[#EAECF0] hover:border-[#D0D5DD] rounded-xl px-3 flex items-center justify-between bg-white cursor-pointer transition-all"
+            >
+              <div className="flex items-center gap-1.5 overflow-hidden flex-1 mr-2">
+                {selectedDegrees.length === 0 ? (
+                  <span className="text-xs text-[#98A2B3]">Select degrees...</span>
+                ) : (
+                  <>
+                    {selectedDegrees.slice(0, 2).map((d) => (
+                      <span 
+                        key={d} 
+                        className="bg-[#F2F4F7] text-[#344054] text-xs font-medium px-2 py-0.5 rounded-md flex items-center gap-1 shrink-0"
+                      >
+                        <span>{d}</span>
+                        <span 
+                          onClick={(e) => removeDegree(d, e)}
+                          className="p-0.5 hover:text-red-500 rounded-xs cursor-pointer"
+                          title={`Remove ${d}`}
+                        >
+                          <HugeiconsIcon icon={Cancel01Icon} size={11} />
+                        </span>
+                      </span>
+                    ))}
+                    {selectedDegrees.length > 2 && (
+                      <span className="bg-[#F2F4F7] text-[#344054] text-xs font-semibold px-1.5 py-0.5 rounded-md shrink-0">
+                        +{selectedDegrees.length - 2}
+                      </span>
+                    )}
+                  </>
+                )}
+              </div>
+
+              <HugeiconsIcon 
+                icon={ArrowDown01Icon} 
+                size={16} 
+                className={`text-[#667085] shrink-0 transition-transform ${isDegreeOpen ? 'rotate-180' : ''}`} 
+              />
+            </div>
+
+            {/* Degree Popover Dropdown */}
+            {isDegreeOpen && (
+              <div className="absolute left-0 top-full mt-1.5 w-56 bg-white rounded-xl border border-[#EAECF0] shadow-xl p-3 z-50 space-y-1 animate-in fade-in slide-in-from-top-1">
+                {ALL_DEGREES.map((d) => {
+                  const isChecked = selectedDegrees.includes(d);
+                  return (
+                    <div
+                      key={d}
+                      onClick={() => toggleDegree(d)}
+                      className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs cursor-pointer transition-colors ${
+                        isChecked ? 'bg-[#EDE9FE] text-[#7150E7] font-semibold' : 'hover:bg-slate-50 text-[#344054]'
+                      }`}
+                    >
+                      <span>{d}</span>
+                      {isChecked && (
+                        <HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} className="text-[#7150E7]" />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* 3. COUNTRY SELECTION (Figma Group 5 Node 122:3229) */}
+          <div className="relative" ref={countryRef}>
+            {/* Floating Label */}
+            <div className="absolute -top-2.5 left-3 px-1.5 bg-white text-[11px] font-semibold text-[#344054] flex items-center gap-1 z-10 rounded-sm">
+              <span>Country</span>
+            </div>
+
+            {/* Selection Trigger Box */}
+            <div 
+              onClick={() => setIsCountryOpen(prev => !prev)}
+              className="h-12 border border-[#EAECF0] hover:border-[#D0D5DD] rounded-xl px-3 flex items-center justify-between bg-white cursor-pointer transition-all"
+            >
+              <div className="flex items-center gap-1.5 overflow-hidden flex-1 mr-2">
+                {selectedCountries.length === 0 ? (
+                  <span className="text-xs text-[#98A2B3]">Select countries...</span>
+                ) : (
+                  <>
+                    {selectedCountries.slice(0, 2).map((c) => (
+                      <span 
+                        key={c} 
+                        className="bg-[#F2F4F7] text-[#344054] text-xs font-medium px-2 py-0.5 rounded-md flex items-center gap-1 shrink-0"
+                      >
+                        <span>{c}</span>
+                        <span 
+                          onClick={(e) => removeCountry(c, e)}
+                          className="p-0.5 hover:text-red-500 rounded-xs cursor-pointer"
+                          title={`Remove ${c}`}
+                        >
+                          <HugeiconsIcon icon={Cancel01Icon} size={11} />
+                        </span>
+                      </span>
+                    ))}
+                    {selectedCountries.length > 2 && (
+                      <span className="bg-[#F2F4F7] text-[#344054] text-xs font-semibold px-1.5 py-0.5 rounded-md shrink-0">
+                        +{selectedCountries.length - 2}
+                      </span>
+                    )}
+                  </>
+                )}
+              </div>
+
+              <HugeiconsIcon 
+                icon={ArrowDown01Icon} 
+                size={16} 
+                className={`text-[#667085] shrink-0 transition-transform ${isCountryOpen ? 'rotate-180' : ''}`} 
+              />
+            </div>
+
+            {/* Country Popover Dropdown */}
+            {isCountryOpen && (
+              <div className="absolute left-0 top-full mt-1.5 w-64 bg-white rounded-xl border border-[#EAECF0] shadow-xl p-3 z-50 space-y-2.5 animate-in fade-in slide-in-from-top-1">
+                {/* Search */}
+                <div className="relative">
+                  <HugeiconsIcon icon={Search01Icon} size={14} className="text-[#98A2B3] absolute left-2.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={countrySearch}
+                    onChange={(e) => setCountrySearch(e.target.value)}
+                    placeholder="Search country..."
+                    className="w-full h-8 pl-8 pr-3 text-xs bg-[#F8FAFC] border border-[#EAECF0] rounded-lg focus:outline-hidden focus:border-[#7150E7]"
+                    autoFocus
+                  />
+                </div>
+
+                {/* Options List */}
+                <div className="max-h-48 overflow-y-auto space-y-1 pr-1">
+                  {filteredCountryOptions.map((c) => {
+                    const isChecked = selectedCountries.includes(c);
+                    return (
+                      <div
+                        key={c}
+                        onClick={() => toggleCountry(c)}
+                        className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs cursor-pointer transition-colors ${
+                          isChecked ? 'bg-[#EDE9FE] text-[#7150E7] font-semibold' : 'hover:bg-slate-50 text-[#344054]'
+                        }`}
+                      >
+                        <span>{c}</span>
+                        {isChecked && (
+                          <HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} className="text-[#7150E7]" />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 4. ACCEPTANCE & FUNDING SELECTION (Figma Group 6 Node 122:3251) */}
+          <div className="relative" ref={fundingRef}>
+            {/* Floating Label */}
+            <div className="absolute -top-2.5 left-3 px-1.5 bg-white text-[11px] font-semibold text-[#344054] flex items-center gap-1 z-10 rounded-sm">
+              <span>Acceptance &amp; Funding</span>
+            </div>
+
+            {/* Selection Trigger Box */}
+            <div 
+              onClick={() => setIsFundingOpen(prev => !prev)}
+              className="h-12 border border-[#EAECF0] hover:border-[#D0D5DD] rounded-xl px-3 flex items-center justify-between bg-white cursor-pointer transition-all"
+            >
+              <div className="flex items-center gap-1.5 overflow-hidden flex-1 mr-2">
+                {selectedFunding.length === 0 ? (
+                  <span className="text-xs text-[#98A2B3]">Select funding...</span>
+                ) : (
+                  <>
+                    {selectedFunding.slice(0, 1).map((f) => (
+                      <span 
+                        key={f} 
+                        className="bg-[#F2F4F7] text-[#344054] text-xs font-medium px-2 py-0.5 rounded-md flex items-center gap-1 shrink-0"
+                      >
+                        <span className="whitespace-nowrap">{f}</span>
+                        <span 
+                          onClick={(e) => removeFunding(f, e)}
+                          className="p-0.5 hover:text-red-500 rounded-xs cursor-pointer"
+                          title={`Remove ${f}`}
+                        >
+                          <HugeiconsIcon icon={Cancel01Icon} size={11} />
+                        </span>
+                      </span>
+                    ))}
+                    {selectedFunding.length > 1 && (
+                      <span className="bg-[#F2F4F7] text-[#344054] text-xs font-semibold px-1.5 py-0.5 rounded-md shrink-0">
+                        +{selectedFunding.length - 1}
+                      </span>
+                    )}
+                  </>
+                )}
+              </div>
+
+              <HugeiconsIcon 
+                icon={ArrowDown01Icon} 
+                size={16} 
+                className={`text-[#667085] shrink-0 transition-transform ${isFundingOpen ? 'rotate-180' : ''}`} 
+              />
+            </div>
+
+            {/* Funding Popover Dropdown */}
+            {isFundingOpen && (
+              <div className="absolute left-0 top-full mt-1.5 w-64 bg-white rounded-xl border border-[#EAECF0] shadow-xl p-3 z-50 space-y-1 animate-in fade-in slide-in-from-top-1">
+                {ALL_FUNDING.map((f) => {
+                  const isChecked = selectedFunding.includes(f);
+                  return (
+                    <div
+                      key={f}
+                      onClick={() => toggleFunding(f)}
+                      className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs cursor-pointer transition-colors ${
+                        isChecked ? 'bg-[#EDE9FE] text-[#7150E7] font-semibold' : 'hover:bg-slate-50 text-[#344054]'
+                      }`}
+                    >
+                      <span className="truncate">{f}</span>
+                      {isChecked && (
+                        <HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} className="text-[#7150E7] shrink-0" />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+        </div>
+      </header>
+
+      {/* 
+        ========================================================================
+        BODY CONTENT AREA BELOW UNIFIED HEADER:
+        Figma Node 116:1921 Frame 2147226743
+        - Opportunity List Bar (48 items, acceptance rate badge, view toggle)
+        - 3-Column Opportunity Cards Grid
+        ========================================================================
+      */}
+      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
+        
+        {/* Opportunity List Sub-Bar (Figma Frame 2147226741 Node 116:1923) */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
+          {/* Left Title & Subtitle */}
+          <div>
+            <div className="flex items-center">
+              <h2 className="text-base sm:text-lg font-bold text-[#101828] leading-tight">
+                Opportunity List
+              </h2>
+              <span className="text-xs sm:text-sm font-semibold text-[#98A2B3] ml-1.5">
+                / {filteredOpportunities.length} Items
+              </span>
+            </div>
+            <p className="text-xs text-[#667085] mt-0.5">
+              Safe-Bet Universities with Guaranteed Funding &amp; Assistantships
+            </p>
+          </div>
+
+          {/* Right: Acceptance Rate Pill + Grid/List View Toggle */}
+          <div className="flex items-center gap-3 shrink-0">
+            {/* Green Acceptance Rate Badge */}
+            <span className="bg-[#ECFDF3] border border-[#A6F4C5] text-[#027A48] text-xs font-semibold px-3 py-1.5 rounded-full inline-flex items-center gap-1 select-none">
+              <span>✓ 85% – 95% Acceptance Rate</span>
+            </span>
+
+            {/* View Mode Switcher Container (Figma Container 116:2372) */}
+            <div className="bg-[#F8FAFC] border border-[#EAECF0] rounded-xl p-0.5 flex items-center gap-0.5">
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                  viewMode === 'grid'
+                    ? 'text-[#7050E6] bg-white shadow-2xs'
+                    : 'text-[#98A2B3] hover:text-[#475467] hover:bg-white/50'
+                }`}
+                title="Grid view"
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('list')}
+                className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                  viewMode === 'list'
+                    ? 'text-[#7050E6] bg-white shadow-2xs'
+                    : 'text-[#98A2B3] hover:text-[#475467] hover:bg-white/50'
+                }`}
+                title="List view"
+              >
+                <List className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Opportunities Grid / List (Figma Frame 2147226740 Node 116:1930) */}
+        {filteredOpportunities.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-[#EAECF0] p-12 text-center space-y-3">
+            <div className="w-12 h-12 rounded-full bg-[#EDE9FE] text-[#7150E7] flex items-center justify-center mx-auto">
+              <HugeiconsIcon icon={FilterIcon} size={24} />
+            </div>
+            <h3 className="text-base font-bold text-[#101828]">No matching opportunities found</h3>
+            <p className="text-xs text-[#667085] max-w-md mx-auto">
+              Try removing some subject or country filters to view more scholarship and funding opportunities.
+            </p>
+            <button
+              onClick={() => {
+                setSelectedSubjects(['UX & Product Design', 'HCI']);
+                setSelectedDegrees(['Masters', 'PhD']);
+                setSelectedCountries(['USA', 'Germany']);
+                setSelectedFunding(['Safe Regional']);
+              }}
+              className="px-4 py-2 bg-[#7050E6] text-white text-xs font-semibold rounded-full hover:bg-[#5D3FD3] transition-colors cursor-pointer"
+            >
+              Reset to Default Filters
+            </button>
+          </div>
+        ) : (
+          <div className={
+            viewMode === 'grid' 
+              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" 
+              : "space-y-4"
+          }>
+            {filteredOpportunities.map((opp) => (
+              <OpportunityCard key={opp.id} opportunity={opp} />
+            ))}
+          </div>
+        )}
+
+      </div>
     </div>
   );
 };
