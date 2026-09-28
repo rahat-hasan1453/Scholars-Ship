@@ -3,15 +3,12 @@
 import React from 'react';
 import { HiringOpportunity } from '@/types';
 import { useApp } from '@/context/AppContext';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { 
-  SparklesIcon, 
-  Bookmark01Icon, 
-  Tick01Icon, 
-  Building02Icon,
-  ArrowUpRight01Icon,
-  FlaskConicalIcon
-} from '@hugeicons/core-free-icons';
+  Bookmark, 
+  ArrowUpRight, 
+  ChevronRight, 
+  Check
+} from 'lucide-react';
 
 interface OpportunityCardProps {
   opportunity: HiringOpportunity;
@@ -20,34 +17,50 @@ interface OpportunityCardProps {
 const getCountryFlag = (country: string) => {
   switch (country?.toLowerCase()) {
     case 'germany':
-      return '🇩🇪';
+      return { flag: '🇩🇪', label: 'Germany' };
     case 'usa':
     case 'united states':
-      return '🇺🇸';
+      return { flag: '🇺🇸', label: 'United States' };
     case 'canada':
-      return '🇨🇦';
+      return { flag: '🇨🇦', label: 'Canada' };
     case 'uk':
     case 'united kingdom':
-      return '🇬🇧';
+      return { flag: '🇬🇧', label: 'United Kingdom' };
     case 'switzerland':
-      return '🇨🇭';
+      return { flag: '🇨🇭', label: 'Switzerland' };
     case 'sweden':
-      return '🇸🇪';
+      return { flag: '🇸🇪', label: 'Sweden' };
     case 'netherlands':
-      return '🇳🇱';
+      return { flag: '🇳🇱', label: 'Netherlands' };
     case 'france':
-      return '🇫🇷';
+      return { flag: '🇫🇷', label: 'France' };
     case 'japan':
-      return '🇯🇵';
+      return { flag: '🇯🇵', label: 'Japan' };
     case 'south korea':
     case 'korea':
-      return '🇰🇷';
+      return { flag: '🇰🇷', label: 'South Korea' };
     case 'singapore':
-      return '🇸🇬';
+      return { flag: '🇸🇬', label: 'Singapore' };
     case 'australia':
-      return '🇦🇺';
+      return { flag: '🇦🇺', label: 'Australia' };
     default:
-      return '🇩🇪';
+      return { flag: '🇺🇸', label: 'United States' };
+  }
+};
+
+const getLivingCostByCountry = (country: string) => {
+  switch (country?.toLowerCase()) {
+    case 'germany':
+      return 'Zero Tuition Fees (€0) + Free Transit Ticket • €750-€850/mo';
+    case 'uk':
+    case 'united kingdom':
+      return 'Affordable Living Outside London (£750-£900/mo)';
+    case 'canada':
+      return 'Low Cost University Town (CAD $800-$950/mo)';
+    case 'switzerland':
+      return 'Competitive Living Support (CHF 1,600/mo)';
+    default:
+      return 'Low Cost College Town ($650/mo)';
   }
 };
 
@@ -55,171 +68,148 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({ opportunity })
   const { openColdEmailModal, saveOpportunityToOutreach, outreachRecords } = useApp();
 
   const isSaved = outreachRecords.some((r) => r.opportunityId === opportunity.id);
+  const countryInfo = getCountryFlag(opportunity.country);
 
-  // Match score calculation or display
-  const matchPercentage = opportunity.matchType === 'exact' ? '98% Match' : '85% Match';
-  const degreeLevel = opportunity.degrees[0] || 'Masters';
-  const labOrGroup = opportunity.labName || (opportunity.institution ? `${opportunity.institution} Research Lab` : 'Fluid Interfaces Group, MIT Media Lab');
+  // Dynamic values mapped from system data
+  const universityName = opportunity.institution || 'Arkansas State University';
+  const departmentSubtitle = opportunity.fieldTags?.length 
+    ? opportunity.fieldTags.slice(0, 3).join(', ') 
+    : 'UX Design, CS & Digital Media';
+
+  const financialText = opportunity.funding || 'In-State Tuition Waiver + $1,400/mo Graduate Assistantship (TA/RA)';
+  
+  const admissionText = opportunity.minCgpa 
+    ? `Accepts CGPA ${opportunity.minCgpa}+, No GRE required, 4+ Years Study Gap Accepted`
+    : 'Accepts CGPA 2.65+, No GRE required, 4+ Years Study Gap Accepted';
+
+  const livingText = getLivingCostByCountry(opportunity.country);
+
+  // Dynamic ranking and acceptance banner
+  const acceptancePercent = opportunity.matchType === 'exact' ? '88%' : '92%';
+  const rankText = opportunity.matchType === 'exact' ? 'Rank 1,200 – 1,800' : 'Rank 1,800 – 2,400';
+
+  const handleBookmarkToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    saveOpportunityToOutreach(opportunity);
+  };
+
+  const handleOfficialLink = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const url = opportunity.sourceUrl || opportunity.officialUrl || 'https://www.google.com/search?q=' + encodeURIComponent(universityName + ' graduate admissions');
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleSeeDetails = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    openColdEmailModal(opportunity);
+  };
 
   return (
-    <div className="group bg-white rounded-2xl border border-[#EAECF0] hover:border-[#D0D5DD] hover:shadow-lg transition-all duration-200 p-5 sm:p-6 flex flex-col justify-between">
+    <div className="group bg-white rounded-2xl border border-[#EAECF0] hover:border-[#D0D5DD] hover:shadow-lg transition-all duration-200 p-4 sm:p-5 flex flex-col justify-between">
       <div>
-        {/* Top Header Row: Lab Name & Badges */}
-        <div className="flex items-center justify-between gap-3 mb-3.5">
-          {/* Left: Flask Icon + Italic Lab / Group Name */}
-          <div className="flex items-center gap-2 min-w-0 pr-2">
-            <HugeiconsIcon icon={FlaskConicalIcon} size={16} className="text-slate-400 shrink-0" />
-            <span className="italic font-semibold text-sm text-[#101828] truncate">
-              {labOrGroup}
-            </span>
+        {/* Top Header Row: University Name, Department, Flag */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <h3 className="font-bold text-base text-[#101828] leading-tight truncate group-hover:text-[#6941C6] transition-colors">
+              {universityName}
+            </h3>
+            <p className="text-xs text-[#667085] font-normal leading-tight mt-1 truncate">
+              {departmentSubtitle}
+            </p>
           </div>
 
-          {/* Right: Degree Badge + Match Badge + Flag */}
-          <div className="flex items-center gap-2 shrink-0">
-            <span className="bg-[#F2F4F7] text-[#344054] text-xs font-medium px-3 py-1 rounded-full">
-              {degreeLevel}
-            </span>
-            <span className="bg-[#DCFCE7] text-[#027A48] text-xs font-semibold px-3 py-1 rounded-full">
-              {matchPercentage}
-            </span>
-            <span 
-              className="text-lg leading-none inline-flex items-center justify-center filter drop-shadow-2xs select-none" 
-              title={opportunity.country}
-            >
-              {getCountryFlag(opportunity.country)}
-            </span>
-          </div>
+          {/* Country Flag Badge */}
+          <span 
+            className="text-xl leading-none inline-flex items-center justify-center shrink-0 filter drop-shadow-2xs select-none ml-2" 
+            title={countryInfo.label}
+          >
+            {countryInfo.flag}
+          </span>
         </div>
 
-        {/* Top Divider */}
-        <hr className="border-[#F2F4F7] mb-3.5" />
+        {/* Separator Line */}
+        <hr className="border-[#F2F4F7] my-3.5" />
 
-        {/* Opportunity Headline / Title */}
-        <h3 className="font-bold italic text-[#101828] text-base leading-snug tracking-tight mb-2 group-hover:text-[#6941C6] transition-colors">
-          {opportunity.title}
-        </h3>
-
-        {/* Abstract / Description */}
-        <p className="italic text-xs text-[#475467] leading-relaxed line-clamp-3 mb-4">
-          {opportunity.content}
-        </p>
-
-        {/* Author / Professor Info Row */}
-        <div className="flex items-center justify-between gap-3 mb-3.5">
-          {/* Professor details */}
-          <div className="flex items-center gap-3 min-w-0">
-            {opportunity.authorAvatar ? (
-              <img
-                src={opportunity.authorAvatar}
-                alt={opportunity.authorName}
-                className="w-11 h-11 rounded-full object-cover shrink-0 border border-slate-100"
-              />
-            ) : (
-              <div className="w-11 h-11 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs shrink-0">
-                {opportunity.authorName.slice(0, 2).toUpperCase()}
-              </div>
-            )}
-
+        {/* Structured 3-Bullet Points (Figma Node 116:2525) */}
+        <div className="space-y-2.5">
+          {/* Financial Item */}
+          <div className="text-xs text-[#344054] leading-relaxed flex items-start gap-2">
+            <span className="shrink-0 text-sm select-none">💰</span>
             <div className="min-w-0">
-              <h4 className="font-bold text-sm text-[#101828] leading-tight truncate">
-                {opportunity.authorName}
-              </h4>
-              <p className="text-xs text-[#475467] leading-tight truncate mt-0.5">
-                {opportunity.authorTitle}
-              </p>
-              <div className="inline-flex items-center gap-1.5 text-xs text-[#667085] mt-1 truncate">
-                <HugeiconsIcon icon={Building02Icon} size={14} className="text-[#667085] shrink-0" />
-                <span className="truncate">{opportunity.institution}</span>
-              </div>
+              <strong className="font-semibold text-[#101828]">Financial: </strong>
+              <span className="italic text-[#475467]">{financialText}</span>
             </div>
           </div>
 
-          {/* Social / Source Link */}
-          <a
-            href={opportunity.sourceUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-[#0A66C2] text-xs font-semibold hover:underline shrink-0"
-            title="Open original post"
-          >
-            <span className="w-4 h-4 bg-[#0A66C2] text-white rounded-xs flex items-center justify-center font-bold text-[10px] leading-none">
-              in
-            </span>
-            <span className="hidden sm:inline">See Original Post</span>
-          </a>
+          {/* Admission Item */}
+          <div className="text-xs text-[#344054] leading-relaxed flex items-start gap-2">
+            <span className="shrink-0 text-sm select-none">🎓</span>
+            <div className="min-w-0">
+              <strong className="font-semibold text-[#101828]">Admission: </strong>
+              <span className="italic text-[#475467]">{admissionText}</span>
+            </div>
+          </div>
+
+          {/* Living Item */}
+          <div className="text-xs text-[#344054] leading-relaxed flex items-start gap-2">
+            <span className="shrink-0 text-sm select-none">🏡</span>
+            <div className="min-w-0">
+              <strong className="font-semibold text-[#101828]">Living: </strong>
+              <span className="italic text-[#475467]">{livingText}</span>
+            </div>
+          </div>
         </div>
 
-        {/* Mid Divider */}
-        <hr className="border-[#F2F4F7] mb-3.5" />
-
-        {/* Funding & Research Tags Row */}
-        <div className="flex flex-wrap items-center gap-2 mb-5">
-          {/* Fully Funded Pill */}
-          <span className="bg-[#DCFCE7] text-[#027A48] italic font-medium text-xs px-3.5 py-1.5 rounded-full inline-flex items-center gap-1.5 shrink-0">
-            <span className="font-bold text-xs not-italic">$</span>
-            <span>{opportunity.funding || 'Fully Funded / University Fellowship'}</span>
+        {/* Mint Green Acceptance Badge (Figma Node 116:2531) */}
+        <div className="mt-3.5 mb-3.5 bg-[#ECFDF3] border border-[#D1FADF] rounded-lg py-1.5 px-3 text-center">
+          <span className="text-xs font-semibold text-[#027A48] tracking-tight">
+            {rankText} • High Acceptance ({acceptancePercent})
           </span>
-
-          {/* Vertical Separator */}
-          <span className="h-4 w-[1px] bg-[#E4E7EC] mx-1 hidden sm:inline-block" />
-
-          {/* Field Tags in Italic */}
-          {opportunity.fieldTags.slice(0, 4).map((tag) => (
-            <span
-              key={tag}
-              className="italic text-xs text-[#344054] bg-[#F2F4F7] hover:bg-[#E4E7EC] px-3 py-1 rounded-full font-normal transition-colors"
-            >
-              {tag}
-            </span>
-          ))}
         </div>
       </div>
 
-      {/* Bottom Action Footer */}
-      <div className="flex items-center gap-2.5 pt-2">
-        {/* Button 1: Track / Tracked */}
-        <button
-          onClick={() => saveOpportunityToOutreach(opportunity)}
-          disabled={isSaved}
-          className={`h-10 px-5 border rounded-full text-xs font-medium inline-flex items-center justify-center gap-1.5 shadow-2xs transition-all cursor-pointer shrink-0 ${
-            isSaved
-              ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-              : 'bg-white hover:bg-slate-50 text-[#344054] border-[#D0D5DD]'
-          }`}
-          title={isSaved ? 'Saved to Pipeline' : 'Save to Pipeline'}
-        >
-          {isSaved ? (
-            <>
-              <HugeiconsIcon icon={Tick01Icon} size={15} className="text-emerald-600" />
-              <span>Tracked</span>
-            </>
-          ) : (
-            <>
-              <HugeiconsIcon icon={Bookmark01Icon} size={15} className="text-[#344054]" />
-              <span>Track</span>
-            </>
-          )}
-        </button>
+      <div>
+        {/* Bottom Separator Line */}
+        <hr className="border-[#F2F4F7] mb-3" />
 
-        {/* Button 2: See Original Post */}
-        <a
-          href={opportunity.sourceUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex-1 h-10 bg-white border border-[#7150E7] hover:bg-[#F4F3FE] text-[#7150E7] font-semibold text-xs rounded-full inline-flex items-center justify-center gap-1.5 shadow-2xs transition-all cursor-pointer"
-        >
-          <span>See Original Post</span>
-          <HugeiconsIcon icon={ArrowUpRight01Icon} size={15} className="text-[#7150E7]" />
-        </a>
+        {/* Footer Action Buttons Row (Figma Node 116:2535) */}
+        <div className="flex items-center gap-2">
+          {/* Bookmark Button */}
+          <button
+            type="button"
+            onClick={handleBookmarkToggle}
+            className={`w-9 h-9 rounded-xl border flex items-center justify-center transition-all cursor-pointer shrink-0 ${
+              isSaved 
+                ? 'bg-[#EDE9FE] border-[#D6BBFB] text-[#6941C6]' 
+                : 'bg-white hover:bg-slate-50 border-[#EAECF0] text-[#667085] hover:text-[#101828]'
+            }`}
+            title={isSaved ? 'Saved to Wishlist' : 'Save to Wishlist'}
+          >
+            <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-[#6941C6] text-[#6941C6]' : ''}`} />
+          </button>
 
-        {/* Button 3: Draft AI Email */}
-        <button
-          onClick={() => openColdEmailModal(opportunity)}
-          className="flex-1 h-10 bg-[#6941C6] hover:bg-[#5925DC] text-white font-semibold text-xs rounded-full inline-flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
-        >
-          <HugeiconsIcon icon={SparklesIcon} size={15} className="text-white" />
-          <span>Draft AI Email</span>
-        </button>
+          {/* Official Link Button */}
+          <button
+            type="button"
+            onClick={handleOfficialLink}
+            className="flex-1 h-9 px-3 rounded-xl border border-[#7150E7] text-[#7150E7] hover:bg-[#F9F5FF] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+            title="Open official university / program link"
+          >
+            <span>Official Link</span>
+            <ArrowUpRight className="w-3.5 h-3.5 text-[#7150E7]" />
+          </button>
+
+          {/* See Details Button */}
+          <button
+            type="button"
+            onClick={handleSeeDetails}
+            className="flex-1 h-9 px-3 rounded-xl bg-[#6941C6] hover:bg-[#5925DC] text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+            title="See details & prepare outreach email"
+          >
+            <span>See Details</span>
+            <ChevronRight className="w-3.5 h-3.5 text-white" />
+          </button>
+        </div>
       </div>
     </div>
   );

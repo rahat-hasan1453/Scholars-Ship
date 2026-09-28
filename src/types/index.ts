@@ -122,6 +122,8 @@ export interface HiringOpportunity {
   contactEmail?: string;
   recentPaperTopic?: string;
   country: string;
+  minCgpa?: number;
+  officialUrl?: string;
 }
 
 export interface OutreachRecord {
