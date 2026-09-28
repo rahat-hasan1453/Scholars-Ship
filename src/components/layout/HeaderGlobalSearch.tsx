@@ -36,7 +36,10 @@ export const HeaderGlobalSearch: React.FC<HeaderGlobalSearchProps> = ({
     opportunities, 
     globalSearchQuery, 
     setGlobalSearchQuery,
-    setActiveNavTab
+    setActiveNavTab,
+    setSelectedScholarship,
+    setSelectedProfessor,
+    openColdEmailModal,
   } = useApp();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -265,6 +268,8 @@ export const HeaderGlobalSearch: React.FC<HeaderGlobalSearchProps> = ({
                         key={sch.id}
                         onClick={() => {
                           setIsOpen(false);
+                          setGlobalSearchQuery(sch.title);
+                          setSelectedScholarship(sch);
                           onSelectScholarship?.(sch);
                         }}
                         className="p-3 rounded-xl hover:bg-purple-50/60 transition-colors cursor-pointer flex items-center justify-between gap-3 group"
@@ -300,6 +305,8 @@ export const HeaderGlobalSearch: React.FC<HeaderGlobalSearchProps> = ({
                         key={prof.id}
                         onClick={() => {
                           setIsOpen(false);
+                          setGlobalSearchQuery(prof.name);
+                          setSelectedProfessor(prof);
                           onSelectProfessor?.(prof);
                           setActiveNavTab('professors');
                           onNavigateToTab?.('professors');
@@ -344,6 +351,8 @@ export const HeaderGlobalSearch: React.FC<HeaderGlobalSearchProps> = ({
                         key={opp.id}
                         onClick={() => {
                           setIsOpen(false);
+                          setGlobalSearchQuery(opp.title);
+                          openColdEmailModal(opp);
                           setActiveNavTab('opportunities');
                           onNavigateToTab?.('opportunities');
                         }}

@@ -13,6 +13,7 @@ import { ScholarshipDetailModal } from '@/components/ScholarshipDetailModal';
 import { ChromeExtensionDrawer } from '@/components/ChromeExtensionDrawer';
 import { OpportunitiesFeed } from '@/components/OpportunitiesFeed';
 import { ColdEmailModal } from '@/components/ColdEmailModal';
+import { ProfessorDetailModal } from '@/components/ProfessorDetailModal';
 import { OutreachKanban } from '@/components/OutreachKanban';
 import { AdvancedFilterModal, FilterState, initialFilterState } from '@/components/AdvancedFilterModal';
 import { SmartProfileMatcherModal } from '@/components/SmartProfileMatcherModal';
@@ -60,7 +61,9 @@ export default function HomePage() {
     outreachRecords,
     setIsOnboardingOpen, 
     selectedScholarship, 
-    setSelectedScholarship 
+    setSelectedScholarship,
+    selectedProfessor,
+    setSelectedProfessor,
   } = useApp();
 
   const [activeTab, setActiveTab] = useState<'scholarships' | 'opportunities' | 'professors' | 'research' | 'tracker' | 'profile'>('opportunities');
@@ -781,6 +784,10 @@ export default function HomePage() {
       <ScholarshipDetailModal
         scholarship={selectedScholarship}
         onClose={() => setSelectedScholarship(null)}
+      />
+      <ProfessorDetailModal
+        professor={selectedProfessor}
+        onClose={() => setSelectedProfessor(null)}
       />
       <ChromeExtensionDrawer
         isOpen={isExtensionDrawerOpen}

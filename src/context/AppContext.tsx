@@ -29,6 +29,8 @@ interface AppContextType {
   addProfessor: (professor: Professor) => void;
   selectedScholarship: Scholarship | null;
   setSelectedScholarship: (sch: Scholarship | null) => void;
+  selectedProfessor: Professor | null;
+  setSelectedProfessor: (prof: Professor | null) => void;
   selectedOpportunityForEmail: HiringOpportunity | null;
   setSelectedOpportunityForEmail: (opp: HiringOpportunity | null) => void;
   isColdEmailModalOpen: boolean;
@@ -74,6 +76,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [savedPaperIds, setSavedPaperIds] = useState<string[]>([]);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [selectedScholarship, setSelectedScholarship] = useState<Scholarship | null>(null);
+  const [selectedProfessor, setSelectedProfessor] = useState<Professor | null>(null);
   const [selectedOpportunityForEmail, setSelectedOpportunityForEmail] = useState<HiringOpportunity | null>(null);
   const [isColdEmailModalOpen, setIsColdEmailModalOpen] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
@@ -507,6 +510,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         addProfessor,
         selectedScholarship,
         setSelectedScholarship,
+        selectedProfessor,
+        setSelectedProfessor,
         selectedOpportunityForEmail,
         setSelectedOpportunityForEmail,
         isColdEmailModalOpen,
