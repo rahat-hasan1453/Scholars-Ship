@@ -1079,41 +1079,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
               />
             </div>
 
-            {/* Live Global Internet Engine Indicator & Switch */}
-            <div className="w-full flex flex-wrap items-center justify-between gap-2 px-1 pt-1">
-              <div className="flex items-center gap-2">
-                <span className="relative flex h-2.5 w-2.5">
-                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isLiveWebActive ? 'bg-emerald-400 opacity-75' : 'bg-slate-300'}`}></span>
-                  <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${isLiveWebActive ? 'bg-emerald-500' : 'bg-slate-400'}`}></span>
-                </span>
-                <span className="text-[12px] font-semibold text-[#344054]">
-                  {isLiveWebActive ? 'Live Global Academic Web Search Active' : 'Local Seed Data Only'}
-                </span>
-                <span className="hidden sm:inline-block text-[11px] text-[#98A2B3]">
-                  • OpenAlex (250M+ Papers &amp; 30M+ Researchers) • Live Fediverse
-                </span>
-              </div>
 
-              <div className="flex items-center gap-2">
-                {isLiveSearchingProfessors && (
-                  <span className="text-[11px] font-medium text-[#7150E7] animate-pulse flex items-center gap-1">
-                    <Sparkles className="w-3 h-3" /> Fetching OpenAlex live...
-                  </span>
-                )}
-                <button
-                  type="button"
-                  onClick={() => setIsLiveWebActive(!isLiveWebActive)}
-                  className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full border transition-all cursor-pointer ${
-                    isLiveWebActive 
-                      ? 'bg-[#F9F5FF] text-[#7150E7] border-[#D6BBFB] hover:bg-[#F4EBFF]' 
-                      : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
-                  }`}
-                  title={isLiveWebActive ? "Switch to local curated database" : "Enable Live Global Web Search via OpenAlex"}
-                >
-                  {isLiveWebActive ? '🌐 Live Web ON' : '⚙️ Local Seed'}
-                </button>
-              </div>
-            </div>
 
             {/* 5. Search Input + Filter Button matching Figma Node 89:4385 Frame 2147226745 */}
             <div className="w-full">
