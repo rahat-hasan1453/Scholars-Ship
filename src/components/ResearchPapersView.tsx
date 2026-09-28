@@ -215,17 +215,17 @@ export const ResearchPapersView: React.FC = () => {
               
               {/* Integrated Left Composite Search Input: Joined ALL Button + Search Box */}
               <div className="inline-flex items-center shadow-2xs">
-                {/* ALL Button */}
+                {/* ALL Button as mutually exclusive tab */}
                 <button
                   type="button"
                   onClick={() => {
                     setSelectedDiscipline('ALL');
                     setActiveTab('all');
                   }}
-                  className={`h-9 px-3.5 rounded-l-full text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center justify-center ${
+                  className={`h-9 px-3.5 rounded-l-full text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center justify-center border-y border-l ${
                     selectedDiscipline === 'ALL' && activeTab === 'all'
-                      ? 'bg-[#6941C6] text-white'
-                      : 'bg-[#5b36ad] hover:bg-[#6941C6] text-white/90'
+                      ? 'bg-[#6941C6] text-white border-[#6941C6]'
+                      : 'bg-white text-[#344054] hover:bg-slate-50 border-[#D0D5DD] font-medium'
                   }`}
                 >
                   ALL
