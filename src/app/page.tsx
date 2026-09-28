@@ -287,19 +287,19 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* 4 DISCOVERY TABS: All 4 tabs share the exact same Figma Node 89:4385 Hero Card */}
-      {(viewMode === 'unified' && ['opportunities', 'scholarships', 'professors', 'research'].includes(activeTab)) && (
+      {/* 1. OPPORTUNITY FEED: Figma Node 116:1841 */}
+      {activeTab === 'opportunities' && (
+        <OpportunitiesFeed />
+      )}
+
+      {/* DISCOVERY TABS: scholarships, professors, research */}
+      {(viewMode === 'unified' && ['scholarships', 'professors', 'research'].includes(activeTab)) && (
         <UnifiedHubView
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           onSwitchToClassic={() => setViewMode('classic')}
           onOpenScholarshipDetail={(sch) => setSelectedScholarship(sch)}
         />
-      )}
-
-      {/* CLASSIC FALLBACK TABS */}
-      {viewMode === 'classic' && activeTab === 'opportunities' && (
-        <OpportunitiesFeed />
       )}
 
       {/* TAB 1: SCHOLARSHIPS (Classic Fallback) */}
