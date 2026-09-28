@@ -1006,8 +1006,8 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
           </div>
         </div>
 
-        {/* Bottom Lavender Filter Section matching Figma Node 89:4385 */}
-        <div className="bg-[#EDE9FC] px-5 sm:px-7 pt-5 pb-5 sm:pb-6 border-t border-[#E4DEF7] rounded-b-3xl">
+        {/* Bottom Filter Section */}
+        <div className="bg-[#F8FAFC] px-5 sm:px-7 pt-5 pb-5 sm:pb-6 border-t border-[#EAECF0] rounded-b-3xl">
           
           {/* Row matching Figma: 4 Dropdowns distributed cleanly across the row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end">
@@ -1090,17 +1090,22 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
       </div>
       )}
 
-      {/* 3. UNIFIED SECTION 1: SAFE REGIONAL UNIVERSITIES (RANK 1,000 – 5,000+) matching Figma Node 89:4385 */}
+      {/* 3. UNIFIED SECTION 1: OPPORTUNITY LIST (SAFE REGIONAL UNIVERSITIES) */}
       {(activeSection === 'all' || activeSection === 'safe_unis') && safeUniversities.length > 0 && (
         <section className="space-y-4">
-          {/* Section Header matching Figma Frame 2147226741 */}
+          {/* Section Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3">
             <div>
-              <h2 className="text-lg sm:text-xl font-bold text-[#101828]">
+              <div className="flex items-baseline gap-1.5">
+                <h2 className="text-base sm:text-lg font-bold text-[#101828]">
+                  Opportunity List
+                </h2>
+                <span className="text-xs italic text-[#98A2B3] font-normal">
+                  / {safeUniversities.length} Items
+                </span>
+              </div>
+              <p className="text-xs text-[#667085] mt-0.5">
                 Safe-Bet Universities with Guaranteed Funding &amp; Assistantships
-              </h2>
-              <p className="text-xs text-[#90A1B9] font-medium mt-0.5">
-                High Acceptance &amp; $0 Tuition
               </p>
             </div>
             <span className="text-xs text-[#006045] bg-[#ECFDF5] px-3.5 py-1 rounded-full font-bold border border-[#A7F3D0] self-start sm:self-auto">
