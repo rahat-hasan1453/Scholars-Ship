@@ -969,13 +969,15 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
           </div>
 
           <div className="flex flex-col items-end justify-center gap-2.5 shrink-0">
-            {/* Grid / List View Toggle matching Figma Node 89:4385 */}
-            <div className="flex items-center p-0.5 bg-white border border-[#D0D5DD] rounded-xl shadow-2xs">
+            {/* Grid / List View Toggle matching Figma Node 89:4385 & Node 19:2130 */}
+            <div className="flex items-center p-1 bg-white border border-[#D0D5DD] rounded-full shadow-2xs">
               <button
                 type="button"
                 onClick={() => setViewLayout('grid')}
-                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                  viewLayout === 'grid' ? 'bg-[#F4F3FE] text-[#7150E7]' : 'text-[#667085] hover:text-[#101828]'
+                className={`p-1.5 rounded-full transition-all cursor-pointer ${
+                  viewLayout === 'grid' 
+                    ? 'bg-[#F4F3FE] text-[#7150E7]' 
+                    : 'text-[#98A2B3] hover:text-[#475467]'
                 }`}
                 title="Grid View"
               >
@@ -984,8 +986,10 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
               <button
                 type="button"
                 onClick={() => setViewLayout('list')}
-                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                  viewLayout === 'list' ? 'bg-[#F4F3FE] text-[#7150E7]' : 'text-[#667085] hover:text-[#101828]'
+                className={`p-1.5 rounded-full transition-all cursor-pointer ${
+                  viewLayout === 'list' 
+                    ? 'bg-[#F4F3FE] text-[#7150E7]' 
+                    : 'text-[#98A2B3] hover:text-[#475467]'
                 }`}
                 title="List View"
               >
@@ -1102,126 +1106,211 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {safeUniversities.map((uni) => (
-              <div 
-                key={uni.id}
-                className="bg-white rounded-[16px] border border-[#F1F5F9] p-4 flex flex-col justify-between gap-3 shadow-2xs hover:shadow-md transition-all group"
-              >
-                {/* Header (Frame 2147226739) */}
-                <div className="space-y-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <h3 className="text-base font-bold text-[#101828] leading-snug group-hover:text-[#7050E6] transition-colors truncate">
-                        {uni.name}
-                      </h3>
-                      <p className="text-xs text-[#919EAB] font-medium mt-0.5 truncate">
-                        {uni.field}
+          {viewLayout === 'grid' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {safeUniversities.map((uni) => (
+                <div 
+                  key={uni.id}
+                  className="bg-white rounded-[16px] border border-[#F1F5F9] p-4 flex flex-col justify-between gap-3 shadow-2xs hover:shadow-md transition-all group"
+                >
+                  {/* Header (Frame 2147226739) */}
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <h3 className="text-base font-bold text-[#101828] leading-snug group-hover:text-[#7050E6] transition-colors truncate">
+                          {uni.name}
+                        </h3>
+                        <p className="text-xs text-[#919EAB] font-medium mt-0.5 truncate">
+                          {uni.field}
+                        </p>
+                      </div>
+                      {/* Standalone 28x18 Flag Graphic matching Figma Frame 2147226739 */}
+                      {renderCountryFlag(uni.country, uni.id)}
+                    </div>
+
+                    {/* Divider Line 1 (Vector 1) */}
+                    <div className="h-[1px] bg-[#F1F5F9] w-full" />
+
+                    {/* Middle Details Container (Frame 2147226738) */}
+                    <div className="bg-[#F8FAFC] rounded-lg p-3 text-xs space-y-1.5">
+                      <p className="text-xs leading-snug">
+                        <span className="font-bold text-[#101828]">💰 Financial: </span>
+                        <span className="text-[#101828]">{uni.financialBase}</span>
+                        <span className="font-bold italic text-[#101828]">{uni.financialHighlight}</span>
+                        <span className="text-[#101828]">{uni.financialSuffix}</span>
+                      </p>
+                      <p className="text-xs leading-snug">
+                        <span className="font-bold text-[#101828]">🎓 Admission: </span>
+                        <span className="text-[#919EAB]">{uni.admission}</span>
+                      </p>
+                      <p className="text-xs leading-snug">
+                        <span className="font-bold text-[#101828]">🏡 Living: </span>
+                        <span className="text-[#919EAB]">{uni.living}</span>
                       </p>
                     </div>
-                    {/* Standalone 28x18 Flag Graphic matching Figma Frame 2147226739 */}
-                    {renderCountryFlag(uni.country, uni.id)}
+
+                    {/* Rank Chip (Frame 2147226703) */}
+                    <div className="pt-0.5">
+                      <span className="bg-[#ECFDF5] border border-[#A7F3D0] text-[#009966] text-[11px] font-semibold px-2.5 py-0.5 rounded-full inline-block">
+                        {uni.rankBadge}
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Divider Line 1 (Vector 1) */}
-                  <div className="h-[1px] bg-[#F1F5F9] w-full" />
+                  {/* Bottom Actions Row (Frame 2147226704) */}
+                  <div className="space-y-3 pt-1">
+                    {/* Divider Line 2 (Vector 3) */}
+                    <div className="h-[1px] bg-[#F1F5F9] w-full" />
 
-                  {/* Middle Details Container (Frame 2147226738) */}
-                  <div className="bg-[#F8FAFC] rounded-lg p-3 text-xs space-y-1.5">
-                    <p className="text-xs leading-snug">
-                      <span className="font-bold text-[#101828]">💰 Financial: </span>
-                      <span className="text-[#101828]">{uni.financialBase}</span>
-                      <span className="font-bold italic text-[#101828]">{uni.financialHighlight}</span>
-                      <span className="text-[#101828]">{uni.financialSuffix}</span>
-                    </p>
-                    <p className="text-xs leading-snug">
-                      <span className="font-bold text-[#101828]">🎓 Admission: </span>
-                      <span className="text-[#919EAB]">{uni.admission}</span>
-                    </p>
-                    <p className="text-xs leading-snug">
-                      <span className="font-bold text-[#101828]">🏡 Living: </span>
-                      <span className="text-[#919EAB]">{uni.living}</span>
-                    </p>
+                    <div className="flex items-center gap-4">
+                      {/* Left: Bookmark Button matching Figma Frame 2147226704 Button (no border, rounded-full) */}
+                      <button
+                        type="button"
+                        onClick={() => toggleBookmark(uni.id)}
+                        className="w-10 h-10 rounded-full bg-white flex items-center justify-center hover:bg-slate-50 text-[#98A2B3] hover:text-[#7050E6] transition-colors cursor-pointer shrink-0 shadow-2xs"
+                        title={bookmarkedIds.includes(uni.id) ? "Remove Bookmark" : "Bookmark University"}
+                      >
+                        <Bookmark className={`w-4.5 h-4.5 ${bookmarkedIds.includes(uni.id) ? 'text-[#7050E6] fill-[#7050E6]' : 'text-[#98A2B3]'}`} />
+                      </button>
+
+                      {/* Subtle Vertical Divider (Vector 3: height 15.5px, #D9D9D9) */}
+                      <div className="h-4 w-[1px] bg-[#D9D9D9] shrink-0" />
+
+                      {/* Right: Official Link & See Details Button Group (Frame 2147226705: gap-4, flex-1 equal width) */}
+                      <div className="flex items-center gap-4 flex-1">
+                        <a
+                          href={uni.officialLink}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="h-10 px-4 rounded-full bg-[#F8FAFC] hover:bg-slate-100 text-[#7050E6] border border-[#7050E6] text-xs font-bold flex-1 inline-flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                        >
+                          <span>Official Link</span>
+                          <ArrowUpRight className="w-3.5 h-3.5 text-[#7050E6]" />
+                        </a>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const matchingSch = scholarships.find(s => s.provider.toLowerCase().includes(uni.name.toLowerCase()) || uni.name.toLowerCase().includes(s.provider.toLowerCase()));
+                            if (matchingSch) {
+                              onOpenScholarshipDetail(matchingSch);
+                            } else {
+                              onOpenScholarshipDetail({
+                                id: uni.id,
+                                title: `${uni.name} - ${uni.field} Graduate Assistantship`,
+                                provider: uni.name,
+                                countries: [uni.country],
+                                degreeLevels: uni.degrees as any,
+                                fundingType: 'TUITION_WAIVER',
+                                fundingAmount: `${uni.financialBase}${uni.financialHighlight}${uni.financialSuffix}`,
+                                deadline: '2026-12-15T00:00:00.000Z',
+                                description: `Guaranteed graduate funding opportunity at ${uni.name}. Admission requirements: ${uni.admission}. Living & housing: ${uni.living}.`,
+                                requirements: {
+                                  notes: uni.admission
+                                },
+                                officialUrl: uni.officialLink,
+                                specializations: uni.fieldTags,
+                                tags: ['Guaranteed Funding', 'Safe University', 'Assistantship', ...uni.fieldTags],
+                                featured: true
+                              });
+                            }
+                          }}
+                          className="h-10 px-4 rounded-full bg-[#7050E6] hover:bg-[#5E3CD4] text-white text-xs font-bold flex-1 inline-flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                        >
+                          <span>See Details</span>
+                          <ArrowRight className="w-3.5 h-3.5 text-white" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Rank Chip (Frame 2147226703) */}
-                  <div className="pt-0.5">
-                    <span className="bg-[#ECFDF5] border border-[#A7F3D0] text-[#009966] text-[11px] font-semibold px-2.5 py-0.5 rounded-full inline-block">
-                      {uni.rankBadge}
-                    </span>
-                  </div>
                 </div>
+              ))}
+            </div>
+          ) : (
+            /* List View */
+            <div className="bg-white border border-[#EAECF0] rounded-2xl overflow-hidden divide-y divide-[#F2F4F7] shadow-xs">
+              {safeUniversities.map((uni) => (
+                <div
+                  key={uni.id}
+                  className="px-5 py-3.5 hover:bg-slate-50 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-3 group"
+                >
+                  <div className="flex items-start md:items-center gap-3 min-w-0 flex-1">
+                    <div className="shrink-0 mt-0.5 md:mt-0">
+                      {renderCountryFlag(uni.country, uni.id)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-sm font-bold text-[#101828] group-hover:text-[#7050E6] transition-colors truncate">
+                          {uni.name}
+                        </span>
+                        <span className="bg-[#ECFDF5] border border-[#A7F3D0] text-[#009966] text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0">
+                          {uni.rankBadge}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-[#667085]">
+                        <span className="font-semibold text-slate-800">{uni.field}</span>
+                        <span>•</span>
+                        <span className="text-[#101828] font-bold">💰 {uni.financialHighlight}</span>
+                        <span>•</span>
+                        <span className="text-[#919EAB]">🎓 {uni.admission}</span>
+                      </div>
+                    </div>
+                  </div>
 
-                {/* Bottom Actions Row (Frame 2147226704) */}
-                <div className="space-y-3 pt-1">
-                  {/* Divider Line 2 (Vector 3) */}
-                  <div className="h-[1px] bg-[#F1F5F9] w-full" />
-
-                  <div className="flex items-center gap-4">
-                    {/* Left: Bookmark Button matching Figma Frame 2147226704 Button (no border, rounded-full) */}
+                  <div className="flex items-center gap-2.5 shrink-0 self-end md:self-center">
                     <button
                       type="button"
                       onClick={() => toggleBookmark(uni.id)}
-                      className="w-10 h-10 rounded-full bg-white flex items-center justify-center hover:bg-slate-50 text-[#98A2B3] hover:text-[#7050E6] transition-colors cursor-pointer shrink-0 shadow-2xs"
-                      title={bookmarkedIds.includes(uni.id) ? "Remove Bookmark" : "Bookmark University"}
+                      className="p-2 rounded-xl border border-[#D0D5DD] bg-white hover:bg-slate-50 text-[#98A2B3] hover:text-[#7050E6] transition-colors cursor-pointer"
+                      title={bookmarkedIds.includes(uni.id) ? "Remove Bookmark" : "Bookmark"}
                     >
-                      <Bookmark className={`w-4.5 h-4.5 ${bookmarkedIds.includes(uni.id) ? 'text-[#7050E6] fill-[#7050E6]' : 'text-[#98A2B3]'}`} />
+                      <Bookmark className={`w-3.5 h-3.5 ${bookmarkedIds.includes(uni.id) ? 'text-[#7050E6] fill-[#7050E6]' : 'text-[#98A2B3]'}`} />
                     </button>
-
-                    {/* Subtle Vertical Divider (Vector 3: height 15.5px, #D9D9D9) */}
-                    <div className="h-4 w-[1px] bg-[#D9D9D9] shrink-0" />
-
-                    {/* Right: Official Link & See Details Button Group (Frame 2147226705: gap-4, flex-1 equal width) */}
-                    <div className="flex items-center gap-4 flex-1">
-                      <a
-                        href={uni.officialLink}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="h-10 px-4 rounded-full bg-[#F8FAFC] hover:bg-slate-100 text-[#7050E6] border border-[#7050E6] text-xs font-bold flex-1 inline-flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-                      >
-                        <span>Official Link</span>
-                        <ArrowUpRight className="w-3.5 h-3.5 text-[#7050E6]" />
-                      </a>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const matchingSch = scholarships.find(s => s.provider.toLowerCase().includes(uni.name.toLowerCase()) || uni.name.toLowerCase().includes(s.provider.toLowerCase()));
-                          if (matchingSch) {
-                            onOpenScholarshipDetail(matchingSch);
-                          } else {
-                            onOpenScholarshipDetail({
-                              id: uni.id,
-                              title: `${uni.name} - ${uni.field} Graduate Assistantship`,
-                              provider: uni.name,
-                              countries: [uni.country],
-                              degreeLevels: uni.degrees as any,
-                              fundingType: 'TUITION_WAIVER',
-                              fundingAmount: `${uni.financialBase}${uni.financialHighlight}${uni.financialSuffix}`,
-                              deadline: '2026-12-15T00:00:00.000Z',
-                              description: `Guaranteed graduate funding opportunity at ${uni.name}. Admission requirements: ${uni.admission}. Living & housing: ${uni.living}.`,
-                              requirements: {
-                                notes: uni.admission
-                              },
-                              officialUrl: uni.officialLink,
-                              specializations: uni.fieldTags,
-                              tags: ['Guaranteed Funding', 'Safe University', 'Assistantship', ...uni.fieldTags],
-                              featured: true
-                            });
-                          }
-                        }}
-                        className="h-10 px-4 rounded-full bg-[#7050E6] hover:bg-[#5E3CD4] text-white text-xs font-bold flex-1 inline-flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer"
-                      >
-                        <span>See Details</span>
-                        <ArrowRight className="w-3.5 h-3.5 text-white" />
-                      </button>
-                    </div>
+                    <a
+                      href={uni.officialLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-3.5 py-1.5 rounded-full border border-[#7050E6] bg-[#F8FAFC] hover:bg-slate-100 text-[#7050E6] text-xs font-bold inline-flex items-center gap-1 transition-colors cursor-pointer"
+                    >
+                      <span>Portal</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const matchingSch = scholarships.find(s => s.provider.toLowerCase().includes(uni.name.toLowerCase()) || uni.name.toLowerCase().includes(s.provider.toLowerCase()));
+                        if (matchingSch) {
+                          onOpenScholarshipDetail(matchingSch);
+                        } else {
+                          onOpenScholarshipDetail({
+                            id: uni.id,
+                            title: `${uni.name} - ${uni.field} Graduate Assistantship`,
+                            provider: uni.name,
+                            countries: [uni.country],
+                            degreeLevels: uni.degrees as any,
+                            fundingType: 'TUITION_WAIVER',
+                            fundingAmount: `${uni.financialBase}${uni.financialHighlight}${uni.financialSuffix}`,
+                            deadline: '2026-12-15T00:00:00.000Z',
+                            description: `Guaranteed graduate funding opportunity at ${uni.name}. Admission requirements: ${uni.admission}. Living & housing: ${uni.living}.`,
+                            requirements: { notes: uni.admission },
+                            officialUrl: uni.officialLink,
+                            specializations: uni.fieldTags,
+                            tags: ['Guaranteed Funding', 'Safe University', 'Assistantship', ...uni.fieldTags],
+                            featured: true
+                          });
+                        }
+                      }}
+                      className="px-4 py-1.5 rounded-full bg-[#7050E6] hover:bg-[#5E3CD4] text-white text-xs font-bold inline-flex items-center gap-1 transition-all shadow-xs cursor-pointer"
+                    >
+                      <span>Details</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
-
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
       )}
 
@@ -1270,10 +1359,80 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
             <div className="p-8 bg-white rounded-2xl border border-slate-200 text-center text-xs text-slate-500">
               No direct lab openings matched this query. Try selecting "All Fields" or clicking "Fetch Live Web Postings".
             </div>
-          ) : (
-            <div className={viewLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" : "flex flex-col gap-4"}>
+          ) : viewLayout === 'grid' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {fieldOpportunities.map((opp) => (
                 <OpportunityCard key={opp.id} opportunity={opp} />
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white border border-[#EAECF0] rounded-2xl overflow-hidden divide-y divide-[#F2F4F7] shadow-xs">
+              {fieldOpportunities.map((opp) => (
+                <div
+                  key={opp.id}
+                  className="px-5 py-3.5 hover:bg-slate-50 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-3 group"
+                >
+                  <div className="flex items-start md:items-center gap-3 min-w-0 flex-1">
+                    <div className="w-8 h-8 rounded-xl bg-[#F4F3FE] text-[#7150E7] flex items-center justify-center font-bold text-xs shrink-0">
+                      🧪
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-sm font-bold text-[#101828] truncate group-hover:text-[#7150E7] transition-colors">
+                          {opp.title}
+                        </span>
+                        {opp.matchType === 'exact' && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+                            Exact Match
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-[#667085]">
+                        <span className="font-semibold text-slate-800">{opp.authorName}</span>
+                        <span>•</span>
+                        <span>{opp.institution}</span>
+                        <span>•</span>
+                        <span className="text-emerald-700 font-semibold">{opp.funding}</span>
+                        <span>•</span>
+                        <span className="text-[#98A2B3]">{opp.postedAgo}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const fakeProf: Professor = {
+                          id: `opp-prof-${opp.id}`,
+                          name: opp.authorName,
+                          title: 'Principal Investigator',
+                          university: opp.institution,
+                          department: opp.fieldTags?.[0] || 'Research Laboratory',
+                          country: opp.country || 'United States',
+                          researchTags: opp.fieldTags || [],
+                          openPositions: true,
+                          avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
+                          acceptingTerms: ['Fall 2026', 'Spring 2027'],
+                          email: opp.contactEmail
+                        };
+                        onOpenColdEmail?.(fakeProf);
+                      }}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#7150E7] hover:bg-[#5E3CD4] text-white transition-colors cursor-pointer shadow-xs"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                      <span>AI Cold Email</span>
+                    </button>
+                    <a
+                      href={opp.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-xl text-[#98A2B3] hover:text-[#101828] hover:bg-slate-100 transition-colors"
+                      title="Open source posting"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                </div>
               ))}
             </div>
           )}
@@ -1299,14 +1458,62 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
             <div className="p-8 bg-white rounded-2xl border border-slate-200 text-center text-xs text-slate-500">
               No scholarships matched these criteria. Try selecting "All Countries" or resetting the keyword.
             </div>
-          ) : (
-            <div className={viewLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" : "flex flex-col gap-4"}>
+          ) : viewLayout === 'grid' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {filteredScholarships.map((sch) => (
                 <ScholarshipCard
                   key={sch.id}
                   scholarship={sch}
                   onSelect={(s) => onOpenScholarshipDetail(s)}
                 />
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white border border-[#EAECF0] rounded-2xl overflow-hidden divide-y divide-[#F2F4F7] shadow-xs">
+              {filteredScholarships.map((sch) => (
+                <div
+                  key={sch.id}
+                  className="px-5 py-3.5 hover:bg-slate-50 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-3 group cursor-pointer"
+                  onClick={() => onOpenScholarshipDetail(sch)}
+                >
+                  <div className="flex items-start md:items-center gap-3 min-w-0 flex-1">
+                    <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs shrink-0 border border-amber-200">
+                      🏆
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-sm font-bold text-[#101828] truncate group-hover:text-[#7150E7] transition-colors">
+                          {sch.title}
+                        </span>
+                        <span className="bg-[#ECFDF5] border border-[#A7F3D0] text-[#009966] text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0">
+                          {sch.fundingType.replace('_', ' ')}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-[#667085]">
+                        <span className="font-semibold text-slate-800">{sch.provider}</span>
+                        <span>•</span>
+                        <span>{sch.countries.join(', ')}</span>
+                        <span>•</span>
+                        <span className="text-emerald-700 font-bold">{sch.fundingAmount}</span>
+                        <span>•</span>
+                        <span className="text-slate-500 font-medium">🎓 {sch.degreeLevels.join(', ')}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0 self-end md:self-center" onClick={(e) => e.stopPropagation()}>
+                    <span className="text-xs text-rose-600 font-semibold bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-full">
+                      📅 {new Date(sch.deadline).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => onOpenScholarshipDetail(sch)}
+                      className="px-4 py-1.5 rounded-full bg-[#7150E7] hover:bg-[#5E3CD4] text-white text-xs font-bold inline-flex items-center gap-1 transition-all shadow-xs cursor-pointer"
+                    >
+                      <span>View Details</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
               ))}
             </div>
           )}
@@ -1367,13 +1574,73 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
             <div className="p-8 bg-white rounded-2xl border border-slate-200 text-center text-xs text-slate-500">
               No professors matched this query. Try switching field or country.
             </div>
-          ) : (
-            <div className={viewLayout === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" : "flex flex-col gap-4"}>
+          ) : viewLayout === 'grid' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {filteredProfessors.map((prof) => (
                 <ProfessorCard
                   key={prof.id}
                   professor={prof}
                 />
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white border border-[#EAECF0] rounded-2xl overflow-hidden divide-y divide-[#F2F4F7] shadow-xs">
+              {filteredProfessors.map((prof) => (
+                <div
+                  key={prof.id}
+                  className="px-5 py-3.5 hover:bg-slate-50 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-3 group"
+                >
+                  <div className="flex items-start md:items-center gap-3 min-w-0 flex-1">
+                    <img
+                      src={prof.avatarUrl || `https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80`}
+                      alt={prof.name}
+                      className="w-9 h-9 rounded-full object-cover border border-[#EAECF0] shrink-0"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-sm font-bold text-[#101828] truncate group-hover:text-[#7150E7] transition-colors">
+                          {prof.name}
+                        </span>
+                        <span className="text-xs text-[#667085] font-medium truncate">
+                          ({prof.title})
+                        </span>
+                        {prof.openPositions && (
+                          <span className="bg-[#ECFDF5] border border-[#A7F3D0] text-[#009966] text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0">
+                            ✓ Hiring Students
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-[#667085]">
+                        <span className="font-semibold text-slate-800">{prof.university}</span>
+                        <span>•</span>
+                        <span>{prof.department}</span>
+                        <span>•</span>
+                        <span className="text-purple-700 font-medium">🔬 {prof.researchTags.slice(0, 3).join(', ')}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2.5 shrink-0 self-end md:self-center">
+                    <button
+                      type="button"
+                      onClick={() => onOpenColdEmail?.(prof)}
+                      className="px-4 py-1.5 rounded-full bg-[#7150E7] hover:bg-[#5E3CD4] text-white text-xs font-bold inline-flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                      <span>Draft Cold Email</span>
+                    </button>
+                    {prof.labWebsite && (
+                      <a
+                        href={prof.labWebsite}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="p-2 rounded-xl text-[#98A2B3] hover:text-[#101828] hover:bg-slate-100 transition-colors"
+                        title="Faculty Website"
+                      >
+                        <ArrowUpRight className="w-3.5 h-3.5" />
+                      </a>
+                    )}
+                  </div>
+                </div>
               ))}
             </div>
           )}
