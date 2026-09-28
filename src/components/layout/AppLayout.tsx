@@ -252,14 +252,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           >
             <div className="flex items-center gap-3 min-w-0">
               <img
-                src="/alex-avatar.png"
-                alt="Alex Mercer"
+                src={profile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80'}
+                alt={profile.name || 'User'}
                 className="w-9 h-9 rounded-full object-cover shrink-0 border border-[#EAECF0]"
               />
               <div className="min-w-0 text-left">
-                <div className="text-xs font-semibold text-[#101828] leading-tight">Alex Mercer</div>
+                <div className="text-xs font-semibold text-[#101828] leading-tight truncate">{profile.name || 'User'}</div>
                 <div className="text-[11px] text-[#64748B] leading-tight mt-0.5 truncate">
-                  Masters • UX &amp; HCI
+                  {profile.degreeLevel || 'Masters'} • {profile.specializations?.[0] || 'Scholar'}
                 </div>
               </div>
             </div>
@@ -321,11 +321,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                 title="User Profile"
               >
                 <img
-                  src="/alex-avatar.png"
-                  alt="Alex Mercer"
+                  src={profile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80'}
+                  alt={profile.name || 'User'}
                   className="w-7 h-7 rounded-full object-cover border border-[#EAECF0]"
                 />
-                <span className="text-xs font-bold text-[#101828]">Alex Mercer</span>
+                <span className="text-xs font-bold text-[#101828] max-w-[120px] truncate">{profile.name || 'User'}</span>
               </button>
 
                 {/* Profile Small Modal (Figma Node 49-648 - Compact) */}

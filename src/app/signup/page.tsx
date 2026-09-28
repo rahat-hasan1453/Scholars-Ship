@@ -79,9 +79,10 @@ export default function SignupPage() {
       updateProfile({
         name: name.trim(),
         email: email.trim().toLowerCase(),
+        onboardingCompleted: false,
       });
       setIsLoading(false);
-      router.push('/');
+      router.push('/?onboarding=true');
     }, 500);
   };
 

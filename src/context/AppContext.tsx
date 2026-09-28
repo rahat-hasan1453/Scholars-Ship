@@ -102,10 +102,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }
       }
 
-      // Check URL parameters if redirected from Google OAuth callback
+      // Check URL parameters if redirected from Google OAuth callback or signup
       if (typeof window !== 'undefined') {
         const urlParams = new URLSearchParams(window.location.search);
         const authProvider = urlParams.get('auth_provider');
+        const shouldTriggerOnboarding = urlParams.get('onboarding') === 'true';
+
         if (authProvider === 'google') {
           const rawName = urlParams.get('user_name');
           const rawEmail = urlParams.get('user_email');
@@ -115,17 +117,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           const googleEmail = rawEmail ? decodeURIComponent(rawEmail) : undefined;
           const googleAvatar = rawAvatar ? decodeURIComponent(rawAvatar) : undefined;
 
+          const targetEmail = googleEmail || currentProfile.email;
+          const isUserOnboarded = localStorage.getItem(`highscholar_onboarded_${targetEmail}`) === 'true';
+
           const updatedProfile = {
             ...currentProfile,
             ...(googleName ? { name: googleName } : {}),
             ...(googleEmail ? { email: googleEmail } : {}),
             ...(googleAvatar ? { avatar: googleAvatar } : {}),
+            onboardingCompleted: isUserOnboarded,
           };
 
           setProfile(updatedProfile);
           localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(updatedProfile));
 
+          // First time Google sign in or explicitly triggered -> open onboarding modal
+          if (!isUserOnboarded || shouldTriggerOnboarding) {
+            setIsOnboardingOpen(true);
+          }
+
           // Clean URL without reloading page
+          const cleanUrl = window.location.pathname;
+          window.history.replaceState({}, document.title, cleanUrl);
+        } else if (shouldTriggerOnboarding) {
+          setIsOnboardingOpen(true);
           const cleanUrl = window.location.pathname;
           window.history.replaceState({}, document.title, cleanUrl);
         }
@@ -135,16 +150,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           .then((res) => (res.ok ? res.json() : null))
           .then((data) => {
             if (data?.authenticated && data?.user) {
+              const uEmail = data.user.email;
+              const isAlreadyOnboarded = localStorage.getItem(`highscholar_onboarded_${uEmail}`) === 'true';
+
               setProfile((prev) => {
                 const synced = {
                   ...prev,
                   name: data.user.name || prev.name,
                   email: data.user.email || prev.email,
                   avatar: data.user.avatar || prev.avatar,
+                  onboardingCompleted: isAlreadyOnboarded,
                 };
                 localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(synced));
                 return synced;
               });
+
+              if (!isAlreadyOnboarded && uEmail && !uEmail.includes('alex.mercer')) {
+                setIsOnboardingOpen(true);
+              }
             }
           })
           .catch(() => {});

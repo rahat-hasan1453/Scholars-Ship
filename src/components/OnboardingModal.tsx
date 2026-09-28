@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '@/context/AppContext';
 import { DegreeLevel } from '@/types';
 import { 
@@ -90,6 +90,19 @@ export const OnboardingModal: React.FC = () => {
   const [ielts, setIelts] = useState<number>(profile.testScores?.ielts || 7.5);
   const [gre, setGre] = useState<number>(profile.testScores?.gre || 320);
 
+  useEffect(() => {
+    if (isOnboardingOpen) {
+      if (profile.name) setName(profile.name);
+      if (profile.email) setEmail(profile.email);
+      if (profile.degreeLevel) setDegreeLevel(profile.degreeLevel);
+      if (profile.specializations?.length) setSelectedSpecializations(profile.specializations);
+      if (profile.targetCountries?.length) setSelectedCountries(profile.targetCountries);
+      if (profile.cgpa) setCgpa(profile.cgpa);
+      if (profile.testScores?.ielts) setIelts(profile.testScores.ielts);
+      if (profile.testScores?.gre) setGre(profile.testScores.gre);
+    }
+  }, [profile.name, profile.email, isOnboardingOpen]);
+
   if (!isOnboardingOpen) return null;
 
   const toggleSpecialization = (tag: string) => {
@@ -109,9 +122,12 @@ export const OnboardingModal: React.FC = () => {
   };
 
   const handleSaveAndComplete = () => {
+    const finalName = name.trim() || profile.name || 'Scholar User';
+    const finalEmail = email.trim() || profile.email || 'scholar@highscholar.io';
+
     updateProfile({
-      name: name.trim() || 'Alex Mercer',
-      email: email.trim() || 'alex.mercer@scholar.io',
+      name: finalName,
+      email: finalEmail,
       degreeLevel,
       specializations: selectedSpecializations.length > 0 ? selectedSpecializations : ['UX Design', 'Computer Science'],
       targetCountries: selectedCountries.length > 0 ? selectedCountries : ['USA', 'United Kingdom', 'Germany'],
@@ -122,6 +138,11 @@ export const OnboardingModal: React.FC = () => {
       },
       onboardingCompleted: true,
     });
+
+    if (typeof window !== 'undefined' && finalEmail) {
+      localStorage.setItem(`highscholar_onboarded_${finalEmail}`, 'true');
+    }
+
     setIsOnboardingOpen(false);
   };
 
@@ -175,7 +196,7 @@ export const OnboardingModal: React.FC = () => {
                 <div>
                   <label className="text-xs font-bold text-slate-700 block mb-1">Full Name</label>
                   <Input
-                    placeholder="e.g. Alex Mercer"
+                    placeholder="Your Full Name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="text-sm"
@@ -186,7 +207,7 @@ export const OnboardingModal: React.FC = () => {
                   <label className="text-xs font-bold text-slate-700 block mb-1">Email Address</label>
                   <Input
                     type="email"
-                    placeholder="e.g. alex.mercer@scholar.io"
+                    placeholder="name@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="text-sm"
