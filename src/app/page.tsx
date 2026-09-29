@@ -19,6 +19,9 @@ import { AdvancedFilterModal, FilterState, initialFilterState } from '@/componen
 import { SmartProfileMatcherModal } from '@/components/SmartProfileMatcherModal';
 import { UnifiedHubView } from '@/components/UnifiedHubView';
 import { ResearchPapersView } from '@/components/ResearchPapersView';
+import { ScholarshipRadarFeed } from '@/components/ScholarshipRadarFeed';
+import { FacultyLabsFeed } from '@/components/FacultyLabsFeed';
+import { ResearchPapersFeed } from '@/components/ResearchPapersFeed';
 import { getCountryOptions } from '@/data/countries';
 import { calculateCountdown, calculateMatchScore } from '@/lib/utils';
 import { 
@@ -64,9 +67,31 @@ export default function HomePage() {
     setSelectedScholarship,
     selectedProfessor,
     setSelectedProfessor,
+    activeNavTab,
+    setActiveNavTab,
   } = useApp();
 
-  const [activeTab, setActiveTab] = useState<'scholarships' | 'opportunities' | 'professors' | 'research' | 'tracker' | 'profile'>('opportunities');
+  const [activeTab, setActiveTab] = useState<'scholarships' | 'opportunities' | 'professors' | 'research' | 'tracker' | 'profile'>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab') as any;
+      if (tabParam && ['opportunities', 'scholarships', 'professors', 'research', 'tracker', 'profile'].includes(tabParam)) {
+        return tabParam;
+      }
+    }
+    return 'opportunities';
+  });
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab') as any;
+      if (tabParam && ['opportunities', 'scholarships', 'professors', 'research', 'tracker', 'profile'].includes(tabParam)) {
+        setActiveTab(tabParam);
+        setActiveNavTab(tabParam);
+      }
+    }
+  }, [setActiveNavTab]);
   const [viewMode, setViewMode] = useState<'classic' | 'unified'>('unified');
   const [trackerMode, setTrackerMode] = useState<'outreach' | 'scholarships'>('outreach');
   const [isExtensionDrawerOpen, setIsExtensionDrawerOpen] = useState(false);
@@ -292,18 +317,23 @@ export default function HomePage() {
         <OpportunitiesFeed />
       )}
 
-      {/* DISCOVERY TABS: scholarships, professors, research */}
-      {(viewMode === 'unified' && ['scholarships', 'professors', 'research'].includes(activeTab)) && (
-        <UnifiedHubView
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          onSwitchToClassic={() => setViewMode('classic')}
-          onOpenScholarshipDetail={(sch) => setSelectedScholarship(sch)}
-        />
+      {/* 2. SCHOLARSHIP RADAR: Figma Node 122:3864 */}
+      {activeTab === 'scholarships' && (
+        <ScholarshipRadarFeed />
       )}
 
-      {/* TAB 1: SCHOLARSHIPS (Classic Fallback) */}
-      {viewMode === 'classic' && activeTab === 'scholarships' && (
+      {/* 3. FACULTY & RESEARCH LABS: Figma Node 122:5197 */}
+      {activeTab === 'professors' && (
+        <FacultyLabsFeed />
+      )}
+
+      {/* 4. RESEARCH PAPERS: Figma Node 122:8982 */}
+      {activeTab === 'research' && (
+        <ResearchPapersFeed />
+      )}
+
+      {/* TAB 1: SCHOLARSHIPS (Classic Fallback - Disabled in favor of ScholarshipRadarFeed) */}
+      {false && (
         <div className="space-y-6">
           
           {/* Figma Node 25-4268 Hero Banner */}
@@ -507,8 +537,8 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* TAB 2: PROFESSORS & LABS (Classic Fallback) */}
-      {viewMode === 'classic' && activeTab === 'professors' && (
+      {/* TAB 2: PROFESSORS & LABS (Classic Fallback - Disabled in favor of FacultyLabsFeed) */}
+      {false && (
         <div className="space-y-6">
           
           {/* Figma Node 26-6797 Hero Banner Card */}
@@ -728,8 +758,8 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* TAB 2.5: RESEARCH PAPERS (Classic Fallback) */}
-      {viewMode === 'classic' && activeTab === 'research' && (
+      {/* TAB 2.5: RESEARCH PAPERS (Classic Fallback - Disabled in favor of ResearchPapersFeed) */}
+      {false && (
         <ResearchPapersView />
       )}
 
