@@ -272,17 +272,23 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
 
               <hr className="border-[#F2F4F7] my-2" />
 
-              <Link
-                href="/login"
-                onClick={() => {
+              <button
+                type="button"
+                onClick={async () => {
                   setIsProfileMenuOpen(false);
-                  fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+                  try {
+                    await fetch('/api/auth/logout', { method: 'POST' });
+                  } catch {}
+                  if (typeof window !== 'undefined') {
+                    localStorage.removeItem('highscholar_profile_v2');
+                    window.location.href = '/login';
+                  }
                 }}
                 className="w-full h-8 sm:h-8.5 bg-[#FEF3F2] hover:bg-[#FEE4E2] text-[#F04438] rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5 text-[#F04438]" />
                 <span>Logout</span>
-              </Link>
+              </button>
             </div>
           )}
         </div>

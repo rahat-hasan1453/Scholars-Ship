@@ -7,9 +7,10 @@ export interface AuthSessionUser {
   name: string;
   avatar?: string;
   googleId?: string;
+  onboardingCompleted?: boolean;
 }
 
-const SESSION_COOKIE_NAME = 'highscholar_session';
+export const SESSION_COOKIE_NAME = 'highscholar_session';
 
 /**
  * Encodes session user payload into a base64url string

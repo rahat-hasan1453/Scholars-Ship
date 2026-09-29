@@ -151,7 +151,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           .then((data) => {
             if (data?.authenticated && data?.user) {
               const uEmail = data.user.email;
-              const isAlreadyOnboarded = localStorage.getItem(`highscholar_onboarded_${uEmail}`) === 'true';
+              const isAlreadyOnboarded =
+                data.user.onboardingCompleted === true ||
+                localStorage.getItem(`highscholar_onboarded_${uEmail}`) === 'true';
+
+              const profileData = data.user.profileData || {};
 
               setProfile((prev) => {
                 const synced = {
@@ -159,9 +163,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                   name: data.user.name || prev.name,
                   email: data.user.email || prev.email,
                   avatar: data.user.avatar || prev.avatar,
+                  degreeLevel: profileData.degreeLevel || prev.degreeLevel,
+                  specializations: profileData.specializations || prev.specializations,
+                  targetCountries: profileData.targetCountries || prev.targetCountries,
+                  cgpa: profileData.cgpa || prev.cgpa,
+                  testScores: profileData.testScores || prev.testScores,
                   onboardingCompleted: isAlreadyOnboarded,
                 };
                 localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(synced));
+                if (isAlreadyOnboarded) {
+                  localStorage.setItem(`highscholar_onboarded_${uEmail}`, 'true');
+                }
                 return synced;
               });
 

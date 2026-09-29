@@ -144,11 +144,11 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
     }
   };
 
-  const handleSaveAndComplete = () => {
+  const handleSaveAndComplete = async () => {
     const finalName = name.trim() || profile?.name || 'Scholar User';
     const finalEmail = email.trim() || profile?.email || 'scholar@highscholar.io';
 
-    updateProfile({
+    const profilePayload = {
       name: finalName,
       email: finalEmail,
       degreeLevel,
@@ -160,19 +160,29 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
         gre: Number(gre) || 0,
       },
       onboardingCompleted: true,
-    });
+    };
+
+    updateProfile(profilePayload);
 
     if (typeof window !== 'undefined' && finalEmail) {
       localStorage.setItem(`highscholar_onboarded_${finalEmail}`, 'true');
+    }
+
+    try {
+      await fetch('/api/auth/complete-onboarding', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profilePayload),
+      });
+    } catch (err) {
+      console.error('Failed to notify backend of completed onboarding:', err);
     }
 
     if (onFinish) {
       onFinish();
     } else {
       setIsOnboardingOpen(false);
-      if (isStandalonePage) {
-        router.push('/?welcome=true');
-      }
+      router.push('/?welcome=true');
     }
   };
 
