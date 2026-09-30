@@ -27,11 +27,11 @@ function BrandLogo() {
 
 /* Text input (Input field 179:3609) */
 const inputClass =
-  'h-[44px] w-full rounded-[8px] border border-[#E1E8F0] bg-white px-[14px] py-[10px] text-[16px] leading-[20px] text-[#101828] shadow-[0_1px_1px_rgba(0,0,0,0.05)] outline-none transition-colors placeholder:text-[#919EAB] focus:border-[#7150E7]';
+  'h-[44px] w-full rounded-[8px] border border-stroke-default bg-white px-[14px] py-[10px] text-[16px] leading-[20px] text-text-primary shadow-[0_1px_1px_rgba(0,0,0,0.05)] outline-none transition-colors placeholder:text-text-secondary focus:border-brand-primary';
 
 /* Primary button (Buttons/Button 179:4933) */
 const primaryButtonClass =
-  'flex h-[36px] w-full items-center justify-center gap-2 rounded-[8px] border border-[#7F56D9] bg-[#7150E7] px-[14px] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-[14px] font-semibold leading-[20px] text-white shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition-colors hover:bg-[#6341dc] cursor-pointer disabled:cursor-not-allowed disabled:opacity-60';
+  'flex h-[36px] w-full items-center justify-center gap-2 rounded-[8px] border border-brand-600 bg-brand-primary px-[14px] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-[14px] font-semibold leading-[20px] text-white shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition-colors hover:bg-brand-primary/90 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -296,7 +296,7 @@ export default function SignupPage() {
       className="absolute right-[14px] top-1/2 flex size-[16px] -translate-y-1/2 cursor-pointer items-center justify-center"
     >
       {visible ? (
-        <EyeOff className="size-[16px] text-[#D0D7E1]" strokeWidth={1.5} />
+        <EyeOff className="size-[16px] text-text-placeholder" strokeWidth={1.5} />
       ) : (
         <img src="/signup/eye.svg" alt="" className="h-[12.1667px] w-[16.1667px]" />
       )}
@@ -304,7 +304,7 @@ export default function SignupPage() {
   );
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col bg-[#FCFCFC] tracking-normal lg:flex-row">
+    <div className="relative flex min-h-screen w-full flex-col bg-surface-bg tracking-normal lg:flex-row">
       {/* Image Container (167:2953) — 810 × 883 at 1728 × 883 */}
       <div className="relative h-[240px] w-full shrink-0 select-none overflow-hidden sm:h-[320px] lg:sticky lg:top-0 lg:h-screen lg:w-[46.875%]">
         <img
@@ -324,12 +324,12 @@ export default function SignupPage() {
             {step === 'form' ? (
               <div className="flex w-full flex-col gap-[28px]">
                 <div className="flex flex-col gap-[4px]">
-                  <h1 className="text-[24px] font-[510] leading-[32px] text-[#101828]">Create an account</h1>
-                  <p className="text-[14px] leading-[18px] text-[#919EAB]">
+                  <h1 className="text-[24px] font-[510] leading-[32px] text-text-primary">Create an account</h1>
+                  <p className="text-[14px] leading-[18px] text-text-secondary">
                     Join HighScholar to start your scholarship radar
                   </p>
                   {error && (
-                    <p role="alert" className="mt-[8px] text-[12px] leading-[16px] text-[#F04438]">
+                    <p role="alert" className="mt-[8px] text-[12px] leading-[16px] text-error-main">
                       {error}
                     </p>
                   )}
@@ -403,9 +403,9 @@ export default function SignupPage() {
                           {agreeTerms && <img src="/signup/check.svg" alt="" className="size-[14px]" />}
                         </span>
                       </span>
-                      <span className="text-[12px] italic leading-[16px] text-[#475467]">
-                        I agree to HighScholar&apos;s <span className="text-[#7150E7]">Terms of Service</span> and{' '}
-                        <span className="text-[#7150E7]">Privacy Policy</span>.
+                      <span className="text-[12px] italic leading-[16px] text-text-body">
+                        I agree to HighScholar&apos;s <span className="text-brand-primary">Terms of Service</span> and{' '}
+                        <span className="text-brand-primary">Privacy Policy</span>.
                       </span>
                     </label>
                   </div>
@@ -421,17 +421,17 @@ export default function SignupPage() {
             ) : (
               <div className="flex w-full flex-col gap-[28px]">
                 <div className="flex flex-col gap-[4px]">
-                  <h1 className="text-[24px] font-[510] leading-[32px] text-[#101828]">Verify your account</h1>
-                  <p className="text-[14px] leading-[18px] text-[#919EAB]">
+                  <h1 className="text-[24px] font-[510] leading-[32px] text-text-primary">Verify your account</h1>
+                  <p className="text-[14px] leading-[18px] text-text-secondary">
                     Join HighScholar to start your scholarship radar
                   </p>
                   {error ? (
-                    <p role="alert" className="mt-[8px] text-[12px] leading-[16px] text-[#F04438]">
+                    <p role="alert" className="mt-[8px] text-[12px] leading-[16px] text-error-main">
                       {error}
                     </p>
                   ) : (
                     successMsg && (
-                      <p className="mt-[8px] text-[12px] leading-[16px] text-[#12B76A]">{successMsg}</p>
+                      <p className="mt-[8px] text-[12px] leading-[16px] text-success-main">{successMsg}</p>
                     )
                   )}
                 </div>
@@ -456,7 +456,7 @@ export default function SignupPage() {
                         onKeyDown={(e) => handleOtpKeyDown(idx, e)}
                         onPaste={handleOtpPaste}
                         autoFocus={idx === 0}
-                        className="h-[64px] min-w-0 max-w-[64px] flex-1 basis-0 rounded-[8px] border border-[#E1E8F0] bg-white p-[8px] text-center text-[32px] font-[590] leading-[40px] text-[#101828] outline-none transition-colors placeholder:text-[#D0D7E1] focus:border-[#7150E7]"
+                        className="h-[64px] min-w-0 max-w-[64px] flex-1 basis-0 rounded-[8px] border border-stroke-default bg-white p-[8px] text-center text-[32px] font-[590] leading-[40px] text-text-primary outline-none transition-colors placeholder:text-text-placeholder focus:border-brand-primary"
                       />
                     ))}
                   </div>
@@ -473,14 +473,14 @@ export default function SignupPage() {
                       {isVerifying ? 'Verifying...' : 'Create Account'}
                     </button>
 
-                    <div className="flex items-center justify-between text-[12px] leading-[16px] text-[#919EAB]">
+                    <div className="flex items-center justify-between text-[12px] leading-[16px] text-text-secondary">
                       <button
                         type="button"
                         onClick={() => {
                           setStep('form');
                           setError('');
                         }}
-                        className="cursor-pointer hover:text-[#101828]"
+                        className="cursor-pointer hover:text-text-primary"
                       >
                         ← Change details
                       </button>
@@ -488,7 +488,7 @@ export default function SignupPage() {
                         type="button"
                         onClick={handleResendCode}
                         disabled={resendCooldown > 0 || isLoading}
-                        className="cursor-pointer text-[#7150E7] disabled:cursor-not-allowed disabled:text-[#919EAB]"
+                        className="cursor-pointer text-brand-primary disabled:cursor-not-allowed disabled:text-text-secondary"
                       >
                         {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
                       </button>
@@ -500,36 +500,36 @@ export default function SignupPage() {
           </div>
 
           {/* Footer (179:5135) */}
-          <div className="w-full rounded-b-[24px] border-t border-dashed border-[#E1E8F0] bg-white py-[12px]">
+          <div className="w-full rounded-b-[24px] border-t border-dashed border-stroke-default bg-white py-[12px]">
             <div className="relative flex w-full flex-col items-center gap-[8px]">
               <button
                 type="button"
                 onClick={handleGoogleAuth}
                 disabled={isGoogleLoading || isLoading}
-                className="flex cursor-pointer items-center gap-[12px] rounded-[100px] border border-[#E1E8F0] py-[8px] pl-[8px] pr-[15px] transition-colors hover:bg-[#F9F8FE] disabled:opacity-60"
+                className="flex cursor-pointer items-center gap-[12px] rounded-[100px] border border-stroke-default py-[8px] pl-[8px] pr-[15px] transition-colors hover:bg-brand-soft disabled:opacity-60"
               >
                 {isGoogleLoading ? (
                   <span className="flex size-[31px] items-center justify-center">
-                    <span className="size-4 animate-spin rounded-full border-2 border-[#E1E8F0] border-t-[#7150E7]" />
+                    <span className="size-4 animate-spin rounded-full border-2 border-stroke-default border-t-brand-primary" />
                   </span>
                 ) : (
                   <img src="/signup/google.svg" alt="" className="size-[31px]" />
                 )}
                 <span className="flex flex-col items-start gap-[2px]">
-                  <span className="text-[10px] italic leading-[16px] text-[#98A2B3]">Or sign in with email</span>
-                  <span className="text-[14px] leading-[18px] text-[#919EAB]">
+                  <span className="text-[10px] italic leading-[16px] text-text-caption">Or sign in with email</span>
+                  <span className="text-[14px] leading-[18px] text-text-secondary">
                     {isGoogleLoading ? 'Connecting...' : 'Continue with Google'}
                   </span>
                 </span>
               </button>
 
               <div className="flex items-center">
-                <span className="flex w-[158px] justify-center whitespace-nowrap text-[12px] italic leading-[18px] text-[#919EAB]">
+                <span className="flex w-[158px] justify-center whitespace-nowrap text-[12px] italic leading-[18px] text-text-secondary">
                   Already have an account?&nbsp;
                 </span>
                 <Link
                   href="/login"
-                  className="text-[14px] font-[508] italic leading-[20px] text-[#101828] hover:text-[#7150E7]"
+                  className="text-[14px] font-[508] italic leading-[20px] text-text-primary hover:text-brand-primary"
                 >
                   Log in Now!
                 </Link>

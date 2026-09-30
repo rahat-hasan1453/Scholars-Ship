@@ -1,5 +1,31 @@
 @import "tailwindcss";
 
+/* Figma design tokens (styles node 181-3148). Source of truth: docs/DESIGN-TOKENS.md */
+@theme {
+  --color-brand-primary: #7150e7;
+  --color-brand-600: #7f56d9; /* Figma button border (Brand/600) */
+  --color-brand-light: #ede9fc;
+  --color-brand-soft: #eef2ff;
+
+  --color-text-primary: #101828;
+  --color-text-secondary: #919eab;
+  --color-text-tertiary: #637381;
+  --color-text-placeholder: #d0d7e1;
+  --color-text-subtle: #95a3b6;
+  --color-text-body: #475467; /* checkbox label text in Figma */
+  --color-text-caption: #98a2b3; /* Caption/2 It, "Or sign in with email" */
+
+  --color-stroke-default: #e1e8f0;
+  --color-surface-bg: #fcfcfc;
+  --color-surface-white: #ffffff;
+
+  --color-error-main: #f62752;
+  --color-success-main: #36b37e;
+
+  /* Apple: system SF Pro first, then Inter, then generic. The body rule below also inserts the next/font Inter. */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif;
+}
+
 :root {
   /* Uxcel Design System Tokens */
   --bg-canvas: #f8fafc;
@@ -63,9 +89,9 @@
 body {
   background-color: var(--bg-canvas);
   color: var(--text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Plus Jakarta Sans", Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", var(--font-inter), Inter, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  letter-spacing: -0.012em;
+  letter-spacing: 0;
   overflow-x: hidden;
 }
 
