@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Eye, EyeOff, ChevronDown, Check, ArrowLeft, Mail, RefreshCw, Sparkles } from 'lucide-react';
+import { Eye, EyeOff, ChevronDown, Check, ArrowLeft, Mail, RefreshCw } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 
 export default function SignupPage() {
@@ -22,7 +22,6 @@ export default function SignupPage() {
   // OTP 2-step verification states
   const [step, setStep] = useState<'form' | 'otp'>('form');
   const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '', '']);
-  const [previewCode, setPreviewCode] = useState<string>('');
   const [resendCooldown, setResendCooldown] = useState<number>(0);
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -115,9 +114,8 @@ export default function SignupPage() {
       }
 
       setStep('otp');
-      setPreviewCode(data.previewCode || '');
       setResendCooldown(60);
-      setSuccessMsg(`We sent a 5-digit verification code to ${email.trim().toLowerCase()}`);
+      setSuccessMsg(`We sent a 5-digit verification code to ${email.trim().toLowerCase()}. Please check your inbox.`);
       setIsLoading(false);
 
       // Focus first OTP input on transition
@@ -253,9 +251,8 @@ export default function SignupPage() {
       });
       const data = await res.json();
       if (data.success) {
-        setPreviewCode(data.previewCode || '');
         setResendCooldown(60);
-        setSuccessMsg(`A new code was sent to ${email}`);
+        setSuccessMsg(`A new code was sent to ${email}. Please check your inbox.`);
         setOtpDigits(['', '', '', '', '']);
         otpInputRefs.current[0]?.focus();
       } else {
@@ -563,27 +560,6 @@ export default function SignupPage() {
                 </div>
               )}
 
-              {/* Developer Demo Preview Code Callout */}
-              {previewCode && (
-                <div className="mb-5 p-3 rounded-xl bg-[#F9F5FF] border border-[#E9D7FE] flex items-center justify-between text-xs text-[#6941C6]">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-[#7150E7] shrink-0" />
-                    <span>
-                      Demo code: <strong className="font-mono text-sm tracking-wider text-[#7150E7]">{previewCode}</strong>
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const chars = previewCode.slice(0, 5).split('');
-                      setOtpDigits(chars);
-                    }}
-                    className="text-[11px] underline font-semibold cursor-pointer hover:text-[#5925DC]"
-                  >
-                    Auto-fill
-                  </button>
-                </div>
-              )}
 
               {/* 5-Digit Inputs Row */}
               <form onSubmit={handleVerifyOtp} className="space-y-6">

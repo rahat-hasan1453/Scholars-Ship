@@ -1,0 +1,126 @@
+import nodemailer from 'nodemailer';
+
+export interface SendEmailOptions {
+  to: string;
+  subject: string;
+  html: string;
+}
+
+export async function sendOtpEmail(toEmail: string, otpCode: string, name?: string): Promise<{ success: boolean; error?: string }> {
+  const recipientName = name?.trim() || 'Scholar';
+  
+  // HTML Template for HighScholar Verification Email
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Verify your HighScholar account</title>
+        <style>
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #F8F9FA; margin: 0; padding: 24px; color: #101828; }
+          .container { max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 20px; padding: 40px 32px; box-shadow: 0 4px 24px rgba(112, 80, 230, 0.08); border: 1px solid #EAECF0; }
+          .logo { font-size: 24px; font-weight: 800; color: #704FE6; margin-bottom: 24px; display: flex; align-items: center; gap: 8px; }
+          .greeting { font-size: 18px; font-weight: 600; color: #101828; margin-bottom: 12px; }
+          .description { font-size: 14px; color: #475467; line-height: 1.6; margin-bottom: 28px; }
+          .code-box { background: #F4F1FD; border: 1.5px dashed #704FE6; border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 28px; }
+          .code-label { font-size: 12px; font-weight: 600; color: #704FE6; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+          .code-number { font-size: 38px; font-weight: 800; color: #101828; letter-spacing: 10px; font-family: 'SF Pro Display', -apple-system, monospace; }
+          .footer-note { font-size: 12px; color: #98A2B3; line-height: 1.5; border-top: 1px solid #F2F4F7; padding-top: 20px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="logo">
+            🎓 HighScholar
+          </div>
+          <div class="greeting">
+            Welcome, ${recipientName}!
+          </div>
+          <div class="description">
+            Thank you for registering with HighScholar. Please use the following 5-digit verification code to confirm your email and complete your scholar account setup:
+          </div>
+          <div class="code-box">
+            <div class="code-label">Verification Code</div>
+            <div class="code-number">${otpCode}</div>
+          </div>
+          <div class="description" style="font-size: 13px; color: #667085;">
+            This code will expire in <strong>10 minutes</strong>. If you did not request this registration, you can safely ignore this email.
+          </div>
+          <div class="footer-note">
+            HighScholar — Global Higher Ed, Fully Funded Scholarships & Faculty Matching<br/>
+            Need help? Contact support@highscholar.io
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+
+  // 1. Check if Resend API Key is set
+  const resendApiKey = process.env.RESEND_API_KEY;
+  if (resendApiKey) {
+    try {
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${resendApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: process.env.EMAIL_FROM || 'HighScholar <onboarding@resend.dev>',
+          to: [toEmail],
+          subject: `${otpCode} is your HighScholar verification code`,
+          html: htmlContent,
+        }),
+      });
+
+      if (response.ok) {
+        console.log(`[Email] OTP sent successfully via Resend to ${toEmail}`);
+        return { success: true };
+      }
+      const errData = await response.json();
+      console.error('[Email] Resend error:', errData);
+    } catch (err) {
+      console.error('[Email] Resend fetch exception:', err);
+    }
+  }
+
+  // 2. Check if SMTP configuration is set (e.g. Gmail, Amazon SES, SendGrid SMTP)
+  const smtpUser = process.env.SMTP_USER || process.env.EMAIL_USER;
+  const smtpPass = process.env.SMTP_PASSWORD || process.env.SMTP_PASS || process.env.EMAIL_PASS;
+  const smtpHost = process.env.SMTP_HOST || (smtpUser?.includes('@gmail.com') ? 'smtp.gmail.com' : undefined);
+  const smtpPort = Number(process.env.SMTP_PORT) || 465;
+
+  if (smtpUser && smtpPass && smtpHost) {
+    try {
+      const transporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpPort === 465,
+        auth: {
+          user: smtpUser,
+          pass: smtpPass,
+        },
+      });
+
+      await transporter.sendMail({
+        from: process.env.SMTP_FROM || `"HighScholar" <${smtpUser}>`,
+        to: toEmail,
+        subject: `${otpCode} is your HighScholar verification code`,
+        html: htmlContent,
+      });
+
+      console.log(`[Email] OTP sent successfully via SMTP to ${toEmail}`);
+      return { success: true };
+    } catch (smtpError) {
+      console.error('[Email] SMTP send failure:', smtpError);
+      return { success: false, error: 'Failed to dispatch email via SMTP server.' };
+    }
+  }
+
+  // If no SMTP or Resend credentials are provided in env:
+  console.warn(`[HighScholar Email Notice] No SMTP or Resend credentials configured in .env.local / Vercel Environment Variables. Code for ${toEmail} is ${otpCode}`);
+  return { 
+    success: false, 
+    error: 'Email service credentials (SMTP_USER/SMTP_PASSWORD or RESEND_API_KEY) are not configured yet.' 
+  };
+}

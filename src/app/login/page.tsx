@@ -172,20 +172,6 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Quick Demo Helper Chip */}
-            <div className="mb-4 px-3 py-2 rounded-[16px] bg-[#F9F5FF] border border-[#E9D7FE] flex items-center justify-between text-xs text-[#6941C6]">
-              <span className="truncate">Demo: <strong>alex.mercer@scholar.io</strong></span>
-              <button
-                type="button"
-                onClick={() => {
-                  setEmail('alex.mercer@scholar.io');
-                  setPassword('password123');
-                }}
-                className="text-[11px] underline font-semibold cursor-pointer hover:text-[#5925DC] shrink-0 ml-2"
-              >
-                Autofill
-              </button>
-            </div>
 
             {/* Form */}
             <form onSubmit={handleLogin} className="space-y-4">
