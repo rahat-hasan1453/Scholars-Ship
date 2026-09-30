@@ -90,20 +90,34 @@ export async function sendOtpEmail(toEmail: string, otpCode: string, name?: stri
   const smtpHost = process.env.SMTP_HOST || (smtpUser?.includes('@gmail.com') ? 'smtp.gmail.com' : undefined);
   const smtpPort = Number(process.env.SMTP_PORT) || 465;
 
-  if (smtpUser && smtpPass && smtpHost) {
+  if (smtpUser && smtpPass) {
     try {
-      const transporter = nodemailer.createTransport({
-        host: smtpHost,
-        port: smtpPort,
-        secure: smtpPort === 465,
-        auth: {
-          user: smtpUser,
-          pass: smtpPass,
-        },
-      });
+      const cleanPass = smtpPass.replace(/\s+/g, '');
+      const isGmail = (smtpHost && smtpHost.includes('gmail')) || smtpUser.includes('@gmail.com');
+
+      const transporter = isGmail
+        ? nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              user: smtpUser.trim(),
+              pass: cleanPass,
+            },
+          })
+        : nodemailer.createTransport({
+            host: smtpHost || 'smtp.gmail.com',
+            port: smtpPort,
+            secure: smtpPort === 465,
+            auth: {
+              user: smtpUser.trim(),
+              pass: cleanPass,
+            },
+            tls: {
+              rejectUnauthorized: false,
+            },
+          });
 
       await transporter.sendMail({
-        from: process.env.SMTP_FROM || `"HighScholar" <${smtpUser}>`,
+        from: process.env.SMTP_FROM || `"HighScholar" <${smtpUser.trim()}>`,
         to: toEmail,
         subject: `${otpCode} is your HighScholar verification code`,
         html: htmlContent,
@@ -111,9 +125,15 @@ export async function sendOtpEmail(toEmail: string, otpCode: string, name?: stri
 
       console.log(`[Email] OTP sent successfully via SMTP to ${toEmail}`);
       return { success: true };
-    } catch (smtpError) {
+    } catch (smtpError: any) {
       console.error('[Email] SMTP send failure:', smtpError);
-      return { success: false, error: 'Failed to dispatch email via SMTP server.' };
+      const detail = smtpError?.message || 'Failed to dispatch email via SMTP server.';
+      return { 
+        success: false, 
+        error: detail.includes('535') 
+          ? 'Gmail authentication failed: Please verify that you are using a 16-character Google App Password (not your regular Gmail password).' 
+          : `SMTP dispatch error: ${detail}` 
+      };
     }
   }
 
