@@ -329,7 +329,7 @@ export default function SignupPage() {
                       isSelected={agreeTerms}
                       onChange={setAgreeTerms}
                       className="items-center [&_p]:leading-[16px]"
-                      boxClassName={`mt-[2px] rounded-[2px] ${agreeTerms ? 'bg-brand-primary ring-brand-primary' : 'ring-[#767676]'}`}
+                      boxClassName={`mt-[2px] rounded-[2px] ${agreeTerms ? 'bg-brand-solid ring-brand-primary' : 'ring-[#767676]'}`}
                       label={
                         <span className="text-[12px] font-normal italic leading-[16px] text-text-body">
                           I agree to HighScholar&apos;s <span className="text-brand-primary">Terms of Service</span> and{' '}
