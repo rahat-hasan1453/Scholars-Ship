@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Professor } from '@/types';
 import { useApp } from '@/context/AppContext';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -70,6 +71,22 @@ export default function HomePage() {
     activeNavTab,
     setActiveNavTab,
   } = useApp();
+
+  const router = useRouter();
+
+  // Route protection & onboarding check
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!data?.authenticated) {
+          router.replace('/login');
+        } else if (!data.user?.onboardingCompleted) {
+          router.replace('/onboarding');
+        }
+      })
+      .catch(() => {});
+  }, [router]);
 
   const [activeTab, setActiveTab] = useState<'scholarships' | 'opportunities' | 'professors' | 'research' | 'tracker' | 'profile'>(() => {
     if (typeof window !== 'undefined') {

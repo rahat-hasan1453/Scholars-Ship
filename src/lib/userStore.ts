@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 import { AuthSessionUser } from './auth';
 
 export interface StoredUser {
@@ -10,7 +8,7 @@ export interface StoredUser {
   avatar?: string;
   googleId?: string;
   onboardingCompleted: boolean;
-  profileData?: any;
+  profileData?: Record<string, unknown>;
   createdAt: string;
 }
 
@@ -20,8 +18,8 @@ export interface StoredOtp {
   expiresAt: number;
 }
 
-// In-memory caches backed by filesystem fallback for local development resilience
-const globalStore = global as unknown as {
+// In-memory caches resilient across hot-reloads and serverless invocations
+const globalStore = globalThis as unknown as {
   __highscholar_users?: Map<string, StoredUser>;
   __highscholar_otps?: Map<string, StoredOtp>;
 };
@@ -47,40 +45,6 @@ if (!globalStore.__highscholar_otps) {
 const usersMap = globalStore.__highscholar_users;
 const otpsMap = globalStore.__highscholar_otps;
 
-const STORAGE_FILE = path.join(process.cwd(), '.next', 'highscholar_users.json');
-
-function tryPersistToDisk() {
-  try {
-    const list = Array.from(usersMap.values());
-    const dir = path.dirname(STORAGE_FILE);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(STORAGE_FILE, JSON.stringify(list, null, 2), 'utf-8');
-  } catch {
-    // Non-fatal if disk write fails in restricted environments
-  }
-}
-
-function tryHydrateFromDisk() {
-  try {
-    if (fs.existsSync(STORAGE_FILE)) {
-      const raw = fs.readFileSync(STORAGE_FILE, 'utf-8');
-      const list: StoredUser[] = JSON.parse(raw);
-      list.forEach((u) => {
-        if (u.email) {
-          usersMap.set(u.email.toLowerCase(), u);
-        }
-      });
-    }
-  } catch {
-    // Non-fatal
-  }
-}
-
-// Attempt initial hydrate
-tryHydrateFromDisk();
-
 export function getUserByEmail(email: string): StoredUser | null {
   const normalized = email.trim().toLowerCase();
   return usersMap.get(normalized) || null;
@@ -89,7 +53,6 @@ export function getUserByEmail(email: string): StoredUser | null {
 export function saveUser(user: StoredUser): StoredUser {
   const normalized = user.email.trim().toLowerCase();
   usersMap.set(normalized, { ...user, email: normalized });
-  tryPersistToDisk();
   return usersMap.get(normalized)!;
 }
 
