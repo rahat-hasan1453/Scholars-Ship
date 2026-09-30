@@ -323,13 +323,13 @@ export default function SignupPage() {
                       onChange={setConfirmPassword}
                     />
 
-                    {/* Terms checkbox (168:3066) — Figma uses the native blue check (#0075FF) */}
+                    {/* Terms checkbox (168:3066) — Brand/Primary purple #7150E7 */}
                     <Checkbox
                       id="terms"
                       isSelected={agreeTerms}
                       onChange={setAgreeTerms}
                       className="items-center [&_p]:leading-[16px]"
-                      boxClassName={`mt-[2px] rounded-[2px] ${agreeTerms ? 'bg-[#0075FF] ring-[#0075FF]' : 'ring-[#767676]'}`}
+                      boxClassName={`mt-[2px] rounded-[2px] ${agreeTerms ? 'bg-brand-primary ring-brand-primary' : 'ring-[#767676]'}`}
                       label={
                         <span className="text-[12px] font-normal italic leading-[16px] text-text-body">
                           I agree to HighScholar&apos;s <span className="text-brand-primary">Terms of Service</span> and{' '}
