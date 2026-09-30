@@ -2,12 +2,16 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { EyeOff } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
-import { cn } from '@/lib/utils';
+import { Button } from '@/components/base/buttons/button';
+import { SocialButton } from '@/components/base/buttons/social-button';
+import { Checkbox } from '@/components/base/checkbox/checkbox';
+import { HintText } from '@/components/base/input/hint-text';
+import { Input } from '@/components/base/input/input';
+import { PinInput } from '@/components/base/input/pin-input';
 
 // Figma: zLYU2tCsLDvZNnUXk7Cpgw — Signup (167:2884) & OTP Verification (179:5183)
+// Components: Untitled UI. Colors & fonts: Figma tokens (see src/app/globals.css).
 
 /* Scholars'ship wordmark (Title Area 167:2890) */
 function BrandLogo() {
@@ -25,13 +29,16 @@ function BrandLogo() {
   );
 }
 
-/* Text input (Input field 179:3609) */
-const inputClass =
-  'h-[44px] w-full rounded-[8px] border border-stroke-default bg-white px-[14px] py-[10px] text-[16px] leading-[20px] text-text-primary shadow-[0_1px_1px_rgba(0,0,0,0.05)] outline-none transition-colors placeholder:text-text-secondary focus:border-brand-primary';
+/* Input field 179:3609 — 44px, radius 8, Figma placeholder Text/Secondary */
+const inputProps = {
+  size: 'lg' as const,
+  wrapperClassName: 'shadow-[0_1px_1px_rgba(0,0,0,0.05)]',
+  inputClassName: 'placeholder:text-secondary',
+};
 
-/* Primary button (Buttons/Button 179:4933) */
+/* Buttons/Button 179:4933 — 36px, Brand/Primary fill, Brand/600 border */
 const primaryButtonClass =
-  'flex h-[36px] w-full items-center justify-center gap-2 rounded-[8px] border border-brand-600 bg-brand-primary px-[14px] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-[14px] font-semibold leading-[20px] text-white shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition-colors hover:bg-brand-primary/90 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60';
+  'w-full font-[Inter,ui-sans-serif,system-ui,sans-serif] leading-[20px] shadow-[0_1px_2px_rgba(0,0,0,0.05)]! ring-brand-600 before:hidden';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -41,8 +48,6 @@ export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(true);
 
   // OTP 2-step verification states
@@ -143,50 +148,10 @@ export default function SignupPage() {
     }
   };
 
-  // Step 2: Handle OTP Input Changes (auto-advance, backspace, paste)
-  const handleOtpChange = (index: number, value: string) => {
-    const cleanVal = value.replace(/\D/g, '');
-    if (!cleanVal && value !== '') return;
-
-    const newDigits = [...otpDigits];
-
-    if (cleanVal.length > 1) {
-      const pasted = cleanVal.slice(0, 5).split('');
-      pasted.forEach((char, i) => {
-        if (i < 5) newDigits[i] = char;
-      });
-      setOtpDigits(newDigits);
-      const focusIndex = Math.min(pasted.length, 4);
-      otpInputRefs.current[focusIndex]?.focus();
-      return;
-    }
-
-    newDigits[index] = cleanVal;
-    setOtpDigits(newDigits);
-
-    if (cleanVal && index < 4) {
-      otpInputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace' && !otpDigits[index] && index > 0) {
-      otpInputRefs.current[index - 1]?.focus();
-    }
-  };
-
-  const handleOtpPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 5);
-    if (!pastedData) return;
-
-    const newDigits = [...otpDigits];
-    pastedData.split('').forEach((char, i) => {
-      if (i < 5) newDigits[i] = char;
-    });
-    setOtpDigits(newDigits);
-    const focusTarget = Math.min(pastedData.length, 4);
-    otpInputRefs.current[focusTarget]?.focus();
+  // Step 2: OTP input (Untitled UI PinInput gives a string; keep the 5-slot array state)
+  const handleOtpValueChange = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 5).split('');
+    setOtpDigits(Array.from({ length: 5 }, (_, i) => digits[i] ?? ''));
   };
 
   // Step 3: Verify OTP and proceed to Onboarding
@@ -287,21 +252,6 @@ export default function SignupPage() {
     window.location.href = '/api/auth/google';
   };
 
-  const passwordToggle = (visible: boolean, onToggle: () => void, label: string) => (
-    <button
-      type="button"
-      onClick={onToggle}
-      aria-label={label}
-      aria-pressed={visible}
-      className="absolute right-[14px] top-1/2 flex size-[16px] -translate-y-1/2 cursor-pointer items-center justify-center"
-    >
-      {visible ? (
-        <EyeOff className="size-[16px] text-text-placeholder" strokeWidth={1.5} />
-      ) : (
-        <img src="/signup/eye.svg" alt="" className="h-[12.1667px] w-[16.1667px]" />
-      )}
-    </button>
-  );
 
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-surface-bg tracking-normal lg:flex-row">
@@ -318,180 +268,166 @@ export default function SignupPage() {
       <div className="flex flex-1 items-center justify-center px-4 py-8 lg:pl-[22px] lg:pr-0 lg:py-10">
         <div className="w-full max-w-[472px] overflow-hidden">
           {/* login form (167:2888) */}
-          <div className="flex w-full flex-col gap-[10px] rounded-t-[24px] bg-white px-[24px] py-[36px]">
+          <div className="flex w-full flex-col gap-[10px] rounded-t-[24px] bg-surface-white px-[24px] py-[36px]">
             <BrandLogo />
 
             {step === 'form' ? (
               <div className="flex w-full flex-col gap-[28px]">
                 <div className="flex flex-col gap-[4px]">
-                  <h1 className="text-[24px] font-[510] leading-[32px] text-text-primary">Create an account</h1>
-                  <p className="text-[14px] leading-[18px] text-text-secondary">
+                  <h1 className="text-[24px] font-[510] leading-[32px] text-primary">Create an account</h1>
+                  <p className="text-[14px] leading-[18px] text-secondary">
                     Join HighScholar to start your scholarship radar
                   </p>
                   {error && (
-                    <p role="alert" className="mt-[8px] text-[12px] leading-[16px] text-error-main">
+                    <HintText isInvalid role="alert" className="mt-[8px] text-[12px] leading-[16px]">
                       {error}
-                    </p>
+                    </HintText>
                   )}
                 </div>
 
                 <form onSubmit={handleInitiateSignup} className="flex w-full flex-col gap-[24px]">
                   <div className="flex w-full flex-col gap-[16px]">
-                    <input
-                      type="email"
+                    <Input
+                      {...inputProps}
                       id="email"
+                      type="email"
                       autoComplete="email"
                       aria-label="Email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter Email"
-                      required
-                      className={inputClass}
+                      isRequired
+                      value={email}
+                      onChange={setEmail}
+                    />
+                    <Input
+                      {...inputProps}
+                      inputClassName={`${inputProps.inputClassName} pr-9.5`}
+                      id="password"
+                      type="password"
+                      autoComplete="new-password"
+                      aria-label="Password"
+                      placeholder="Enter Password"
+                      isRequired
+                      value={password}
+                      onChange={setPassword}
+                    />
+                    <Input
+                      {...inputProps}
+                      inputClassName={`${inputProps.inputClassName} pr-9.5`}
+                      id="confirmPassword"
+                      type="password"
+                      autoComplete="new-password"
+                      aria-label="Confirm Password"
+                      placeholder="Confirm Password"
+                      isRequired
+                      value={confirmPassword}
+                      onChange={setConfirmPassword}
                     />
 
-                    <div className="relative w-full">
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        id="password"
-                        autoComplete="new-password"
-                        aria-label="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Enter Password"
-                        required
-                        className={cn(inputClass, 'pr-[38px]')}
-                      />
-                      {passwordToggle(showPassword, () => setShowPassword(!showPassword), 'Toggle password visibility')}
-                    </div>
-
-                    <div className="relative w-full">
-                      <input
-                        type={showConfirmPassword ? 'text' : 'password'}
-                        id="confirmPassword"
-                        autoComplete="new-password"
-                        aria-label="Confirm Password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="Confirm Password"
-                        required
-                        className={cn(inputClass, 'pr-[38px]')}
-                      />
-                      {passwordToggle(
-                        showConfirmPassword,
-                        () => setShowConfirmPassword(!showConfirmPassword),
-                        'Toggle confirm password visibility'
-                      )}
-                    </div>
-
-                    {/* Terms checkbox (168:3066) */}
-                    <label htmlFor="terms" className="flex cursor-pointer select-none items-center gap-[8px]">
-                      <span className="relative flex shrink-0 pt-[2px]">
-                        <input
-                          type="checkbox"
-                          id="terms"
-                          checked={agreeTerms}
-                          onChange={(e) => setAgreeTerms(e.target.checked)}
-                          className="peer absolute inset-0 size-[16px] cursor-pointer opacity-0"
-                        />
-                        <span
-                          className={cn(
-                            'flex size-[16px] items-center justify-center rounded-[2px] border',
-                            agreeTerms ? 'border-[#0075FF] bg-[#0075FF]' : 'border-[#767676] bg-white',
-                            'peer-focus-visible:ring-2 peer-focus-visible:ring-[#0075FF]/40'
-                          )}
-                        >
-                          {agreeTerms && <img src="/signup/check.svg" alt="" className="size-[14px]" />}
+                    {/* Terms checkbox (168:3066) — Figma uses the native blue check (#0075FF) */}
+                    <Checkbox
+                      id="terms"
+                      isSelected={agreeTerms}
+                      onChange={setAgreeTerms}
+                      className="items-center [&_p]:leading-[16px]"
+                      boxClassName={`mt-[2px] rounded-[2px] ${agreeTerms ? 'bg-[#0075FF] ring-[#0075FF]' : 'ring-[#767676]'}`}
+                      label={
+                        <span className="text-[12px] font-normal italic leading-[16px] text-text-body">
+                          I agree to HighScholar&apos;s <span className="text-brand-primary">Terms of Service</span> and{' '}
+                          <span className="text-brand-primary">Privacy Policy</span>.
                         </span>
-                      </span>
-                      <span className="text-[12px] italic leading-[16px] text-text-body">
-                        I agree to HighScholar&apos;s <span className="text-brand-primary">Terms of Service</span> and{' '}
-                        <span className="text-brand-primary">Privacy Policy</span>.
-                      </span>
-                    </label>
+                      }
+                    />
                   </div>
 
-                  <button type="submit" disabled={isLoading || isGoogleLoading} className={primaryButtonClass}>
-                    {isLoading && (
-                      <span className="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                    )}
+                  <Button
+                    type="submit"
+                    size="sm"
+                    isLoading={isLoading}
+                    showTextWhileLoading
+                    isDisabled={isGoogleLoading}
+                    className={primaryButtonClass}
+                  >
                     {isLoading ? 'Sending code...' : 'Create Account'}
-                  </button>
+                  </Button>
                 </form>
               </div>
             ) : (
               <div className="flex w-full flex-col gap-[28px]">
                 <div className="flex flex-col gap-[4px]">
-                  <h1 className="text-[24px] font-[510] leading-[32px] text-text-primary">Verify your account</h1>
-                  <p className="text-[14px] leading-[18px] text-text-secondary">
+                  <h1 className="text-[24px] font-[510] leading-[32px] text-primary">Verify your account</h1>
+                  <p className="text-[14px] leading-[18px] text-secondary">
                     Join HighScholar to start your scholarship radar
                   </p>
                   {error ? (
-                    <p role="alert" className="mt-[8px] text-[12px] leading-[16px] text-error-main">
+                    <HintText isInvalid role="alert" className="mt-[8px] text-[12px] leading-[16px]">
                       {error}
-                    </p>
+                    </HintText>
                   ) : (
                     successMsg && (
-                      <p className="mt-[8px] text-[12px] leading-[16px] text-success-main">{successMsg}</p>
+                      <HintText className="mt-[8px] text-[12px] leading-[16px] text-success-main">{successMsg}</HintText>
                     )
                   )}
                 </div>
 
                 <form onSubmit={handleVerifyOtp} className="flex w-full flex-col gap-[24px]">
                   {/* Verification code input field (179:5586) */}
-                  <div className="flex w-full max-w-[352px] gap-[8px]">
-                    {otpDigits.map((digit, idx) => (
-                      <input
-                        key={idx}
-                        ref={(el) => {
-                          otpInputRefs.current[idx] = el;
-                        }}
-                        type="text"
-                        inputMode="numeric"
-                        autoComplete={idx === 0 ? 'one-time-code' : 'off'}
-                        aria-label={`Digit ${idx + 1}`}
-                        maxLength={1}
-                        value={digit}
-                        placeholder="0"
-                        onChange={(e) => handleOtpChange(idx, e.target.value)}
-                        onKeyDown={(e) => handleOtpKeyDown(idx, e)}
-                        onPaste={handleOtpPaste}
-                        autoFocus={idx === 0}
-                        className="h-[64px] min-w-0 max-w-[64px] flex-1 basis-0 rounded-[8px] border border-stroke-default bg-white p-[8px] text-center text-[32px] font-[590] leading-[40px] text-text-primary outline-none transition-colors placeholder:text-text-placeholder focus:border-brand-primary"
-                      />
-                    ))}
-                  </div>
+                  <PinInput size="sm">
+                    <PinInput.Group
+                      ref={(el: HTMLInputElement | null) => {
+                        otpInputRefs.current[0] = el;
+                      }}
+                      maxLength={5}
+                      value={otpDigits.join('')}
+                      onChange={handleOtpValueChange}
+                      inputMode="numeric"
+                      pattern="^[0-9]*$"
+                      autoComplete="one-time-code"
+                      autoFocus
+                      containerClassName="h-auto gap-[8px]"
+                    >
+                      {otpDigits.map((digit, idx) => (
+                        <PinInput.Slot
+                          key={idx}
+                          index={idx}
+                          className={`size-[56px] rounded-[8px] p-[8px] text-[32px] font-[590] leading-[40px] shadow-none sm:size-[64px] ${digit ? 'text-primary' : 'text-placeholder'}`}
+                        />
+                      ))}
+                    </PinInput.Group>
+                  </PinInput>
 
                   <div className="flex flex-col gap-[12px]">
-                    <button
+                    <Button
                       type="submit"
-                      disabled={isVerifying || otpDigits.join('').length < 5}
+                      size="sm"
+                      isLoading={isVerifying}
+                      showTextWhileLoading
+                      isDisabled={otpDigits.join('').length < 5}
                       className={primaryButtonClass}
                     >
-                      {isVerifying && (
-                        <span className="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                      )}
                       {isVerifying ? 'Verifying...' : 'Create Account'}
-                    </button>
+                    </Button>
 
-                    <div className="flex items-center justify-between text-[12px] leading-[16px] text-text-secondary">
-                      <button
-                        type="button"
-                        onClick={() => {
+                    <div className="flex items-center justify-between">
+                      <Button
+                        color="link-gray"
+                        size="xs"
+                        className="text-[12px] font-normal leading-[16px] text-secondary"
+                        onPress={() => {
                           setStep('form');
                           setError('');
                         }}
-                        className="cursor-pointer hover:text-text-primary"
                       >
                         ← Change details
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleResendCode}
-                        disabled={resendCooldown > 0 || isLoading}
-                        className="cursor-pointer text-brand-primary disabled:cursor-not-allowed disabled:text-text-secondary"
+                      </Button>
+                      <Button
+                        color="link-color"
+                        size="xs"
+                        className="text-[12px] font-normal leading-[16px]"
+                        onPress={handleResendCode}
+                        isDisabled={resendCooldown > 0 || isLoading}
                       >
                         {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </form>
@@ -500,39 +436,36 @@ export default function SignupPage() {
           </div>
 
           {/* Footer (179:5135) */}
-          <div className="w-full rounded-b-[24px] border-t border-dashed border-stroke-default bg-white py-[12px]">
+          <div className="w-full rounded-b-[24px] border-t border-dashed border-stroke-default bg-surface-white py-[12px]">
             <div className="relative flex w-full flex-col items-center gap-[8px]">
-              <button
-                type="button"
-                onClick={handleGoogleAuth}
-                disabled={isGoogleLoading || isLoading}
-                className="flex cursor-pointer items-center gap-[12px] rounded-[100px] border border-stroke-default py-[8px] pl-[8px] pr-[15px] transition-colors hover:bg-brand-soft disabled:opacity-60"
+              <SocialButton
+                social="google"
+                theme="color"
+                size="lg"
+                onPress={handleGoogleAuth}
+                isDisabled={isGoogleLoading || isLoading}
+                className="gap-[12px] rounded-full py-[9px] pl-[8px] pr-[15px] font-normal shadow-none before:hidden hover:bg-brand-soft [&>svg]:size-[31px] [&>svg]:p-[4px]"
               >
-                {isGoogleLoading ? (
-                  <span className="flex size-[31px] items-center justify-center">
-                    <span className="size-4 animate-spin rounded-full border-2 border-stroke-default border-t-brand-primary" />
-                  </span>
-                ) : (
-                  <img src="/signup/google.svg" alt="" className="size-[31px]" />
-                )}
                 <span className="flex flex-col items-start gap-[2px]">
                   <span className="text-[10px] italic leading-[16px] text-text-caption">Or sign in with email</span>
-                  <span className="text-[14px] leading-[18px] text-text-secondary">
+                  <span className="text-[14px] leading-[18px] text-secondary">
                     {isGoogleLoading ? 'Connecting...' : 'Continue with Google'}
                   </span>
                 </span>
-              </button>
+              </SocialButton>
 
               <div className="flex items-center">
-                <span className="flex w-[158px] justify-center whitespace-nowrap text-[12px] italic leading-[18px] text-text-secondary">
+                <span className="flex w-[158px] justify-center whitespace-nowrap text-[12px] italic leading-[18px] text-secondary">
                   Already have an account?&nbsp;
                 </span>
-                <Link
+                <Button
                   href="/login"
-                  className="text-[14px] font-[508] italic leading-[20px] text-text-primary hover:text-brand-primary"
+                  color="link-gray"
+                  size="sm"
+                  className="text-[14px] font-[508] italic leading-[20px] text-primary hover:text-brand-primary"
                 >
                   Log in Now!
-                </Link>
+                </Button>
               </div>
 
               {/* Corner decoration (179:5172) */}
