@@ -53,6 +53,7 @@
   --color-text-caption: #98a2b3; /* Caption/2 It, "Or sign in with email" */
 
   --color-stroke-default: #e1e8f0;
+  --color-chip-bg: #f4f4f4; /* Onboarding unselected chip (161:2668) */
   --color-surface-bg: #fafafa;
   --color-surface-white: #ffffff;
 
