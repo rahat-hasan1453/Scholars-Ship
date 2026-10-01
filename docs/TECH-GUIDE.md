@@ -160,6 +160,19 @@ Mistakes never break the live site, parallel sessions stay separate, and changes
 
 ---
 
+## 15. cmdk (shadcn Command + Popover)
+
+| | |
+|---|---|
+| **বাংলা** | search করা যায় এমন তালিকা (command menu) বানানোর library। shadcn-এর `Command` কম্পোনেন্ট এর ওপর তৈরি, আর `Popover` দিয়ে সেটা একটা ছোট dropdown হিসেবে খোলে। |
+| **English** | A library for searchable lists (command menus). shadcn's `Command` component is built on it, and `Popover` opens it as a small dropdown. |
+| **উপমা / Analogy** | ফোনের contact list-এর search: লিখতে থাকলেই তালিকা ছোট হয়ে আসে। / Like searching your phone's contacts: the list narrows as you type. |
+| **কোথায় / Where** | Onboarding ধাপ ৪-এ "Other" চাপলে বাকি দেশের dropdown (`src/components/OnboardingModal.tsx`)। ফাইল: `src/components/shadcn/command.tsx`, `popover.tsx`, `dialog.tsx`। / The "Other" country dropdown in onboarding step 4. |
+| **কমান্ড / Command** | `npx shadcn@latest add popover command` |
+| **অবস্থা / Status** | যোগ হয়েছে ২০২৬-১০-০১। / Added 2026-10-01. |
+
+---
+
 ## npm Commands / npm কমান্ড
 
 | Command | বাংলা | English |
