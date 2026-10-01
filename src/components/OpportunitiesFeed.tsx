@@ -5,8 +5,7 @@ import { useApp } from '@/context/AppContext';
 import { OpportunityCard } from '@/components/OpportunityCard';
 import { UnifiedDiscoveryHeader } from '@/components/layout/UnifiedDiscoveryHeader';
 import { LayoutGrid, List } from 'lucide-react';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { FilterIcon } from '@hugeicons/core-free-icons';
+import { FilterIcon } from 'lucide-react';
 
 export const OpportunitiesFeed: React.FC = () => {
   const { 
@@ -158,7 +157,7 @@ export const OpportunitiesFeed: React.FC = () => {
           {filteredOpportunities.length === 0 ? (
             <div className="bg-white rounded-2xl border border-[#EAECF0] p-12 text-center space-y-3">
               <div className="w-12 h-12 rounded-full bg-[#EDE9FE] text-[#7150E7] flex items-center justify-center mx-auto">
-                <HugeiconsIcon icon={FilterIcon} size={24} />
+                <FilterIcon size={24} />
               </div>
               <h3 className="text-base font-bold text-[#101828]">No matching opportunities found</h3>
               <p className="text-xs text-[#667085] max-w-md mx-auto">

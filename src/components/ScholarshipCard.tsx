@@ -4,15 +4,7 @@ import React from 'react';
 import { Scholarship } from '@/types';
 import { useApp } from '@/context/AppContext';
 import { calculateMatchScore, formatFunding, calculateCountdown } from '@/lib/utils';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { 
-  Award01Icon, 
-  Bookmark01Icon, 
-  ArrowUpRight01Icon, 
-  ChevronRightIcon, 
-  Tick01Icon,
-  Calendar03Icon 
-} from '@hugeicons/core-free-icons';
+import { ArrowUpRightIcon, AwardIcon, BookmarkIcon, CalendarIcon, CheckIcon, ChevronRightIcon } from 'lucide-react';
 
 interface ScholarshipCardProps {
   scholarship: Scholarship;
@@ -56,7 +48,7 @@ export const ScholarshipCard: React.FC<ScholarshipCardProps> = ({ scholarship, o
             className="flex items-center gap-1.5 text-xs text-[#344054] italic font-medium truncate max-w-[200px]" 
             title={scholarship.provider}
           >
-            <HugeiconsIcon icon={Award01Icon} size={15} className="text-[#6941C6] shrink-0 not-italic" />
+            <AwardIcon size={15} className="text-[#6941C6] shrink-0 not-italic" />
             <span className="truncate">{scholarship.provider}</span>
           </div>
 
@@ -123,7 +115,7 @@ export const ScholarshipCard: React.FC<ScholarshipCardProps> = ({ scholarship, o
         {/* Deadline Information */}
         <div className="mt-3 flex items-center justify-between text-xs" suppressHydrationWarning>
           <div className="flex items-center gap-1.5 min-w-0">
-            <HugeiconsIcon icon={Calendar03Icon} size={14} className="text-[#6941C6] shrink-0" />
+            <CalendarIcon size={14} className="text-[#6941C6] shrink-0" />
             <span className="text-[#667085] font-medium">Deadline:</span>
             <span className="font-semibold text-[#101828] truncate">
               {new Date(scholarship.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -159,12 +151,12 @@ export const ScholarshipCard: React.FC<ScholarshipCardProps> = ({ scholarship, o
         >
           {isSaved ? (
             <>
-              <HugeiconsIcon icon={Tick01Icon} size={15} className="text-emerald-600" />
+              <CheckIcon size={15} className="text-emerald-600" />
               <span>Tracked</span>
             </>
           ) : (
             <>
-              <HugeiconsIcon icon={Bookmark01Icon} size={15} className="text-[#344054]" />
+              <BookmarkIcon size={15} className="text-[#344054]" />
               <span>Track</span>
             </>
           )}
@@ -181,7 +173,7 @@ export const ScholarshipCard: React.FC<ScholarshipCardProps> = ({ scholarship, o
           className="flex-1 h-10 bg-white border border-[#7150E7] hover:bg-[#F4F3FE] text-[#7150E7] font-semibold text-xs rounded-full inline-flex items-center justify-center gap-1.5 shadow-2xs transition-all cursor-pointer"
         >
           <span>Official Link</span>
-          <HugeiconsIcon icon={ArrowUpRight01Icon} size={15} className="text-[#7150E7]" />
+          <ArrowUpRightIcon size={15} className="text-[#7150E7]" />
         </a>
 
         {/* Button 3: See Details */}
@@ -191,7 +183,7 @@ export const ScholarshipCard: React.FC<ScholarshipCardProps> = ({ scholarship, o
           className="flex-1 h-10 bg-[#6941C6] hover:bg-[#5925DC] text-white font-semibold text-xs rounded-full inline-flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"
         >
           <span>See Details</span>
-          <HugeiconsIcon icon={ChevronRightIcon} size={15} className="text-white" />
+          <ChevronRightIcon size={15} className="text-white" />
         </button>
       </div>
     </div>
