@@ -6,8 +6,7 @@ import { initialResearchPapers } from '@/data/researchPapers';
 import { UnifiedDiscoveryHeader } from '@/components/layout/UnifiedDiscoveryHeader';
 import { ResearchPaperCard } from '@/components/ResearchPaperCard';
 import { LayoutGrid, List } from 'lucide-react';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { FilterIcon } from '@hugeicons/core-free-icons';
+import { FilterIcon } from 'lucide-react';
 
 export const ResearchPapersFeed: React.FC = () => {
   const { globalSearchQuery } = useApp();
@@ -143,7 +142,7 @@ export const ResearchPapersFeed: React.FC = () => {
           {filteredPapers.length === 0 ? (
             <div className="bg-white rounded-2xl border border-[#EAECF0] p-12 text-center space-y-3">
               <div className="w-12 h-12 rounded-full bg-[#EDE9FE] text-[#7150E7] flex items-center justify-center mx-auto">
-                <HugeiconsIcon icon={FilterIcon} size={24} />
+                <FilterIcon size={24} />
               </div>
               <h3 className="text-base font-bold text-[#101828]">No matching research papers found</h3>
               <p className="text-xs text-[#667085] max-w-md mx-auto">
