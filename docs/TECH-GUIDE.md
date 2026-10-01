@@ -175,6 +175,38 @@ Mistakes never break the live site, parallel sessions stay separate, and changes
 | **কমান্ড / Command** | `npx shadcn@latest add popover command` |
 | **অবস্থা / Status** | যোগ হয়েছে ২০২৬-১০-০১। / Added 2026-10-01. |
 
+## 16. Vitest + Testing Library (Automated Tests / স্বয়ংক্রিয় টেস্ট)
+
+| | |
+|---|---|
+| **বাংলা** | কোড ঠিকমতো কাজ করছে কিনা তা কোড দিয়েই স্বয়ংক্রিয়ভাবে পরীক্ষা করার টুল। **Unit test** একটা ছোট function আলাদা করে পরীক্ষা করে; **API test** একটা route (যেমন `/api/auth/email/verify-code`) পরীক্ষা করে। `jsdom` ব্রাউজারের নকল পরিবেশ দেয়; `@testing-library/react` component পরীক্ষার জন্য। |
+| **English** | Tools that automatically check the code works, using code. A **unit test** checks one small function; an **API test** checks a route handler. `jsdom` fakes a browser; `@testing-library/react` is for testing components. |
+| **উপমা / Analogy** | গাড়ি বিক্রির আগে প্রতিটা যন্ত্রাংশ আলাদা করে টেস্ট বেঞ্চে চালিয়ে দেখা। / Testing every car part on a bench before the car is sold. |
+| **প্রজেক্টে / In project** | `tests/unit/` (lib function), `tests/api/` (route), `tests/helpers/` (নকল database ও cookie / fake DB and cookies). কনফিগ: `vitest.config.mts`। আসল email, Google বা database ব্যবহার হয় না, সব mock (নকল)। / No real email, Google or database: everything is mocked. |
+| **`it.fails`** | জানা bug-এর টেস্ট। bug থাকা পর্যন্ত এটা "expected fail" দেখায়; bug ঠিক হলে টেস্টটা লাল হবে, তখন `it.fails` বদলে `it` করতে হবে। বিস্তারিত `docs/QA-REPORT.md`-এ। / A test for a known bug: it shows "expected fail" until fixed, then turns red so you switch it to `it`. See `docs/QA-REPORT.md`. |
+| **ভার্সন / Version** | Vitest 4 (Vitest 5-এর জন্য `@types/node` 22+ লাগে, প্রজেক্টে 20 আছে)। / Vitest 4 (v5 needs `@types/node` 22+; the project uses 20). |
+
+## 17. Playwright + axe (Browser / E2E Tests / ব্রাউজার টেস্ট)
+
+| | |
+|---|---|
+| **বাংলা** | আসল browser (Chromium, Firefox, WebKit/Safari) খুলে মানুষের মতো ক্লিক ও টাইপ করে পুরো flow পরীক্ষা করে: যেমন login → code → onboarding → home। একে **E2E (end-to-end) test** বলে। `@axe-core/playwright` প্রতিটা পেজে accessibility (WCAG 2.1 AA) নিয়ম, যেমন লেখার রঙের contrast বা বাটনের নাম, পরীক্ষা করে। |
+| **English** | Opens real browsers and clicks/types like a person to test whole flows (E2E tests). `@axe-core/playwright` checks each page against accessibility rules (WCAG 2.1 AA), such as text contrast and button names. |
+| **উপমা / Analogy** | Unit test হলো যন্ত্রাংশ আলাদা করে পরীক্ষা; E2E হলো পুরো গাড়ি রাস্তায় চালিয়ে দেখা। / Unit tests check parts on a bench; E2E drives the whole car on the road. |
+| **প্রজেক্টে / In project** | `tests/e2e/` (spec), `tests/e2e/fixtures.ts` (নকল backend: সব `/api` call browser-এই উত্তর পায় / fake backend), কনফিগ `playwright.config.ts` (Desktop 1728px: Chromium, Firefox, WebKit; Mobile 375px: Chromium)। টেস্ট নিজেই `next dev` (port 3100) চালু করে। |
+| **কমান্ড / Commands** | `npm run test:e2e` (সব / all), `npx playwright test --project=chromium-desktop` (একটা browser / one browser), `npx playwright show-report` (রিপোর্ট দেখা / open the HTML report), `npx playwright install` (browser নামানো, একবার / download browsers once) |
+| **`test.fail()`** | জানা bug-এর E2E টেস্ট (Vitest-এর `it.fails`-এর মতো) / Known-bug E2E test, like `it.fails` in Vitest |
+
+## 18. GitHub Actions (CI / স্বয়ংক্রিয় চেক)
+
+| | |
+|---|---|
+| **বাংলা** | GitHub-এর নিজস্ব রোবট। প্রতিটা PR খোলা বা আপডেট হলে এবং `main`-এ push হলে এটা নিজে থেকে কোড নামিয়ে type check (`tsc`) ও `npm test` চালায়। কিছু ভাঙলে PR-এ লাল ✗ দেখায়, তাই merge-এর আগেই ধরা পড়ে। একে **CI (Continuous Integration)** বলে। |
+| **English** | GitHub's built-in robot. On every PR and every push to `main` it installs the project and runs the type check and `npm test`. A red ✗ on the PR means something broke, before it is merged. This is **CI (Continuous Integration)**. |
+| **উপমা / Analogy** | কারখানার গেটে মান-পরীক্ষক: প্রতিটা নতুন জিনিস ঢোকার আগে চেক হয়। / A quality inspector at the factory gate. |
+| **প্রজেক্টে / In project** | `.github/workflows/test.yml` (Node 22, `npm ci` → `tsc --noEmit` → `npm test`)। কোনো secret লাগে না, সব mock। E2E (Playwright) এখনো CI-তে নেই, লোকালে `npm run test:e2e`। / No secrets needed; E2E is not in CI yet. |
+| **দেখার জায়গা / Where to see** | PR পেজের নিচে "Checks", বা repo-র **Actions** ট্যাব / The PR's "Checks" section or the repo's **Actions** tab |
+
 ---
 
 ## npm Commands / npm কমান্ড
@@ -185,6 +217,9 @@ Mistakes never break the live site, parallel sessions stay separate, and changes
 | `npm run build` | প্রোডাকশন বিল্ড বানানো | Create a production build |
 | `npm run start` | বিল্ড করা ভার্সন চালানো | Run the built version |
 | `npm run lint` | কোড চেক করা | Check the code |
+| `npm test` | সব unit ও API টেস্ট একবার চালানো | Run all unit and API tests once |
+| `npm run test:watch` | ফাইল বদলালেই টেস্ট আবার চালানো | Re-run tests whenever a file changes |
+| `npm run test:e2e` | ব্রাউজারে E2E ও accessibility টেস্ট চালানো | Run browser E2E and accessibility tests |
 
 ## Glossary / শব্দকোষ
 
