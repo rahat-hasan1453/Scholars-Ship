@@ -281,12 +281,13 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                         Email
                       </span>
                     </div>
+                    {/* Read-only: this is the verified sign-in email */}
                     <input
                       type="email"
-                      placeholder="Enter your email"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full h-12 px-3.5 bg-white border border-[#E1E8F0] rounded-lg text-sm text-[#0F172B] placeholder:text-[#90A1B9] focus:outline-none focus:border-[#704FE5] focus:ring-1 focus:ring-[#704FE5] transition-all"
+                      readOnly
+                      aria-readonly="true"
+                      className="w-full h-12 px-3.5 bg-[#F8FAFC] border border-[#E1E8F0] rounded-lg text-sm text-[#62748E] cursor-not-allowed focus:outline-none"
                     />
                   </div>
 
