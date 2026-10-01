@@ -1,0 +1,129 @@
+# QA Report / কিউএ রিপোর্ট
+
+| | |
+|---|---|
+| **কোড / Code under test** | `claude/youthful-driscoll-c25cfe` @ `9da06e8` (Signup session: passwordless auth, shadcn/ui, signed session) |
+| **QA branch** | `claude/optimistic-blackburn-1aeb1b` (same code + tests) |
+| **তারিখ / Date** | 2026-10-01 |
+| **রান / Run** | #1: static checks, unit tests, API tests. E2E, visual, accessibility, performance: পরের রানে / next runs |
+
+## সারসংক্ষেপ / Summary
+
+| Test type | Passed | Failed | Known bug (`it.fails`) | Skipped / Not run |
+|---|---|---|---|---|
+| TypeScript (`tsc --noEmit`) | ✅ | 0 | – | – |
+| Lint (`npm run lint`) | – | ❌ 63 errors, 177 warnings | – | – |
+| Build (`npm run build`) | ✅ in a path without `'` | ❌ in the project folder (BUG-01) | – | – |
+| `npm audit` | ✅ prod: 0 | – | dev: 3 high (deepmerge-ts via prisma) | – |
+| Unit (Vitest), `tests/unit` | 33 | 0 | 6 | `AppContext` not yet covered |
+| API (Vitest), `tests/api` | 39 | 0 | 5 | `research/chat`, `professors` GET/POST not yet covered |
+| E2E (Playwright) | – | – | – | Not run (needs install approval) |
+| Visual / A11y / Lighthouse | – | – | – | Not run |
+
+**`it.fails` কী? / What is `it.fails`?** প্রতিটা জানা bug-এর জন্য একটা test আছে, যেটা bug থাকা পর্যন্ত "expected fail" দেখায়। তাই `npm test` এখন সবুজ। Bug ঠিক হলে test-টা লাল হবে, তখন `it.fails` বদলে `it` করতে হবে।
+Each known bug has a test that is expected to fail while the bug exists, so `npm test` stays green. When a bug is fixed, that test turns red: change `it.fails` to `it`.
+
+চালানোর নিয়ম / How to run: `npm test`. আসল email, Google, OpenAlex বা database কিছুই ব্যবহার হয় না, সব mock (নকল)। / No real email, Google, OpenAlex or database: all mocked.
+
+## যা ঠিকমতো কাজ করছে / Verified working
+- Session cookie HMAC দিয়ে sign করা থাকে। এডিট করা, পুরনো unsigned base64, অন্য secret দিয়ে sign করা বা মেয়াদোত্তীর্ণ (৩০ দিনের বেশি) cookie বাতিল হয়। `httpOnly`, `sameSite=lax` চালু, production-এ `secure`। Production-এ দুর্বল `SESSION_SECRET` থাকলে app চলবে না। *(Earlier "unsigned cookie" issue: fixed.)*
+  Session cookie is HMAC-signed. Tampered, legacy unsigned base64, wrong-secret and expired (30+ days) cookies are rejected. `httpOnly` and `sameSite=lax` are set, plus `secure` in production. The app refuses a weak `SESSION_SECRET` in production.
+- Login code: ৫ অঙ্কের, শুধু SHA-256 hash সংরক্ষিত, ১০ মিনিটে মেয়াদ শেষ, একবারই ব্যবহার করা যায়, ৬০ সেকেন্ড resend cooldown, প্রতি code-এ ৫ বার ভুল দিলে lock। একসাথে অনেক অনুমান পাঠালেও সংখ্যা ঠিকমতো গোনা হয় (atomic)। এক email-এর code দিয়ে অন্য email-এ ঢোকা যায় না। Response-এ code ফেরত আসে না। *(Earlier plaintext password and in-memory OTP issues: fixed, now passwordless with Prisma/Postgres.)*
+  Login code: 5 digits, only the SHA-256 hash is stored, expires in 10 minutes, single use, 60s resend cooldown, locked after 5 wrong tries per code. Parallel guesses are counted atomically. A code for one email cannot sign in another email. The code is never returned in the response.
+- Google OAuth: CSRF-এর জন্য `state` cookie মিলিয়ে দেখা হয়। Google-এ email verified না থাকলে ঢুকতে দেয় না। সব redirect app-এর নিজের origin-এই যায়, open redirect নেই।
+  Google OAuth: the CSRF `state` cookie is checked. Unverified Google emails are rejected. Every redirect stays on the app origin, so there is no open redirect.
+- `complete-onboarding`: email সবসময় session থেকে নেওয়া হয়, body থেকে নয়। Body-তে পাঠানো `email` বা `onboardingCompleted` উপেক্ষা করা হয়।
+  `complete-onboarding`: the email always comes from the session, never the body. `email` and `onboardingCompleted` sent in the body are ignored.
+- কোথাও `dangerouslySetInnerHTML` নেই, তাই feed-এর data দিয়ে XSS-এর ঝুঁকি কম। Secret-যুক্ত কোনো file commit করা নেই।
+  No `dangerouslySetInnerHTML` anywhere, so XSS risk from feed data is low. No files with secrets are committed.
+
+## Bugs / বাগ
+
+| ID | Severity | Title | Fix owner |
+|---|---|---|---|
+| BUG-02 | **High** | Login code brute force across re-issued codes | Signup |
+| BUG-01 | Medium | Local `npm run build` fails because of `'` in folder path | GenOps |
+| BUG-03 | Medium | No per-IP rate limit on send-code (email bombing) | Signup |
+| BUG-04 | Medium | Search "USA" matches Australia/Austria/Russia | GenOps (Home) |
+| BUG-13 | Medium | Professor search invents data (open positions, PI title, random photo) | GenOps (Home) |
+| BUG-05 | Low | Degree/category keyword false positives ("systems" = Masters) | GenOps (Home) |
+| BUG-09 | Low | `complete-onboarding` stores any JSON with no validation/size limit | Signup / Onboarding |
+| BUG-10 | Low | Ingest API "key" check accepts any `highscholar_*` string | GenOps |
+| BUG-06 | Low | `ignoreBuildErrors: true` hides type errors in builds | GenOps |
+| BUG-14 | Low | 63 lint errors (incl. 10 setState-in-effect) | GenOps / owners |
+| BUG-07 | Low | Countdown shows "NaNd NaNh left" for a bad date | GenOps (Home) |
+| BUG-08 | Low | Empty specialization gets the +10 match bonus | GenOps (Home) |
+| BUG-11 | Low | Research search reports OpenAlex outage as success, 0 papers | GenOps (Home) |
+| BUG-12 | Low | `?limit=abc` returns no opportunities; `?tag=` ignored | GenOps (Home) |
+| BUG-15 | Low | Sessions can't be revoked server-side; send-code email links use Host header when `NEXT_PUBLIC_APP_URL` unset | Signup |
+
+### BUG-02 · High · Login code brute force / লগইন কোড অনুমান করে ঢোকা
+- **File:** `src/lib/loginCodes.ts:21-22` (5-digit code; every new code resets `attempts: 0`)
+- **বাংলা:** প্রতিটা code-এ ৫ বার ভুল করার সীমা আছে। কিন্তু ৬০ সেকেন্ড পরপর নতুন code চাইলে সেই সীমা আবার শূন্য থেকে শুরু হয়। ফলে কেউ অন্যের email দিয়ে দিনে প্রায় ৭,২০০ বার অনুমান করতে পারে। মোট সম্ভাব্য code ১,০০,০০০টা, তাই প্রতিদিন প্রায় ৭% সম্ভাবনা যে সে অন্যের account-এ ঢুকে যাবে।
+- **English:** The 5-attempt limit is per code, and a new code every 60s resets it. An attacker can make about 7,200 guesses a day against one email in a 100,000-code space, which is roughly a 7% chance per day of taking over that account.
+- **Repro:** `tests/unit/loginCodes.test.ts` → "limits total wrong guesses per email across re-issued codes" (3 rounds give 15 guesses).
+- **Expected:** A per-email limit across codes (e.g. 10 wrong attempts per hour, then lock), plus per-IP limits. A 6-digit code would also help.
+- **Actual:** 5 guesses per minute, with no upper bound.
+
+### BUG-01 · Medium · Build fails in this folder / এই folder-এ build ব্যর্থ
+- **বাংলা:** Folder-এর নাম "Scholars**'** Ship"। Next.js file-এর path একটা `'...'` string-এর ভেতরে বসায়, তাই webpack-এর `favicon.ico` loader ভেঙে যায় (`Module parse failed: Unexpected token`)। একই কোড এমন path-এ build করলে, যার নামে `'` নেই, build সফল হয় আর ২০টা route তৈরি হয়। Vercel-এ সমস্যা হওয়ার কথা নয়।
+- **English:** The folder name contains an apostrophe. Next.js puts the file path inside a `'...'` string, which breaks the webpack `favicon.ico` metadata loader. The same code builds fine (20 routes) in a path without `'`. Vercel should be unaffected.
+- **Fix:** Rename the folder, e.g. `Scholars-Ship`, or report it upstream to Next.js.
+
+### BUG-03 · Medium · No per-IP rate limit on send-code
+- **File:** `src/app/api/auth/email/send-code/route.ts:16`. The cooldown is per email only.
+- **বাংলা:** একজন একই কম্পিউটার থেকে হাজার হাজার আলাদা email-এ code পাঠাতে পারে। এতে মানুষ spam পায়, SMTP বা Resend-এর quota শেষ হয়, আর sender-এর reputation নষ্ট হয়।
+- **English:** One client can trigger codes to unlimited different addresses. That spams people, burns the SMTP/Resend quota and hurts sender reputation.
+- **Repro:** `tests/api/auth-routes.test.ts` → "rate-limits one client sending codes to many addresses" (30 different emails, all return 200).
+- **Expected:** Per-IP and global limits (e.g. Vercel KV/Upstash, or the Vercel Firewall rate limit), and a CAPTCHA after N requests.
+
+### BUG-04 · Medium · "USA" search matches Australia etc.
+- **File:** `src/lib/semanticSearch.ts:157`. `c.includes('us')` is true for Australia, Austria, Russia, Belarus and Cyprus.
+- **Repro:** `matchItemSemantically('PhD position', 'Australia', parse('phd position usa'))` → `matches: true`.
+- **Expected:** Exact or alias match (`usa`, `united states`, `us`).
+
+### BUG-13 · Medium · Professor search shows invented data / ভুয়া তথ্য
+- **File:** `src/app/api/professors/search/route.ts:70-85`
+- **বাংলা:** OpenAlex-এর যেকোনো লেখক (৫টার বেশি paper থাকলেই) দেখানো হয়:
+  - "Principal Investigator & Research Faculty" পদবি দিয়ে
+  - `openPositions: true` (সবার lab-এ নাকি জায়গা খালি আছে) দিয়ে
+  - "Fall 2026, Spring 2027"-এ ভর্তি নেওয়ার কথা বলে
+  - এলোমেলো একটা Unsplash ছবি দিয়ে, যেটা সেই মানুষের নয়
+
+  ছাত্রছাত্রীরা ভুল তথ্য দেখে email পাঠাতে পারে।
+- **English:** Every OpenAlex author with more than 5 works is shown as a "Principal Investigator" with `openPositions: true`, "Fall 2026, Spring 2027" intake, and a computed Unsplash photo that is not that person. Students may act on false information.
+- **Expected:** Show only real data. Mark unknown fields as unknown, use initials avatars.
+
+### BUG-05 · Low · Keyword false positives
+- **File:** `src/lib/semanticSearch.ts:117` (`/ms/` matches "systems", "programs", "algorithms") and `:122` (`/pi|lab/` matches "topic", "available").
+- **Expected:** Word boundaries, e.g. `\bms\b`, `\bpi\b`.
+
+### BUG-09 · Low · Onboarding payload not validated
+- **File:** `src/app/api/auth/complete-onboarding/route.ts:13`. Any keys of any size are saved to `profileData`, and `name` has no length limit.
+- **Repro:** `tests/api/auth-routes.test.ts` → "rejects an oversized / unexpected profile payload" (600 KB is accepted).
+- **Expected:** A whitelist of fields (zod schema) and a size limit.
+
+### BUG-10 · Low · Fake API key check
+- **File:** `src/app/api/scholarships/route.ts:41`, `src/app/api/professors/route.ts:41`. Any `highscholar_<anything>` is accepted. Low for now because nothing is saved; it becomes **High** once these routes write to the database.
+
+### BUG-06 · Low · `ignoreBuildErrors: true`
+- **File:** `next.config.ts:6`. Type errors no longer block a deploy. `tsc` passes today, so turning this off is safe.
+
+### BUG-14 · Low · Lint errors
+- 37 × `no-explicit-any`, 16 × `react/no-unescaped-entities`, 10 × React Compiler `set-state-in-effect` (`src/components/UnifiedHubView.tsx:91,207,267`, `src/context/AppContext.tsx:97`, `src/components/AdvancedFilterModal.tsx:47`, `src/components/ResearchBotModal.tsx:43`, `src/app/page.tsx:107`). Only 2 are in auth files (`src/app/login/page.tsx`, `src/lib/email.ts:130`).
+
+### BUG-07, 08, 11, 12 · Low
+- **BUG-07:** `src/lib/utils.ts:21`. An invalid date gives `NaN`, and the card shows "NaNd NaNh left".
+- **BUG-08:** `src/lib/utils.ts:71`. `''` matches every specialization (+10).
+- **BUG-11:** `src/app/api/research/search/route.ts:26`. Upstream failure returns `200 { success: true, count: 0 }`; `professors/search` returns 502.
+- **BUG-12:** `src/app/api/opportunities/live/route.ts:217,264`. `limit=abc` gives `slice(0, NaN)`, which is `[]`. `tag` (line 216) is read but never used.
+
+### BUG-15 · Low · Session and email notes
+- Logout only deletes the cookie. A stolen cookie stays valid for up to 30 days, because there is no server-side session list or version check.
+- `send-code/route.ts:28`: if `NEXT_PUBLIC_APP_URL` is not set, the email logo URL comes from the request's Host header. Make sure `NEXT_PUBLIC_APP_URL` is set on Vercel.
+- Dev-only: the sign-in code is printed to the server console when `NODE_ENV !== 'production'` (fine locally, and Vercel previews run as production).
+
+## পরের ধাপ / Next runs
+1. E2E with Playwright + axe (needs install approval): login → code → onboarding → home, wrong code, resend, logout, responsive 1728/375.
+2. `AppContext` unit tests.
+3. Figma visual comparison, Lighthouse, accessibility review.
