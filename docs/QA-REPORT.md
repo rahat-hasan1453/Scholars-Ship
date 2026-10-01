@@ -2,18 +2,18 @@
 
 | | |
 |---|---|
-| **কোড / Code under test** | `claude/youthful-driscoll-c25cfe` @ `9da06e8` (Signup session: passwordless auth, shadcn/ui, signed session) |
-| **QA branch** | `claude/optimistic-blackburn-1aeb1b` (same code + tests) |
-| **তারিখ / Date** | 2026-10-01 |
-| **রান / Run** | #1: static checks, unit tests, API tests. E2E, visual, accessibility, performance: পরের রানে / next runs |
+| **কোড / Code under test** | `main` @ `dbc599c` (PR #1 passwordless auth, #2 onboarding, #3 lucide icons, #4 docs) merged into the QA branch |
+| **QA branch** | `claude/optimistic-blackburn-1aeb1b` (main + tests) |
+| **তারিখ / Date** | 2026-10-01 (run #1), 2026-10-02 (run #2) |
+| **রান / Run** | #2: same checks re-run after merging `main`. `src/lib`, `src/app/api` and `prisma` are identical to run #1, so every auth/API finding still applies. E2E, visual, accessibility, performance: next runs |
 
 ## সারসংক্ষেপ / Summary
 
 | Test type | Passed | Failed | Known bug (`it.fails`) | Skipped / Not run |
 |---|---|---|---|---|
 | TypeScript (`tsc --noEmit`) | ✅ | 0 | – | – |
-| Lint (`npm run lint`) | – | ❌ 63 errors, 177 warnings | – | – |
-| Build (`npm run build`) | ✅ in a path without `'` | ❌ in the project folder (BUG-01) | – | – |
+| Lint (`npm run lint`) | – | ❌ 62 errors, 165 warnings (run #1: 63 / 177) | – | – |
+| Build (`npm run build`) | ✅ in a path without `'` (all routes incl. `/onboarding`) | ❌ in the project folder (BUG-01) | – | – |
 | `npm audit` | ✅ prod: 0 | – | dev: 3 high (deepmerge-ts via prisma) | – |
 | Unit (Vitest), `tests/unit` | 33 | 0 | 6 | `AppContext` not yet covered |
 | API (Vitest), `tests/api` | 39 | 0 | 5 | `research/chat`, `professors` GET/POST not yet covered |
@@ -26,9 +26,9 @@ Each known bug has a test that is expected to fail while the bug exists, so `npm
 চালানোর নিয়ম / How to run: `npm test`. আসল email, Google, OpenAlex বা database কিছুই ব্যবহার হয় না, সব mock (নকল)। / No real email, Google, OpenAlex or database: all mocked.
 
 ## যা ঠিকমতো কাজ করছে / Verified working
-- Session cookie HMAC দিয়ে sign করা থাকে। এডিট করা, পুরনো unsigned base64, অন্য secret দিয়ে sign করা বা মেয়াদোত্তীর্ণ (৩০ দিনের বেশি) cookie বাতিল হয়। `httpOnly`, `sameSite=lax` চালু, production-এ `secure`। Production-এ দুর্বল `SESSION_SECRET` থাকলে app চলবে না। *(Earlier "unsigned cookie" issue: fixed.)*
+- Session cookie HMAC দিয়ে sign করা থাকে। এডিট করা, পুরনো unsigned base64, অন্য secret দিয়ে sign করা বা মেয়াদোত্তীর্ণ (৩০ দিনের বেশি) cookie বাতিল হয়। `httpOnly`, `sameSite=lax` চালু, production-এ `secure`। Production-এ দুর্বল `SESSION_SECRET` থাকলে app চলবে না। *(Earlier "unsigned base64 session cookie": **fixed**, re-verified on `dbc599c`.)*
   Session cookie is HMAC-signed. Tampered, legacy unsigned base64, wrong-secret and expired (30+ days) cookies are rejected. `httpOnly` and `sameSite=lax` are set, plus `secure` in production. The app refuses a weak `SESSION_SECRET` in production.
-- Login code: ৫ অঙ্কের, শুধু SHA-256 hash সংরক্ষিত, ১০ মিনিটে মেয়াদ শেষ, একবারই ব্যবহার করা যায়, ৬০ সেকেন্ড resend cooldown, প্রতি code-এ ৫ বার ভুল দিলে lock। একসাথে অনেক অনুমান পাঠালেও সংখ্যা ঠিকমতো গোনা হয় (atomic)। এক email-এর code দিয়ে অন্য email-এ ঢোকা যায় না। Response-এ code ফেরত আসে না। *(Earlier plaintext password and in-memory OTP issues: fixed, now passwordless with Prisma/Postgres.)*
+- Login code: ৫ অঙ্কের, শুধু SHA-256 hash সংরক্ষিত, ১০ মিনিটে মেয়াদ শেষ, একবারই ব্যবহার করা যায়, ৬০ সেকেন্ড resend cooldown, প্রতি code-এ ৫ বার ভুল দিলে lock। একসাথে অনেক অনুমান পাঠালেও সংখ্যা ঠিকমতো গোনা হয় (atomic)। এক email-এর code দিয়ে অন্য email-এ ঢোকা যায় না। Response-এ code ফেরত আসে না। *(Earlier "plaintext passwords" and "in-memory user/OTP store on serverless": **fixed**, re-verified on `dbc599c`. Passwords and forgot/reset-password are removed; users and codes live in Prisma/PostgreSQL.)*
   Login code: 5 digits, only the SHA-256 hash is stored, expires in 10 minutes, single use, 60s resend cooldown, locked after 5 wrong tries per code. Parallel guesses are counted atomically. A code for one email cannot sign in another email. The code is never returned in the response.
 - Google OAuth: CSRF-এর জন্য `state` cookie মিলিয়ে দেখা হয়। Google-এ email verified না থাকলে ঢুকতে দেয় না। সব redirect app-এর নিজের origin-এই যায়, open redirect নেই।
   Google OAuth: the CSRF `state` cookie is checked. Unverified Google emails are rejected. Every redirect stays on the app origin, so there is no open redirect.
@@ -36,6 +36,14 @@ Each known bug has a test that is expected to fail while the bug exists, so `npm
   `complete-onboarding`: the email always comes from the session, never the body. `email` and `onboardingCompleted` sent in the body are ignored.
 - কোথাও `dangerouslySetInnerHTML` নেই, তাই feed-এর data দিয়ে XSS-এর ঝুঁকি কম। Secret-যুক্ত কোনো file commit করা নেই।
   No `dangerouslySetInnerHTML` anywhere, so XSS risk from feed data is low. No files with secrets are committed.
+
+## আগের সমস্যার পুনর্যাচাই / Earlier issues re-checked (run #2)
+
+| Earlier issue | Status | Evidence |
+|---|---|---|
+| Unsigned base64 session cookie | ✅ Fixed | `tests/unit/auth-session.test.ts` (forged/legacy cookie rejected), `tests/api/auth-routes.test.ts` (`/me` with forged cookie) |
+| Plaintext passwords | ✅ Fixed (removed) | No password fields or routes; sign-in is Google or email code only |
+| In-memory user/OTP store on serverless | ✅ Fixed | `src/lib/users.ts`, `src/lib/loginCodes.ts` use Prisma (`User`, `LoginCode` tables) |
 
 ## Bugs / বাগ
 
@@ -50,7 +58,7 @@ Each known bug has a test that is expected to fail while the bug exists, so `npm
 | BUG-09 | Low | `complete-onboarding` stores any JSON with no validation/size limit | Signup / Onboarding |
 | BUG-10 | Low | Ingest API "key" check accepts any `highscholar_*` string | GenOps |
 | BUG-06 | Low | `ignoreBuildErrors: true` hides type errors in builds | GenOps |
-| BUG-14 | Low | 63 lint errors (incl. 10 setState-in-effect) | GenOps / owners |
+| BUG-14 | Low | 62 lint errors (incl. 9 setState-in-effect) | GenOps / owners |
 | BUG-07 | Low | Countdown shows "NaNd NaNh left" for a bad date | GenOps (Home) |
 | BUG-08 | Low | Empty specialization gets the +10 match bonus | GenOps (Home) |
 | BUG-11 | Low | Research search reports OpenAlex outage as success, 0 papers | GenOps (Home) |
@@ -110,7 +118,7 @@ Each known bug has a test that is expected to fail while the bug exists, so `npm
 - **File:** `next.config.ts:6`. Type errors no longer block a deploy. `tsc` passes today, so turning this off is safe.
 
 ### BUG-14 · Low · Lint errors
-- 37 × `no-explicit-any`, 16 × `react/no-unescaped-entities`, 10 × React Compiler `set-state-in-effect` (`src/components/UnifiedHubView.tsx:91,207,267`, `src/context/AppContext.tsx:97`, `src/components/AdvancedFilterModal.tsx:47`, `src/components/ResearchBotModal.tsx:43`, `src/app/page.tsx:107`). Only 2 are in auth files (`src/app/login/page.tsx`, `src/lib/email.ts:130`).
+- 37 × `no-explicit-any`, 16 × `react/no-unescaped-entities`, 9 × React Compiler `set-state-in-effect` (`src/components/UnifiedHubView.tsx:91,207,267`, `src/context/AppContext.tsx:97`, `src/components/AdvancedFilterModal.tsx:47`, `src/components/ResearchBotModal.tsx:43`, `src/app/page.tsx:105`, `src/app/login/page.tsx:48`). In auth files: `src/app/login/page.tsx:48`, `src/lib/email.ts:130`.
 
 ### BUG-07, 08, 11, 12 · Low
 - **BUG-07:** `src/lib/utils.ts:21`. An invalid date gives `NaN`, and the card shows "NaNd NaNh left".
