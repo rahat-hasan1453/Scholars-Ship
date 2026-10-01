@@ -1,4 +1,4 @@
-import { prisma } from './prisma';
+import { createHmac, timingSafeEqual } from 'crypto';
 import { cookies } from 'next/headers';
 
 export interface AuthSessionUser {
@@ -11,115 +11,56 @@ export interface AuthSessionUser {
 }
 
 export const SESSION_COOKIE_NAME = 'highscholar_session';
+export const OAUTH_STATE_COOKIE = 'highscholar_oauth_state';
+const SESSION_MAX_AGE = 60 * 60 * 24 * 30;
 
-/**
- * Encodes session user payload into a base64url string
- */
-export function encodeSession(user: AuthSessionUser): string {
-  const jsonStr = JSON.stringify(user);
-  return Buffer.from(jsonStr).toString('base64url');
+function sessionSecret(): string {
+  const secret = process.env.SESSION_SECRET;
+  if (secret && secret.length >= 32) return secret;
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('SESSION_SECRET must be set (at least 32 characters) to sign session cookies.');
+  }
+  return 'dev-only-insecure-session-secret-change-me';
 }
 
-/**
- * Decodes session string back to user payload
- */
+function sign(payload: string): string {
+  return createHmac('sha256', sessionSecret()).update(payload).digest('base64url');
+}
+
+/* Cookie value = base64url(JSON) + "." + HMAC-SHA256 signature, so it can't be forged or edited. */
+export function encodeSession(user: AuthSessionUser): string {
+  const payload = Buffer.from(JSON.stringify({ ...user, exp: Date.now() + SESSION_MAX_AGE * 1000 })).toString('base64url');
+  return `${payload}.${sign(payload)}`;
+}
+
 export function decodeSession(token: string): AuthSessionUser | null {
+  const [payload, signature] = token.split('.');
+  if (!payload || !signature) return null;
+
+  const expected = Buffer.from(sign(payload));
+  const actual = Buffer.from(signature);
+  if (expected.length !== actual.length || !timingSafeEqual(expected, actual)) return null;
+
   try {
-    const jsonStr = Buffer.from(token, 'base64url').toString('utf8');
-    const parsed = JSON.parse(jsonStr);
-    if (parsed && parsed.email && parsed.name) {
-      return parsed as AuthSessionUser;
-    }
-    return null;
+    const { exp, ...user } = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));
+    if (typeof exp !== 'number' || Date.now() > exp || !user.email || !user.id) return null;
+    return user as AuthSessionUser;
   } catch {
     return null;
   }
 }
 
-/**
- * Upserts a Google user into the database via Prisma if DATABASE_URL is configured.
- * Safely falls back if database is not reachable.
- */
-export async function upsertGoogleUser(userData: {
-  email: string;
-  name: string;
-  avatar?: string;
-  googleId: string;
-}): Promise<AuthSessionUser> {
-  if (!process.env.DATABASE_URL) {
-    console.warn('[HighScholar Auth] DATABASE_URL is not set. Proceeding without persistent DB write.');
-    return {
-      id: userData.googleId,
-      email: userData.email,
-      name: userData.name,
-      avatar: userData.avatar,
-      googleId: userData.googleId,
-    };
-  }
-
-  try {
-    const user = await prisma.user.upsert({
-      where: { email: userData.email },
-      update: {
-        name: userData.name,
-        avatar: userData.avatar,
-        googleId: userData.googleId,
-      },
-      create: {
-        email: userData.email,
-        name: userData.name,
-        avatar: userData.avatar,
-        googleId: userData.googleId,
-        profile: {
-          create: {
-            degreeLevel: 'MASTERS',
-            specializations: ['Computer Science'],
-            targetCountries: ['USA', 'Canada'],
-          },
-        },
-      },
-      include: {
-        profile: true,
-      },
-    });
-
-    return {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      avatar: user.avatar || userData.avatar,
-      googleId: user.googleId || userData.googleId,
-    };
-  } catch (error) {
-    console.error('[HighScholar Auth] Error persisting user to database:', error);
-    return {
-      id: userData.googleId,
-      email: userData.email,
-      name: userData.name,
-      avatar: userData.avatar,
-      googleId: userData.googleId,
-    };
-  }
-}
-
-/**
- * Sets auth cookie on incoming/outgoing response
- */
 export async function setSessionCookie(user: AuthSessionUser) {
   const cookieStore = await cookies();
-  const token = encodeSession(user);
-  cookieStore.set(SESSION_COOKIE_NAME, token, {
+  cookieStore.set(SESSION_COOKIE_NAME, encodeSession(user), {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
-    maxAge: 60 * 60 * 24 * 30, // 30 days
+    maxAge: SESSION_MAX_AGE,
   });
 }
 
-/**
- * Retrieves the current session user from cookies
- */
 export async function getSessionUser(): Promise<AuthSessionUser | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
@@ -127,9 +68,6 @@ export async function getSessionUser(): Promise<AuthSessionUser | null> {
   return decodeSession(token);
 }
 
-/**
- * Removes session cookie on logout
- */
 export async function clearSessionCookie() {
   const cookieStore = await cookies();
   cookieStore.delete(SESSION_COOKIE_NAME);

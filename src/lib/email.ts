@@ -15,7 +15,7 @@ export async function sendOtpEmail(toEmail: string, otpCode: string, name?: stri
     <html>
       <head>
         <meta charset="utf-8">
-        <title>Verify your HighScholar account</title>
+        <title>Your HighScholar sign-in code</title>
         <style>
           body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #F8F9FA; margin: 0; padding: 24px; color: #101828; }
           .container { max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 20px; padding: 40px 32px; box-shadow: 0 4px 24px rgba(112, 80, 230, 0.08); border: 1px solid #EAECF0; }
@@ -37,14 +37,14 @@ export async function sendOtpEmail(toEmail: string, otpCode: string, name?: stri
             Welcome, ${recipientName}!
           </div>
           <div class="description">
-            Thank you for registering with HighScholar. Please use the following 5-digit verification code to confirm your email and complete your scholar account setup:
+            Use the following 5-digit code to sign in to HighScholar:
           </div>
           <div class="code-box">
-            <div class="code-label">Verification Code</div>
+            <div class="code-label">Sign-in Code</div>
             <div class="code-number">${otpCode}</div>
           </div>
           <div class="description" style="font-size: 13px; color: #667085;">
-            This code will expire in <strong>10 minutes</strong>. If you did not request this registration, you can safely ignore this email.
+            This code will expire in <strong>10 minutes</strong>. If you did not try to sign in, you can safely ignore this email.
           </div>
           <div class="footer-note">
             HighScholar — Global Higher Ed, Fully Funded Scholarships & Faculty Matching<br/>
@@ -55,6 +55,10 @@ export async function sendOtpEmail(toEmail: string, otpCode: string, name?: stri
     </html>
   `;
 
+  return sendEmail({ to: toEmail, subject: `${otpCode} is your HighScholar sign-in code`, html: htmlContent });
+}
+
+export async function sendEmail({ to, subject, html }: SendEmailOptions): Promise<{ success: boolean; error?: string }> {
   // 1. Check if Resend API Key is set
   const resendApiKey = process.env.RESEND_API_KEY;
   if (resendApiKey) {
@@ -67,14 +71,14 @@ export async function sendOtpEmail(toEmail: string, otpCode: string, name?: stri
         },
         body: JSON.stringify({
           from: process.env.EMAIL_FROM || 'HighScholar <onboarding@resend.dev>',
-          to: [toEmail],
-          subject: `${otpCode} is your HighScholar verification code`,
-          html: htmlContent,
+          to: [to],
+          subject,
+          html,
         }),
       });
 
       if (response.ok) {
-        console.log(`[Email] OTP sent successfully via Resend to ${toEmail}`);
+        console.log(`[Email] Sent "${subject}" via Resend to ${to}`);
         return { success: true };
       }
       const errData = await response.json();
@@ -118,12 +122,12 @@ export async function sendOtpEmail(toEmail: string, otpCode: string, name?: stri
 
       await transporter.sendMail({
         from: process.env.SMTP_FROM || `"HighScholar" <${smtpUser.trim()}>`,
-        to: toEmail,
-        subject: `${otpCode} is your HighScholar verification code`,
-        html: htmlContent,
+        to,
+        subject,
+        html,
       });
 
-      console.log(`[Email] OTP sent successfully via SMTP to ${toEmail}`);
+      console.log(`[Email] Sent "${subject}" via SMTP to ${to}`);
       return { success: true };
     } catch (smtpError: any) {
       console.error('[Email] SMTP send failure:', smtpError);
@@ -138,7 +142,7 @@ export async function sendOtpEmail(toEmail: string, otpCode: string, name?: stri
   }
 
   // If no SMTP or Resend credentials are provided in env:
-  console.warn(`[HighScholar Email Notice] No SMTP or Resend credentials configured in .env.local / Vercel Environment Variables. Code for ${toEmail} is ${otpCode}`);
+  console.warn(`[HighScholar Email Notice] No SMTP or Resend credentials configured in .env.local / Vercel Environment Variables. Undelivered email to ${to}: ${subject}`);
   return { 
     success: false, 
     error: 'Email service credentials (SMTP_USER/SMTP_PASSWORD or RESEND_API_KEY) are not configured yet.' 

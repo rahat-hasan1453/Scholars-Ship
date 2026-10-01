@@ -32,14 +32,26 @@ enum DecisionResult {
 }
 
 model User {
-  id        String       @id @default(uuid())
-  email     String       @unique
-  name      String
-  avatar    String?
-  googleId  String?      @unique
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  profile   UserProfile?
+  id                  String       @id @default(uuid())
+  email               String       @unique
+  name                String
+  avatar              String?
+  googleId            String?      @unique
+  onboardingCompleted Boolean      @default(false)
+  profileData         Json?
+  emailVerifiedAt     DateTime?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  profile             UserProfile?
+}
+
+// One pending email sign-in code per address; only the SHA-256 hash is stored.
+model LoginCode {
+  email     String   @id
+  codeHash  String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
 }
 
 model UserProfile {
@@ -77,25 +89,25 @@ model Scholarship {
 }
 
 model Professor {
-  id              String       @id @default(uuid())
-  name            String
-  title           String
-  university      String
-  department      String
-  country         String
-  labName         String?
-  researchTags    String[]
-  openPositions   Boolean      @default(true)
-  recentGrants    String?
-  email           String?
-  linkedInUrl     String?
-  googleScholar   String?
-  labWebsite      String?
-  avatarUrl       String?
-  acceptingTerms  String[]
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-  followers       ProfFollow[]
+  id             String       @id @default(uuid())
+  name           String
+  title          String
+  university     String
+  department     String
+  country        String
+  labName        String?
+  researchTags   String[]
+  openPositions  Boolean      @default(true)
+  recentGrants   String?
+  email          String?
+  linkedInUrl    String?
+  googleScholar  String?
+  labWebsite     String?
+  avatarUrl      String?
+  acceptingTerms String[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  followers      ProfFollow[]
 }
 
 model ProfFollow {
