@@ -46,3 +46,6 @@ scripts/
 
 # Claude Code local files
 .claude/
+
+# graphify knowledge graph output
+graphify-out/
