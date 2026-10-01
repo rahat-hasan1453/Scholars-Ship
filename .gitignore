@@ -43,3 +43,6 @@ next-env.d.ts
 
 # local scripts
 scripts/
+
+# graphify knowledge graph output
+graphify-out/
