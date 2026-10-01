@@ -4,41 +4,23 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
 import { Button } from '@/components/base/buttons/button';
-import { SocialButton } from '@/components/base/buttons/social-button';
 import { Checkbox } from '@/components/base/checkbox/checkbox';
 import { HintText } from '@/components/base/input/hint-text';
 import { Input } from '@/components/base/input/input';
 import { PinInput } from '@/components/base/input/pin-input';
+import {
+  AuthFooterLink,
+  AuthHeading,
+  AuthLayout,
+  GoogleButton,
+  authCheckboxBoxClass,
+  authInputProps,
+  authPasswordInputClassName,
+  authPrimaryButtonClass,
+} from '@/components/auth/auth-layout';
 
 // Figma: zLYU2tCsLDvZNnUXk7Cpgw — Signup (167:2884) & OTP Verification (179:5183)
 // Components: Untitled UI. Colors & fonts: Figma tokens (see src/app/globals.css).
-
-/* Scholars'ship wordmark (Title Area 167:2890) */
-function BrandLogo() {
-  return (
-    <div className="flex items-center gap-2" aria-label="Scholars'ship">
-      <div className="relative h-[35.635px] w-[45.68px] shrink-0">
-        <img src="/signup/logo-mark-back.svg" alt="" className="absolute left-0 top-[1.69px] h-[34.313px] w-[17.77px]" />
-        <img src="/signup/logo-mark-front.svg" alt="" className="absolute left-[16.58px] top-0 h-[35.635px] w-[29.1px]" />
-      </div>
-      <div className="relative h-[47.963px] w-[186.329px] shrink-0">
-        <img src="/signup/logo-scholars.svg" alt="" className="absolute left-0 top-[9.82px] h-[23.576px] w-[125.897px]" />
-        <img src="/signup/logo-ship.svg" alt="" className="absolute left-[127.44px] top-0 h-[47.963px] w-[58.889px]" />
-      </div>
-    </div>
-  );
-}
-
-/* Input field 179:3609 — 44px, radius 8, Figma placeholder Text/Secondary */
-const inputProps = {
-  size: 'lg' as const,
-  wrapperClassName: 'shadow-[0_1px_1px_rgba(0,0,0,0.05)]',
-  inputClassName: 'placeholder:text-secondary',
-};
-
-/* Buttons/Button 179:4933 — 36px, Brand/Primary fill, Brand/600 border */
-const primaryButtonClass =
-  'w-full font-[Inter,ui-sans-serif,system-ui,sans-serif] leading-[20px] shadow-[0_1px_2px_rgba(0,0,0,0.05)]! ring-brand-600 before:hidden';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -254,233 +236,173 @@ export default function SignupPage() {
 
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col bg-surface-bg tracking-normal lg:flex-row">
-      {/* Image Container (167:2953) — 810 × 883 at 1728 × 883 */}
-      <div className="relative h-[240px] w-full shrink-0 select-none overflow-hidden sm:h-[320px] lg:sticky lg:top-0 lg:h-screen lg:w-[46.875%]">
-        <img
-          src="/login-figma-banner.jpg"
-          alt="Graduate celebrating with a purple cap"
-          className="h-full w-full object-cover object-center"
-        />
-      </div>
-
-      {/* Right canvas — card centred at x = 1280 of 1728 */}
-      <div className="flex flex-1 items-center justify-center px-4 py-8 lg:pl-[22px] lg:pr-0 lg:py-10">
-        <div className="w-full max-w-[472px] overflow-hidden">
-          {/* login form (167:2888) */}
-          <div className="flex w-full flex-col gap-[10px] rounded-t-[24px] bg-surface-white px-[24px] py-[36px]">
-            <BrandLogo />
-
-            {step === 'form' ? (
-              <div className="flex w-full flex-col gap-[28px]">
-                <div className="flex flex-col gap-[4px]">
-                  <h1 className="text-[24px] font-[510] leading-[32px] text-primary">Create an account</h1>
-                  <p className="text-[14px] leading-[18px] text-secondary">
-                    Join HighScholar to start your scholarship radar
-                  </p>
-                  {error && (
-                    <HintText isInvalid role="alert" className="mt-[8px] text-[12px] leading-[16px]">
-                      {error}
-                    </HintText>
-                  )}
-                </div>
-
-                <form onSubmit={handleInitiateSignup} className="flex w-full flex-col gap-[24px]">
-                  <div className="flex w-full flex-col gap-[16px]">
-                    <Input
-                      {...inputProps}
-                      id="email"
-                      type="email"
-                      autoComplete="email"
-                      aria-label="Email"
-                      placeholder="Enter Email"
-                      isRequired
-                      value={email}
-                      onChange={setEmail}
-                    />
-                    <Input
-                      {...inputProps}
-                      inputClassName={`${inputProps.inputClassName} pr-9.5`}
-                      id="password"
-                      type="password"
-                      autoComplete="new-password"
-                      aria-label="Password"
-                      placeholder="Enter Password"
-                      isRequired
-                      value={password}
-                      onChange={setPassword}
-                    />
-                    <Input
-                      {...inputProps}
-                      inputClassName={`${inputProps.inputClassName} pr-9.5`}
-                      id="confirmPassword"
-                      type="password"
-                      autoComplete="new-password"
-                      aria-label="Confirm Password"
-                      placeholder="Confirm Password"
-                      isRequired
-                      value={confirmPassword}
-                      onChange={setConfirmPassword}
-                    />
-
-                    {/* Terms checkbox (168:3066) — Brand/Primary purple #7150E7 */}
-                    <Checkbox
-                      id="terms"
-                      isSelected={agreeTerms}
-                      onChange={setAgreeTerms}
-                      className="items-center [&_p]:leading-[16px]"
-                      boxClassName={`mt-[2px] rounded-[2px] ${agreeTerms ? 'bg-brand-solid ring-brand-primary' : 'ring-[#767676]'}`}
-                      label={
-                        <span className="text-[12px] font-normal italic leading-[16px] text-text-body">
-                          I agree to HighScholar&apos;s <span className="text-brand-primary">Terms of Service</span> and{' '}
-                          <span className="text-brand-primary">Privacy Policy</span>.
-                        </span>
-                      }
-                    />
-                  </div>
-
-                  <Button
-                    type="submit"
-                    size="sm"
-                    isLoading={isLoading}
-                    showTextWhileLoading
-                    isDisabled={isGoogleLoading}
-                    className={primaryButtonClass}
-                  >
-                    {isLoading ? 'Sending code...' : 'Create Account'}
-                  </Button>
-                </form>
-              </div>
-            ) : (
-              <div className="flex w-full flex-col gap-[28px]">
-                <div className="flex flex-col gap-[4px]">
-                  <h1 className="text-[24px] font-[510] leading-[32px] text-primary">Verify your account</h1>
-                  <p className="text-[14px] leading-[18px] text-secondary">
-                    Join HighScholar to start your scholarship radar
-                  </p>
-                  {error ? (
-                    <HintText isInvalid role="alert" className="mt-[8px] text-[12px] leading-[16px]">
-                      {error}
-                    </HintText>
-                  ) : (
-                    successMsg && (
-                      <HintText className="mt-[8px] text-[12px] leading-[16px] text-success-main">{successMsg}</HintText>
-                    )
-                  )}
-                </div>
-
-                <form onSubmit={handleVerifyOtp} className="flex w-full flex-col gap-[24px]">
-                  {/* Verification code input field (179:5586) */}
-                  <PinInput size="sm">
-                    <PinInput.Group
-                      ref={(el: HTMLInputElement | null) => {
-                        otpInputRefs.current[0] = el;
-                      }}
-                      maxLength={5}
-                      value={otpDigits.join('')}
-                      onChange={handleOtpValueChange}
-                      inputMode="numeric"
-                      pattern="^[0-9]*$"
-                      autoComplete="one-time-code"
-                      autoFocus
-                      containerClassName="h-auto gap-[8px]"
-                    >
-                      {otpDigits.map((digit, idx) => (
-                        <PinInput.Slot
-                          key={idx}
-                          index={idx}
-                          className={`size-[56px] rounded-[8px] p-[8px] text-[32px] font-[590] leading-[40px] shadow-none sm:size-[64px] ${digit ? 'text-primary' : 'text-placeholder'}`}
-                        />
-                      ))}
-                    </PinInput.Group>
-                  </PinInput>
-
-                  <div className="flex flex-col gap-[12px]">
-                    <Button
-                      type="submit"
-                      size="sm"
-                      isLoading={isVerifying}
-                      showTextWhileLoading
-                      isDisabled={otpDigits.join('').length < 5}
-                      className={primaryButtonClass}
-                    >
-                      {isVerifying ? 'Verifying...' : 'Create Account'}
-                    </Button>
-
-                    <div className="flex items-center justify-between">
-                      <Button
-                        color="link-gray"
-                        size="xs"
-                        className="text-[12px] font-normal leading-[16px] text-secondary"
-                        onPress={() => {
-                          setStep('form');
-                          setError('');
-                        }}
-                      >
-                        ← Change details
-                      </Button>
-                      <Button
-                        color="link-color"
-                        size="xs"
-                        className="text-[12px] font-normal leading-[16px]"
-                        onPress={handleResendCode}
-                        isDisabled={resendCooldown > 0 || isLoading}
-                      >
-                        {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
-                      </Button>
-                    </div>
-                  </div>
-                </form>
-              </div>
+    <AuthLayout
+      footer={
+        <>
+          <GoogleButton
+            caption="Or sign in with email"
+            onPress={handleGoogleAuth}
+            isDisabled={isGoogleLoading || isLoading}
+            isLoading={isGoogleLoading}
+          />
+          <AuthFooterLink prompt="Already have an account?" href="/login" label="Log in Now!" />
+        </>
+      }
+    >
+      {step === 'form' ? (
+        <div className="flex w-full flex-col gap-[28px]">
+          <AuthHeading title="Create an account" subtitle="Join HighScholar to start your scholarship radar">
+            {error && (
+              <HintText isInvalid role="alert" className="mt-[8px] text-[12px] leading-[16px]">
+                {error}
+              </HintText>
             )}
-          </div>
+          </AuthHeading>
 
-          {/* Footer (179:5135) */}
-          <div className="w-full rounded-b-[24px] border-t border-dashed border-stroke-default bg-surface-white py-[12px]">
-            <div className="relative flex w-full flex-col items-center gap-[8px]">
-              <SocialButton
-                social="google"
-                theme="color"
-                size="lg"
-                onPress={handleGoogleAuth}
-                isDisabled={isGoogleLoading || isLoading}
-                className="gap-[12px] rounded-full py-[9px] pl-[8px] pr-[15px] font-normal shadow-none before:hidden hover:bg-brand-soft [&>svg]:size-[31px] [&>svg]:p-[4px]"
-              >
-                <span className="flex flex-col items-start gap-[2px]">
-                  <span className="text-[10px] italic leading-[16px] text-text-caption">Or sign in with email</span>
-                  <span className="text-[14px] leading-[18px] text-secondary">
-                    {isGoogleLoading ? 'Connecting...' : 'Continue with Google'}
+          <form onSubmit={handleInitiateSignup} className="flex w-full flex-col gap-[24px]">
+            <div className="flex w-full flex-col gap-[16px]">
+              <Input
+                {...authInputProps}
+                id="email"
+                type="email"
+                autoComplete="email"
+                aria-label="Email"
+                placeholder="Enter Email"
+                isRequired
+                value={email}
+                onChange={setEmail}
+              />
+              <Input
+                {...authInputProps}
+                inputClassName={authPasswordInputClassName}
+                id="password"
+                type="password"
+                autoComplete="new-password"
+                aria-label="Password"
+                placeholder="Enter Password"
+                isRequired
+                value={password}
+                onChange={setPassword}
+              />
+              <Input
+                {...authInputProps}
+                inputClassName={authPasswordInputClassName}
+                id="confirmPassword"
+                type="password"
+                autoComplete="new-password"
+                aria-label="Confirm Password"
+                placeholder="Confirm Password"
+                isRequired
+                value={confirmPassword}
+                onChange={setConfirmPassword}
+              />
+
+              {/* Terms checkbox (168:3066) — Brand/Primary purple #7150E7 */}
+              <Checkbox
+                id="terms"
+                isSelected={agreeTerms}
+                onChange={setAgreeTerms}
+                className="items-center [&_p]:leading-[16px]"
+                boxClassName={authCheckboxBoxClass(agreeTerms)}
+                label={
+                  <span className="text-[12px] font-normal italic leading-[16px] text-text-body">
+                    I agree to HighScholar&apos;s <span className="text-brand-primary">Terms of Service</span> and{' '}
+                    <span className="text-brand-primary">Privacy Policy</span>.
                   </span>
-                </span>
-              </SocialButton>
+                }
+              />
+            </div>
 
-              <div className="flex items-center">
-                <span className="flex w-[158px] justify-center whitespace-nowrap text-[12px] italic leading-[18px] text-secondary">
-                  Already have an account?&nbsp;
-                </span>
+            <Button
+              type="submit"
+              size="sm"
+              isLoading={isLoading}
+              showTextWhileLoading
+              isDisabled={isGoogleLoading}
+              className={authPrimaryButtonClass}
+            >
+              {isLoading ? 'Sending code...' : 'Create Account'}
+            </Button>
+          </form>
+        </div>
+      ) : (
+        <div className="flex w-full flex-col gap-[28px]">
+          <AuthHeading title="Verify your account" subtitle="Join HighScholar to start your scholarship radar">
+            {error ? (
+              <HintText isInvalid role="alert" className="mt-[8px] text-[12px] leading-[16px]">
+                {error}
+              </HintText>
+            ) : (
+              successMsg && (
+                <HintText className="mt-[8px] text-[12px] leading-[16px] text-success-main">{successMsg}</HintText>
+              )
+            )}
+          </AuthHeading>
+
+          <form onSubmit={handleVerifyOtp} className="flex w-full flex-col gap-[24px]">
+            {/* Verification code input field (179:5586) */}
+            <PinInput size="sm">
+              <PinInput.Group
+                ref={(el: HTMLInputElement | null) => {
+                  otpInputRefs.current[0] = el;
+                }}
+                maxLength={5}
+                value={otpDigits.join('')}
+                onChange={handleOtpValueChange}
+                inputMode="numeric"
+                pattern="^[0-9]*$"
+                autoComplete="one-time-code"
+                autoFocus
+                containerClassName="h-auto gap-[8px]"
+              >
+                {otpDigits.map((digit, idx) => (
+                  <PinInput.Slot
+                    key={idx}
+                    index={idx}
+                    className={`size-[56px] rounded-[8px] p-[8px] text-[32px] font-[590] leading-[40px] shadow-none sm:size-[64px] ${digit ? 'text-primary' : 'text-placeholder'}`}
+                  />
+                ))}
+              </PinInput.Group>
+            </PinInput>
+
+            <div className="flex flex-col gap-[12px]">
+              <Button
+                type="submit"
+                size="sm"
+                isLoading={isVerifying}
+                showTextWhileLoading
+                isDisabled={otpDigits.join('').length < 5}
+                className={authPrimaryButtonClass}
+              >
+                {isVerifying ? 'Verifying...' : 'Create Account'}
+              </Button>
+
+              <div className="flex items-center justify-between">
                 <Button
-                  href="/login"
                   color="link-gray"
-                  size="sm"
-                  className="text-[14px] font-[508] italic leading-[20px] text-primary hover:text-brand-primary"
+                  size="xs"
+                  className="text-[12px] font-normal leading-[16px] text-secondary"
+                  onPress={() => {
+                    setStep('form');
+                    setError('');
+                  }}
                 >
-                  Log in Now!
+                  ← Change details
+                </Button>
+                <Button
+                  color="link-color"
+                  size="xs"
+                  className="text-[12px] font-normal leading-[16px]"
+                  onPress={handleResendCode}
+                  isDisabled={resendCooldown > 0 || isLoading}
+                >
+                  {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
                 </Button>
               </div>
-
-              {/* Corner decoration (179:5172) */}
-              <div aria-hidden="true" className="pointer-events-none absolute left-full top-0 h-0 w-0">
-                <div className="absolute left-[-37.1px] top-[68.4px] flex h-[39.6px] w-[33.5px] items-center justify-center">
-                  <img src="/signup/deco-back.svg" alt="" className="h-[35.1954px] w-[18.2291px] max-w-none rotate-[-30.16deg]" />
-                </div>
-                <div className="absolute left-[-23.3px] top-[52.5px] flex h-[46.6px] w-[44.2px] items-center justify-center">
-                  <img src="/signup/deco-front.svg" alt="" className="h-[36.5512px] w-[29.8519px] max-w-none rotate-[-30.16deg]" />
-                </div>
-              </div>
             </div>
-          </div>
+          </form>
         </div>
-      </div>
-    </div>
+      )}
+    </AuthLayout>
   );
 }

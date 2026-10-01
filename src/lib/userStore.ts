@@ -1,3 +1,4 @@
+import { randomBytes } from 'crypto';
 import { AuthSessionUser } from './auth';
 
 export interface StoredUser {
@@ -22,6 +23,7 @@ export interface StoredOtp {
 const globalStore = globalThis as unknown as {
   __highscholar_users?: Map<string, StoredUser>;
   __highscholar_otps?: Map<string, StoredOtp>;
+  __highscholar_reset_tokens?: Map<string, { email: string; expiresAt: number }>;
 };
 
 if (!globalStore.__highscholar_users) {
@@ -42,8 +44,13 @@ if (!globalStore.__highscholar_otps) {
   globalStore.__highscholar_otps = new Map();
 }
 
+if (!globalStore.__highscholar_reset_tokens) {
+  globalStore.__highscholar_reset_tokens = new Map();
+}
+
 const usersMap = globalStore.__highscholar_users;
 const otpsMap = globalStore.__highscholar_otps;
+const resetTokensMap = globalStore.__highscholar_reset_tokens;
 
 export function getUserByEmail(email: string): StoredUser | null {
   const normalized = email.trim().toLowerCase();
@@ -91,6 +98,19 @@ export function verifyOtp(email: string, inputCode: string): { valid: boolean; r
   // OTP is valid - consume it
   otpsMap.delete(normalized);
   return { valid: true };
+}
+
+export function createResetToken(email: string, ttlSeconds = 1800): string {
+  const token = randomBytes(32).toString('hex');
+  resetTokensMap.set(token, { email: email.trim().toLowerCase(), expiresAt: Date.now() + ttlSeconds * 1000 });
+  return token;
+}
+
+export function consumeResetToken(token: string): string | null {
+  const record = resetTokensMap.get(token);
+  if (!record) return null;
+  resetTokensMap.delete(token);
+  return Date.now() > record.expiresAt ? null : record.email;
 }
 
 export function toSessionUser(user: StoredUser): AuthSessionUser {
