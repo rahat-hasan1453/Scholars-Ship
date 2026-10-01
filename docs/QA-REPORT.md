@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| **কোড / Code under test** | `main` @ `dbc599c` (PR #1 passwordless auth, #2 onboarding, #3 lucide icons, #4 docs) merged into the QA branch |
+| **কোড / Code under test** | `main` @ `5730706` (PR #1 passwordless auth, #2 onboarding, #3 lucide icons, #4 docs, #5 auth rate limits, #9 Terms consent) merged into the QA branch |
 | **QA branch** | `claude/optimistic-blackburn-1aeb1b` (main + tests) |
-| **তারিখ / Date** | 2026-10-01 (run #1), 2026-10-02 (runs #2, #3) |
-| **রান / Run** | #3 (2026-10-02): E2E + axe accessibility in Chromium, Firefox, WebKit (desktop 1728) and Chromium mobile (375). #2: same checks re-run after merging `main`. `src/lib`, `src/app/api` and `prisma` are identical to run #1, so every auth/API finding still applies. E2E, visual, accessibility, performance: next runs |
+| **তারিখ / Date** | 2026-10-01 (run #1), 2026-10-02 (runs #2–#4) |
+| **রান / Run** | #4: re-tested after PR #5 and #9. BUG-02, BUG-03 and BUG-16 are **fixed**; their tests are now normal tests, plus new rate-limit tests. #3 (2026-10-02): E2E + axe accessibility in Chromium, Firefox, WebKit (desktop 1728) and Chromium mobile (375). #2: same checks re-run after merging `main`. `src/lib`, `src/app/api` and `prisma` are identical to run #1, so every auth/API finding still applies. E2E, visual, accessibility, performance: next runs |
 
 ## সারসংক্ষেপ / Summary
 
@@ -15,9 +15,9 @@
 | Lint (`npm run lint`) | – | ❌ 62 errors, 165 warnings (run #1: 63 / 177) | – | – |
 | Build (`npm run build`) | ✅ in a path without `'` (all routes incl. `/onboarding`) | ❌ in the project folder (BUG-01) | – | – |
 | `npm audit` | ✅ prod: 0 | – | dev: 3 high (deepmerge-ts via prisma) | – |
-| Unit (Vitest), `tests/unit` | 33 | 0 | 6 | `AppContext` not yet covered |
-| API (Vitest), `tests/api` | 39 | 0 | 5 | `research/chat`, `professors` GET/POST not yet covered |
-| E2E (Playwright), `tests/e2e`: 4 projects | 66 | 0 | 11 (BUG-16, 17, 18) | 3 (Firefox: clock-based resend test, hydration check; mobile: logout) |
+| Unit (Vitest), `tests/unit` | 38 | 0 | 5 | `AppContext` not yet covered |
+| API (Vitest), `tests/api` | 43 | 0 | 4 | `research/chat`, `professors` GET/POST not yet covered |
+| E2E (Playwright), `tests/e2e`: 4 projects | 70 | 0 | 7 (BUG-17, 18) | 3 (Firefox: clock-based resend test, hydration check; mobile: logout) |
 | Accessibility (axe, WCAG 2.1 AA) in E2E | 1 (Firefox home) | – | 11 (BUG-19) | – |
 | Visual (Figma) / Lighthouse | – | – | – | Not run yet |
 
@@ -50,9 +50,9 @@ Each known bug has a test that is expected to fail while the bug exists, so `npm
 
 | ID | Severity | Title | Fix owner |
 |---|---|---|---|
-| BUG-02 | **High** | Login code brute force across re-issued codes | Signup |
+| BUG-02 | ~~High~~ ✅ **Fixed (PR #5)** | Login code brute force across re-issued codes | Signup |
 | BUG-01 | Medium | Local `npm run build` fails because of `'` in folder path | GenOps |
-| BUG-03 | Medium | No per-IP rate limit on send-code (email bombing) | Signup |
+| BUG-03 | ~~Medium~~ ✅ **Fixed (PR #5)** | No per-IP rate limit on send-code (email bombing) | Signup |
 | BUG-04 | Medium | Search "USA" matches Australia/Austria/Russia | GenOps (Home) |
 | BUG-13 | Medium | Professor search invents data (open positions, PI title, random photo) | GenOps (Home) |
 | BUG-05 | Low | Degree/category keyword false positives ("systems" = Masters) | GenOps (Home) |
@@ -68,10 +68,11 @@ Each known bug has a test that is expected to fail while the bug exists, so `npm
 | BUG-17 | **Medium** | Onboarding save failure is ignored: user sent home, then bounced back, answers lost | Onboarding |
 | BUG-18 | Medium | `/?tab=...` deep link causes a React hydration error (whole page re-rendered) | GenOps (Home) |
 | BUG-19 | Medium | Accessibility: low-contrast grey text everywhere, unnamed controls (WCAG 2.1 AA) | GenOps + Design |
-| BUG-16 | Low | Terms checkbox can be unticked and sign-in still continues | Signup |
+| BUG-16 | ~~Low~~ ✅ **Fixed (PR #9)** | Terms checkbox can be unticked and sign-in still continues | Signup |
 | BUG-20 | Low | Route protection is client-side only (home renders, then redirects) | Signup / GenOps |
 
-### BUG-02 · High · Login code brute force / লগইন কোড অনুমান করে ঢোকা
+### BUG-02 · ✅ Fixed in PR #5 (was High) · Login code brute force / লগইন কোড অনুমান করে ঢোকা
+- **Verified (run #4):** 10 wrong guesses per email per hour across all codes, then `locked` (even for the right code); unlocks after the hour; a successful sign-in resets the counter; at most 5 codes per email per hour. Tests: `tests/unit/loginCodes.test.ts`, `tests/api/auth-routes.test.ts` ("429 locked after 10 wrong guesses"). Remaining risk is about 10 guesses/hour ≈ 240/day ≈ 0.24%/day per account; a 6-digit code would cut it 10×.
 - **File:** `src/lib/loginCodes.ts:21-22` (5-digit code; every new code resets `attempts: 0`)
 - **বাংলা:** প্রতিটা code-এ ৫ বার ভুল করার সীমা আছে। কিন্তু ৬০ সেকেন্ড পরপর নতুন code চাইলে সেই সীমা আবার শূন্য থেকে শুরু হয়। ফলে কেউ অন্যের email দিয়ে দিনে প্রায় ৭,২০০ বার অনুমান করতে পারে। মোট সম্ভাব্য code ১,০০,০০০টা, তাই প্রতিদিন প্রায় ৭% সম্ভাবনা যে সে অন্যের account-এ ঢুকে যাবে।
 - **English:** The 5-attempt limit is per code, and a new code every 60s resets it. An attacker can make about 7,200 guesses a day against one email in a 100,000-code space, which is roughly a 7% chance per day of taking over that account.
@@ -84,7 +85,8 @@ Each known bug has a test that is expected to fail while the bug exists, so `npm
 - **English:** The folder name contains an apostrophe. Next.js puts the file path inside a `'...'` string, which breaks the webpack `favicon.ico` metadata loader. The same code builds fine (20 routes) in a path without `'`. Vercel should be unaffected.
 - **Fix:** Rename the folder, e.g. `Scholars-Ship`, or report it upstream to Next.js.
 
-### BUG-03 · Medium · No per-IP rate limit on send-code
+### BUG-03 · ✅ Fixed in PR #5 (was Medium) · No per-IP rate limit on send-code
+- **Verified (run #4):** 10 sends per IP per hour (11th → 429 with `Retry-After` and `rateLimited: true`), and other IPs are not affected; verify is limited to 30 per IP per hour. Note: the IP comes from `x-forwarded-for`, which is trustworthy on Vercel but spoofable if the app is ever hosted behind another proxy.
 - **File:** `src/app/api/auth/email/send-code/route.ts:16`. The cooldown is per email only.
 - **বাংলা:** একজন একই কম্পিউটার থেকে হাজার হাজার আলাদা email-এ code পাঠাতে পারে। এতে মানুষ spam পায়, SMTP বা Resend-এর quota শেষ হয়, আর sender-এর reputation নষ্ট হয়।
 - **English:** One client can trigger codes to unlimited different addresses. That spams people, burns the SMTP/Resend quota and hurts sender reputation.
@@ -159,7 +161,8 @@ Each known bug has a test that is expected to fail while the bug exists, so `npm
 - **English:** The grey secondary text token fails contrast. It comes from Figma, so Design must darken it (e.g. #637381 ≈ 4.6:1). Add `aria-label` to the icon button and the progressbar, and `role="img"` (or remove `aria-label`) on the logo div.
 - **Repro:** `tests/e2e/a11y.spec.ts` (full JSON attached in the Playwright HTML report).
 
-### BUG-16 · Low · Terms checkbox not enforced
+### BUG-16 · ✅ Fixed in PR #9 (was Low) · Terms checkbox not enforced
+- **Verified (run #4, all 4 browser projects):** Terms start unticked; "Continue with email" and Google stay disabled and Enter sends nothing until ticked.
 - **File:** `src/app/login/page.tsx:38` (`agreeTerms` is set but never checked before `sendCode`). Untick Terms, then Continue: the code is still sent. Test: `tests/e2e/auth.spec.ts` → "cannot continue without accepting the Terms".
 
 ### BUG-20 · Low · Client-only route protection

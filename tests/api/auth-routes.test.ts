@@ -69,11 +69,23 @@ describe('POST /api/auth/email/send-code', () => {
     expect(res.status).toBe(500);
     expect(JSON.stringify(await res.json())).not.toContain('secret detail');
   });
-  // BUG-03: no per-IP/global limit: one client can trigger emails to unlimited different addresses.
-  it.fails('rate-limits one client sending codes to many addresses', async () => {
+  // BUG-03 (fixed in PR #5): 10 sends per IP per hour.
+  it('rate-limits one client sending codes to many addresses (10/hour per IP)', async () => {
     const statuses = [];
-    for (let i = 0; i < 30; i++) statuses.push((await sendCode(post('/api/auth/email/send-code', { email: `victim${i}@example.test` }))).status);
-    expect(statuses).toContain(429);
+    for (let i = 0; i < 12; i++) statuses.push((await sendCode(post('/api/auth/email/send-code', { email: `victim${i}@example.test` }))).status);
+    expect(statuses.slice(0, 10).every((x) => x === 200)).toBe(true);
+    expect(statuses.slice(10)).toEqual([429, 429]);
+    expect(h.sendOtpEmail).toHaveBeenCalledTimes(10);
+  });
+  it('per-IP limit is keyed on x-forwarded-for: another IP is not blocked', async () => {
+    const from = (ip: string, email: string) =>
+      new Request('http://localhost:3000/api/auth/email/send-code', { method: 'POST', headers: { 'content-type': 'application/json', 'x-forwarded-for': ip }, body: JSON.stringify({ email }) });
+    for (let i = 0; i < 10; i++) await sendCode(from('203.0.113.1', `a${i}@example.test`));
+    const blocked = await sendCode(from('203.0.113.1', 'b@example.test'));
+    expect(blocked.status).toBe(429);
+    expect(blocked.headers.get('retry-after')).toMatch(/^\d+$/);
+    expect(await blocked.json()).toMatchObject({ rateLimited: true });
+    expect((await sendCode(from('198.51.100.7', 'c@example.test'))).status).toBe(200);
   });
 });
 
@@ -102,6 +114,23 @@ describe('POST /api/auth/email/verify-code', () => {
     expect(cookie.options).toMatchObject({ httpOnly: true, sameSite: 'lax', path: '/' });
     expect(sessionUser()).toMatchObject({ email: EMAIL });
     expect(h.db._users.get(EMAIL).emailVerifiedAt).toBeInstanceOf(Date);
+  });
+  it('429 "locked" after 10 wrong guesses for one email across codes', async () => {
+    await sendCode(post('/api/auth/email/send-code', { email: EMAIL }));
+    const code = h.sendOtpEmail.mock.calls[0][1];
+    const wrong = code === '00000' ? '00001' : '00000';
+    for (let i = 0; i < 10; i++) await verifyCode(post('/api/auth/email/verify-code', { email: EMAIL, code: wrong }));
+    // the first code is used up after 5; a lock on the email must hold for the right code too
+    h.db._loginCodes.get(EMAIL).attempts = 0;
+    const res = await verifyCode(post('/api/auth/email/verify-code', { email: EMAIL, code }));
+    expect(res.status).toBe(429);
+    expect(await res.json()).toMatchObject({ reason: 'locked' });
+    expect(h.jar.store.has(SESSION_COOKIE_NAME)).toBe(false);
+  });
+  it('429 after 30 verify attempts from one IP (any emails)', async () => {
+    let last;
+    for (let i = 0; i < 31; i++) last = await verifyCode(post('/api/auth/email/verify-code', { email: `x${i}@example.test`, code: '12345' }));
+    expect(last!.status).toBe(429);
   });
   it('a code issued for one email cannot sign in another email', async () => {
     await sendCode(post('/api/auth/email/send-code', { email: EMAIL }));

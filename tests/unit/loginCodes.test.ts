@@ -70,12 +70,13 @@ describe('login codes', () => {
     const r = await issueLoginCode(EMAIL);
     if (!r.ok) throw new Error('not issued');
     const wrong = r.code === '00000' ? '00001' : '00000';
-    await Promise.all(Array.from({ length: 20 }, () => verifyLoginCode(EMAIL, wrong)));
-    expect(db.current._loginCodes.get(EMAIL).attempts).toBe(5);
+    const results = await Promise.all(Array.from({ length: 20 }, () => verifyLoginCode(EMAIL, wrong)));
+    // Never more than 5 compared; since PR #5 the per-email hourly limit may refuse even more ('locked'), which is fail-safe.
+    expect(db.current._loginCodes.get(EMAIL).attempts).toBeLessThanOrEqual(5);
+    expect(results.some((x) => x.ok)).toBe(false);
   });
-  // BUG-02: a fresh code (every 60s) resets attempts to 0, so guessing is limited only by the cooldown:
-  // 5 guesses/min ≈ 7,200/day against a 100,000-code space (~7% chance per day per account).
-  it.fails('limits total wrong guesses per email across re-issued codes', async () => {
+  // BUG-02 (fixed in PR #5): a fresh code used to reset the guess budget; now 10 guesses/hour per email across all codes.
+  it('limits total wrong guesses per email across re-issued codes', async () => {
     let total = 0;
     for (let round = 0; round < 3; round++) {
       const r = await issueLoginCode(EMAIL);
@@ -86,5 +87,47 @@ describe('login codes', () => {
       vi.advanceTimersByTime(61_000);
     }
     expect(total).toBeLessThanOrEqual(10);
+  });
+
+  it('locks the email after 10 wrong guesses in an hour, even with a fresh code', async () => {
+    const wrongFor = (code: string) => (code === '00000' ? '00001' : '00000');
+    let r = await issueLoginCode(EMAIL);
+    if (!r.ok) throw new Error('not issued');
+    for (let i = 0; i < 5; i++) await verifyLoginCode(EMAIL, wrongFor(r.code));
+    vi.advanceTimersByTime(61_000);
+    r = await issueLoginCode(EMAIL);
+    if (!r.ok) throw new Error('not issued');
+    for (let i = 0; i < 5; i++) await verifyLoginCode(EMAIL, wrongFor(r.code));
+    vi.advanceTimersByTime(61_000);
+    r = await issueLoginCode(EMAIL);
+    if (!r.ok) throw new Error('not issued');
+    const locked = await verifyLoginCode(EMAIL, r.code); // even the right code is refused while locked
+    expect(locked).toMatchObject({ ok: false, reason: 'locked' });
+    expect((locked as any).retryAfterSeconds).toBeGreaterThan(0);
+  });
+  it('unlocks after the hour window passes', async () => {
+    let r = await issueLoginCode(EMAIL);
+    if (!r.ok) throw new Error('not issued');
+    for (let i = 0; i < 10; i++) await verifyLoginCode(EMAIL, '99999');
+    vi.advanceTimersByTime(3600 * 1000 + 1000);
+    r = await issueLoginCode(EMAIL);
+    if (!r.ok) throw new Error('not issued');
+    expect(await verifyLoginCode(EMAIL, r.code)).toEqual({ ok: true });
+  });
+  it('a successful sign-in resets the guess counter', async () => {
+    const r = await issueLoginCode(EMAIL);
+    if (!r.ok) throw new Error('not issued');
+    await verifyLoginCode(EMAIL, r.code === '00000' ? '00001' : '00000');
+    await verifyLoginCode(EMAIL, r.code);
+    expect(db.current._rateLimits.has(`verify:email:${EMAIL}`)).toBe(false);
+  });
+  it('sends at most 5 codes per email per hour', async () => {
+    const results = [];
+    for (let i = 0; i < 6; i++) {
+      results.push(await issueLoginCode(EMAIL));
+      vi.advanceTimersByTime(61_000);
+    }
+    expect(results.slice(0, 5).every((x) => x.ok)).toBe(true);
+    expect(results[5]).toMatchObject({ ok: false, rateLimited: true });
   });
 });
