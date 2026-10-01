@@ -162,7 +162,7 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({ opportunity })
             <h3 className="font-bold text-sm sm:text-base text-[#101828] leading-tight truncate group-hover:text-[#7050E6] transition-colors">
               {universityName}
             </h3>
-            <p className="text-xs text-[#919EAB] font-normal leading-tight mt-1 truncate">
+            <p className="text-xs text-text-secondary font-normal leading-tight mt-1 truncate">
               {departmentSubtitle}
             </p>
           </div>
@@ -199,7 +199,7 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({ opportunity })
             <span className="shrink-0 text-xs select-none">🎓</span>
             <div className="min-w-0">
               <span className="font-semibold text-[#475467]">Admission: </span>
-              <span className="text-[#919EAB] font-normal">{admissionText}</span>
+              <span className="text-text-secondary font-normal">{admissionText}</span>
             </div>
           </div>
 
@@ -208,7 +208,7 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({ opportunity })
             <span className="shrink-0 text-xs select-none">🏡</span>
             <div className="min-w-0">
               <span className="font-semibold text-[#475467]">Living: </span>
-              <span className="text-[#919EAB] font-normal">{livingText}</span>
+              <span className="text-text-secondary font-normal">{livingText}</span>
             </div>
           </div>
         </div>

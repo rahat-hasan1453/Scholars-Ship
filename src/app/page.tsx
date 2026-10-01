@@ -86,16 +86,8 @@ export default function HomePage() {
       .catch(() => {});
   }, [router]);
 
-  const [activeTab, setActiveTab] = useState<'scholarships' | 'opportunities' | 'professors' | 'research' | 'tracker' | 'profile'>(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const tabParam = params.get('tab') as any;
-      if (tabParam && ['opportunities', 'scholarships', 'professors', 'research', 'tracker', 'profile'].includes(tabParam)) {
-        return tabParam;
-      }
-    }
-    return 'opportunities';
-  });
+  // Start with the same tab on server and client; the effect below applies ?tab= after hydration (BUG-18).
+  const [activeTab, setActiveTab] = useState<'scholarships' | 'opportunities' | 'professors' | 'research' | 'tracker' | 'profile'>('opportunities');
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {

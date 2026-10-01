@@ -83,7 +83,7 @@ export const FacultyLabCard: React.FC<FacultyLabCardProps> = ({
             <Building2 className="w-3.5 h-3.5 text-[#98A2B3] shrink-0" />
             <span className="truncate">{professor.university}</span>
           </div>
-          <p className="text-[11px] italic text-[#919EAB] truncate pl-5">
+          <p className="text-[11px] italic text-text-secondary truncate pl-5">
             {professor.labName ? `${professor.labName}, ${professor.country}` : `${professor.department}, ${professor.country}`}
           </p>
         </div>
