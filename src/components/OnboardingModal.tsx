@@ -2,12 +2,15 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Check, ChevronLeft, ChevronRight, CircleHelp, Plus } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, CircleHelp } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { DegreeLevel } from '@/types';
 import { WORLD_COUNTRIES } from '@/data/countries';
 import { BrandLogo } from '@/components/auth/auth-layout';
 import { Button } from '@/components/shadcn/button';
+import { Checkbox } from '@/components/shadcn/checkbox';
+import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '@/components/shadcn/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/shadcn/popover';
 import { Input } from '@/components/shadcn/input';
 import { cn } from '@/lib/utils';
 
@@ -61,6 +64,8 @@ const FIGMA_COUNTRY_VALUES = [
 ];
 const MAIN_COUNTRIES = FIGMA_COUNTRY_VALUES.map((v) => WORLD_COUNTRIES.find((c) => c.value === v)!).filter(Boolean);
 const OTHER_COUNTRIES = WORLD_COUNTRIES.filter((c) => !FIGMA_COUNTRY_VALUES.includes(c.value));
+const countryOption = (value: string) =>
+  WORLD_COUNTRIES.find((c) => c.value === value) ?? { value, label: value, flag: '🌐' };
 
 const toggle = (list: string[], item: string) =>
   list.includes(item) ? list.filter((i) => i !== item) : [...list, item];
@@ -69,34 +74,15 @@ const toggle = (list: string[], item: string) =>
 function StepHeading({ title, subtitle, titleClass }: { title: string; subtitle: string; titleClass?: string }) {
   return (
     <div className="flex w-full flex-col gap-2 break-words">
-      <h1 className={cn('text-2xl font-[510] leading-8 text-black', titleClass)}>{title}</h1>
+      <h1 className={cn('text-2xl font-normal leading-8 text-black', titleClass)}>{title}</h1>
       <p className="text-base leading-5 text-text-secondary">{subtitle}</p>
     </div>
   );
 }
 
-/* Floating-label field 159:760 */
-function FloatingField({
-  label,
-  className,
-  ...props
-}: { label: string } & React.ComponentProps<typeof Input>) {
-  return (
-    <div className="relative w-full">
-      <Input
-        aria-label={label}
-        className={cn(
-          'mt-[7px] h-12 rounded-[8px] border-stroke-default bg-surface-white px-2 py-1 text-base leading-5 text-text-primary shadow-none placeholder:text-slate-400 focus-visible:ring-0 md:text-base',
-          className,
-        )}
-        {...props}
-      />
-      <span className="pointer-events-none absolute left-[3.32%] top-0 bg-surface-white px-1 text-[11px] italic leading-[16.5px] tracking-[-0.1275px] text-slate-400">
-        {label}
-      </span>
-    </div>
-  );
-}
+/* Input 203:557 — shadcn Input, 44px, radius-lg 10, Body/2 R */
+const fieldClass =
+  'h-11 rounded-[10px] bg-background px-2.5 py-1 text-sm leading-[18px] text-foreground shadow-none placeholder:text-muted-foreground md:text-sm';
 
 /* Chip 161:2664 */
 function SpecializationChip({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) {
@@ -118,6 +104,23 @@ function SpecializationChip({ label, selected, onClick }: { label: string; selec
   );
 }
 
+/* Card/cell that hosts a Checkbox (itself a <button>), so it can't be a <button> too */
+const pressableProps = (onClick: () => void) => ({
+  tabIndex: 0,
+  onClick,
+  onKeyDown: (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onClick();
+    }
+  },
+});
+
+/* Checkbox 203:573 — visual only; the whole card/cell is the control */
+function SelectCheckbox({ checked }: { checked: boolean }) {
+  return <Checkbox checked={checked} tabIndex={-1} aria-hidden="true" className="pointer-events-none shadow-none" />;
+}
+
 /* Country cell 161:1945 */
 function CountryCell({
   flag,
@@ -131,16 +134,16 @@ function CountryCell({
   onClick: () => void;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={selected}
+    <div
+      role="checkbox"
+      aria-checked={selected}
+      {...pressableProps(onClick)}
       className={cn(
-        'flex h-[46px] min-w-0 items-center gap-2 overflow-hidden rounded-[8px] border p-[10px] text-left outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+        'flex h-[46px] min-w-0 cursor-pointer items-center gap-2 overflow-hidden rounded-[10px] border p-[10px] text-left outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
         selected ? 'border-brand-primary' : 'border-slate-200',
       )}
     >
-      <span className="text-base leading-6 tracking-[-0.5045px] text-brand-primary">{flag}</span>
+      <span className="w-4 shrink-0 text-base leading-6 tracking-[-0.5045px] text-brand-primary">{flag}</span>
       <span
         className={cn(
           'min-w-0 flex-1 truncate text-xs leading-4 tracking-[-0.192px] text-brand-primary',
@@ -149,8 +152,8 @@ function CountryCell({
       >
         {label}
       </span>
-      {selected && <Check className="size-[14px] shrink-0 text-brand-primary" />}
-    </button>
+      <SelectCheckbox checked={selected} />
+    </div>
   );
 }
 
@@ -159,70 +162,52 @@ function ScoreCard({
   label,
   hint,
   value,
+  placeholder,
   onChange,
-  tall,
 }: {
   label: React.ReactNode;
   hint: string;
   value: string;
+  placeholder: string;
   onChange: (v: string) => void;
-  tall?: boolean;
 }) {
   return (
-    <div className="flex h-[142px] min-w-0 flex-1 flex-col rounded-[20px] border border-slate-200 bg-slate-50/40 p-4">
-      <label className="block text-xs font-bold leading-4 tracking-[-0.192px] text-slate-700">
-        {label}
-        <div className="py-2">
-          <Input
-            inputMode="decimal"
-            value={value}
-            placeholder="0"
-            onChange={(e) => onChange(e.target.value.replace(/[^0-9.]/g, ''))}
-            className="h-9 rounded-[8px] border-transparent bg-surface-white px-3 py-1.5 text-xs font-semibold leading-4 tracking-[-0.192px] text-slate-900 shadow-[0_1px_0_rgba(0,0,0,0.05)] focus-visible:border-brand-primary focus-visible:ring-0 md:text-xs"
-          />
-        </div>
-      </label>
-      <p className={cn('pt-1 text-[11px] font-normal leading-[16.5px] tracking-[-0.1275px] text-slate-500', tall && 'h-10')}>
-        {hint}
-      </p>
-    </div>
+    <label className="flex h-[142px] min-w-0 flex-1 flex-col justify-between rounded-[10px] bg-surface-bg px-2 py-4">
+      <span className="text-xs font-bold leading-4 tracking-[-0.192px] text-slate-700">{label}</span>
+      <span className="flex flex-col gap-1">
+        <Input
+          inputMode="decimal"
+          value={value}
+          placeholder={placeholder}
+          onChange={(e) => onChange(e.target.value.replace(/[^0-9.]/g, ''))}
+          className={fieldClass}
+        />
+        <span className="text-[11px] font-normal leading-[16.5px] tracking-[-0.1275px] text-slate-500">{hint}</span>
+      </span>
+    </label>
   );
 }
 
-/* Nav button 159:814 / 161:2780 */
-function NavButtons({
-  step,
-  onPrev,
-  onNext,
-}: {
-  step: number;
-  onPrev: () => void;
-  onNext: () => void;
-}) {
+/* Footer buttons 203:605 (Back) / 203:613 (Next) — shadcn Button, 36px, radius-sm 6, Body/2 M */
+const navButtonClass = 'h-9 gap-1 rounded-[6px] px-2 text-sm font-[510] leading-5 shadow-none';
+
+function NavButtons({ step, onPrev, onNext }: { step: number; onPrev: () => void; onNext: () => void }) {
   const last = step === TOTAL_STEPS;
   return (
-    <div className="flex items-center gap-6">
+    <div className="flex items-center gap-4">
       {step > 1 && (
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onPrev}
-          className="h-10 gap-2 rounded-[20px] border-brand-primary bg-slate-50 px-3 py-2 text-xs font-bold leading-4 tracking-[-0.192px] text-brand-primary shadow-none hover:bg-brand-light hover:text-brand-primary"
-        >
-          <ChevronLeft className="size-[18px]" />
-          Previous
+        <Button type="button" variant="secondary" onClick={onPrev} className={cn(navButtonClass, 'w-[140px] text-foreground')}>
+          <ArrowLeft className="size-3" />
+          Back
         </Button>
       )}
       <Button
         type="button"
         onClick={onNext}
-        className={cn(
-          'h-10 gap-2 rounded-[20px] bg-brand-primary px-[14px] py-2 text-xs font-bold leading-4 tracking-[-0.192px] text-white shadow-[0_1px_1px_rgba(0,0,0,0.05)] hover:bg-brand-primary/90',
-          !last && 'w-[160.833px]',
-        )}
+        className={cn(navButtonClass, 'bg-brand-primary text-primary-foreground hover:bg-brand-primary/90', !last && 'w-[140px]')}
       >
-        {last ? 'Complete Profile & Reveal Matches' : 'Next Step'}
-        <ChevronRight className="size-[18px]" />
+        {last ? 'Complete Profile & Reveal Matches' : 'Next'}
+        <ArrowRight className="size-3" />
       </Button>
     </div>
   );
@@ -245,9 +230,11 @@ function ProgressDots({ step }: { step: number }) {
 interface OnboardingFlowProps {
   isStandalonePage?: boolean;
   onFinish?: () => void;
+  /** Signed-in account from /api/auth/me; pre-fills name (editable) and email (read-only). */
+  account?: { name?: string | null; email?: string | null } | null;
 }
 
-export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onFinish }) => {
+export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onFinish, account }) => {
   const router = useRouter();
   const { profile, updateProfile, setIsOnboardingOpen } = useApp();
 
@@ -259,8 +246,9 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onFinish }) => {
   // null = untouched, so the session profile (loaded after mount) fills the field until the user types.
   const [nameInput, setName] = useState<string | null>(null);
   const [emailInput, setEmail] = useState<string | null>(null);
-  const name = nameInput ?? (isDemo ? '' : profile?.name || '');
-  const email = emailInput ?? (isDemo ? '' : profile?.email || '');
+  const name = nameInput ?? (account?.name || (isDemo ? '' : profile?.name) || '');
+  const email = emailInput ?? (account?.email || (isDemo ? '' : profile?.email) || '');
+  const emailLocked = !!(account?.email || (!isDemo && profile?.email));
   const [degreeLevel, setDegreeLevel] = useState<DegreeLevel>(saved ? profile.degreeLevel : 'Masters');
   const [specializations, setSpecializations] = useState<string[]>(saved ? profile.specializations : []);
   const [countries, setCountries] = useState<string[]>(saved ? profile.targetCountries : []);
@@ -271,14 +259,31 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onFinish }) => {
   const [showError, setShowError] = useState(false);
   const [showOtherSpec, setShowOtherSpec] = useState(false);
   const [customSpec, setCustomSpec] = useState('');
-  const [showOtherCountries, setShowOtherCountries] = useState(false);
+  const [countryPickerOpen, setCountryPickerOpen] = useState(false);
+  // Items added through "Other" stay visible (even if later unticked) until the flow is left.
+  const [extraSpecs, setExtraSpecs] = useState<string[]>(() =>
+    specializations.filter((s) => !AVAILABLE_SPECIALIZATIONS.includes(s)),
+  );
+  const [extraCountries, setExtraCountries] = useState<string[]>(() =>
+    countries.filter((c) => !FIGMA_COUNTRY_VALUES.includes(c)),
+  );
 
-  const customSpecs = specializations.filter((s) => !AVAILABLE_SPECIALIZATIONS.includes(s));
-
-  const addCustomSpec = () => {
+  const closeCustomSpec = () => {
     const value = customSpec.trim();
-    if (value && !specializations.includes(value)) setSpecializations([...specializations, value]);
+    if (value) {
+      const exists = [...AVAILABLE_SPECIALIZATIONS, ...extraSpecs].find((t) => t.toLowerCase() === value.toLowerCase());
+      if (!exists) setExtraSpecs((prev) => [...prev, value]);
+      const tag = exists ?? value;
+      setSpecializations((prev) => (prev.includes(tag) ? prev : [...prev, tag]));
+    }
     setCustomSpec('');
+    setShowOtherSpec(false);
+  };
+
+  const addCountry = (value: string) => {
+    setExtraCountries((prev) => (prev.includes(value) ? prev : [...prev, value]));
+    setCountries((prev) => (prev.includes(value) ? prev : [...prev, value]));
+    setCountryPickerOpen(false);
   };
 
   const canNext =
@@ -351,7 +356,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onFinish }) => {
     : '';
 
   return (
-    <div className="relative min-h-screen w-full select-none overflow-hidden bg-surface-white text-text-primary">
+    <div className="relative flex min-h-screen w-full select-none flex-col overflow-hidden bg-surface-white text-text-primary">
       {/* Decorative sails — 178:1166 */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden xl:block">
         <img
@@ -368,8 +373,9 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onFinish }) => {
         />
       </div>
 
-      <div className="relative mx-auto flex w-full max-w-[580px] flex-col px-4 pb-10 pt-12 xl:absolute xl:left-[46.296%] xl:top-[200px] xl:mx-0 xl:block xl:max-w-none xl:p-0">
-        <div className="flex w-full flex-col items-start gap-12 xl:w-[580px]">
+      {/* Content starts at y=200; the footer sits at y=737 (200 + 497 + 40 gap) unless a long list pushes it down */}
+      <div className="relative mx-auto flex w-full max-w-[612px] flex-1 flex-col px-4 pt-12 sm:pt-[200px] xl:mx-0 xl:ml-[46.296%] xl:w-[580px] xl:max-w-none xl:px-0">
+        <div className="flex w-full flex-col items-start gap-12 sm:min-h-[497px]">
           <BrandLogo />
 
           {step === 1 && (
@@ -381,8 +387,18 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onFinish }) => {
                   titleClass="max-w-[211px]"
                 />
                 <div className="flex w-full flex-col gap-4">
-                  <FloatingField label="Full Name" placeholder="Enter your full name" value={name} onChange={(e) => setName(e.target.value)} />
-                  <FloatingField label="Email" type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                  <Input aria-label="Full name" placeholder="Enter Your Name" value={name} onChange={(e) => setName(e.target.value)} className={fieldClass} />
+                  <Input
+                    aria-label="Email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    // Verified sign-in email: read-only once the session provides it (the API saves the session email anyway).
+                    readOnly={emailLocked}
+                    aria-readonly={emailLocked}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className={cn(fieldClass, 'placeholder:text-text-placeholder', emailLocked && 'cursor-default text-text-placeholder')}
+                  />
                 </div>
               </div>
               <p className="w-full text-xs leading-4 text-text-secondary">
@@ -401,14 +417,13 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onFinish }) => {
                 {DEGREE_OPTIONS.map((opt) => {
                   const selected = degreeLevel === opt.id;
                   return (
-                    <button
+                    <div
                       key={opt.id}
-                      type="button"
                       role="radio"
                       aria-checked={selected}
-                      onClick={() => setDegreeLevel(opt.id)}
+                      {...pressableProps(() => setDegreeLevel(opt.id))}
                       className={cn(
-                        'flex w-full items-center gap-4 overflow-hidden rounded-[20px] border p-4 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+                        'flex w-full cursor-pointer items-center gap-4 overflow-hidden rounded-[10px] border p-4 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
                         selected ? 'border-brand-primary' : 'border-slate-200',
                       )}
                     >
@@ -418,8 +433,8 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onFinish }) => {
                         </span>
                         <span className="pt-0.5 text-xs leading-4 tracking-[-0.192px] text-text-secondary">{opt.subtitle}</span>
                       </span>
-                      {selected && <Check className="size-6 shrink-0 text-brand-primary" />}
-                    </button>
+                      <SelectCheckbox checked={selected} />
+                    </div>
                   );
                 })}
               </div>
@@ -434,32 +449,43 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onFinish }) => {
                 titleClass="max-w-[437px]"
               />
               <div className="flex w-full flex-wrap gap-2">
-                {[...AVAILABLE_SPECIALIZATIONS, ...customSpecs].map((tag) => (
+                {[...AVAILABLE_SPECIALIZATIONS, ...extraSpecs].map((tag) => (
                   <SpecializationChip
                     key={tag}
                     label={tag}
                     selected={specializations.includes(tag)}
-                    onClick={() => setSpecializations(toggle(specializations, tag))}
+                    onClick={() => setSpecializations((prev) => toggle(prev, tag))}
                   />
                 ))}
                 {showOtherSpec ? (
-                  <Input
-                    autoFocus
-                    value={customSpec}
-                    placeholder="Add your field"
-                    onChange={(e) => setCustomSpec(e.target.value)}
-                    onBlur={() => {
-                      addCustomSpec();
-                      setShowOtherSpec(false);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        addCustomSpec();
-                        setShowOtherSpec(false);
-                      }
-                    }}
-                    className="h-7 w-44 rounded-full border-stroke-default px-[14px] text-xs shadow-none focus-visible:ring-0 md:text-xs"
-                  />
+                  <span className="flex h-7 w-52 items-center gap-1 rounded-full border border-brand-primary pl-[14px] pr-1 focus-within:ring-[3px] focus-within:ring-ring/50">
+                    <Input
+                      autoFocus
+                      value={customSpec}
+                      placeholder="Add your field"
+                      aria-label="New field of study"
+                      onChange={(e) => setCustomSpec(e.target.value)}
+                      onBlur={closeCustomSpec}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') closeCustomSpec();
+                        if (e.key === 'Escape') {
+                          setCustomSpec('');
+                          setShowOtherSpec(false);
+                        }
+                      }}
+                      className="h-full min-w-0 flex-1 rounded-none border-0 bg-transparent p-0 text-xs leading-4 tracking-[-0.192px] shadow-none focus-visible:ring-0 md:text-xs"
+                    />
+                    <Button
+                      type="button"
+                      size="icon-xs"
+                      aria-label="Add field"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={closeCustomSpec}
+                      className="size-5 shrink-0 rounded-full bg-brand-primary text-primary-foreground hover:bg-brand-primary/90"
+                    >
+                      <Check className="size-3" />
+                    </Button>
+                  </span>
                 ) : (
                   <SpecializationChip label="Other" selected={false} onClick={() => setShowOtherSpec(true)} />
                 )}
@@ -475,24 +501,40 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onFinish }) => {
                 titleClass="max-w-[437px]"
               />
               <div className="grid w-full grid-cols-2 gap-[10px] sm:grid-cols-4">
-                {[...MAIN_COUNTRIES, ...(showOtherCountries ? OTHER_COUNTRIES : [])].map((c) => (
+                {[...MAIN_COUNTRIES, ...extraCountries.map(countryOption)].map((c) => (
                   <CountryCell
                     key={c.value}
                     flag={c.flag}
                     label={c.value === 'USA' ? 'USA' : c.label}
                     selected={countries.includes(c.value)}
-                    onClick={() => setCountries(toggle(countries, c.value))}
+                    onClick={() => setCountries((prev) => toggle(prev, c.value))}
                   />
                 ))}
-                <button
-                  type="button"
-                  onClick={() => setShowOtherCountries((v) => !v)}
-                  aria-expanded={showOtherCountries}
-                  className="flex h-[46px] min-w-0 items-center gap-2 overflow-hidden rounded-[8px] border border-stroke-default p-[10px] text-left outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-                >
-                  <span className="min-w-0 flex-1 truncate text-xs font-[590] leading-4 tracking-[-0.192px] text-text-primary">Other</span>
-                  <Plus className={cn('size-4 shrink-0 text-slate-700', showOtherCountries && 'rotate-45')} />
-                </button>
+                <Popover open={countryPickerOpen} onOpenChange={setCountryPickerOpen}>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="flex h-[46px] min-w-0 items-center gap-2 overflow-hidden rounded-[10px] border border-stroke-default p-[10px] text-left outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+                    >
+                      <span className="min-w-0 flex-1 truncate text-xs font-[590] leading-4 tracking-[-0.192px] text-text-primary">Other</span>
+                      <span className="shrink-0 text-base font-medium leading-4 tracking-[-0.192px] text-slate-700">+</span>
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent side="right" align="start" className="w-64 rounded-[10px] border-stroke-default p-0">
+                    <Command>
+                      <CommandInput placeholder="Search country..." />
+                      <CommandList>
+                        <CommandEmpty>No country found.</CommandEmpty>
+                        {OTHER_COUNTRIES.filter((c) => !extraCountries.includes(c.value)).map((c) => (
+                          <CommandItem key={c.value} value={c.label} onSelect={() => addCountry(c.value)}>
+                            <span className="text-base leading-6">{c.flag}</span>
+                            {c.label}
+                          </CommandItem>
+                        ))}
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
           )}
@@ -506,19 +548,19 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onFinish }) => {
               />
               <div className="flex w-full flex-col gap-6">
                 <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center">
-                  <ScoreCard label="Normalized CGPA (4.0 scale)" hint="e.g., 7.5 or 8.0" value={cgpa} onChange={setCgpa} />
-                  <ScoreCard label="English Band (IELTS / TOEFL)" hint="e.g., 7.5 or 8.0" value={ielts} onChange={setIelts} />
+                  <ScoreCard label="CGPA (4.0 scale)" hint="e.g., 3.50 of 4.00" placeholder="3.79" value={cgpa} onChange={setCgpa} />
+                  <ScoreCard label="English Band (IELTS / TOEFL)" hint="e.g., 7.5 or 8.0" placeholder="7.5" value={ielts} onChange={setIelts} />
                   <ScoreCard
                     label={<>GRE /<br />GMAT Total</>}
                     hint="e.g., 324 (Quant 168)"
+                    placeholder="279"
                     value={gre}
                     onChange={setGre}
-                    tall
                   />
                 </div>
-                <div className="flex w-full items-start gap-2 rounded-[8px] border border-amber-200 bg-amber-50 p-3">
-                  <CircleHelp className="mt-0.5 size-4 shrink-0 text-amber-600" />
-                  <p className="min-w-0 flex-1 text-xs leading-4 tracking-[-0.192px] text-amber-900">
+                <div className="flex w-full items-start gap-2 rounded-[8px] border border-warning-main bg-warning-lightest p-3">
+                  <CircleHelp className="mt-0.5 size-3 shrink-0 text-warning-main" />
+                  <p className="min-w-0 flex-1 text-xs leading-4 tracking-[-0.192px] text-warning-darker">
                     HighScholar automatically matches your scores against historical admission cut-offs and flags scholarships where you exceed requirements!
                   </p>
                 </div>
@@ -533,7 +575,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onFinish }) => {
         </div>
 
         {/* Footer — progress 162:2797 + buttons 159:814 */}
-        <div className="mt-10 flex w-full items-center justify-between xl:absolute xl:left-0 xl:top-[537px] xl:mt-0 xl:w-[580px]">
+        <div className="sticky bottom-0 mt-auto flex w-full items-center justify-between bg-surface-white py-4 sm:static sm:mt-10 sm:bg-transparent sm:pb-[110px] sm:pt-0">
           <ProgressDots step={step} />
           <NavButtons step={step} onPrev={() => goTo(step - 1)} onNext={next} />
         </div>
