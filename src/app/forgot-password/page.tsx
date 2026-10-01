@@ -1,15 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button } from '@/components/base/buttons/button';
-import { HintText } from '@/components/base/input/hint-text';
-import { Input } from '@/components/base/input/input';
 import {
   AuthFooterLink,
   AuthHeading,
+  AuthInput,
   AuthLayout,
-  authInputProps,
-  authPrimaryButtonClass,
+  AuthMessage,
+  AuthSubmitButton,
 } from '@/components/auth/auth-layout';
 
 export default function ForgotPasswordPage() {
@@ -50,34 +48,25 @@ export default function ForgotPasswordPage() {
 
   return (
     <AuthLayout footer={<AuthFooterLink prompt="Remember your password?" href="/login" label="Log in" />}>
-      <div className="flex w-full flex-col gap-[28px]">
+      <div className="flex w-full flex-col gap-7">
         <AuthHeading title="Forgot password?" subtitle="Enter your email and we'll send you a reset link">
-          {error ? (
-            <HintText isInvalid role="alert" className="mt-[8px] text-[12px] leading-[16px]">
-              {error}
-            </HintText>
-          ) : (
-            successMsg && (
-              <HintText className="mt-[8px] text-[12px] leading-[16px] text-success-main">{successMsg}</HintText>
-            )
-          )}
+          <AuthMessage error={error} success={successMsg} />
         </AuthHeading>
 
-        <form onSubmit={handleSubmit} className="flex w-full flex-col gap-[24px]">
-          <Input
-            {...authInputProps}
+        <form onSubmit={handleSubmit} className="flex w-full flex-col gap-6">
+          <AuthInput
             id="email"
             type="email"
             autoComplete="email"
             aria-label="Email"
             placeholder="Enter Email"
-            isRequired
+            required
             value={email}
-            onChange={setEmail}
+            onChange={(e) => setEmail(e.target.value)}
           />
-          <Button type="submit" size="sm" isLoading={isLoading} showTextWhileLoading className={authPrimaryButtonClass}>
+          <AuthSubmitButton disabled={isLoading}>
             {isLoading ? 'Sending link...' : successMsg ? 'Resend link' : 'Send reset link'}
-          </Button>
+          </AuthSubmitButton>
         </form>
       </div>
     </AuthLayout>

@@ -1,21 +1,19 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
-import { Button } from '@/components/base/buttons/button';
-import { Checkbox } from '@/components/base/checkbox/checkbox';
-import { HintText } from '@/components/base/input/hint-text';
-import { Input } from '@/components/base/input/input';
 import {
   AuthFooterLink,
   AuthHeading,
+  AuthInput,
   AuthLayout,
+  AuthMessage,
+  AuthPasswordInput,
+  AuthSubmitButton,
   GoogleButton,
-  authCheckboxBoxClass,
-  authInputProps,
-  authPasswordInputClassName,
-  authPrimaryButtonClass,
+  TermsCheckbox,
 } from '@/components/auth/auth-layout';
 
 // Figma: zLYU2tCsLDvZNnUXk7Cpgw — Login (179:1438)
@@ -124,86 +122,51 @@ export default function LoginPage() {
     <AuthLayout
       footer={
         <>
-          <GoogleButton onPress={handleGoogleAuth} isDisabled={isGoogleLoading || isLoading} isLoading={isGoogleLoading} />
+          <GoogleButton onClick={handleGoogleAuth} disabled={isGoogleLoading || isLoading} isLoading={isGoogleLoading} />
           <AuthFooterLink prompt="Don’t have an account?" href="/signup" label="Sign up now!" />
         </>
       }
     >
-      <div className="flex w-full flex-col gap-[28px]">
+      <div className="flex w-full flex-col gap-7">
         <AuthHeading title="Welcome back!" subtitle="Sign in to continue">
-          {error ? (
-            <HintText isInvalid role="alert" className="mt-[8px] text-[12px] leading-[16px]">
-              {error}
-            </HintText>
-          ) : (
-            successMsg && (
-              <HintText className="mt-[8px] text-[12px] leading-[16px] text-success-main">{successMsg}</HintText>
-            )
-          )}
+          <AuthMessage error={error} success={successMsg} />
         </AuthHeading>
 
-        <form onSubmit={handleLogin} className="flex w-full flex-col gap-[24px]">
-          <div className="flex w-full flex-col gap-[16px]">
-            <Input
-              {...authInputProps}
+        <form onSubmit={handleLogin} className="flex w-full flex-col gap-6">
+          <div className="flex w-full flex-col gap-4">
+            <AuthInput
               id="email"
               type="email"
               autoComplete="email"
               aria-label="Email"
               placeholder="Enter Email"
-              isRequired
+              required
               value={email}
-              onChange={setEmail}
+              onChange={(e) => setEmail(e.target.value)}
             />
-            <div className="flex flex-col gap-[6px]">
-              <Input
-                {...authInputProps}
-                inputClassName={authPasswordInputClassName}
+            <div className="flex flex-col gap-1.5">
+              <AuthPasswordInput
                 id="password"
-                type="password"
                 autoComplete="current-password"
                 aria-label="Password"
                 placeholder="Enter Password"
-                isRequired
+                required
                 value={password}
-                onChange={setPassword}
+                onChange={(e) => setPassword(e.target.value)}
               />
-              <Button
+              <Link
                 href="/forgot-password"
-                color="link-gray"
-                size="xs"
-                className="self-end text-[12px] font-normal leading-[16px] text-secondary hover:text-brand-primary"
+                className="self-end text-xs leading-4 text-text-secondary hover:text-brand-primary"
               >
                 Forgot password?
-              </Button>
+              </Link>
             </div>
-
-            {/* Terms checkbox (179:5016) */}
-            <Checkbox
-              id="terms"
-              isSelected={agreeTerms}
-              onChange={setAgreeTerms}
-              className="items-center [&_p]:leading-[16px]"
-              boxClassName={authCheckboxBoxClass(agreeTerms)}
-              label={
-                <span className="text-[12px] font-normal italic leading-[16px] text-text-body">
-                  I agree to HighScholar&apos;s <span className="text-brand-primary">Terms of Service</span> and{' '}
-                  <span className="text-brand-primary">Privacy Policy</span>.
-                </span>
-              }
-            />
+            <TermsCheckbox checked={agreeTerms} onCheckedChange={setAgreeTerms} />
           </div>
 
-          <Button
-            type="submit"
-            size="sm"
-            isLoading={isLoading}
-            showTextWhileLoading
-            isDisabled={isGoogleLoading}
-            className={authPrimaryButtonClass}
-          >
+          <AuthSubmitButton disabled={isLoading || isGoogleLoading}>
             {isLoading ? 'Logging in...' : 'Login'}
-          </Button>
+          </AuthSubmitButton>
         </form>
       </div>
     </AuthLayout>

@@ -2,16 +2,14 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/base/buttons/button';
-import { HintText } from '@/components/base/input/hint-text';
-import { Input } from '@/components/base/input/input';
+import Link from 'next/link';
 import {
   AuthFooterLink,
   AuthHeading,
   AuthLayout,
-  authInputProps,
-  authPasswordInputClassName,
-  authPrimaryButtonClass,
+  AuthMessage,
+  AuthPasswordInput,
+  AuthSubmitButton,
 } from '@/components/auth/auth-layout';
 
 export default function ResetPasswordPage() {
@@ -60,56 +58,42 @@ export default function ResetPasswordPage() {
 
   return (
     <AuthLayout footer={<AuthFooterLink prompt="Remember your password?" href="/login" label="Log in" />}>
-      <div className="flex w-full flex-col gap-[28px]">
+      <div className="flex w-full flex-col gap-7">
         <AuthHeading title="Set a new password" subtitle="Choose a new password for your account">
-          {error && (
-            <HintText isInvalid role="alert" className="mt-[8px] text-[12px] leading-[16px]">
-              {error}
-            </HintText>
-          )}
+          <AuthMessage error={error} />
         </AuthHeading>
 
-        <form onSubmit={handleSubmit} className="flex w-full flex-col gap-[24px]">
-          <div className="flex w-full flex-col gap-[16px]">
-            <Input
-              {...authInputProps}
-              inputClassName={authPasswordInputClassName}
+        <form onSubmit={handleSubmit} className="flex w-full flex-col gap-6">
+          <div className="flex w-full flex-col gap-4">
+            <AuthPasswordInput
               id="password"
-              type="password"
               autoComplete="new-password"
               aria-label="New Password"
               placeholder="New Password"
-              isRequired
+              required
               value={password}
-              onChange={setPassword}
+              onChange={(e) => setPassword(e.target.value)}
             />
-            <Input
-              {...authInputProps}
-              inputClassName={authPasswordInputClassName}
+            <AuthPasswordInput
               id="confirmPassword"
-              type="password"
               autoComplete="new-password"
               aria-label="Confirm Password"
               placeholder="Confirm Password"
-              isRequired
+              required
               value={confirmPassword}
-              onChange={setConfirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
             />
           </div>
 
-          <div className="flex flex-col gap-[12px]">
-            <Button type="submit" size="sm" isLoading={isLoading} showTextWhileLoading className={authPrimaryButtonClass}>
-              {isLoading ? 'Saving...' : 'Reset password'}
-            </Button>
+          <div className="flex flex-col gap-3">
+            <AuthSubmitButton disabled={isLoading}>{isLoading ? 'Saving...' : 'Reset password'}</AuthSubmitButton>
             {linkExpired && (
-              <Button
+              <Link
                 href="/forgot-password"
-                color="link-color"
-                size="xs"
-                className="self-center text-[12px] font-normal leading-[16px]"
+                className="self-center text-xs leading-4 text-brand-primary hover:underline"
               >
                 Request a new link
-              </Button>
+              </Link>
             )}
           </div>
         </form>

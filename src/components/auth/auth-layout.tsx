@@ -1,27 +1,79 @@
 'use client';
 
-import type { ReactNode } from 'react';
-import { Button } from '@/components/base/buttons/button';
-import { SocialButton } from '@/components/base/buttons/social-button';
+import { useState, type ComponentProps, type ReactNode } from 'react';
+import Link from 'next/link';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { ViewIcon, ViewOffIcon } from '@hugeicons/core-free-icons';
+import { Button } from '@/components/shadcn/button';
+import { Checkbox } from '@/components/shadcn/checkbox';
+import { Input } from '@/components/shadcn/input';
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/shadcn/input-group';
+import { Label } from '@/components/shadcn/label';
+import { cn } from '@/lib/utils';
 
 // Shared shell for the auth screens — Figma: Signup 167:2884, OTP 179:5183, Login 179:1438.
+// Radii are explicit because the app's legacy :root --radius-* tokens override Tailwind's rounded-* scale.
 
-/* Input field 179:3609 — 44px, radius 8, Figma placeholder Text/Secondary */
-export const authInputProps = {
-  size: 'lg' as const,
-  wrapperClassName: 'shadow-[0_1px_1px_rgba(0,0,0,0.05)]',
-  inputClassName: 'py-3 text-sm placeholder:text-secondary',
-};
+/* Input 184:5103 — 44px, radius-lg 10, px 10, text-sm, muted-foreground placeholder */
+const fieldClass = 'h-11 rounded-[10px] bg-background shadow-none';
 
-export const authPasswordInputClassName = `${authInputProps.inputClassName} pr-9.5`;
+export function AuthInput({ className, ...props }: ComponentProps<typeof Input>) {
+  return <Input className={cn(fieldClass, 'px-2.5', className)} {...props} />;
+}
 
-/* Buttons/Button 179:4933 — 36px, Brand/Primary fill, Brand/600 border */
-export const authPrimaryButtonClass =
-  'w-full font-[Inter,ui-sans-serif,system-ui,sans-serif] leading-[20px] shadow-[0_1px_2px_rgba(0,0,0,0.05)]! ring-brand-600 before:hidden';
+export function AuthPasswordInput({ className, ...props }: Omit<ComponentProps<typeof InputGroupInput>, 'type'>) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <InputGroup className={cn(fieldClass, className)}>
+      <InputGroupInput type={visible ? 'text' : 'password'} className="h-full pl-2.5" {...props} />
+      <InputGroupAddon align="inline-end" className="pr-2.5 has-[>button]:mr-0">
+        <InputGroupButton
+          size="icon-xs"
+          className="size-4 rounded-sm text-muted-foreground"
+          aria-label={visible ? 'Hide password' : 'Show password'}
+          aria-pressed={visible}
+          onClick={() => setVisible((v) => !v)}
+        >
+          <HugeiconsIcon icon={visible ? ViewOffIcon : ViewIcon} size={16} />
+        </InputGroupButton>
+      </InputGroupAddon>
+    </InputGroup>
+  );
+}
 
-/* Terms checkbox 168:3066 — Brand/Primary when checked */
-export const authCheckboxBoxClass = (selected: boolean) =>
-  `mt-[2px] rounded-[2px] ${selected ? 'bg-brand-solid ring-brand-primary' : 'ring-[#767676]'}`;
+/* Button 185:6449 — 36px, radius-sm 6, Brand/Primary, Body/2 M */
+export function AuthSubmitButton({ className, ...props }: ComponentProps<typeof Button>) {
+  return <Button type="submit" className={cn('h-9 w-full rounded-[6px] px-2 font-[510] leading-5', className)} {...props} />;
+}
+
+/* Terms checkbox 185:6594 */
+export function TermsCheckbox({ checked, onCheckedChange }: { checked: boolean; onCheckedChange: (v: boolean) => void }) {
+  return (
+    <div className="flex items-center gap-2">
+      <Checkbox id="terms" checked={checked} onCheckedChange={(v) => onCheckedChange(v === true)} className="shadow-none" />
+      <Label htmlFor="terms" className="text-xs font-normal italic leading-4 text-text-body">
+        <span>
+          I agree to HighScholar&apos;s <span className="text-brand-primary">Terms of Service</span> and{' '}
+          <span className="text-brand-primary">Privacy Policy</span>.
+        </span>
+      </Label>
+    </div>
+  );
+}
+
+export function AuthMessage({ error, success }: { error?: string; success?: string }) {
+  if (error) {
+    return (
+      <p role="alert" className="mt-2 text-xs leading-4 text-destructive">
+        {error}
+      </p>
+    );
+  }
+  if (success) {
+    return <p className="mt-2 text-xs leading-4 text-success-main">{success}</p>;
+  }
+  return null;
+}
 
 /* Scholars'ship wordmark (Title Area 167:2890) */
 export function BrandLogo() {
@@ -42,56 +94,51 @@ export function BrandLogo() {
 /* Title/2 + Body/2 R, followed by optional status messages */
 export function AuthHeading({ title, subtitle, children }: { title: string; subtitle: string; children?: ReactNode }) {
   return (
-    <div className="flex flex-col gap-[4px]">
-      <h1 className="text-[24px] font-[510] leading-[32px] text-primary">{title}</h1>
-      <p className="text-[14px] leading-[18px] text-secondary">{subtitle}</p>
+    <div className="flex flex-col gap-1">
+      <h1 className="text-2xl font-[510] leading-8 text-text-primary">{title}</h1>
+      <p className="text-sm leading-[18px] text-text-secondary">{subtitle}</p>
       {children}
     </div>
   );
 }
 
+/* Google pill 179:5161 — outline button, Stroke/Default border */
 export function GoogleButton({
-  onPress,
-  isDisabled,
+  onClick,
+  disabled,
   isLoading,
   caption,
 }: {
-  onPress: () => void;
-  isDisabled?: boolean;
+  onClick: () => void;
+  disabled?: boolean;
   isLoading?: boolean;
   caption?: string;
 }) {
   return (
-    <SocialButton
-      social="google"
-      theme="color"
-      size="lg"
-      onPress={onPress}
-      isDisabled={isDisabled}
-      className="gap-[12px] rounded-full py-[9px] pl-[8px] pr-[15px] font-normal shadow-none before:hidden hover:bg-brand-soft [&>svg]:size-[31px] [&>svg]:p-[4px]"
+    <Button
+      type="button"
+      variant="outline"
+      onClick={onClick}
+      disabled={disabled}
+      className="h-auto gap-3 rounded-full border-stroke-default py-2 pl-2 pr-[15px] font-normal shadow-none hover:bg-brand-soft"
     >
-      <span className="flex flex-col items-start gap-[2px]">
-        {caption && <span className="text-[10px] italic leading-[16px] text-text-caption">{caption}</span>}
-        <span className="text-[14px] leading-[18px] text-secondary">{isLoading ? 'Connecting...' : 'Continue with Google'}</span>
+      <img src="/signup/google.svg" alt="" className="size-[31px]" />
+      <span className="flex flex-col items-start gap-0.5">
+        {caption && <span className="text-[10px] italic leading-4 text-text-caption">{caption}</span>}
+        <span className="text-sm leading-[18px] text-text-secondary">{isLoading ? 'Connecting...' : 'Continue with Google'}</span>
       </span>
-    </SocialButton>
+    </Button>
   );
 }
 
+/* Caption/1 It — prompt + link */
 export function AuthFooterLink({ prompt, href, label }: { prompt: string; href: string; label: string }) {
   return (
-    <div className="flex items-center">
-      <span className="flex w-[158px] justify-center whitespace-nowrap text-[12px] italic leading-[18px] text-secondary">
-        {prompt}&nbsp;
-      </span>
-      <Button
-        href={href}
-        color="link-gray"
-        size="sm"
-        className="text-[12px] font-medium italic leading-[18px] text-primary hover:text-brand-primary"
-      >
+    <div className="flex items-center text-xs italic leading-[18px]">
+      <span className="flex w-[158px] justify-center whitespace-nowrap font-normal text-text-secondary">{prompt}&nbsp;</span>
+      <Link href={href} className="font-[508] text-text-primary hover:text-brand-primary">
         {label}
-      </Button>
+      </Link>
     </div>
   );
 }
@@ -111,18 +158,18 @@ export function AuthLayout({ children, footer }: { children: ReactNode; footer: 
       {/* Right canvas — card centred at x = 1280 of 1728 */}
       <div className="flex flex-1 items-center justify-center px-4 py-8 lg:pl-[22px] lg:pr-0 lg:py-10">
         <div className="w-full max-w-[472px] overflow-hidden">
-          <div className="flex w-full flex-col gap-[10px] rounded-t-[24px] bg-surface-white px-[24px] py-[36px]">
+          <div className="flex w-full flex-col gap-2.5 rounded-t-[24px] bg-surface-white px-6 py-9">
             <BrandLogo />
             {children}
           </div>
 
           {/* Dashed divider: 6px dash, 6px gap (a CSS dashed border can't set the gap) */}
-          <div className="w-full rounded-b-[24px] bg-surface-white bg-[linear-gradient(to_right,var(--color-stroke-default)_50%,transparent_50%)] bg-[length:12px_1px] bg-top bg-repeat-x pb-[12px] pt-[13px]">
-            <div className="relative flex w-full flex-col items-center gap-[8px]">
+          <div className="w-full rounded-b-[24px] bg-surface-white bg-[linear-gradient(to_right,var(--color-stroke-default)_50%,transparent_50%)] bg-[length:12px_1px] bg-top bg-repeat-x pb-3 pt-[13px]">
+            <div className="relative flex w-full flex-col items-center gap-2">
               {footer}
 
               {/* Corner decoration */}
-              <div aria-hidden="true" className="pointer-events-none absolute left-full top-0 h-0 w-0">
+              <div aria-hidden="true" className="pointer-events-none absolute left-full top-0 size-0">
                 <div className="absolute left-[-37.1px] top-[68.4px] flex h-[39.6px] w-[33.5px] items-center justify-center">
                   <img src="/signup/deco-back.svg" alt="" className="h-[35.1954px] w-[18.2291px] max-w-none rotate-[-30.16deg]" />
                 </div>

@@ -1,61 +1,43 @@
-/* Untitled UI (components only). Its colors, fonts and scale are overridden below. */
-@import "../styles/globals.css";
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* shadcn/ui variables — values from the Figma shadcn kit variables (Login 179:1438, OTP 179:5183) */
+:root {
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --primary: #7150e7;
+  --primary-foreground: #fafafa;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #171717;
+  --muted: #f5f5f5;
+  --muted-foreground: #737373;
+  --accent: #f5f5f5;
+  --accent-foreground: #171717;
+  --destructive: #f62752;
+  --border: #e5e5e5;
+  --input: #e5e5e5;
+  --ring: #7150e7;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
 
 /* Figma design tokens (styles node 181-3148). Source of truth: docs/DESIGN-TOKENS.md */
 @theme {
-  /* --- Untitled UI semantic tokens → Figma values --- */
-  --color-neutral-950: #0f172b;
-  --color-neutral-900: #101828;
-  --color-neutral-800: #212b36;
-  --color-neutral-700: #314158;
-  --color-neutral-600: #45556c;
-  --color-neutral-500: #62748e;
-  --color-neutral-400: #90a1b9;
-  --color-neutral-300: #cad5e2;
-  --color-neutral-200: #e1e8f0;
-  --color-neutral-100: #f1f5f9;
-  --color-neutral-50: #f8fafc;
-
-  --color-bg-primary: #ffffff;
-  --color-bg-primary_hover: #fafafa; /* Surface/Secondary Surface */
-  --color-bg-brand-solid: #7150e7;
-  --color-bg-brand-solid_hover: color-mix(in srgb, #7150e7 90%, black);
-  --color-bg-error-solid: #f62752;
-  --color-bg-error-solid_hover: #c10f41;
-
-  --color-text-secondary_hover: #637381;
-  --color-text-tertiary_hover: #101828;
-  --color-text-brand-primary: #7150e7;
-  --color-text-brand-secondary: #7150e7;
-  --color-text-brand-secondary_hover: #7150e7;
-  --color-text-brand-tertiary_alt: #101828;
-  --color-text-error-primary: #f62752;
-  --color-text-error-primary_hover: #c10f41;
-
-  --color-border-primary: #e1e8f0;
-  --color-border-secondary: #e1e8f0;
-  --color-border-brand: #7150e7;
-  --color-border-error: #f62752;
-  --color-border-error_subtle: #fd6f88;
-
-  --color-fg-quaternary: #d0d7e1;
-  --color-fg-quaternary_hover: #919eab;
-  --color-fg-brand-primary: #7150e7;
-  --color-fg-brand-secondary_alt: #7150e7;
-  --color-fg-error-secondary: #f62752;
-  --color-focus-ring: #7150e7;
-
-  /* Keep the project's Tailwind type & shadow scale (Untitled UI changes these site-wide) */
-  --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif;
-  --font-display: var(--font-body);
-  --text-xs--line-height: 1rem;
-  --text-xl--line-height: 1.75rem;
-  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-
   /* --- Figma tokens --- */
   --color-brand-primary: #7150e7;
   --color-brand-600: #7f56d9; /* Figma button border (Brand/600) */
@@ -71,7 +53,7 @@
   --color-text-caption: #98a2b3; /* Caption/2 It, "Or sign in with email" */
 
   --color-stroke-default: #e1e8f0;
-  --color-surface-bg: #fcfcfc;
+  --color-surface-bg: #fafafa;
   --color-surface-white: #ffffff;
 
   --color-error-main: #f62752;

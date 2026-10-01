@@ -3,24 +3,22 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
-import { Button } from '@/components/base/buttons/button';
-import { Checkbox } from '@/components/base/checkbox/checkbox';
-import { HintText } from '@/components/base/input/hint-text';
-import { Input } from '@/components/base/input/input';
-import { PinInput } from '@/components/base/input/pin-input';
+import { Button } from '@/components/shadcn/button';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/shadcn/input-otp';
 import {
   AuthFooterLink,
   AuthHeading,
+  AuthInput,
   AuthLayout,
+  AuthMessage,
+  AuthPasswordInput,
+  AuthSubmitButton,
   GoogleButton,
-  authCheckboxBoxClass,
-  authInputProps,
-  authPasswordInputClassName,
-  authPrimaryButtonClass,
+  TermsCheckbox,
 } from '@/components/auth/auth-layout';
 
 // Figma: zLYU2tCsLDvZNnUXk7Cpgw — Signup (167:2884) & OTP Verification (179:5183)
-// Components: Untitled UI. Colors & fonts: Figma tokens (see src/app/globals.css).
+// Components: shadcn/ui. Colors & fonts: Figma tokens (see src/app/globals.css).
 
 export default function SignupPage() {
   const router = useRouter();
@@ -241,8 +239,8 @@ export default function SignupPage() {
         <>
           <GoogleButton
             caption="Or sign in with email"
-            onPress={handleGoogleAuth}
-            isDisabled={isGoogleLoading || isLoading}
+            onClick={handleGoogleAuth}
+            disabled={isGoogleLoading || isLoading}
             isLoading={isGoogleLoading}
           />
           <AuthFooterLink prompt="Already have an account?" href="/login" label="Log in Now!" />
@@ -250,139 +248,93 @@ export default function SignupPage() {
       }
     >
       {step === 'form' ? (
-        <div className="flex w-full flex-col gap-[28px]">
+        <div className="flex w-full flex-col gap-7">
           <AuthHeading title="Create an account" subtitle="Join HighScholar to start your scholarship radar">
-            {error && (
-              <HintText isInvalid role="alert" className="mt-[8px] text-[12px] leading-[16px]">
-                {error}
-              </HintText>
-            )}
+            <AuthMessage error={error} />
           </AuthHeading>
 
-          <form onSubmit={handleInitiateSignup} className="flex w-full flex-col gap-[24px]">
-            <div className="flex w-full flex-col gap-[16px]">
-              <Input
-                {...authInputProps}
+          <form onSubmit={handleInitiateSignup} className="flex w-full flex-col gap-6">
+            <div className="flex w-full flex-col gap-4">
+              <AuthInput
                 id="email"
                 type="email"
                 autoComplete="email"
                 aria-label="Email"
                 placeholder="Enter Email"
-                isRequired
+                required
                 value={email}
-                onChange={setEmail}
+                onChange={(e) => setEmail(e.target.value)}
               />
-              <Input
-                {...authInputProps}
-                inputClassName={authPasswordInputClassName}
+              <AuthPasswordInput
                 id="password"
-                type="password"
                 autoComplete="new-password"
                 aria-label="Password"
                 placeholder="Enter Password"
-                isRequired
+                required
                 value={password}
-                onChange={setPassword}
+                onChange={(e) => setPassword(e.target.value)}
               />
-              <Input
-                {...authInputProps}
-                inputClassName={authPasswordInputClassName}
+              <AuthPasswordInput
                 id="confirmPassword"
-                type="password"
                 autoComplete="new-password"
                 aria-label="Confirm Password"
                 placeholder="Confirm Password"
-                isRequired
+                required
                 value={confirmPassword}
-                onChange={setConfirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
               />
-
-              {/* Terms checkbox (168:3066) — Brand/Primary purple #7150E7 */}
-              <Checkbox
-                id="terms"
-                isSelected={agreeTerms}
-                onChange={setAgreeTerms}
-                className="items-center [&_p]:leading-[16px]"
-                boxClassName={authCheckboxBoxClass(agreeTerms)}
-                label={
-                  <span className="text-[12px] font-normal italic leading-[16px] text-text-body">
-                    I agree to HighScholar&apos;s <span className="text-brand-primary">Terms of Service</span> and{' '}
-                    <span className="text-brand-primary">Privacy Policy</span>.
-                  </span>
-                }
-              />
+              <TermsCheckbox checked={agreeTerms} onCheckedChange={setAgreeTerms} />
             </div>
 
-            <Button
-              type="submit"
-              size="sm"
-              isLoading={isLoading}
-              showTextWhileLoading
-              isDisabled={isGoogleLoading}
-              className={authPrimaryButtonClass}
-            >
+            <AuthSubmitButton disabled={isLoading || isGoogleLoading}>
               {isLoading ? 'Sending code...' : 'Create Account'}
-            </Button>
+            </AuthSubmitButton>
           </form>
         </div>
       ) : (
-        <div className="flex w-full flex-col gap-[28px]">
+        <div className="flex w-full flex-col gap-7">
           <AuthHeading title="Verify your account" subtitle="Join HighScholar to start your scholarship radar">
-            {error ? (
-              <HintText isInvalid role="alert" className="mt-[8px] text-[12px] leading-[16px]">
-                {error}
-              </HintText>
-            ) : (
-              successMsg && (
-                <HintText className="mt-[8px] text-[12px] leading-[16px] text-success-main">{successMsg}</HintText>
-              )
-            )}
+            <AuthMessage error={error} success={successMsg} />
           </AuthHeading>
 
-          <form onSubmit={handleVerifyOtp} className="flex w-full flex-col gap-[24px]">
-            {/* Verification code input field (179:5586) */}
-            <PinInput size="sm">
-              <PinInput.Group
-                ref={(el: HTMLInputElement | null) => {
-                  otpInputRefs.current[0] = el;
-                }}
-                maxLength={5}
-                value={otpDigits.join('')}
-                onChange={handleOtpValueChange}
-                inputMode="numeric"
-                pattern="^[0-9]*$"
-                autoComplete="one-time-code"
-                autoFocus
-                containerClassName="h-auto gap-[8px]"
-              >
-                {otpDigits.map((digit, idx) => (
-                  <PinInput.Slot
+          <form onSubmit={handleVerifyOtp} className="flex w-full flex-col gap-7">
+            {/* InputOTP 185:6521 — 5 slots, 243 × 48 */}
+            <InputOTP
+              ref={(el) => {
+                otpInputRefs.current[0] = el;
+              }}
+              maxLength={5}
+              value={otpDigits.join('')}
+              onChange={handleOtpValueChange}
+              inputMode="numeric"
+              pattern="^[0-9]*$"
+              autoComplete="one-time-code"
+              autoFocus
+              aria-label="Verification code"
+            >
+              <InputOTPGroup>
+                {otpDigits.map((_, idx) => (
+                  <InputOTPSlot
                     key={idx}
                     index={idx}
-                    className={`size-[56px] rounded-[8px] p-[8px] text-[32px] font-[590] leading-[40px] shadow-none sm:size-[64px] ${digit ? 'text-primary' : 'text-placeholder'}`}
+                    className="h-12 w-[48.4px] bg-background text-foreground shadow-none first:w-[49.4px] first:rounded-l-[10px] last:rounded-r-[8px]"
                   />
                 ))}
-              </PinInput.Group>
-            </PinInput>
+              </InputOTPGroup>
+            </InputOTP>
 
-            <div className="flex flex-col gap-[12px]">
-              <Button
-                type="submit"
-                size="sm"
-                isLoading={isVerifying}
-                showTextWhileLoading
-                isDisabled={otpDigits.join('').length < 5}
-                className={authPrimaryButtonClass}
-              >
+            <div className="flex flex-col gap-3">
+              <AuthSubmitButton disabled={isVerifying || otpDigits.join('').length < 5}>
                 {isVerifying ? 'Verifying...' : 'Create Account'}
-              </Button>
+              </AuthSubmitButton>
 
+              {/* Not in Figma: kept so users can fix their email or request a new code */}
               <div className="flex items-center justify-between">
                 <Button
-                  color="link-gray"
-                  size="xs"
-                  className="text-[12px] font-normal leading-[16px] text-secondary"
-                  onPress={() => {
+                  type="button"
+                  variant="link"
+                  className="h-auto p-0 text-xs font-normal leading-4 text-text-secondary hover:text-text-primary hover:no-underline"
+                  onClick={() => {
                     setStep('form');
                     setError('');
                   }}
@@ -390,11 +342,11 @@ export default function SignupPage() {
                   ← Change details
                 </Button>
                 <Button
-                  color="link-color"
-                  size="xs"
-                  className="text-[12px] font-normal leading-[16px]"
-                  onPress={handleResendCode}
-                  isDisabled={resendCooldown > 0 || isLoading}
+                  type="button"
+                  variant="link"
+                  className="h-auto p-0 text-xs font-normal leading-4 text-brand-primary hover:no-underline disabled:text-text-secondary"
+                  onClick={handleResendCode}
+                  disabled={resendCooldown > 0 || isLoading}
                 >
                   {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
                 </Button>
