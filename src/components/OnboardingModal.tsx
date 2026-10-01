@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, ArrowRight, Check, CircleHelp } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
@@ -191,12 +192,22 @@ function ScoreCard({
 /* Footer buttons 203:605 (Back) / 203:613 (Next) — shadcn Button, 36px, radius-sm 6, Body/2 M */
 const navButtonClass = 'h-9 gap-1 rounded-[6px] px-2 text-sm font-[510] leading-5 shadow-none';
 
-function NavButtons({ step, onPrev, onNext }: { step: number; onPrev: () => void; onNext: () => void }) {
+function NavButtons({
+  step,
+  saving,
+  onPrev,
+  onNext,
+}: {
+  step: number;
+  saving: boolean;
+  onPrev: () => void;
+  onNext: () => void;
+}) {
   const last = step === TOTAL_STEPS;
   return (
     <div className="flex items-center gap-4">
       {step > 1 && (
-        <Button type="button" variant="secondary" onClick={onPrev} className={cn(navButtonClass, 'w-[140px] text-foreground')}>
+        <Button type="button" variant="secondary" onClick={onPrev} disabled={saving} className={cn(navButtonClass, 'w-[140px] text-foreground')}>
           <ArrowLeft className="size-3" />
           Back
         </Button>
@@ -204,9 +215,10 @@ function NavButtons({ step, onPrev, onNext }: { step: number; onPrev: () => void
       <Button
         type="button"
         onClick={onNext}
+        disabled={saving}
         className={cn(navButtonClass, 'bg-brand-primary text-primary-foreground hover:bg-brand-primary/90', !last && 'w-[140px]')}
       >
-        {last ? 'Complete Profile & Reveal Matches' : 'Next'}
+        {last ? (saving ? 'Saving...' : 'Complete Profile & Reveal Matches') : 'Next'}
         <ArrowRight className="size-3" />
       </Button>
     </div>
@@ -257,6 +269,8 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onFinish, accoun
   const [gre, setGre] = useState(saved && profile.testScores?.gre ? String(profile.testScores.gre) : '');
 
   const [showError, setShowError] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
   const [showOtherSpec, setShowOtherSpec] = useState(false);
   const [customSpec, setCustomSpec] = useState('');
   const [countryPickerOpen, setCountryPickerOpen] = useState(false);
@@ -311,20 +325,35 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onFinish, accoun
       onboardingCompleted: true,
     };
 
-    updateProfile(profilePayload);
-
-    if (typeof window !== 'undefined' && finalEmail) {
-      localStorage.setItem(`highscholar_onboarded_${finalEmail}`, 'true');
-    }
-
+    // Save on the server first; only mark the user onboarded once it succeeded (BUG-17).
+    setSaving(true);
+    setSaveError('');
     try {
-      await fetch('/api/auth/complete-onboarding', {
+      const res = await fetch('/api/auth/complete-onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(profilePayload),
       });
+      if (!res.ok) {
+        setSaveError(
+          res.status === 401
+            ? 'Your session has expired. Please sign in again.'
+            : 'We couldn’t save your profile. Please try again.',
+        );
+        return;
+      }
     } catch (err) {
-      console.error('Failed to notify backend of completed onboarding:', err);
+      console.error('Failed to save onboarding profile:', err);
+      setSaveError('We couldn’t save your profile. Check your connection and try again.');
+      return;
+    } finally {
+      setSaving(false);
+    }
+
+    updateProfile(profilePayload);
+
+    if (typeof window !== 'undefined' && finalEmail) {
+      localStorage.setItem(`highscholar_onboarded_${finalEmail}`, 'true');
     }
 
     if (onFinish) {
@@ -337,6 +366,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onFinish, accoun
 
   const goTo = (n: number) => {
     setShowError(false);
+    setSaveError('');
     setStep(n);
   };
 
@@ -345,6 +375,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onFinish, accoun
       setShowError(true);
       return;
     }
+    if (saving) return;
     if (step === TOTAL_STEPS) handleSaveAndComplete();
     else goTo(step + 1);
   };
@@ -572,12 +603,25 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onFinish, accoun
               {errorMessage}
             </p>
           )}
+          {saveError && (
+            <p role="alert" className="-mt-8 text-xs leading-4 text-destructive">
+              {saveError}
+              {saveError.startsWith('Your session') && (
+                <>
+                  {' '}
+                  <Link href="/login" className="font-[510] underline underline-offset-2">
+                    Sign in
+                  </Link>
+                </>
+              )}
+            </p>
+          )}
         </div>
 
         {/* Footer — progress 162:2797 + buttons 159:814 */}
         <div className="sticky bottom-0 mt-auto flex w-full items-center justify-between bg-surface-white py-4 sm:static sm:mt-10 sm:bg-transparent sm:pb-[110px] sm:pt-0">
           <ProgressDots step={step} />
-          <NavButtons step={step} onPrev={() => goTo(step - 1)} onNext={next} />
+          <NavButtons step={step} saving={saving} onPrev={() => goTo(step - 1)} onNext={next} />
         </div>
       </div>
     </div>
