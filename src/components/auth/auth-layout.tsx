@@ -1,13 +1,10 @@
 'use client';
 
-import { useState, type ComponentProps, type ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import Link from 'next/link';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { ViewIcon, ViewOffIcon } from '@hugeicons/core-free-icons';
 import { Button } from '@/components/shadcn/button';
 import { Checkbox } from '@/components/shadcn/checkbox';
 import { Input } from '@/components/shadcn/input';
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/shadcn/input-group';
 import { Label } from '@/components/shadcn/label';
 import { cn } from '@/lib/utils';
 
@@ -19,26 +16,6 @@ const fieldClass = 'h-11 rounded-[10px] bg-background shadow-none';
 
 export function AuthInput({ className, ...props }: ComponentProps<typeof Input>) {
   return <Input className={cn(fieldClass, 'px-2.5', className)} {...props} />;
-}
-
-export function AuthPasswordInput({ className, ...props }: Omit<ComponentProps<typeof InputGroupInput>, 'type'>) {
-  const [visible, setVisible] = useState(false);
-  return (
-    <InputGroup className={cn(fieldClass, className)}>
-      <InputGroupInput type={visible ? 'text' : 'password'} className="h-full pl-2.5" {...props} />
-      <InputGroupAddon align="inline-end" className="pr-2.5 has-[>button]:mr-0">
-        <InputGroupButton
-          size="icon-xs"
-          className="size-4 rounded-sm text-muted-foreground"
-          aria-label={visible ? 'Hide password' : 'Show password'}
-          aria-pressed={visible}
-          onClick={() => setVisible((v) => !v)}
-        >
-          <HugeiconsIcon icon={visible ? ViewOffIcon : ViewIcon} size={16} />
-        </InputGroupButton>
-      </InputGroupAddon>
-    </InputGroup>
-  );
 }
 
 /* Button 185:6449 — 36px, radius-sm 6, Brand/Primary, Body/2 M */
@@ -168,12 +145,12 @@ export function AuthLayout({ children, footer }: { children: ReactNode; footer: 
             <div className="relative flex w-full flex-col items-center gap-2">
               {footer}
 
-              {/* Corner decoration */}
-              <div aria-hidden="true" className="pointer-events-none absolute left-full top-0 size-0">
-                <div className="absolute left-[-37.1px] top-[68.4px] flex h-[39.6px] w-[33.5px] items-center justify-center">
+              {/* Corner decoration — anchored to the footer content's bottom edge (Figma Login 179:5177) */}
+              <div aria-hidden="true" className="pointer-events-none absolute bottom-0 left-full size-0">
+                <div className="absolute left-[-37.1px] top-[-6.8px] flex h-[39.6px] w-[33.5px] items-center justify-center">
                   <img src="/signup/deco-back.svg" alt="" className="h-[35.1954px] w-[18.2291px] max-w-none rotate-[-30.16deg]" />
                 </div>
-                <div className="absolute left-[-23.3px] top-[52.5px] flex h-[46.6px] w-[44.2px] items-center justify-center">
+                <div className="absolute left-[-23.3px] top-[-22.7px] flex h-[46.6px] w-[44.2px] items-center justify-center">
                   <img src="/signup/deco-front.svg" alt="" className="h-[36.5512px] w-[29.8519px] max-w-none rotate-[-30.16deg]" />
                 </div>
               </div>

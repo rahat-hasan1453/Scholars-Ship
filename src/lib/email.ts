@@ -15,7 +15,7 @@ export async function sendOtpEmail(toEmail: string, otpCode: string, name?: stri
     <html>
       <head>
         <meta charset="utf-8">
-        <title>Verify your HighScholar account</title>
+        <title>Your HighScholar sign-in code</title>
         <style>
           body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #F8F9FA; margin: 0; padding: 24px; color: #101828; }
           .container { max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 20px; padding: 40px 32px; box-shadow: 0 4px 24px rgba(112, 80, 230, 0.08); border: 1px solid #EAECF0; }
@@ -37,14 +37,14 @@ export async function sendOtpEmail(toEmail: string, otpCode: string, name?: stri
             Welcome, ${recipientName}!
           </div>
           <div class="description">
-            Thank you for registering with HighScholar. Please use the following 5-digit verification code to confirm your email and complete your scholar account setup:
+            Use the following 5-digit code to sign in to HighScholar:
           </div>
           <div class="code-box">
-            <div class="code-label">Verification Code</div>
+            <div class="code-label">Sign-in Code</div>
             <div class="code-number">${otpCode}</div>
           </div>
           <div class="description" style="font-size: 13px; color: #667085;">
-            This code will expire in <strong>10 minutes</strong>. If you did not request this registration, you can safely ignore this email.
+            This code will expire in <strong>10 minutes</strong>. If you did not try to sign in, you can safely ignore this email.
           </div>
           <div class="footer-note">
             HighScholar — Global Higher Ed, Fully Funded Scholarships & Faculty Matching<br/>
@@ -55,51 +55,7 @@ export async function sendOtpEmail(toEmail: string, otpCode: string, name?: stri
     </html>
   `;
 
-  return sendEmail({ to: toEmail, subject: `${otpCode} is your HighScholar verification code`, html: htmlContent });
-}
-
-export async function sendPasswordResetEmail(toEmail: string, resetLink: string, name?: string): Promise<{ success: boolean; error?: string }> {
-  const recipientName = (name?.trim() || 'Scholar').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
-
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta charset="utf-8">
-        <title>Reset your HighScholar password</title>
-        <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #F8F9FA; margin: 0; padding: 24px; color: #101828; }
-          .container { max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 20px; padding: 40px 32px; box-shadow: 0 4px 24px rgba(112, 80, 230, 0.08); border: 1px solid #EAECF0; }
-          .logo { font-size: 24px; font-weight: 800; color: #7150E7; margin-bottom: 24px; }
-          .greeting { font-size: 18px; font-weight: 600; color: #101828; margin-bottom: 12px; }
-          .description { font-size: 14px; color: #475467; line-height: 1.6; margin-bottom: 28px; }
-          .button { display: inline-block; background: #7150E7; color: #ffffff !important; text-decoration: none; font-weight: 600; font-size: 14px; padding: 10px 20px; border-radius: 8px; margin-bottom: 28px; }
-          .link { font-size: 12px; color: #667085; word-break: break-all; margin-bottom: 28px; }
-          .footer-note { font-size: 12px; color: #98A2B3; line-height: 1.5; border-top: 1px solid #F2F4F7; padding-top: 20px; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="logo">HighScholar</div>
-          <div class="greeting">Hi ${recipientName},</div>
-          <div class="description">
-            We received a request to reset your HighScholar password. Click the button below to choose a new password.
-          </div>
-          <a class="button" href="${resetLink}">Reset password</a>
-          <div class="link">Or copy this link into your browser:<br/>${resetLink}</div>
-          <div class="description" style="font-size: 13px; color: #667085;">
-            This link will expire in <strong>30 minutes</strong> and can be used once. If you did not request a password reset, you can safely ignore this email.
-          </div>
-          <div class="footer-note">
-            HighScholar — Global Higher Ed, Fully Funded Scholarships & Faculty Matching<br/>
-            Need help? Contact support@highscholar.io
-          </div>
-        </div>
-      </body>
-    </html>
-  `;
-
-  return sendEmail({ to: toEmail, subject: 'Reset your HighScholar password', html: htmlContent });
+  return sendEmail({ to: toEmail, subject: `${otpCode} is your HighScholar sign-in code`, html: htmlContent });
 }
 
 export async function sendEmail({ to, subject, html }: SendEmailOptions): Promise<{ success: boolean; error?: string }> {
