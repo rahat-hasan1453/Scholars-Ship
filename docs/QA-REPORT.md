@@ -4,8 +4,8 @@
 |---|---|
 | **কোড / Code under test** | `main` @ `dbc599c` (PR #1 passwordless auth, #2 onboarding, #3 lucide icons, #4 docs) merged into the QA branch |
 | **QA branch** | `claude/optimistic-blackburn-1aeb1b` (main + tests) |
-| **তারিখ / Date** | 2026-10-01 (run #1), 2026-10-02 (run #2) |
-| **রান / Run** | #2: same checks re-run after merging `main`. `src/lib`, `src/app/api` and `prisma` are identical to run #1, so every auth/API finding still applies. E2E, visual, accessibility, performance: next runs |
+| **তারিখ / Date** | 2026-10-01 (run #1), 2026-10-02 (runs #2, #3) |
+| **রান / Run** | #3 (2026-10-02): E2E + axe accessibility in Chromium, Firefox, WebKit (desktop 1728) and Chromium mobile (375). #2: same checks re-run after merging `main`. `src/lib`, `src/app/api` and `prisma` are identical to run #1, so every auth/API finding still applies. E2E, visual, accessibility, performance: next runs |
 
 ## সারসংক্ষেপ / Summary
 
@@ -17,13 +17,14 @@
 | `npm audit` | ✅ prod: 0 | – | dev: 3 high (deepmerge-ts via prisma) | – |
 | Unit (Vitest), `tests/unit` | 33 | 0 | 6 | `AppContext` not yet covered |
 | API (Vitest), `tests/api` | 39 | 0 | 5 | `research/chat`, `professors` GET/POST not yet covered |
-| E2E (Playwright) | – | – | – | Not run (needs install approval) |
-| Visual / A11y / Lighthouse | – | – | – | Not run |
+| E2E (Playwright), `tests/e2e`: 4 projects | 66 | 0 | 11 (BUG-16, 17, 18) | 3 (Firefox: clock-based resend test, hydration check; mobile: logout) |
+| Accessibility (axe, WCAG 2.1 AA) in E2E | 1 (Firefox home) | – | 11 (BUG-19) | – |
+| Visual (Figma) / Lighthouse | – | – | – | Not run yet |
 
 **`it.fails` কী? / What is `it.fails`?** প্রতিটা জানা bug-এর জন্য একটা test আছে, যেটা bug থাকা পর্যন্ত "expected fail" দেখায়। তাই `npm test` এখন সবুজ। Bug ঠিক হলে test-টা লাল হবে, তখন `it.fails` বদলে `it` করতে হবে।
 Each known bug has a test that is expected to fail while the bug exists, so `npm test` stays green. When a bug is fixed, that test turns red: change `it.fails` to `it`.
 
-চালানোর নিয়ম / How to run: `npm test`. আসল email, Google, OpenAlex বা database কিছুই ব্যবহার হয় না, সব mock (নকল)। / No real email, Google, OpenAlex or database: all mocked.
+চালানোর নিয়ম / How to run: `npm test` (unit + API), `npm run test:e2e` (browser; starts `next dev` on port 3100). E2E-তে সব `/api` call browser-এই নকল করা (`tests/e2e/fixtures.ts`), তাই database/email/Google লাগে না। / In E2E every `/api` call is faked in the browser, so no DB, email or Google is needed. Test code `12345` exists only in that fake. আসল email, Google, OpenAlex বা database কিছুই ব্যবহার হয় না, সব mock (নকল)। / No real email, Google, OpenAlex or database: all mocked.
 
 ## যা ঠিকমতো কাজ করছে / Verified working
 - Session cookie HMAC দিয়ে sign করা থাকে। এডিট করা, পুরনো unsigned base64, অন্য secret দিয়ে sign করা বা মেয়াদোত্তীর্ণ (৩০ দিনের বেশি) cookie বাতিল হয়। `httpOnly`, `sameSite=lax` চালু, production-এ `secure`। Production-এ দুর্বল `SESSION_SECRET` থাকলে app চলবে না। *(Earlier "unsigned base64 session cookie": **fixed**, re-verified on `dbc599c`.)*
@@ -64,6 +65,11 @@ Each known bug has a test that is expected to fail while the bug exists, so `npm
 | BUG-11 | Low | Research search reports OpenAlex outage as success, 0 papers | GenOps (Home) |
 | BUG-12 | Low | `?limit=abc` returns no opportunities; `?tag=` ignored | GenOps (Home) |
 | BUG-15 | Low | Sessions can't be revoked server-side; send-code email links use Host header when `NEXT_PUBLIC_APP_URL` unset | Signup |
+| BUG-17 | **Medium** | Onboarding save failure is ignored: user sent home, then bounced back, answers lost | Onboarding |
+| BUG-18 | Medium | `/?tab=...` deep link causes a React hydration error (whole page re-rendered) | GenOps (Home) |
+| BUG-19 | Medium | Accessibility: low-contrast grey text everywhere, unnamed controls (WCAG 2.1 AA) | GenOps + Design |
+| BUG-16 | Low | Terms checkbox can be unticked and sign-in still continues | Signup |
+| BUG-20 | Low | Route protection is client-side only (home renders, then redirects) | Signup / GenOps |
 
 ### BUG-02 · High · Login code brute force / লগইন কোড অনুমান করে ঢোকা
 - **File:** `src/lib/loginCodes.ts:21-22` (5-digit code; every new code resets `attempts: 0`)
@@ -131,7 +137,47 @@ Each known bug has a test that is expected to fail while the bug exists, so `npm
 - `send-code/route.ts:28`: if `NEXT_PUBLIC_APP_URL` is not set, the email logo URL comes from the request's Host header. Make sure `NEXT_PUBLIC_APP_URL` is set on Vercel.
 - Dev-only: the sign-in code is printed to the server console when `NODE_ENV !== 'production'` (fine locally, and Vercel previews run as production).
 
+### BUG-17 · Medium · Onboarding save failure ignored / প্রোফাইল সেভ ব্যর্থ হলেও এগিয়ে যায়
+- **File:** `src/components/OnboardingModal.tsx:320-334`. The `fetch('/api/auth/complete-onboarding')` result is never checked, and the code always calls `router.push('/?welcome=true')`.
+- **বাংলা:** Server-এ প্রোফাইল সেভ না হলেও (যেমন 500 error বা session শেষ হয়ে গেলে) কোনো error দেখায় না, সরাসরি Home-এ পাঠিয়ে দেয়। Home তখন দেখে onboarding শেষ হয়নি, তাই আবার `/onboarding`-এ ফেরত পাঠায়। ফলে ব্যবহারকারীর সব উত্তর হারিয়ে যায়।
+- **English:** If the server save fails (500, expired session), no error is shown and the user is sent home. Home sees `onboardingCompleted=false` and bounces back to `/onboarding`, so the answers are lost.
+- **Repro:** `tests/e2e/onboarding.spec.ts` → "shows an error and stays when saving the profile fails".
+- **Expected:** Check `res.ok`, show an error, stay on step 5, offer a retry.
+
+### BUG-18 · Medium · Hydration error on `/?tab=`
+- **File:** `src/app/page.tsx:87-96`. `useState(() => window.location...)` picks the tab on the client, but the server rendered the default tab. React logs "Hydration failed…" and re-renders the whole tree, which is slower and can flash.
+- **Repro:** open `/?tab=scholarships` while signed in (Chromium/WebKit console). Test: `tests/e2e/home.spec.ts` → "deep link ?tab=scholarships renders without a hydration error".
+- **Expected:** Read the tab with `useSearchParams()`, or set it in an effect after mount.
+
+### BUG-19 · Medium · Accessibility (WCAG 2.1 AA, axe)
+| Page | Violations (serious/critical) |
+|---|---|
+| `/login` | `color-contrast` ×3: `text-text-secondary` **#919EAB on white = 2.73:1** (needs 4.5:1), `#98A2B3` 10px = 2.57:1. `aria-prohibited-attr`: `aria-label` on a plain `<div>` (logo) |
+| `/onboarding` | `aria-progressbar-name`: progress dots have no label. `color-contrast` ×2 (#919EAB subtitle; placeholder #C0C7D0 = 1.7:1). `aria-prohibited-attr` (logo div) |
+| `/` home | `color-contrast` ×81 (#919EAB, #90A1B9 = 2.63:1, #009966 = 3.65:1, brand #7150E7 on #EDE9FE 10px = 4.41:1). Mobile: **critical** `button-name`: the `lg:hidden` icon button has no label |
+- **বাংলা:** হালকা ধূসর লেখা (#919EAB) সাদা background-এর ওপর পড়তে কষ্ট হয়, বিশেষ করে যাঁদের চোখে সমস্যা আছে। রঙটা Figma token থেকে এসেছে, তাই Design-এর সাথে কথা বলে গাঢ় করতে হবে (যেমন #637381 ≈ 4.6:1)। Icon button-এ `aria-label`, আর progressbar-এ `aria-label="Step 1 of 5"` লাগবে।
+- **English:** The grey secondary text token fails contrast. It comes from Figma, so Design must darken it (e.g. #637381 ≈ 4.6:1). Add `aria-label` to the icon button and the progressbar, and `role="img"` (or remove `aria-label`) on the logo div.
+- **Repro:** `tests/e2e/a11y.spec.ts` (full JSON attached in the Playwright HTML report).
+
+### BUG-16 · Low · Terms checkbox not enforced
+- **File:** `src/app/login/page.tsx:38` (`agreeTerms` is set but never checked before `sendCode`). Untick Terms, then Continue: the code is still sent. Test: `tests/e2e/auth.spec.ts` → "cannot continue without accepting the Terms".
+
+### BUG-20 · Low · Client-only route protection
+- There is no `proxy.ts`/middleware. `/` and `/onboarding` render for signed-out visitors, then `useEffect` calls `/api/auth/me` and redirects. The data APIs are public anyway, so the risk is low, but the page flashes and a no-JS visitor sees the app shell.
+
+### E2E: যা পাস করেছে / What passed (all 4 browser projects)
+- New user: email → 5-digit code → `/onboarding`. Returning onboarded user → `/`. Email is normalized (trim, lowercase).
+- Wrong code: error shown, input cleared. Letters are ignored, and Continue stays disabled until 5 digits.
+- Resend: locked for 60s, then sends a new code. A server 429 cooldown message is shown. Change email keeps the address.
+- Google `?error=` codes are shown as friendly text, and an HTML injection in `?error=` is not rendered (no XSS).
+- Route guards: signed-out → `/login`; not onboarded → `/onboarding`; onboarded visiting `/onboarding` → `/`.
+- Onboarding: step validation (name, ≥1 field, ≥1 country), Back/Next, and the payload sent to the API matches the inputs.
+- Home: no console errors, **no horizontal scroll at 375px and 1728px**, `?tab=` views open, logout clears the session → `/login`.
+
+### টেস্ট পরিবেশের নোট / Test environment notes
+- E2E runs on `next dev` because `npm run build` fails in this folder (BUG-01). The dev server compiles pages on first visit, which occasionally races in Firefox, so the config allows 1 retry and reports such tests as "flaky".
+
 ## পরের ধাপ / Next runs
-1. E2E with Playwright + axe (needs install approval): login → code → onboarding → home, wrong code, resend, logout, responsive 1728/375.
-2. `AppContext` unit tests.
-3. Figma visual comparison, Lighthouse, accessibility review.
+1. Figma visual comparison (needs the Figma connector authorized), Lighthouse (mobile + desktop).
+2. `AppContext` unit tests; E2E for bookmarks/track, Kanban, feed filters and search.
+3. Exploratory pass with the browser pane (console + network errors).

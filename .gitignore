@@ -49,3 +49,8 @@ scripts/
 
 # graphify knowledge graph output
 graphify-out/
+
+# playwright
+/test-results/
+/playwright-report/
+/blob-report/
