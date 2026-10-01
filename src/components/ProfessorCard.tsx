@@ -2,13 +2,7 @@
 
 import React from 'react';
 import { Professor } from '@/types';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { 
-  Building02Icon, 
-  FlaskConicalIcon, 
-  ChevronRightIcon, 
-  ArrowUpRight01Icon 
-} from '@hugeicons/core-free-icons';
+import { ArrowUpRightIcon, Building2Icon, ChevronRightIcon, FlaskConicalIcon } from 'lucide-react';
 
 interface ProfessorCardProps {
   professor: Professor;
@@ -38,7 +32,7 @@ export const ProfessorCard: React.FC<ProfessorCardProps> = ({ professor }) => {
                 {professor.title}
               </p>
               <div className="flex items-center gap-1.5 text-xs text-[#344054] font-medium truncate mt-1">
-                <HugeiconsIcon icon={Building02Icon} size={14} className="text-[#667085] shrink-0" />
+                <Building2Icon size={14} className="text-[#667085] shrink-0" />
                 <span className="truncate">{professor.university}</span>
               </div>
               <p className="text-[11px] text-[#475467] italic truncate mt-0.5" title={`${professor.department}, ${professor.country}`}>
@@ -67,7 +61,7 @@ export const ProfessorCard: React.FC<ProfessorCardProps> = ({ professor }) => {
           {/* Box 1: Lab Information */}
           <div className="p-3 bg-[#F8F9FC] border border-[#EAECF0] rounded-xl">
             <div className="flex items-center gap-2 text-xs font-semibold text-[#101828]">
-              <HugeiconsIcon icon={FlaskConicalIcon} size={15} className="text-[#667085] shrink-0" />
+              <FlaskConicalIcon size={15} className="text-[#667085] shrink-0" />
               <span className="truncate">{professor.labName || 'Research Laboratory'}</span>
             </div>
           </div>
@@ -155,7 +149,7 @@ export const ProfessorCard: React.FC<ProfessorCardProps> = ({ professor }) => {
             className="h-10 px-4.5 bg-white border border-[#7150E7] hover:bg-[#F9F5FF] text-[#7150E7] font-semibold text-xs rounded-full inline-flex items-center justify-center gap-1.5 shadow-2xs transition-all cursor-pointer shrink-0"
           >
             <span>Original Link</span>
-            <HugeiconsIcon icon={ArrowUpRight01Icon} size={15} className="text-[#7150E7]" />
+            <ArrowUpRightIcon size={15} className="text-[#7150E7]" />
           </a>
 
           {/* Button 2: See Details */}
@@ -168,7 +162,7 @@ export const ProfessorCard: React.FC<ProfessorCardProps> = ({ professor }) => {
             className="h-10 px-4.5 bg-[#6941C6] hover:bg-[#5925DC] text-white font-semibold text-xs rounded-full inline-flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer shrink-0"
           >
             <span>See Details</span>
-            <HugeiconsIcon icon={ChevronRightIcon} size={15} className="text-white" />
+            <ChevronRightIcon size={15} className="text-white" />
           </a>
         </div>
       </div>

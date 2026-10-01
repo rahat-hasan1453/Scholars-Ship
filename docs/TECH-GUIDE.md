@@ -45,12 +45,13 @@ This file explains the basics of every technology we use. It is updated whenever
 | **English** | Style by adding ready-made classes in HTML instead of writing CSS. Makes matching Figma sizes and colors easy. |
 | **সহায়ক / Helpers** | `tailwind-merge` (ক্লাসের দ্বন্দ্ব মেটায় / resolves class conflicts), `clsx` (শর্ত দিয়ে ক্লাস চালু-বন্ধ / conditional classes) |
 
-## 5. Icons: Hugeicons, lucide-react
+## 5. Icons: lucide-react
 
 | | |
 |---|---|
-| **বাংলা** | তৈরি আইকন সেট। component হিসেবে import করে ব্যবহার করা যায়। |
-| **English** | Ready-made icon sets, imported and used as components. |
+| **বাংলা** | তৈরি আইকন সেট। component হিসেবে import করে ব্যবহার করা যায় (যেমন `import { SearchIcon } from 'lucide-react'`)। shadcn/ui-র ডিফল্ট আইকন সেটও এটাই। Figma-তেও Lucide আইকন ব্যবহার হয়, তাই কোড ও ডিজাইন মেলে। আগে Hugeicons ছিল, সেটা বাদ (২০২৬-১০-০১)। |
+| **English** | A ready-made icon set, imported and used as components (e.g. `import { SearchIcon } from 'lucide-react'`). It is also shadcn/ui's default icon set. Figma uses Lucide icons too, so code and design match. Hugeicons was used earlier and has been removed (2026-10-01). |
+| **নিয়ম / Rule** | আইকনের সাইজ `size={16}` প্রপ দিয়ে, রঙ `className="text-..."` দিয়ে (Figma টোকেন)। / Set size with `size={16}` and color with `className="text-..."` (Figma tokens). |
 
 ## 6. canvas-confetti
 
@@ -63,8 +64,8 @@ This file explains the basics of every technology we use. It is updated whenever
 
 | | |
 |---|---|
-| **বাংলা** | কোড থেকে ইমেইল পাঠানোর লাইব্রেরি। আমরা OTP ইমেইল পাঠাতে ব্যবহার করি। **SMTP** হলো ইমেইল পাঠানোর প্রোটোকল/সার্ভার (Gmail বা Resend)। |
-| **English** | A library for sending email from code. We use it for OTP emails. **SMTP** is the email-sending protocol/server (Gmail or Resend). |
+| **বাংলা** | কোড থেকে ইমেইল পাঠানোর লাইব্রেরি। লগইনের ৫ অঙ্কের কোড ইমেইলে পাঠাতে ব্যবহার করি (ইমেইলে Scholars'ship লোগো থাকে, `public/email/logo.png`)। **SMTP** হলো ইমেইল পাঠানোর প্রোটোকল/সার্ভার (Gmail বা Resend)। |
+| **English** | A library for sending email from code. We use it to email the 5-digit sign-in code (branded with the Scholars'ship logo, `public/email/logo.png`). **SMTP** is the email-sending protocol/server (Gmail or Resend). |
 
 ⚠️ ইমেইল পাসওয়ার্ড/কী থাকে `.env` ফাইলে। কখনো GitHub-এ পুশ করা যাবে না।
 ⚠️ Email passwords/keys live in `.env`. Never push them to GitHub.
@@ -76,6 +77,7 @@ This file explains the basics of every technology we use. It is updated whenever
 | **বাংলা** | ডেটাবেসের সাথে কথা বলার টুল (ORM)। SQL না লিখেও ডেটা সেভ ও পড়া যায়। |
 | **English** | A tool (ORM) for talking to the database. Save and read data without writing SQL. |
 | **উপমা / Analogy** | ডেটাবেসের জন্য একজন অনুবাদক। / A translator for the database. |
+| **প্রজেক্টে / In project** | এখন **বাধ্যতামূলক**: ইউজার (`User`) ও লগইন কোড (`LoginCode`, কোড hash করে রাখা) PostgreSQL-এ থাকে (Neon)। স্কিমা বদলালে ডেটাবেসে প্রয়োগ করতে `npx prisma db push`। / Now **required**: users (`User`) and sign-in codes (`LoginCode`, stored hashed) live in PostgreSQL (Neon). Apply schema changes with `npx prisma db push`. |
 
 ## 9. ESLint
 
@@ -90,6 +92,7 @@ This file explains the basics of every technology we use. It is updated whenever
 |---|---|
 | **বাংলা** | ওয়েবসাইট অনলাইনে (live) দেওয়ার হোস্টিং প্ল্যাটফর্ম। GitHub-এ পুশ করলে অটো ডিপ্লয় হয়। SMTP পাসওয়ার্ডের মতো গোপন তথ্য Vercel ড্যাশবোর্ডে env variable হিসেবে রাখতে হয়। |
 | **English** | A hosting platform that puts the site online. Pushing to GitHub auto-deploys. Secrets like SMTP passwords are stored as env variables in the Vercel dashboard. |
+| **দরকারি env / Required env** | `DATABASE_URL`, `SESSION_SECRET` (৩২+ অক্ষর, কুকি সাইন করতে / 32+ chars, signs the session cookie), SMTP বা Resend, ঐচ্ছিক / optional `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` |
 
 ## 11. Git & GitHub
 
@@ -148,17 +151,31 @@ Mistakes never break the live site, parallel sessions stay separate, and changes
 
 | | |
 |---|---|
-| **বাংলা** | তৈরি UI কম্পোনেন্টের সংগ্রহ (Button, Input, Checkbox, OTP ইনপুট ইত্যাদি)। এটা **CDN নয়**। কমান্ড চালালে কম্পোনেন্টের কোড আপনার প্রজেক্টে (`src/components/ui/`) কপি হয়ে বসে, তারপর সেগুলো আপনার নিজের কোড। ভেতরে Radix UI ও Tailwind ব্যবহার হয়। |
-| **English** | A collection of ready-made UI components (Button, Input, Checkbox, OTP input, etc.). It is **not a CDN**: a command copies the component source into your project (`src/components/ui/`), and from then on it is your own code. Built on Radix UI and Tailwind. |
+| **বাংলা** | তৈরি UI কম্পোনেন্টের সংগ্রহ (Button, Input, Checkbox, OTP ইনপুট ইত্যাদি)। এটা **CDN নয়**। কমান্ড চালালে কম্পোনেন্টের কোড আপনার প্রজেক্টে (`src/components/shadcn/`) কপি হয়ে বসে, তারপর সেগুলো আপনার নিজের কোড। ভেতরে Radix UI ও Tailwind ব্যবহার হয়। |
+| **English** | A collection of ready-made UI components (Button, Input, Checkbox, OTP input, etc.). It is **not a CDN**: a command copies the component source into your project (`src/components/shadcn/`), and from then on it is your own code. Built on Radix UI and Tailwind. |
 | **উপমা / Analogy** | রেডিমেড আসবাবের নকশা: আপনি নকশাটা নিয়ে নিজের ঘরে নিজের রঙে বানিয়ে নেন। / Furniture blueprints: you take the design and build it in your own colors. |
 | **আমাদের নিয়ম / Our rule** | কম্পোনেন্ট shadcn/ui থেকে, কিন্তু **রঙ ও টোকেন Figma থেকে** (Brand Primary `#7150E7`), shadcn-এর ডিফল্ট রঙ নয়। / Components from shadcn/ui, but **colors and tokens from Figma**, not shadcn defaults. |
 | **কমান্ড / Commands** | `npx shadcn@latest init` (একবার / once), `npx shadcn@latest add button` (কম্পোনেন্ট যোগ / add a component) |
 | **থিম / Theme** | `src/app/globals.css`-এর CSS variables (`--primary`, `--background` ইত্যাদি), Figma টোকেন দিয়ে ভরা / CSS variables filled from Figma tokens |
-| **অবস্থা / Status** | সিদ্ধান্ত হয়েছে (২০২৬-১০-০১), ইনস্টল চলছে। আগে Untitled UI ভাবা হয়েছিল, সেটা বাদ। / Decided 2026-10-01, installation in progress. Untitled UI was considered earlier and dropped. |
+| **অবস্থা / Status** | ইনস্টল হয়েছে, `main`-এ আছে (PR #1, ২০২৬-১০-০১)। ফোল্ডার `src/components/shadcn/`। `src/components/ui/`-এ অ্যাপের নিজের পুরোনো button/input আছে, সেগুলো shadcn না। Untitled UI পুরো সরানো হয়েছে। / Installed and on `main` (PR #1, 2026-10-01) in `src/components/shadcn/`. `src/components/ui/` holds the app's own older button/input, not shadcn. Untitled UI fully removed. |
+| **Figma রঙ / Figma colors** | `src/app/globals.css`: primary `#7150E7`, border `#E5E5E5`, placeholder `#737373` |
 | **Claude skill** | অফিশিয়াল shadcn skill গ্লোবালি ইনস্টল করা আছে (`~/.claude/skills/shadcn`), তাই সব সেশনে Claude shadcn-এর নিয়ম জেনে কাজ করে। প্রজেক্টে `components.json` থাকলে এটা সক্রিয় হয়। / The official shadcn skill is installed globally (`~/.claude/skills/shadcn`), so Claude follows shadcn conventions in every session. It activates when the project has a `components.json`. |
 | **Skill কমান্ড / Skill command** | `npx skills add shadcn/ui -g -a claude-code -s shadcn -y` (ইনস্টল / install), `npx skills update` (আপডেট / update), `npx skills remove shadcn` (সরানো / remove) |
 
-## 15. Vitest + Testing Library (Automated Tests / স্বয়ংক্রিয় টেস্ট)
+---
+
+## 15. cmdk (shadcn Command + Popover)
+
+| | |
+|---|---|
+| **বাংলা** | search করা যায় এমন তালিকা (command menu) বানানোর library। shadcn-এর `Command` কম্পোনেন্ট এর ওপর তৈরি, আর `Popover` দিয়ে সেটা একটা ছোট dropdown হিসেবে খোলে। |
+| **English** | A library for searchable lists (command menus). shadcn's `Command` component is built on it, and `Popover` opens it as a small dropdown. |
+| **উপমা / Analogy** | ফোনের contact list-এর search: লিখতে থাকলেই তালিকা ছোট হয়ে আসে। / Like searching your phone's contacts: the list narrows as you type. |
+| **কোথায় / Where** | Onboarding ধাপ ৪-এ "Other" চাপলে বাকি দেশের dropdown (`src/components/OnboardingModal.tsx`)। ফাইল: `src/components/shadcn/command.tsx`, `popover.tsx`, `dialog.tsx`। / The "Other" country dropdown in onboarding step 4. |
+| **কমান্ড / Command** | `npx shadcn@latest add popover command` |
+| **অবস্থা / Status** | যোগ হয়েছে ২০২৬-১০-০১। / Added 2026-10-01. |
+
+## 16. Vitest + Testing Library (Automated Tests / স্বয়ংক্রিয় টেস্ট)
 
 | | |
 |---|---|

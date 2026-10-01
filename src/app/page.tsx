@@ -53,8 +53,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { CustomDropdown } from '@/components/ui/CustomDropdown';
 import { Tag } from '@/components/ui/tag';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { PreferenceHorizontalIcon, Search01Icon } from '@hugeicons/core-free-icons';
 
 export default function HomePage() {
   const { 

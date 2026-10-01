@@ -3,22 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/context/AppContext';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { 
-  ArrowLeftDoubleIcon,
-  Compass01Icon, 
-  UserGroupIcon, 
-  KanbanIcon, 
-  UserCircleIcon, 
-  FlashIcon, 
-  PreferenceHorizontalIcon, 
-  Menu01Icon, 
-  Cancel01Icon,
-  SparklesIcon,
-  Clock01Icon,
-  CheckmarkCircle01Icon,
-  PuzzleIcon
-} from '@hugeicons/core-free-icons';
+import { ChevronsLeftIcon, CompassIcon, MenuIcon, SlidersHorizontalIcon, UsersIcon, XIcon, ZapIcon } from 'lucide-react';
 import { ChevronRight, Zap, LogOut, Settings, User, Sparkles, BookOpen } from 'lucide-react';
 import { HighScholarLogo } from './HighScholarLogo';
 import { HeaderGlobalSearch } from './HeaderGlobalSearch';
@@ -115,13 +100,13 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
               onClick={() => setIsSidebarOpen(false)}
               className="lg:hidden p-1 text-slate-400 hover:text-slate-700"
             >
-              <HugeiconsIcon icon={Cancel01Icon} size={20} />
+              <XIcon size={20} />
             </button>
             <button
               className="hidden lg:flex p-1 rounded-md text-[#94A3B8] hover:text-[#475467] hover:bg-slate-50 transition-colors"
               title="Collapse sidebar"
             >
-              <HugeiconsIcon icon={ArrowLeftDoubleIcon} size={18} />
+              <ChevronsLeftIcon size={18} />
             </button>
           </div>
 
@@ -151,9 +136,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                   )}
 
                   <div className="flex items-center gap-3">
-                    <HugeiconsIcon 
-                      icon={FlashIcon} 
-                      size={18} 
+                    <ZapIcon size={18} 
                       className={activeTab === 'opportunities' ? 'text-[#7150E7]' : 'text-[#64748B]'} 
                     />
                     <span className={activeTab === 'opportunities' ? 'text-[#101828] font-semibold' : 'text-[#475467]'}>
@@ -179,9 +162,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                   )}
 
                   <div className="flex items-center gap-3">
-                    <HugeiconsIcon 
-                      icon={Compass01Icon} 
-                      size={18} 
+                    <CompassIcon size={18} 
                       className={activeTab === 'scholarships' ? 'text-[#7150E7]' : 'text-[#64748B]'} 
                     />
                     <span className={activeTab === 'scholarships' ? 'text-[#101828] font-semibold' : 'text-[#475467]'}>
@@ -207,9 +188,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                   )}
 
                   <div className="flex items-center gap-3">
-                    <HugeiconsIcon 
-                      icon={UserGroupIcon} 
-                      size={18} 
+                    <UsersIcon size={18} 
                       className={activeTab === 'professors' ? 'text-[#7150E7]' : 'text-[#64748B]'} 
                     />
                     <span className={activeTab === 'professors' ? 'text-[#101828] font-semibold' : 'text-[#475467]'}>
@@ -278,7 +257,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
               className="p-1 rounded-md text-[#94A3B8] hover:text-[#7150E7] hover:bg-[#EDE9FE] transition-colors cursor-pointer"
               title="Edit Profile Wizard"
             >
-              <HugeiconsIcon icon={PreferenceHorizontalIcon} size={18} />
+              <SlidersHorizontalIcon size={18} />
             </button>
           </div>
         </div>
@@ -296,7 +275,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
               onClick={() => setIsSidebarOpen(true)}
               className="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 shrink-0"
             >
-              <HugeiconsIcon icon={Menu01Icon} size={20} />
+              <MenuIcon size={20} />
             </button>
 
             {/* Global Omnisearch matching Figma Node 122:3165 Frame 2147226771 */}

@@ -4,14 +4,7 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/context/AppContext';
 import { HeaderGlobalSearch } from '@/components/layout/HeaderGlobalSearch';
-import { HugeiconsIcon } from '@hugeicons/react';
-import {
-  Menu01Icon,
-  ArrowDown01Icon,
-  Cancel01Icon,
-  Search01Icon,
-  CheckmarkCircle02Icon,
-} from '@hugeicons/core-free-icons';
+import { ChevronDownIcon, CircleCheckIcon, MenuIcon, SearchIcon, XIcon } from 'lucide-react';
 import { User, Settings, LogOut } from 'lucide-react';
 
 export const ALL_SUBJECTS = [
@@ -175,7 +168,7 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
           className="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 shrink-0 cursor-pointer"
           title="Open navigation menu"
         >
-          <HugeiconsIcon icon={Menu01Icon} size={20} />
+          <MenuIcon size={20} />
         </button>
 
         {/* Omnisearch Box (Figma Node 122:3166) */}
@@ -332,7 +325,7 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
                         className="p-0.5 hover:text-red-500 rounded-xs cursor-pointer"
                         title={`Remove ${s}`}
                       >
-                        <HugeiconsIcon icon={Cancel01Icon} size={11} />
+                        <XIcon size={11} />
                       </span>
                     </span>
                   ))}
@@ -344,9 +337,7 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
                 </>
               )}
             </div>
-            <HugeiconsIcon 
-              icon={ArrowDown01Icon} 
-              size={16} 
+            <ChevronDownIcon size={16} 
               className={`text-[#667085] shrink-0 transition-transform ${isSubjectOpen ? 'rotate-180' : ''}`} 
             />
           </div>
@@ -354,7 +345,7 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
           {isSubjectOpen && (
             <div className="absolute left-0 top-full mt-1.5 w-72 bg-white rounded-xl border border-[#EAECF0] shadow-xl p-3 z-50 space-y-2.5 animate-in fade-in slide-in-from-top-1">
               <div className="relative">
-                <HugeiconsIcon icon={Search01Icon} size={14} className="text-[#98A2B3] absolute left-2.5 top-1/2 -translate-y-1/2" />
+                <SearchIcon size={14} className="text-[#98A2B3] absolute left-2.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={subjectSearch}
@@ -377,7 +368,7 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
                     >
                       <span>{s}</span>
                       {isChecked && (
-                        <HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} className="text-[#7150E7]" />
+                        <CircleCheckIcon size={14} className="text-[#7150E7]" />
                       )}
                     </div>
                   );
@@ -413,7 +404,7 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
                         className="p-0.5 hover:text-red-500 rounded-xs cursor-pointer"
                         title={`Remove ${d}`}
                       >
-                        <HugeiconsIcon icon={Cancel01Icon} size={11} />
+                        <XIcon size={11} />
                       </span>
                     </span>
                   ))}
@@ -425,9 +416,7 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
                 </>
               )}
             </div>
-            <HugeiconsIcon 
-              icon={ArrowDown01Icon} 
-              size={16} 
+            <ChevronDownIcon size={16} 
               className={`text-[#667085] shrink-0 transition-transform ${isDegreeOpen ? 'rotate-180' : ''}`} 
             />
           </div>
@@ -446,7 +435,7 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
                   >
                     <span>{d}</span>
                     {isChecked && (
-                      <HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} className="text-[#7150E7]" />
+                      <CircleCheckIcon size={14} className="text-[#7150E7]" />
                     )}
                   </div>
                 );
@@ -481,7 +470,7 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
                         className="p-0.5 hover:text-red-500 rounded-xs cursor-pointer"
                         title={`Remove ${c}`}
                       >
-                        <HugeiconsIcon icon={Cancel01Icon} size={11} />
+                        <XIcon size={11} />
                       </span>
                     </span>
                   ))}
@@ -493,9 +482,7 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
                 </>
               )}
             </div>
-            <HugeiconsIcon 
-              icon={ArrowDown01Icon} 
-              size={16} 
+            <ChevronDownIcon size={16} 
               className={`text-[#667085] shrink-0 transition-transform ${isCountryOpen ? 'rotate-180' : ''}`} 
             />
           </div>
@@ -503,7 +490,7 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
           {isCountryOpen && (
             <div className="absolute left-0 top-full mt-1.5 w-64 bg-white rounded-xl border border-[#EAECF0] shadow-xl p-3 z-50 space-y-2.5 animate-in fade-in slide-in-from-top-1">
               <div className="relative">
-                <HugeiconsIcon icon={Search01Icon} size={14} className="text-[#98A2B3] absolute left-2.5 top-1/2 -translate-y-1/2" />
+                <SearchIcon size={14} className="text-[#98A2B3] absolute left-2.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={countrySearch}
@@ -526,7 +513,7 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
                     >
                       <span>{c}</span>
                       {isChecked && (
-                        <HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} className="text-[#7150E7]" />
+                        <CircleCheckIcon size={14} className="text-[#7150E7]" />
                       )}
                     </div>
                   );
@@ -562,7 +549,7 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
                         className="p-0.5 hover:text-red-500 rounded-xs cursor-pointer"
                         title={`Remove ${f}`}
                       >
-                        <HugeiconsIcon icon={Cancel01Icon} size={11} />
+                        <XIcon size={11} />
                       </span>
                     </span>
                   ))}
@@ -574,9 +561,7 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
                 </>
               )}
             </div>
-            <HugeiconsIcon 
-              icon={ArrowDown01Icon} 
-              size={16} 
+            <ChevronDownIcon size={16} 
               className={`text-[#667085] shrink-0 transition-transform ${isFundingOpen ? 'rotate-180' : ''}`} 
             />
           </div>
@@ -595,7 +580,7 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
                   >
                     <span className="truncate">{f}</span>
                     {isChecked && (
-                      <HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} className="text-[#7150E7] shrink-0" />
+                      <CircleCheckIcon size={14} className="text-[#7150E7] shrink-0" />
                     )}
                   </div>
                 );
