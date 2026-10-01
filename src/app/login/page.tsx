@@ -73,7 +73,7 @@ export default function LoginPage() {
         setResendCooldown(RESEND_COOLDOWN_SECONDS);
       } else {
         setError(data.error || 'Failed to send the code. Please try again.');
-        if (data.retryAfterSeconds) {
+        if (data.retryAfterSeconds && !data.rateLimited) {
           setStep('code');
           setResendCooldown(data.retryAfterSeconds);
         }
