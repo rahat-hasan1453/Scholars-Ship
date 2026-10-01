@@ -25,7 +25,8 @@ export async function POST(req: Request) {
       console.log(`[HighScholar Auth] Sign-in code for ${normalizedEmail}: ${issued.code}`);
     }
 
-    const emailResult = await sendOtpEmail(normalizedEmail, issued.code);
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || new URL(req.url).origin;
+    const emailResult = await sendOtpEmail(normalizedEmail, issued.code, appUrl);
     if (!emailResult.success) {
       console.warn(`[HighScholar Auth] Sign-in code delivery failed for ${normalizedEmail}: ${emailResult.error}`);
       return NextResponse.json(
