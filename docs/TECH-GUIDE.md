@@ -197,6 +197,16 @@ Mistakes never break the live site, parallel sessions stay separate, and changes
 | **কমান্ড / Commands** | `npm run test:e2e` (সব / all), `npx playwright test --project=chromium-desktop` (একটা browser / one browser), `npx playwright show-report` (রিপোর্ট দেখা / open the HTML report), `npx playwright install` (browser নামানো, একবার / download browsers once) |
 | **`test.fail()`** | জানা bug-এর E2E টেস্ট (Vitest-এর `it.fails`-এর মতো) / Known-bug E2E test, like `it.fails` in Vitest |
 
+## 18. GitHub Actions (CI / স্বয়ংক্রিয় চেক)
+
+| | |
+|---|---|
+| **বাংলা** | GitHub-এর নিজস্ব রোবট। প্রতিটা PR খোলা বা আপডেট হলে এবং `main`-এ push হলে এটা নিজে থেকে কোড নামিয়ে type check (`tsc`) ও `npm test` চালায়। কিছু ভাঙলে PR-এ লাল ✗ দেখায়, তাই merge-এর আগেই ধরা পড়ে। একে **CI (Continuous Integration)** বলে। |
+| **English** | GitHub's built-in robot. On every PR and every push to `main` it installs the project and runs the type check and `npm test`. A red ✗ on the PR means something broke, before it is merged. This is **CI (Continuous Integration)**. |
+| **উপমা / Analogy** | কারখানার গেটে মান-পরীক্ষক: প্রতিটা নতুন জিনিস ঢোকার আগে চেক হয়। / A quality inspector at the factory gate. |
+| **প্রজেক্টে / In project** | `.github/workflows/test.yml` (Node 22, `npm ci` → `tsc --noEmit` → `npm test`)। কোনো secret লাগে না, সব mock। E2E (Playwright) এখনো CI-তে নেই, লোকালে `npm run test:e2e`। / No secrets needed; E2E is not in CI yet. |
+| **দেখার জায়গা / Where to see** | PR পেজের নিচে "Checks", বা repo-র **Actions** ট্যাব / The PR's "Checks" section or the repo's **Actions** tab |
+
 ---
 
 ## npm Commands / npm কমান্ড
