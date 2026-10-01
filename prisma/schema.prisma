@@ -54,6 +54,13 @@ model LoginCode {
   createdAt DateTime @default(now())
 }
 
+// Fixed-window counters for rate limiting. key = "<scope>:<subject>", e.g. "verify:email:a@b.c".
+model RateLimit {
+  key         String   @id
+  count       Int      @default(0)
+  windowStart DateTime @default(now())
+}
+
 model UserProfile {
   id              String        @id @default(uuid())
   userId          String        @unique

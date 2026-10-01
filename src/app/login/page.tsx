@@ -34,7 +34,7 @@ export default function LoginPage() {
   const [step, setStep] = useState<'email' | 'code'>('email');
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
-  const [agreeTerms, setAgreeTerms] = useState(true);
+  const [agreeTerms, setAgreeTerms] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [isSending, setIsSending] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -73,7 +73,7 @@ export default function LoginPage() {
         setResendCooldown(RESEND_COOLDOWN_SECONDS);
       } else {
         setError(data.error || 'Failed to send the code. Please try again.');
-        if (data.retryAfterSeconds) {
+        if (data.retryAfterSeconds && !data.rateLimited) {
           setStep('code');
           setResendCooldown(data.retryAfterSeconds);
         }
@@ -89,6 +89,10 @@ export default function LoginPage() {
     e.preventDefault();
     if (!email.trim() || !email.includes('@')) {
       setError('Please enter a valid email address');
+      return;
+    }
+    if (!agreeTerms) {
+      setError("Please agree to the Terms of Service and Privacy Policy to continue");
       return;
     }
     sendCode();
@@ -145,7 +149,7 @@ export default function LoginPage() {
         <GoogleButton
           caption={step === 'email' ? 'Or continue with' : undefined}
           onClick={handleGoogleAuth}
-          disabled={isGoogleLoading || isSending || isVerifying}
+          disabled={!agreeTerms || isGoogleLoading || isSending || isVerifying}
           isLoading={isGoogleLoading}
         />
       }
@@ -171,7 +175,7 @@ export default function LoginPage() {
               <TermsCheckbox checked={agreeTerms} onCheckedChange={setAgreeTerms} />
             </div>
 
-            <AuthSubmitButton disabled={isSending || isGoogleLoading}>
+            <AuthSubmitButton disabled={!agreeTerms || isSending || isGoogleLoading}>
               {isSending ? 'Sending code...' : 'Continue with email'}
             </AuthSubmitButton>
           </form>

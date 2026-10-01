@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import { issueLoginCode } from '@/lib/loginCodes';
 import { sendOtpEmail } from '@/lib/email';
+import { clientIp, rateLimitHit, waitText } from '@/lib/rateLimit';
 import { normalizeEmail } from '@/lib/users';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_SENDS_PER_IP_PER_HOUR = 10;
 
 export async function POST(req: Request) {
   try {
@@ -13,11 +15,23 @@ export async function POST(req: Request) {
     }
     const normalizedEmail = normalizeEmail(email);
 
+    // One client can't trigger codes to unlimited addresses (email bombing / SMTP quota).
+    const ip = await rateLimitHit(`send:ip:${clientIp(req)}`, MAX_SENDS_PER_IP_PER_HOUR, 3600);
+    if (!ip.allowed) {
+      return NextResponse.json(
+        { success: false, error: `Too many requests. Please try again in ${waitText(ip.retryAfterSeconds)}.`, retryAfterSeconds: ip.retryAfterSeconds, rateLimited: true },
+        { status: 429, headers: { 'Retry-After': String(ip.retryAfterSeconds) } }
+      );
+    }
+
     const issued = await issueLoginCode(normalizedEmail);
     if (!issued.ok) {
+      const error = issued.rateLimited
+        ? `Too many codes requested for this email. Please try again in ${waitText(issued.retryAfterSeconds)}.`
+        : `Please wait ${issued.retryAfterSeconds}s before requesting a new code.`;
       return NextResponse.json(
-        { success: false, error: `Please wait ${issued.retryAfterSeconds}s before requesting a new code.`, retryAfterSeconds: issued.retryAfterSeconds },
-        { status: 429 }
+        { success: false, error, retryAfterSeconds: issued.retryAfterSeconds, rateLimited: issued.rateLimited === true },
+        { status: 429, headers: { 'Retry-After': String(issued.retryAfterSeconds) } }
       );
     }
 
