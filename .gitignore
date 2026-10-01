@@ -44,8 +44,8 @@ next-env.d.ts
 # local scripts
 scripts/
 
-# graphify knowledge graph output
-graphify-out/
-
 # Claude Code local files
 .claude/
+
+# graphify knowledge graph output
+graphify-out/

@@ -30,7 +30,7 @@ export function TermsCheckbox({ checked, onCheckedChange }: { checked: boolean; 
       <Checkbox id="terms" checked={checked} onCheckedChange={(v) => onCheckedChange(v === true)} className="shadow-none" />
       <Label htmlFor="terms" className="text-xs font-normal italic leading-4 text-text-body">
         <span>
-          I agree to HighScholar&apos;s <span className="text-brand-primary">Terms of Service</span> and{' '}
+          I agree to Scholars&apos;ship&apos;s <span className="text-brand-primary">Terms of Service</span> and{' '}
           <span className="text-brand-primary">Privacy Policy</span>.
         </span>
       </Label>
