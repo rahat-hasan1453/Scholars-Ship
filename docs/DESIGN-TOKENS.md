@@ -20,7 +20,7 @@ Figma-ই সত্য। কোডে রঙ হাতে না লিখে �
 | Token | Hex |
 |---|---|
 | Text/Primary | `#101828` |
-| Text/Secondary | `#919EAB` |
+| Text/Secondary | `#627181` (darkened from #919EAB for a11y: 5.0:1 on white, 4.57:1 on #F1F5F9; BUG-19. `Neutral/350` stays #919EAB) |
 | Text/Tertiary | `#637381` |
 | Text/Placeholder | `#D0D7E1` |
 | Text/Subtle | `#95A3B6` |

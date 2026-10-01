@@ -144,14 +144,14 @@ export const ScholarshipRadarCard: React.FC<ScholarshipRadarCardProps> = ({
           <h3 className="font-bold text-sm sm:text-base text-[#101828] leading-tight truncate group-hover:text-[#7050E6] transition-colors">
             {scholarship.title}
           </h3>
-          <p className="text-xs text-[#919EAB] font-normal leading-tight truncate">
+          <p className="text-xs text-text-secondary font-normal leading-tight truncate">
             {scholarship.provider || 'Foreign, Commonwealth & Development Office (FCDO)'}
           </p>
         </div>
 
         {/* Funding Value Container matching Figma */}
         <div className="bg-[#F8FAFC] rounded-lg p-3 my-2.5 space-y-1">
-          <span className="text-[11px] font-medium text-[#919EAB] block leading-none">
+          <span className="text-[11px] font-medium text-text-secondary block leading-none">
             Funding Value
           </span>
           <p className="text-xs font-bold text-[#101828] leading-snug">

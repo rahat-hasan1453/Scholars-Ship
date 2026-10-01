@@ -1127,7 +1127,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                         <h3 className="text-base font-bold text-[#101828] leading-snug group-hover:text-[#7050E6] transition-colors truncate">
                           {uni.name}
                         </h3>
-                        <p className="text-xs text-[#919EAB] font-medium mt-0.5 truncate">
+                        <p className="text-xs text-text-secondary font-medium mt-0.5 truncate">
                           {uni.field}
                         </p>
                       </div>
@@ -1148,11 +1148,11 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                       </p>
                       <p className="text-xs leading-snug">
                         <span className="font-bold text-[#101828]">🎓 Admission: </span>
-                        <span className="text-[#919EAB]">{uni.admission}</span>
+                        <span className="text-text-secondary">{uni.admission}</span>
                       </p>
                       <p className="text-xs leading-snug">
                         <span className="font-bold text-[#101828]">🏡 Living: </span>
-                        <span className="text-[#919EAB]">{uni.living}</span>
+                        <span className="text-text-secondary">{uni.living}</span>
                       </p>
                     </div>
 
@@ -1260,7 +1260,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                         <span>•</span>
                         <span className="text-[#101828] font-bold">💰 {uni.financialHighlight}</span>
                         <span>•</span>
-                        <span className="text-[#919EAB]">🎓 {uni.admission}</span>
+                        <span className="text-text-secondary">🎓 {uni.admission}</span>
                       </div>
                     </div>
                   </div>

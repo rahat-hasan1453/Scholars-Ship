@@ -101,7 +101,7 @@ export const FacultyLabsFeed: React.FC = () => {
                 <h2 className="text-base font-semibold text-[#101828] leading-tight">
                   Opportunity List
                 </h2>
-                <span className="text-xs font-normal text-[#919EAB]">
+                <span className="text-xs font-normal text-text-secondary">
                   / {filteredProfessors.length} Items
                 </span>
               </div>

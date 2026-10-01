@@ -78,7 +78,7 @@ export const ResearchPaperCard: React.FC<ResearchPaperCardProps> = ({
 
         {/* Authors Row */}
         <div className="text-xs text-[#667085] leading-normal mb-3">
-          <span className="text-[#919EAB]">Authors: </span>
+          <span className="text-text-secondary">Authors: </span>
           <span className="font-semibold text-[#344054]">{authorsText}</span>
         </div>
 
