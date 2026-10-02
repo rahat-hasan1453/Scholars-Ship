@@ -134,7 +134,7 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
 
   return (
     // Figma header (212:6322)
-    <header className="w-full shrink-0 flex flex-col gap-4 px-5 py-4 bg-white border-b border-[#f1f1f1]">
+    <header className="w-full shrink-0 flex flex-col gap-4 px-5 py-4 bg-white border-b-4 border-[#f1f1f1]">
       {/* Row 1: search + user */}
       <div className="flex items-center gap-5">
         <button
@@ -155,7 +155,7 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
             type="button"
             onClick={() => setIsProfileMenuOpen((prev) => !prev)}
             aria-expanded={isProfileMenuOpen}
-            className="flex h-11 items-center gap-2 rounded-lg border border-stroke-default px-2 py-1 text-left cursor-pointer hover:bg-slate-50 transition-colors"
+            className="flex h-11 items-center gap-2 rounded-lg px-2 py-1 text-left cursor-pointer hover:bg-slate-50 transition-colors"
           >
             <span className="relative size-8 shrink-0">
               <img

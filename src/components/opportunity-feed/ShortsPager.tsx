@@ -164,7 +164,7 @@ export function ShortsPager<T>({
               aria-label={`Page ${p + 1} of ${pageCount}`}
               aria-current={active ? 'page' : undefined}
               className={`relative w-1 rounded-[16px] cursor-pointer transition-all duration-300 before:absolute before:-inset-x-2 before:-inset-y-0.5 before:content-[''] ${
-                active ? 'h-8 bg-[#7150e7]' : 'h-1 bg-[#ede9fc] hover:bg-[#c9bdf6]'
+                active ? 'h-8 bg-[#7150e7]' : 'h-1 bg-[#c4b8f5] hover:bg-[#9f8cee]'
               }`}
             />
           );
@@ -179,7 +179,7 @@ export function ShortsPager<T>({
         role="region"
         aria-roledescription="carousel"
         aria-label="Opportunity list"
-        className="relative flex-1 min-h-0 overflow-hidden touch-none"
+        className="relative -m-1.5 flex-1 min-h-0 overflow-hidden touch-none"
       >
         <div
           className="h-full flex flex-col transition-transform ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
@@ -190,7 +190,7 @@ export function ShortsPager<T>({
               key={i}
               aria-hidden={i !== page}
               inert={i !== page}
-              className="h-full shrink-0 grid content-start"
+              className="h-full shrink-0 grid content-start p-1.5"
               style={{
                 gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
                 gap: FEED_CARD_GAP,
