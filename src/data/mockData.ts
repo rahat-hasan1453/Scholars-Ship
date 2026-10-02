@@ -806,7 +806,7 @@ export const mockScholarships: Scholarship[] = baseScholarships.map((s) => ({
 }));
 
 // 21 Real, Renowned Research Professors & Labs Worldwide across UX/HCI, STEM, Biotech, AI, Energy & Economics
-export const mockProfessors: Professor[] = [
+const baseProfessors: Professor[] = [
   {
     id: 'prof_klemmer_ux_01',
     name: 'Dr. Scott Klemmer',
@@ -1435,6 +1435,53 @@ export const mockProfessors: Professor[] = [
     bio: 'Specialist in artificial intelligence applied to intrusion detection, cyber-physical grid protection, and adversarial anomaly recognition.',
   },
 ];
+
+// Typical funded-lab package per country, used until each lab has its own funding data
+const LAB_FUNDING_BY_COUNTRY: Record<string, { fundingSummary: string; fundingSource: string }> = {
+  USA: {
+    fundingSummary: 'Full Tuition Waiver + $3,000/mo Research Assistantship',
+    fundingSource: 'National Science Foundation (NSF)',
+  },
+  'United Kingdom': {
+    fundingSummary: 'Full Tuition + £19,237/yr Doctoral Stipend',
+    fundingSource: 'UK Research and Innovation (UKRI)',
+  },
+  Germany: {
+    fundingSummary: 'Merit-Based Scholarships + $1,500/mo Graduate Assistantship',
+    fundingSource: 'German Academic Exchange Service (DAAD)',
+  },
+  Canada: {
+    fundingSummary: 'Guaranteed Funding Package + CAD $2,000/mo Research Stipend',
+    fundingSource: 'Natural Sciences and Engineering Research Council (NSERC)',
+  },
+  Switzerland: {
+    fundingSummary: 'Salaried Doctoral Position (CHF 4,000/mo) + Tuition Covered',
+    fundingSource: 'Swiss National Science Foundation (SNSF)',
+  },
+  Singapore: {
+    fundingSummary: 'Full Tuition + SGD $2,700/mo Research Scholarship',
+    fundingSource: 'Ministry of Education Singapore (MOE)',
+  },
+  'South Korea': {
+    fundingSummary: 'Full Tuition + KRW 1,000,000/mo Living Allowance',
+    fundingSource: 'Global Korea Scholarship (GKS)',
+  },
+  Netherlands: {
+    fundingSummary: 'Salaried PhD Position (€2,770/mo) + Tuition Covered',
+    fundingSource: 'Dutch Research Council (NWO)',
+  },
+  Australia: {
+    fundingSummary: 'Tuition Offset + AUD $35,000/yr Research Training Stipend',
+    fundingSource: 'Australian Research Council (ARC)',
+  },
+};
+
+export const mockProfessors: Professor[] = baseProfessors.map((p) => ({
+  ...p,
+  ...LAB_FUNDING_BY_COUNTRY[p.country],
+  fundingType: p.fundingType ?? 'FULL',
+  degreeLevels: p.degreeLevels ?? ['Masters', 'PhD'],
+}));
 
 export const initialApplications: Application[] = [
   {

@@ -1,39 +1,34 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { FilterIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
+import { Professor } from '@/types';
 import { UnifiedDiscoveryHeader } from '@/components/layout/UnifiedDiscoveryHeader';
 import { FacultyLabCard } from '@/components/FacultyLabCard';
-import { LayoutGrid, List } from 'lucide-react';
-import { FilterIcon } from 'lucide-react';
+import { ShortsPager } from '@/components/opportunity-feed/ShortsPager';
+import { OpportunityListBar, ViewMode } from '@/components/opportunity-feed/OpportunityListBar';
+import { useFeedGrid } from '@/hooks/useFeedGrid';
+
+// Figma defaults (Faculty & Research Labs, node 251:22127)
+const DEFAULT_SUBJECTS = ['UX & Product Design', 'HCI', 'Computer Science', 'Artificial Intelligence'];
+const DEFAULT_DEGREES = ['Masters', 'PhD'];
+const DEFAULT_COUNTRIES = ['USA', 'Germany', 'Norway', 'United Kingdom', 'Canada'];
+const DEFAULT_FUNDING = ['Safe Regional'];
+
+// Labs carry no acceptance-rate data yet, so the Figma range is shown as-is
+const ACCEPTANCE_RANGE = '85% – 95%';
 
 export const FacultyLabsFeed: React.FC = () => {
   const { professors, globalSearchQuery } = useApp();
+  const grid = useFeedGrid();
 
-  // Multi-select Filter States matching Figma defaults
-  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([
-    'UX & Product Design', 
-    'HCI', 
-    'Computer Science', 
-    'Artificial Intelligence'
-  ]);
-  const [selectedDegrees, setSelectedDegrees] = useState<string[]>(['Masters', 'PhD']);
-  const [selectedCountries, setSelectedCountries] = useState<string[]>([
-    'USA', 
-    'Germany', 
-    'United Kingdom', 
-    'Canada'
-  ]);
-  const [selectedFunding, setSelectedFunding] = useState<string[]>([
-    'Safe Regional', 
-    'Tuition Waiver', 
-    'Full Funding'
-  ]);
+  const [selectedSubjects, setSelectedSubjects] = useState<string[]>(DEFAULT_SUBJECTS);
+  const [selectedDegrees, setSelectedDegrees] = useState<string[]>(DEFAULT_DEGREES);
+  const [selectedCountries, setSelectedCountries] = useState<string[]>(DEFAULT_COUNTRIES);
+  const [selectedFunding, setSelectedFunding] = useState<string[]>(DEFAULT_FUNDING);
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
 
-  // View Mode: Grid or List
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-
-  // Filtered Professors
   const filteredProfessors = useMemo(() => {
     return professors.filter((prof) => {
       // 1. Global search query
@@ -47,7 +42,12 @@ export const FacultyLabsFeed: React.FC = () => {
         if (!inName && !inUni && !inDept && !inLab && !inTags) return false;
       }
 
-      // 2. Country filter
+      // 2. Degree filter
+      if (selectedDegrees.length > 0 && prof.degreeLevels?.length) {
+        if (!prof.degreeLevels.some(d => selectedDegrees.includes(d))) return false;
+      }
+
+      // 3. Country filter
       if (selectedCountries.length > 0 && prof.country) {
         const profCountry = prof.country.toLowerCase();
         const matchesCountry = selectedCountries.some(c => {
@@ -57,9 +57,9 @@ export const FacultyLabsFeed: React.FC = () => {
         if (!matchesCountry) return false;
       }
 
-      // 3. Subject filter
+      // 4. Subject filter
       if (selectedSubjects.length > 0 && prof.researchTags?.length) {
-        const matchesSubject = prof.researchTags.some(tag => 
+        const matchesSubject = prof.researchTags.some(tag =>
           selectedSubjects.some(sub => {
             const t = tag.toLowerCase().trim();
             const s = sub.toLowerCase().trim();
@@ -75,110 +75,86 @@ export const FacultyLabsFeed: React.FC = () => {
 
       return true;
     });
-  }, [professors, globalSearchQuery, selectedCountries, selectedSubjects]);
+  }, [professors, globalSearchQuery, selectedDegrees, selectedCountries, selectedSubjects]);
+
+  // Any filter/search change sends the pager back to page 1
+  const resetKey = JSON.stringify([
+    globalSearchQuery,
+    selectedSubjects,
+    selectedDegrees,
+    selectedCountries,
+    selectedFunding,
+    viewMode,
+  ]);
+
+  const resetFilters = () => {
+    setSelectedSubjects(DEFAULT_SUBJECTS);
+    setSelectedDegrees(DEFAULT_DEGREES);
+    setSelectedCountries(DEFAULT_COUNTRIES);
+    setSelectedFunding(DEFAULT_FUNDING);
+  };
+
+  const cols = viewMode === 'list' ? 1 : grid.cols;
 
   return (
-    <div className="flex-1 flex flex-col min-w-0 bg-[#f8fafc]">
-      {/* Reusable Unified Header (Node 122:3164) */}
-      <UnifiedDiscoveryHeader
-        selectedSubjects={selectedSubjects}
-        setSelectedSubjects={setSelectedSubjects}
-        selectedDegrees={selectedDegrees}
-        setSelectedDegrees={setSelectedDegrees}
-        selectedCountries={selectedCountries}
-        setSelectedCountries={setSelectedCountries}
-        selectedFunding={selectedFunding}
-        setSelectedFunding={setSelectedFunding}
-      />
+    // Fixed-height shell: only the card area moves, header + list bar stay put
+    <div className="relative h-scaled-screen flex flex-col min-w-0 lg:py-5 lg:pl-5 lg:pr-[30px]">
+      <div className="flex-1 min-h-0 flex flex-col bg-white lg:rounded-[16px] overflow-hidden">
+        <UnifiedDiscoveryHeader
+          selectedSubjects={selectedSubjects}
+          setSelectedSubjects={setSelectedSubjects}
+          selectedDegrees={selectedDegrees}
+          setSelectedDegrees={setSelectedDegrees}
+          selectedCountries={selectedCountries}
+          setSelectedCountries={setSelectedCountries}
+          selectedFunding={selectedFunding}
+          setSelectedFunding={setSelectedFunding}
+        />
 
-      {/* Body Area with white background matching Figma */}
-      <div className="bg-white flex-1">
-        <div className="p-5 max-w-[1172px] mx-auto w-full space-y-5">
-          {/* Sub-bar matching Figma Frame 2147226741 */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <div className="flex items-baseline gap-1">
-                <h2 className="text-base font-semibold text-[#101828] leading-tight">
-                  Opportunity List
-                </h2>
-                <span className="text-xs font-normal text-text-secondary">
-                  / {filteredProfessors.length} Items
-                </span>
-              </div>
-              <p className="text-xs text-[#90A1B9] mt-0.5">
-                Safe-Bet Universities with Guaranteed Funding &amp; Assistantships
-              </p>
-            </div>
+        <section className="flex-1 min-h-0 flex flex-col gap-5 p-5">
+          <OpportunityListBar
+            count={filteredProfessors.length}
+            acceptanceRange={filteredProfessors.length > 0 ? ACCEPTANCE_RANGE : null}
+            acceptanceColor="#36b37e"
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+          />
 
-            {/* Right: Acceptance Rate + Toggle Switcher */}
-            <div className="flex items-center gap-3 shrink-0">
-              <span className="text-xs font-bold text-[#009966] select-none">
-                ✓ 85% – 95% Acceptance Rate
-              </span>
-
-              <div className="bg-white border border-[#D0D5DD] rounded-[20px] p-0.5 flex items-center">
-                <button
-                  type="button"
-                  onClick={() => setViewMode('grid')}
-                  className={`p-1.5 rounded-2xl transition-all cursor-pointer ${
-                    viewMode === 'grid'
-                      ? 'text-[#7050E6] bg-[#F4F3FE] shadow-xs'
-                      : 'text-[#667085] hover:text-[#475467]'
-                  }`}
-                  title="Grid view"
-                >
-                  <LayoutGrid className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode('list')}
-                  className={`p-1.5 rounded-2xl transition-all cursor-pointer ${
-                    viewMode === 'list'
-                      ? 'text-[#7050E6] bg-[#F4F3FE] shadow-xs'
-                      : 'text-[#667085] hover:text-[#475467]'
-                  }`}
-                  title="List view"
-                >
-                  <List className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Cards Grid */}
           {filteredProfessors.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-[#EAECF0] p-12 text-center space-y-3">
-              <div className="w-12 h-12 rounded-full bg-[#EDE9FE] text-[#7150E7] flex items-center justify-center mx-auto">
+            <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center">
+              <div className="w-12 h-12 rounded-full bg-[#EDE9FE] text-[#7150E7] flex items-center justify-center">
                 <FilterIcon size={24} />
               </div>
               <h3 className="text-base font-bold text-[#101828]">No faculty or research labs found</h3>
-              <p className="text-xs text-[#667085] max-w-md mx-auto">
+              <p className="text-xs text-[#667085] max-w-md">
                 Try removing some filters to discover faculty members and funded research laboratories worldwide.
               </p>
               <button
-                onClick={() => {
-                  setSelectedSubjects(['UX & Product Design', 'HCI']);
-                  setSelectedDegrees(['Masters', 'PhD']);
-                  setSelectedCountries(['USA', 'Germany']);
-                  setSelectedFunding(['Safe Regional']);
-                }}
-                className="px-4 py-2 bg-[#7050E6] text-white text-xs font-semibold rounded-full hover:bg-[#5D3FD3] transition-colors cursor-pointer"
+                type="button"
+                onClick={resetFilters}
+                className="px-4 py-2 bg-[#7150E7] text-white text-xs font-semibold rounded-full hover:bg-[#5f3fd6] transition-colors cursor-pointer"
               >
-                Reset Filters
+                Reset to Default Filters
               </button>
             </div>
           ) : (
-            <div className={
-              viewMode === 'grid' 
-                ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" 
-                : "space-y-4"
-            }>
-              {filteredProfessors.map((prof) => (
-                <FacultyLabCard key={prof.id} professor={prof} />
-              ))}
-            </div>
+            <ShortsPager<Professor>
+              key={resetKey}
+              items={filteredProfessors}
+              cols={cols}
+              rows={grid.rows}
+              getKey={(p) => p.id}
+              renderItem={(p) => <FacultyLabCard professor={p} />}
+              renderIndicator={(indicator) =>
+                indicator && (
+                  <div className="absolute right-[9px] top-1/2 -translate-y-1/2 z-10 hidden lg:block">
+                    {indicator}
+                  </div>
+                )
+              }
+            />
           )}
-        </div>
+        </section>
       </div>
     </div>
   );

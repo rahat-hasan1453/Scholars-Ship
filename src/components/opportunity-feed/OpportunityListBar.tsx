@@ -7,6 +7,8 @@ export type ViewMode = 'grid' | 'list';
 interface OpportunityListBarProps {
   count: number;
   acceptanceRange: string | null;
+  /** Figma uses #1b806a on Scholarship Radar, #36b37e on Faculty & Research Labs */
+  acceptanceColor?: string;
   viewMode: ViewMode;
   onViewModeChange: (mode: ViewMode) => void;
 }
@@ -25,6 +27,7 @@ function ViewToggleIcon({ src, size, active }: { src: string; size: number; acti
 export const OpportunityListBar: React.FC<OpportunityListBarProps> = ({
   count,
   acceptanceRange,
+  acceptanceColor = '#1b806a',
   viewMode,
   onViewModeChange,
 }) => (
@@ -40,7 +43,7 @@ export const OpportunityListBar: React.FC<OpportunityListBarProps> = ({
       </div>
       {acceptanceRange && (
         <p className="text-[14px] leading-[18px] text-[#627181] truncate">
-          <span className="font-bold italic text-[#1b806a]">✓ {acceptanceRange}</span> Acceptance Rate
+          <span className="font-bold italic" style={{ color: acceptanceColor }}>✓ {acceptanceRange}</span> Acceptance Rate
           on your customise filter
         </p>
       )}
