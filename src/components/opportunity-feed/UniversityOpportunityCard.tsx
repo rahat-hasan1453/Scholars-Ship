@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { CardHeader } from '@/components/opportunity-feed/CardHeader';
 import type { UniversityProgram } from '@/data/universityPrograms';
 import { FEED_CARD_HEIGHT } from '@/hooks/useFeedGrid';
 
@@ -21,36 +22,12 @@ export const UniversityOpportunityCard: React.FC<UniversityOpportunityCardProps>
       className="flex flex-col w-full min-w-0 rounded-[16px] border-[0.5px] border-[#f1f1f1] overflow-hidden transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-[#d9d0fa] hover:shadow-[0_10px_24px_-12px_rgba(113,80,231,0.35)] motion-reduce:transition-none motion-reduce:hover:translate-y-0"
       style={{ height: FEED_CARD_HEIGHT }}
     >
-      {/* Title row */}
-      <div className="relative flex items-center gap-2 px-4 py-3 bg-white border-b-[0.5px] border-[#f1f1f1] overflow-hidden shrink-0">
-        <div aria-hidden className="absolute -right-[0.5px] -top-[0.5px] h-[69px] w-[151px] pointer-events-none overflow-hidden">
-          <img
-            src="/opportunity-feed/card-deco.png"
-            alt=""
-            className="absolute max-w-none left-[-0.36%] top-[1.45%] w-[100.73%] h-[98.55%]"
-          />
-        </div>
-        <div className="relative flex flex-1 min-w-0 items-center justify-between gap-2">
-          <div className="flex flex-col gap-1 min-w-0">
-            <h3 className="truncate text-[16px] leading-[24px] font-semibold text-[#101828]">
-              {program.university}
-            </h3>
-            <p className="truncate text-[14px] leading-5 italic text-[#627181]">{program.subjects}</p>
-          </div>
-          <div className="flex items-center gap-1 shrink-0">
-            <img
-              src={`/flags/${program.countryCode}.svg`}
-              alt=""
-              width={20}
-              height={20}
-              className="size-5 rounded-full"
-            />
-            <span className="text-[12px] leading-[18px] italic font-medium text-[#627181]">
-              {program.countryLabel}
-            </span>
-          </div>
-        </div>
-      </div>
+      <CardHeader
+        title={program.university}
+        subtitle={program.subjects}
+        flagSrc={`/flags/${program.countryCode}.svg`}
+        countryLabel={program.countryLabel}
+      />
 
       {/* Details */}
       <div className="flex flex-1 min-h-0 flex-col gap-[10px] px-4 py-3 bg-white overflow-hidden">
