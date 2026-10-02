@@ -18,7 +18,7 @@ export const UniversityOpportunityCard: React.FC<UniversityOpportunityCardProps>
 }) => {
   return (
     <article
-      className="flex flex-col w-full min-w-0 rounded-[16px] border-[0.5px] border-[#f1f1f1] overflow-hidden"
+      className="flex flex-col w-full min-w-0 rounded-[16px] border-[0.5px] border-[#f1f1f1] overflow-hidden transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-[#d9d0fa] hover:shadow-[0_10px_24px_-12px_rgba(113,80,231,0.35)] motion-reduce:transition-none motion-reduce:hover:translate-y-0"
       style={{ height: FEED_CARD_HEIGHT }}
     >
       {/* Title row */}
@@ -35,7 +35,7 @@ export const UniversityOpportunityCard: React.FC<UniversityOpportunityCardProps>
             <h3 className="truncate text-[16px] leading-[24px] font-semibold text-[#101828]">
               {program.university}
             </h3>
-            <p className="truncate text-[12px] leading-[16px] text-[#627181]">{program.subjects}</p>
+            <p className="truncate text-[14px] leading-5 italic text-[#627181]">{program.subjects}</p>
           </div>
           <div className="flex items-center gap-1 shrink-0">
             <img
