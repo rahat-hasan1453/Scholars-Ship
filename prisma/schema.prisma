@@ -75,6 +75,7 @@ model UserProfile {
   updatedAt       DateTime      @updatedAt
   applications    Application[]
   followedProfs   ProfFollow[]
+  savedPapers     SavedPaper[]
 }
 
 model Scholarship {
@@ -135,7 +136,7 @@ model ResearchLab {
 }
 
 model Professor {
-  id             String       @id @default(uuid())
+  id             String        @id @default(uuid())
   name           String
   title          String
   // Plain-text copies stay until the data pipeline links every row to University / ResearchLab
@@ -143,12 +144,12 @@ model Professor {
   department     String
   country        String
   universityId   String?
-  universityRef  University?  @relation(fields: [universityId], references: [id], onDelete: SetNull)
+  universityRef  University?   @relation(fields: [universityId], references: [id], onDelete: SetNull)
   labId          String?
-  lab            ResearchLab? @relation(fields: [labId], references: [id], onDelete: SetNull)
+  lab            ResearchLab?  @relation(fields: [labId], references: [id], onDelete: SetNull)
   labName        String?
   researchTags   String[]
-  openPositions  Boolean      @default(true)
+  openPositions  Boolean       @default(true)
   recentGrants   String?
   email          String?
   linkedInUrl    String?
@@ -156,9 +157,10 @@ model Professor {
   labWebsite     String?
   avatarUrl      String?
   acceptingTerms String[]
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
   followers      ProfFollow[]
+  papers         PaperAuthor[]
 }
 
 model ProfFollow {
@@ -170,6 +172,54 @@ model ProfFollow {
   createdAt   DateTime    @default(now())
 
   @@unique([profileId, professorId])
+}
+
+// Research Paper card (Figma 251:23294): title, abstract, authors, citations, field chips, Scholar + PDF
+model ResearchPaper {
+  id                String        @id @default(uuid())
+  title             String
+  abstract          String
+  year              Int?
+  publishedAt       DateTime?
+  venue             String?
+  citationCount     Int           @default(0)
+  doi               String?       @unique
+  semanticScholarId String?       @unique
+  pdfUrl            String?
+  googleScholarUrl  String?
+  fieldsOfStudy     String[]
+  tags              String[]
+  isOpenAccess      Boolean       @default(false)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  authors           PaperAuthor[]
+  savedBy           SavedPaper[]
+}
+
+// Ordered author list; professorId is set when the author is a known Professor
+model PaperAuthor {
+  id          String        @id @default(uuid())
+  paperId     String
+  paper       ResearchPaper @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  position    Int
+  name        String
+  institution String?
+  professorId String?
+  professor   Professor?    @relation(fields: [professorId], references: [id], onDelete: SetNull)
+
+  @@unique([paperId, position])
+  @@index([professorId])
+}
+
+model SavedPaper {
+  id        String        @id @default(uuid())
+  profileId String
+  paperId   String
+  profile   UserProfile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  paper     ResearchPaper @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  createdAt DateTime      @default(now())
+
+  @@unique([profileId, paperId])
 }
 
 model Application {
