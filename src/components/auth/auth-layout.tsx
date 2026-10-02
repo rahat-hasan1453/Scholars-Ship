@@ -2,8 +2,7 @@
 
 import { useState, type ComponentProps, type ReactNode } from 'react';
 import Link from 'next/link';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { ViewIcon, ViewOffIcon } from '@hugeicons/core-free-icons';
+import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/shadcn/button';
 import { Checkbox } from '@/components/shadcn/checkbox';
 import { Input } from '@/components/shadcn/input';
@@ -34,7 +33,7 @@ export function AuthPasswordInput({ className, ...props }: Omit<ComponentProps<t
         aria-pressed={visible}
         className="absolute right-2.5 top-1/2 flex size-4 -translate-y-1/2 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
       >
-        <HugeiconsIcon icon={visible ? ViewOffIcon : ViewIcon} size={16} />
+        {visible ? <EyeOff size={16} /> : <Eye size={16} />}
       </button>
     </div>
   );
