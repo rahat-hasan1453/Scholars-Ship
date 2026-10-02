@@ -66,6 +66,8 @@ export async function POST(request: Request) {
       countries: body.countries || ['Global'],
       specializations: body.specializations || ['General'],
       requirements: body.requirements || {},
+      admissionSummary: body.admissionSummary,
+      livingCost: body.livingCost,
       officialUrl: body.officialUrl || 'https://highscholar.io',
       description: body.description || 'Ingested via HighScholar Chrome Extension API',
       featured: Boolean(body.featured),

@@ -6,6 +6,7 @@ import { useApp } from '@/context/AppContext';
 import { UnifiedDiscoveryHeader } from '@/components/layout/UnifiedDiscoveryHeader';
 import { UniversityOpportunityCard } from '@/components/opportunity-feed/UniversityOpportunityCard';
 import { ShortsPager } from '@/components/opportunity-feed/ShortsPager';
+import { OpportunityListBar, ViewMode } from '@/components/opportunity-feed/OpportunityListBar';
 import { UNIVERSITY_PROGRAMS, UniversityProgram } from '@/data/universityPrograms';
 import { useFeedGrid } from '@/hooks/useFeedGrid';
 
@@ -50,16 +51,6 @@ function parseBookmarks(raw: string): Set<string> {
   }
 }
 
-function ViewToggleIcon({ src, size, active }: { src: string; size: number; active: boolean }) {
-  return (
-    <span
-      aria-hidden
-      className={active ? 'bg-[#7150e7]' : 'bg-[#627181]'}
-      style={{ width: size, height: size, mask: `url(${src}) center / contain no-repeat` }}
-    />
-  );
-}
-
 export const OpportunitiesFeed: React.FC = () => {
   const { globalSearchQuery } = useApp();
   const grid = useFeedGrid();
@@ -68,7 +59,7 @@ export const OpportunitiesFeed: React.FC = () => {
   const [selectedDegrees, setSelectedDegrees] = useState<string[]>(DEFAULT_DEGREES);
   const [selectedCountries, setSelectedCountries] = useState<string[]>(DEFAULT_COUNTRIES);
   const [selectedFunding, setSelectedFunding] = useState<string[]>(DEFAULT_FUNDING);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const bookmarksRaw = useSyncExternalStore(subscribeBookmarks, readBookmarksRaw, () => '[]');
   const bookmarks = useMemo(() => parseBookmarks(bookmarksRaw), [bookmarksRaw]);
 
@@ -143,58 +134,12 @@ export const OpportunitiesFeed: React.FC = () => {
         />
 
         <section className="flex-1 min-h-0 flex flex-col gap-5 p-5">
-          {/* List bar (Figma 183:4558) */}
-          <div className="flex items-center justify-between gap-3 shrink-0">
-            <div className="flex flex-col gap-1 min-w-0">
-              <div className="flex items-center gap-1">
-                <h2 className="text-[20px] leading-[28px] font-semibold text-[#101828] whitespace-nowrap">
-                  Opportunity List
-                </h2>
-                <span className="flex items-center h-[25px] text-[14px] leading-[18px] text-[#627181] whitespace-nowrap">
-                  / {filteredPrograms.length} Items
-                </span>
-              </div>
-              {acceptanceRange && (
-                <p className="text-[14px] leading-[18px] text-[#627181] truncate">
-                  <span className="font-bold italic text-[#1b806a]">✓ {acceptanceRange}</span> Acceptance Rate
-                  on your customise filter
-                </p>
-              )}
-            </div>
-
-            <div className="flex items-center shrink-0" role="group" aria-label="View mode">
-              <button
-                type="button"
-                onClick={() => setViewMode('grid')}
-                aria-pressed={viewMode === 'grid'}
-                aria-label="Grid view"
-                className={`flex items-center justify-center h-8 w-9 rounded-l-[10px] cursor-pointer ${
-                  viewMode === 'grid'
-                    ? 'bg-[#ede9fc] border border-[#7150e7]'
-                    : 'bg-white border-y border-l border-[#e1e8f0]'
-                }`}
-              >
-                <span className="flex items-center justify-center size-4">
-                  <ViewToggleIcon src="/opportunity-feed/grid-view.svg" size={14.3333} active={viewMode === 'grid'} />
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('list')}
-                aria-pressed={viewMode === 'list'}
-                aria-label="List view"
-                className={`flex items-center justify-center h-8 w-9 rounded-r-[10px] cursor-pointer ${
-                  viewMode === 'list'
-                    ? 'bg-[#ede9fc] border border-[#7150e7]'
-                    : 'bg-white border-y border-r border-[#e1e8f0]'
-                }`}
-              >
-                <span className="flex items-center justify-center size-4">
-                  <ViewToggleIcon src="/opportunity-feed/list-view.svg" size={13.3334} active={viewMode === 'list'} />
-                </span>
-              </button>
-            </div>
-          </div>
+          <OpportunityListBar
+            count={filteredPrograms.length}
+            acceptanceRange={acceptanceRange}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+          />
 
           {filteredPrograms.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center">
