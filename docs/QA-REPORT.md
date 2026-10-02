@@ -4,8 +4,8 @@
 |---|---|
 | **কোড / Code under test** | `main` @ `a2d02a5` (PR #1 passwordless auth, #2 onboarding, #3 lucide icons, #4 docs, #5 auth rate limits, #6 QA suites, #7 onboarding save error, #8 contrast + `?tab=` fix, #9 Terms consent) merged into the QA branch |
 | **QA branch** | `claude/optimistic-blackburn-1aeb1b` (main + tests) |
-| **তারিখ / Date** | 2026-10-01 (run #1), 2026-10-02 (runs #2–#5) |
-| **রান / Run** | #5: re-tested after PR #7 and #8. BUG-17 and BUG-18 are **fixed** (tests now normal); BUG-19 is only **partly fixed** (see below). #4: re-tested after PR #5 and #9. BUG-02, BUG-03 and BUG-16 are **fixed**; their tests are now normal tests, plus new rate-limit tests. #3 (2026-10-02): E2E + axe accessibility in Chromium, Firefox, WebKit (desktop 1728) and Chromium mobile (375). #2: same checks re-run after merging `main`. `src/lib`, `src/app/api` and `prisma` are identical to run #1, so every auth/API finding still applies. E2E, visual, accessibility, performance: next runs |
+| **তারিখ / Date** | 2026-10-01 (run #1), 2026-10-02 (runs #2–#6) |
+| **রান / Run** | #6: Lighthouse performance (see below). #5: re-tested after PR #7 and #8. BUG-17 and BUG-18 are **fixed** (tests now normal); BUG-19 is only **partly fixed** (see below). #4: re-tested after PR #5 and #9. BUG-02, BUG-03 and BUG-16 are **fixed**; their tests are now normal tests, plus new rate-limit tests. #3 (2026-10-02): E2E + axe accessibility in Chromium, Firefox, WebKit (desktop 1728) and Chromium mobile (375). #2: same checks re-run after merging `main`. `src/lib`, `src/app/api` and `prisma` are identical to run #1, so every auth/API finding still applies. E2E, visual, accessibility, performance: next runs |
 
 ## সারসংক্ষেপ / Summary
 
@@ -19,7 +19,8 @@
 | API (Vitest), `tests/api` | 43 | 0 | 4 | `research/chat`, `professors` GET/POST not yet covered |
 | E2E (Playwright), `tests/e2e`: 4 projects | 78 | 0 | 0 | 2 (Firefox: clock-based resend test; mobile: logout) |
 | Accessibility (axe, WCAG 2.1 AA) in E2E | 1 (Firefox home) | – | 11 (BUG-19, partly fixed) | – |
-| Visual (Figma) / Lighthouse | – | – | – | Not run yet |
+| Performance (Lighthouse 13, 6 audits) | 6 pages/devices measured, all Performance ≥ 92 | – | – | – |
+| Visual (Figma) | – | – | – | Not run yet |
 
 **`it.fails` কী? / What is `it.fails`?** প্রতিটা জানা bug-এর জন্য একটা test আছে, যেটা bug থাকা পর্যন্ত "expected fail" দেখায়। তাই `npm test` এখন সবুজ। Bug ঠিক হলে test-টা লাল হবে, তখন `it.fails` বদলে `it` করতে হবে।
 Each known bug has a test that is expected to fail while the bug exists, so `npm test` stays green. When a bug is fixed, that test turns red: change `it.fails` to `it`.
@@ -182,10 +183,36 @@ Each known bug has a test that is expected to fail while the bug exists, so `npm
 - Onboarding: step validation (name, ≥1 field, ≥1 country), Back/Next, and the payload sent to the API matches the inputs.
 - Home: no console errors, **no horizontal scroll at 375px and 1728px**, `?tab=` views open, logout clears the session → `/login`.
 
+### Performance: Lighthouse (run #6) / গতি পরিমাপ
+Lighthouse 13, production build (`next build` in a path without `'`, served by `next start`), headless Chrome, simulated throttling. Mobile = Lighthouse default (Moto G Power, slow 4G); Desktop = desktop preset. `/onboarding` and `/` were measured with a **fake backend** (`/api/auth/me` etc.), so the scores show how heavy the page is, not real server speed.
+
+| Page | Device | Perf | A11y | Best Pr. | SEO | FCP | LCP | CLS | TBT |
+|---|---|---|---|---|---|---|---|---|---|
+| `/login` | Mobile | 94 | 94 | 100 | 100 | 1.1 s | **3.1 s** | 0 | 10 ms |
+| `/login` | Desktop | 92 | 94 | 100 | 100 | 0.3 s | 1.0 s | 0 | **210 ms** |
+| `/onboarding` | Mobile | 97 | 86 | 100 | 100 | 1.1 s | 2.6 s | 0 | 10 ms |
+| `/onboarding` | Desktop | 100 | 86 | 100 | 100 | 0.3 s | 0.6 s | 0 | 0 ms |
+| `/` (home) | Mobile | 94 | 90 | 100 | 100 | 1.1 s | **3.1 s** | 0 | 10 ms |
+| `/` (home) | Desktop | 100 | 96 | 100 | 100 | 0.3 s | 0.7 s | 0 | 0 ms |
+
+- **বাংলা সারাংশ:** গতি ভালো। কোনো page-এ layout লাফায় না (CLS = 0), সব Performance স্কোর ৯২-১০০, Best Practices আর SEO ১০০। দুর্বলতা শুধু mobile-এ LCP (মূল অংশ দেখা যেতে ৩.১ সেকেন্ড; Google-এর "ভালো" সীমা ২.৫ সেকেন্ড) আর `/login` desktop-এ TBT ২১০ ms।
+- **English summary:** Good overall. CLS is 0 everywhere and Performance is 92-100. Weak spots: mobile LCP 3.1 s on `/login` and `/` (Google's "good" threshold is 2.5 s), and TBT 210 ms on `/login` desktop (threshold 200 ms).
+
+**Findings / পাওয়া সমস্যা**
+
+| ID | Severity | Finding | Fix owner |
+|---|---|---|---|
+| PERF-01 | Medium | **Login banner image is huge:** `public/login-figma-banner.jpg` is 580 KB (Lighthouse: "improve image delivery", about 480-540 KB savings) and loaded with a plain `<img>` (`src/components/auth/auth-layout.tsx:129`). Resize it (e.g. 1200 px wide) and convert to WebP/AVIF, or use `next/image`. Other unused heavy files in `public/`: `graduation-hero.jpg` (746 KB), `login-purple-hero.png` (369 KB), `purple-grad-hero.png`, `clean-purple-hero.png`, `login-bg-clean.png` (about 220 KB each); delete them if they are not used. | Signup / GenOps |
+| PERF-02 | Medium | **Mobile LCP 3.1 s is mostly "element render delay"** (about 70-85% of LCP): the page is rendered by client JavaScript (`'use client'` pages), so text only appears after the JS bundle loads and hydrates. Lighthouse also flags render-blocking CSS (about 430 ms on mobile), unused JavaScript (56-77 KB) and legacy JavaScript (12 KB, a polyfill for modern browsers). Suggested: keep the shell of `/login` and `/` as Server Components and make only the form/interactive parts client components, and check what the home bundle imports (e.g. all feeds and modals loaded up front → `next/dynamic`). | GenOps (Home) / Signup |
+| PERF-03 | Low | `/login` desktop **TBT 210 ms** (just over the 200 ms "good" limit), caused by hydration of the login page JS. Reducing the bundle (PERF-02) should fix it. | Signup |
+| PERF-04 | Low | Lighthouse also confirms accessibility issues already tracked in BUG-19 (`aria-prohibited-attr` on the logo, `landmark-one-main`: **no `<main>` landmark** on `/login` and `/onboarding`, unnamed progressbar, unnamed button, low contrast). New item: add a `<main>` element to the auth layout. | Signup / Onboarding |
+
+How to re-run: build in a folder without `'`, start `next start`, then `npx lighthouse@13 <url> [--preset=desktop]`. The fake backend used here was a throwaway ~20-line Node proxy (not committed).
+
 ### টেস্ট পরিবেশের নোট / Test environment notes
 - E2E runs on `next dev` because `npm run build` fails in this folder (BUG-01). The dev server compiles pages on first visit, which occasionally races in Firefox, so the config allows 1 retry and reports such tests as "flaky".
 
 ## পরের ধাপ / Next runs
-1. Figma visual comparison (needs the Figma connector authorized), Lighthouse (mobile + desktop).
+1. Figma visual comparison (needs the Figma connector authorized). Re-run Lighthouse after PERF-01/02 fixes.
 2. `AppContext` unit tests; E2E for bookmarks/track, Kanban, feed filters and search.
 3. Exploratory pass with the browser pane (console + network errors).
