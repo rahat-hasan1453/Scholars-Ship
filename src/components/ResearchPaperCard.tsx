@@ -3,153 +3,158 @@
 import React, { useState } from 'react';
 import { ResearchPaper } from '@/types';
 import { useApp } from '@/context/AppContext';
-import { 
-  Bookmark, 
-  Download, 
-  GraduationCap, 
-  BarChart2, 
-  ChevronRight,
-  ExternalLink 
-} from 'lucide-react';
+import { FEED_CARD_HEIGHT } from '@/hooks/useFeedGrid';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/shadcn/dialog';
 
 interface ResearchPaperCardProps {
   paper: ResearchPaper;
-  onOpenDetail?: (paper: ResearchPaper) => void;
 }
 
-export const ResearchPaperCard: React.FC<ResearchPaperCardProps> = ({ 
-  paper,
-  onOpenDetail 
-}) => {
+// Roughly three lines of the 14px abstract at card width, as in Figma
+const ABSTRACT_PREVIEW_CHARS = 140;
+
+function MaskIcon({ src, size, color }: { src: string; size: number; color: string }) {
+  return (
+    <span
+      aria-hidden
+      className="block shrink-0"
+      style={{ width: size, height: size, backgroundColor: color, mask: `url(${src}) center / contain no-repeat` }}
+    />
+  );
+}
+
+// Figma: "Research Paper" card (node 251:23294)
+export const ResearchPaperCard: React.FC<ResearchPaperCardProps> = ({ paper }) => {
   const { toggleSavePaper, isPaperSaved } = useApp();
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [abstractOpen, setAbstractOpen] = useState(false);
 
-  const isSaved = isPaperSaved ? isPaperSaved(paper.id) : false;
+  const isSaved = isPaperSaved(paper.id);
+  const authorsText = paper.authors.map((a) => a.name).join(' • ');
+  const scholarUrl =
+    paper.googleScholarUrl || `https://scholar.google.com/scholar?q=${encodeURIComponent(paper.title)}`;
+  const pdfUrl = paper.pdfUrl || paper.semanticScholarUrl || scholarUrl;
+  const preview =
+    paper.abstract.length > ABSTRACT_PREVIEW_CHARS
+      ? `${paper.abstract.slice(0, ABSTRACT_PREVIEW_CHARS).trimEnd()}...`
+      : paper.abstract;
 
-  const handleBookmarkToggle = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (toggleSavePaper) {
-      toggleSavePaper(paper.id);
-    }
-  };
-
-  const handleGoogleScholar = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const url = paper.googleScholarUrl || 'https://scholar.google.com/scholar?q=' + encodeURIComponent(paper.title);
-    window.open(url, '_blank', 'noopener,noreferrer');
-  };
-
-  const handleDownloadPdf = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const url = paper.pdfUrl || paper.semanticScholarUrl || paper.googleScholarUrl;
-    if (url) {
-      window.open(url, '_blank', 'noopener,noreferrer');
-    }
-  };
-
-  const authorsText = paper.authors?.map(a => a.name).join(' • ') || 'Dr. Sarah Jenkins • Alex Mercer • Prof. Hiroshi Tanaka';
+  const chipClass =
+    'flex items-center h-6 max-w-full px-2 rounded-full bg-[#f0f3f4] font-[family-name:var(--font-figtree)] text-[12px] leading-[18px] font-medium italic text-[#212b36] whitespace-nowrap';
 
   return (
-    <div className="group bg-white rounded-2xl border border-[#EAECF0] hover:border-[#D0D5DD] hover:shadow-lg transition-all duration-200 p-4 flex flex-col justify-between">
-      <div>
-        {/* Paper Title (Figma Node 122:8982: Bold Italic) */}
-        <h3 className="font-bold italic text-sm sm:text-base text-[#101828] leading-tight mb-2.5 group-hover:text-[#7050E6] transition-colors">
+    <article
+      className="flex flex-col w-full min-w-0 rounded-[16px] border-[0.5px] border-[#f1f1f1] overflow-hidden transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-[#d9d0fa] hover:shadow-[0_10px_24px_-12px_rgba(113,80,231,0.35)] motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+      style={{ height: FEED_CARD_HEIGHT }}
+    >
+      {/* Title */}
+      <div className="px-4 py-3 bg-white shrink-0">
+        <h3 className="line-clamp-2 text-[16px] leading-[24px] font-semibold text-[#101828]" title={paper.title}>
           {paper.title}
         </h3>
+      </div>
 
-        {/* Abstract Preview with Read Full Abstract */}
-        <div className="text-xs text-[#475467] leading-relaxed mb-3">
-          <span className="italic">
-            {isExpanded 
-              ? paper.abstract 
-              : `${paper.abstract.slice(0, 140)}...`}
-          </span>
+      {/* Details */}
+      <div className="flex flex-1 min-h-0 flex-col gap-2 px-4 pb-3 bg-white overflow-hidden">
+        <p className="text-[14px] leading-[18px] text-[#475467] break-words">
+          {preview}{' '}
           <button
             type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsExpanded(prev => !prev);
-            }}
-            className="text-[#7050E6] font-semibold hover:underline ml-1 inline cursor-pointer select-none"
+            onClick={() => setAbstractOpen(true)}
+            className="inline text-[12px] leading-none font-semibold text-[#7050e6] hover:underline cursor-pointer"
           >
-            {isExpanded ? 'Show less' : 'Read full abstract'}
+            Read full abstract
           </button>
+        </p>
+
+        <div className="w-full p-3 rounded-[4px] bg-[#fafafa] shrink-0">
+          <dl className="flex items-start gap-[6px] break-words text-[14px] leading-[20px]">
+            <dt className="w-[95px] shrink-0 font-medium text-[#627181]">👩‍🏫 Authors</dt>
+            <dd className="flex-1 min-w-0 line-clamp-2 italic font-medium text-[#101828]" title={authorsText}>
+              {authorsText}
+            </dd>
+          </dl>
         </div>
 
-        {/* Authors Row */}
-        <div className="text-xs text-[#667085] leading-normal mb-3">
-          <span className="text-text-secondary">Authors: </span>
-          <span className="font-semibold text-[#344054]">{authorsText}</span>
-        </div>
-
-        {/* Tags & Citations Row */}
-        <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2">
-          {/* Tags */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            {paper.fieldsOfStudy?.slice(0, 3).map((field) => (
-              <span key={field} className="bg-[#F2F4F7] text-[#344054] text-xs font-medium px-2 py-0.5 rounded-md truncate max-w-[130px]">
-                #{field}
-              </span>
-            ))}
-          </div>
-
-          {/* Citations Badge matching Figma Node 122:8982 */}
-          <span className="bg-[#FFFAEB] border border-[#FEDF89] text-[#B54708] text-xs font-bold px-2.5 py-0.5 rounded-full inline-flex items-center gap-1 shrink-0">
-            <span className="text-[11px]">📊</span>
-            <span>{paper.citationCount || 142} Citations</span>
+        <div className="flex flex-wrap items-center gap-2 w-full">
+          <span className="flex items-center gap-1 h-6 px-2 shrink-0 rounded-full bg-[#fffae5] whitespace-nowrap">
+            <span aria-hidden className="text-[11px] leading-[14.667px] font-bold">📊</span>
+            <span className="text-[12px] leading-[16px] font-medium italic tracking-[-0.192px] text-[#b76e00]">
+              {paper.citationCount.toLocaleString('en-US')} Citations
+            </span>
           </span>
+          <img src="/opportunity-feed/divider.svg" alt="" width={1} height={15.5} className="shrink-0" />
+          {paper.fieldsOfStudy.slice(0, 3).map((field) => (
+            <span key={field} className={chipClass} title={field}>
+              <span className="truncate">#{field}</span>
+            </span>
+          ))}
         </div>
       </div>
 
-      <div>
-        {/* Bottom Separator Line */}
-        <hr className="border-[#F2F4F7] mb-3.5" />
-
-        {/* Footer Action Buttons Row matching Figma Frame 122:8982 */}
-        <div className="flex items-center gap-2.5">
-          {/* Circular Bookmark Button */}
-          <button
-            type="button"
-            onClick={handleBookmarkToggle}
-            className={`w-[42px] h-10 rounded-[20px] flex items-center justify-center transition-all cursor-pointer shrink-0 ${
-              isSaved 
-                ? 'bg-[#EDE9FE] border border-[#D6BBFB] text-[#7050E6]' 
-                : 'bg-white hover:bg-slate-50 text-[#667085] hover:text-[#7050E6]'
-            }`}
-            title={isSaved ? 'Saved to Wishlist' : 'Save to Wishlist'}
+      {/* Actions */}
+      <div className="flex items-center gap-4 px-4 py-3 bg-white border-t-[0.5px] border-[#f1f1f1] shrink-0">
+        <button
+          type="button"
+          onClick={() => toggleSavePaper(paper.id)}
+          aria-pressed={isSaved}
+          aria-label={isSaved ? 'Remove from saved papers' : 'Save paper'}
+          className={`flex items-center justify-center size-8 shrink-0 rounded-[6px] cursor-pointer transition-colors ${
+            isSaved ? 'bg-[#ede9fc]' : 'bg-[#fafafa] hover:bg-[#f4f2fd]'
+          }`}
+        >
+          <MaskIcon src="/research-papers/bookmark.svg" size={20} color={isSaved ? '#7150e7' : '#627181'} />
+        </button>
+        <img src="/opportunity-feed/divider.svg" alt="" width={1} height={15.5} className="shrink-0" />
+        <div className="flex flex-1 min-w-0 gap-4">
+          <a
+            href={scholarUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-1 min-w-0 items-center justify-center gap-1 h-8 px-2 rounded-[6px] border border-[#7150e7] font-[family-name:var(--font-inter)] text-[12px] leading-[16px] font-medium text-[#7150e7] hover:bg-[#f4f2fd] transition-colors"
           >
-            <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-[#7050E6] text-[#7050E6]' : ''}`} />
-          </button>
-
-          {/* Vertical Divider */}
-          <div className="h-4 w-[1px] bg-[#EAECF0] shrink-0 mx-0.5" />
-
-          {/* Action Buttons Group */}
-          <div className="flex items-center gap-2.5 flex-1 min-w-0">
-            {/* Google Scholar Button */}
-            <button
-              type="button"
-              onClick={handleGoogleScholar}
-              className="flex-1 h-10 px-3 rounded-[20px] bg-[#F8FAFC] border border-[#7050E6] hover:bg-[#EDE9FE] text-[#7050E6] text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer whitespace-nowrap"
-              title="Open in Google Scholar"
-            >
-              <GraduationCap className="w-3.5 h-3.5 text-[#7050E6]" />
-              <span>Google Scholar</span>
-            </button>
-
-            {/* Download PDF Button */}
-            <button
-              type="button"
-              onClick={handleDownloadPdf}
-              className="flex-1 h-10 px-3 rounded-[20px] bg-[#7050E6] hover:bg-[#5D3FD3] text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer whitespace-nowrap"
-              title="Download or view paper PDF"
-            >
-              <Download className="w-3.5 h-3.5 text-white" />
-              <span>Download PDF</span>
-            </button>
-          </div>
+            <span className="truncate">Google Scholar</span>
+            <img src="/opportunity-feed/external-link.svg" alt="" width={12} height={12} className="shrink-0" />
+          </a>
+          <a
+            href={pdfUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-1 min-w-0 items-center justify-center gap-1 h-8 px-2 rounded-[6px] bg-[#7150e7] font-[family-name:var(--font-inter)] text-[12px] leading-[16px] font-medium text-[#fafafa] hover:bg-[#5f3fd6] transition-colors"
+          >
+            <span className="truncate">Download PDF</span>
+            <img src="/research-papers/download.svg" alt="" width={12} height={12} className="shrink-0" />
+          </a>
         </div>
       </div>
-    </div>
+
+      <Dialog open={abstractOpen} onOpenChange={setAbstractOpen}>
+        <DialogContent className="sm:max-w-[560px]">
+          <DialogHeader>
+            <DialogTitle className="text-[16px] leading-[24px] font-semibold text-[#101828]">{paper.title}</DialogTitle>
+            <DialogDescription className="text-[12px] leading-[16.5px] text-[#627181]">
+              {[paper.venue, paper.year].filter(Boolean).join(' · ')}
+            </DialogDescription>
+          </DialogHeader>
+          <p className="text-[14px] leading-[20px] italic font-medium text-[#101828]">{authorsText}</p>
+          <p className="max-h-[50vh] overflow-y-auto text-[14px] leading-[20px] text-[#475467]">{paper.abstract}</p>
+          {paper.doi && (
+            <a
+              href={`https://doi.org/${paper.doi}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[12px] font-semibold text-[#7050e6] hover:underline"
+            >
+              DOI: {paper.doi}
+            </a>
+          )}
+        </DialogContent>
+      </Dialog>
+    </article>
   );
 };
