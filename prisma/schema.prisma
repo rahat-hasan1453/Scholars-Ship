@@ -98,13 +98,54 @@ model Scholarship {
   applications     Application[]
 }
 
+model University {
+  id         String        @id @default(uuid())
+  name       String
+  country    String
+  city       String?
+  website    String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  labs       ResearchLab[]
+  professors Professor[]
+
+  @@unique([name, country])
+}
+
+// Faculty & Research Labs card (Figma 251:22151): lab bar, Financial, Target Terms, chips
+model ResearchLab {
+  id             String        @id @default(uuid())
+  name           String
+  universityId   String
+  university     University    @relation(fields: [universityId], references: [id], onDelete: Cascade)
+  department     String?
+  website        String?
+  researchTags   String[]
+  openPositions  Boolean       @default(true)
+  fundingSummary String? // "Merit-Based Scholarships + $1,500/mo Graduate Assistantship"
+  fundingType    String        @default("FULL") // FULL | PARTIAL, same as Scholarship.fundingType
+  fundingSource  String? // "German Academic Exchange Service (DAAD)"
+  degreeLevels   DegreeLevel[]
+  acceptingTerms String[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  professors     Professor[]
+
+  @@unique([universityId, name])
+}
+
 model Professor {
   id             String       @id @default(uuid())
   name           String
   title          String
+  // Plain-text copies stay until the data pipeline links every row to University / ResearchLab
   university     String
   department     String
   country        String
+  universityId   String?
+  universityRef  University?  @relation(fields: [universityId], references: [id], onDelete: SetNull)
+  labId          String?
+  lab            ResearchLab? @relation(fields: [labId], references: [id], onDelete: SetNull)
   labName        String?
   researchTags   String[]
   openPositions  Boolean      @default(true)

@@ -58,7 +58,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 const STORAGE_KEYS = {
   PROFILE: 'highscholar_profile_v2',
   SCHOLARSHIPS: 'highscholar_scholarships_v5',
-  PROFESSORS: 'highscholar_professors_v4',
+  PROFESSORS: 'highscholar_professors_v5',
   APPLICATIONS: 'highscholar_applications_v2',
   OUTREACH: 'highscholar_outreach_v2',
   OPPORTUNITIES: 'highscholar_opportunities_v4',

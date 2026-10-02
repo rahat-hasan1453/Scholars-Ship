@@ -76,6 +76,11 @@ export interface Professor {
   avatarUrl: string;
   acceptingTerms: string[];
   bio?: string;
+  // Lab funding (Prisma: ResearchLab)
+  fundingSummary?: string;
+  fundingType?: 'FULL' | 'PARTIAL';
+  fundingSource?: string;
+  degreeLevels?: DegreeLevel[];
 }
 
 export interface ApplicationTask {
