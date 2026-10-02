@@ -147,15 +147,15 @@ export const OpportunitiesFeed: React.FC = () => {
           <div className="flex items-center justify-between gap-3 shrink-0">
             <div className="flex flex-col gap-1 min-w-0">
               <div className="flex items-center gap-1">
-                <h2 className="text-[16px] leading-[24px] font-medium text-[#101828] whitespace-nowrap">
+                <h2 className="text-[20px] leading-[28px] font-semibold text-[#101828] whitespace-nowrap">
                   Opportunity List
                 </h2>
-                <span className="flex items-center h-[25px] text-[12px] leading-[14px] italic tracking-[-0.6412px] text-[#627181] whitespace-nowrap">
+                <span className="flex items-center h-[25px] text-[14px] leading-[18px] text-[#627181] whitespace-nowrap">
                   / {filteredPrograms.length} Items
                 </span>
               </div>
               {acceptanceRange && (
-                <p className="text-[12px] leading-[16px] text-[#627181] truncate">
+                <p className="text-[14px] leading-[18px] text-[#627181] truncate">
                   <span className="font-bold italic text-[#1b806a]">✓ {acceptanceRange}</span> Acceptance Rate
                   on your customise filter
                 </p>
