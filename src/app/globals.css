@@ -38,6 +38,8 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  /* inline: next/font sets --font-figtree-loaded on <body>, not :root */
+  --font-figtree: var(--font-figtree-loaded), Figtree, system-ui, sans-serif;
 }
 
 /* Figma design tokens (styles node 181-3148). Source of truth: docs/DESIGN-TOKENS.md */
@@ -75,6 +77,8 @@
   /* Uxcel Design System Tokens */
   --bg-canvas: #f8fafc;
   --bg-sidebar: #ffffff;
+  /* Proportional app-shell scale, set by useDesignScale */
+  --app-scale: 1;
   --bg-surface: #ffffff;
   --bg-surface-subtle: #f8f9fa;
   --bg-surface-hover: #f1f5f9;
@@ -224,4 +228,12 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #98a2b3;
+}
+
+/* Viewport heights inside the zoomed app shell: 100dvh gets zoomed too, so divide it back out */
+@utility h-scaled-screen {
+  height: calc(100dvh / var(--app-scale, 1));
+}
+@utility min-h-scaled-screen {
+  min-height: calc(100dvh / var(--app-scale, 1));
 }

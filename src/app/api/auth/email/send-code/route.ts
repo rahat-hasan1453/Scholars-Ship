@@ -41,6 +41,10 @@ export async function POST(req: Request) {
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || new URL(req.url).origin;
     const emailResult = await sendOtpEmail(normalizedEmail, issued.code, appUrl);
+    // Local dev without email credentials: the code is already printed to the server log above.
+    if (!emailResult.success && emailResult.notConfigured && process.env.NODE_ENV === 'development') {
+      return NextResponse.json({ success: true, message: 'Email is not configured locally — the code is in the dev server log.' });
+    }
     if (!emailResult.success) {
       console.warn(`[HighScholar Auth] Sign-in code delivery failed for ${normalizedEmail}: ${emailResult.error}`);
       return NextResponse.json(

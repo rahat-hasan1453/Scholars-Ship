@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/context/AppContext';
 import { HeaderGlobalSearch } from '@/components/layout/HeaderGlobalSearch';
-import { ChevronDownIcon, CircleCheckIcon, MenuIcon, SearchIcon, XIcon } from 'lucide-react';
+import { MenuIcon } from 'lucide-react';
+import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group';
+import { MultiSelectField } from '@/components/layout/MultiSelectField';
 import { User, Settings, LogOut } from 'lucide-react';
 
 export const ALL_SUBJECTS = [
@@ -38,6 +40,7 @@ export const ALL_COUNTRIES = [
   'Australia',
   'Netherlands',
   'Sweden',
+  'Norway',
   'France',
   'Japan',
   'Singapore'
@@ -53,6 +56,34 @@ export const ALL_FUNDING = [
   'University Fellowship'
 ];
 
+// Round flags in /public/flags, keyed by ALL_COUNTRIES value
+const COUNTRY_FLAGS: Record<string, string> = {
+  USA: '/flags/us.svg',
+  Germany: '/flags/de.svg',
+  'United Kingdom': '/flags/gb.svg',
+  Canada: '/flags/ca.svg',
+  Switzerland: '/flags/ch.svg',
+  Australia: '/flags/au.svg',
+  Netherlands: '/flags/nl.svg',
+  Sweden: '/flags/se.svg',
+  Norway: '/flags/no.svg',
+  France: '/flags/fr.svg',
+  Japan: '/flags/jp.svg',
+  Singapore: '/flags/sg.svg',
+};
+
+export const FUNDING_DESCRIPTIONS: Record<string, string> = {
+  'Safe Regional': 'Regional universities where your profile comfortably meets the admission bar',
+  'Tuition Waiver': 'Tuition fees are fully or partly waived',
+  'Full Funding': 'Tuition plus a living stipend are covered',
+  'Graduate Assistantship (TA/RA)': 'Paid teaching or research job, often with a tuition waiver',
+  'Stipend / Living Allowance': 'A monthly allowance for rent, food and other living costs',
+  'High Acceptance (85%+)': 'Programs that admit 85% or more of applicants',
+  'University Fellowship': "A merit award from the university — no work required",
+};
+
+export type MatchMode = 'all' | 'resume';
+
 export interface UnifiedDiscoveryHeaderProps {
   selectedSubjects: string[];
   setSelectedSubjects: React.Dispatch<React.SetStateAction<string[]>>;
@@ -64,6 +95,8 @@ export interface UnifiedDiscoveryHeaderProps {
   setSelectedFunding: React.Dispatch<React.SetStateAction<string[]>>;
   title?: string;
   subtitle?: string;
+  matchMode?: MatchMode;
+  onMatchModeChange?: (mode: MatchMode) => void;
 }
 
 export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
@@ -77,132 +110,69 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
   setSelectedFunding,
   title = 'Find Your Desired Scholarship, Lab & Safe Universities',
   subtitle = 'A quick search links you to scholarships, expert professors, and trusted regional universities.',
+  matchMode: matchModeProp,
+  onMatchModeChange,
 }) => {
   const { profile, setActiveNavTab, setIsOnboardingOpen } = useApp();
-
-  // Popover open states
-  const [isSubjectOpen, setIsSubjectOpen] = useState(false);
-  const [isDegreeOpen, setIsDegreeOpen] = useState(false);
-  const [isCountryOpen, setIsCountryOpen] = useState(false);
-  const [isFundingOpen, setIsFundingOpen] = useState(false);
-
-  // Profile Menu Dropdown State
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-
-  // Search inside popovers
-  const [subjectSearch, setSubjectSearch] = useState('');
-  const [countrySearch, setCountrySearch] = useState('');
-
-  // Refs for clicking outside
-  const subjectRef = useRef<HTMLDivElement>(null);
-  const degreeRef = useRef<HTMLDivElement>(null);
-  const countryRef = useRef<HTMLDivElement>(null);
-  const fundingRef = useRef<HTMLDivElement>(null);
   const profileMenuRef = useRef<HTMLDivElement>(null);
+  // "All / Resume Customised" — UI only for now; uncontrolled unless the page passes it in
+  const [localMatchMode, setLocalMatchMode] = useState<MatchMode>('all');
+  const matchMode = matchModeProp ?? localMatchMode;
 
   useEffect(() => {
+    if (!isProfileMenuOpen) return;
     const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as Node;
-      if (subjectRef.current && !subjectRef.current.contains(target)) setIsSubjectOpen(false);
-      if (degreeRef.current && !degreeRef.current.contains(target)) setIsDegreeOpen(false);
-      if (countryRef.current && !countryRef.current.contains(target)) setIsCountryOpen(false);
-      if (fundingRef.current && !fundingRef.current.contains(target)) setIsFundingOpen(false);
-      if (profileMenuRef.current && !profileMenuRef.current.contains(target)) setIsProfileMenuOpen(false);
+      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target as Node)) setIsProfileMenuOpen(false);
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [isProfileMenuOpen]);
 
-  // Toggle helpers
-  const toggleSubject = (s: string) => {
-    setSelectedSubjects(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
-  };
-  const removeSubject = (s: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSelectedSubjects(prev => prev.filter(x => x !== s));
-  };
-
-  const toggleDegree = (d: string) => {
-    setSelectedDegrees(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d]);
-  };
-  const removeDegree = (d: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSelectedDegrees(prev => prev.filter(x => x !== d));
-  };
-
-  const toggleCountry = (c: string) => {
-    setSelectedCountries(prev => prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c]);
-  };
-  const removeCountry = (c: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSelectedCountries(prev => prev.filter(x => x !== c));
-  };
-
-  const toggleFunding = (f: string) => {
-    setSelectedFunding(prev => prev.includes(f) ? prev.filter(x => x !== f) : [...prev, f]);
-  };
-  const removeFunding = (f: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSelectedFunding(prev => prev.filter(x => x !== f));
-  };
-
-  // Filter options with search
-  const filteredSubjectOptions = useMemo(() => {
-    if (!subjectSearch.trim()) return ALL_SUBJECTS;
-    return ALL_SUBJECTS.filter(s => s.toLowerCase().includes(subjectSearch.toLowerCase()));
-  }, [subjectSearch]);
-
-  const filteredCountryOptions = useMemo(() => {
-    if (!countrySearch.trim()) return ALL_COUNTRIES;
-    return ALL_COUNTRIES.filter(c => c.toLowerCase().includes(countrySearch.toLowerCase()));
-  }, [countrySearch]);
+  const toggleItemClass =
+    'h-8 min-w-0 px-[10px] font-[family-name:var(--font-inter)] text-[14px] leading-5 font-medium cursor-pointer border border-[#e1e8f0] bg-white text-text-secondary hover:bg-[#f4f2fd] hover:text-text-secondary data-[state=on]:z-10 data-[state=on]:border-[#7150e7] data-[state=on]:bg-[#ede9fc] data-[state=on]:text-[#6f4fe4] data-[spacing=0]:first:rounded-l-[10px] data-[spacing=0]:last:rounded-r-[10px] data-[spacing=0]:last:-ml-px';
 
   return (
-    <header className="w-full bg-white/95 backdrop-blur-md border-b border-[#EAECF0] px-4 sm:px-6 lg:px-8 py-4 space-y-4 shrink-0 shadow-2xs">
-      {/* ROW 1: Omnisearch Input + User Profile (Figma Frame 2147226771) */}
-      <div className="flex items-center justify-between gap-4">
-        {/* Mobile Menu Toggle button */}
+    // Figma header (212:6322)
+    <header className="w-full shrink-0 flex flex-col gap-4 px-5 py-4 bg-white border-b border-[#f1f1f1]">
+      {/* Row 1: search + user */}
+      <div className="flex items-center gap-5">
         <button
           type="button"
           onClick={() => window.dispatchEvent(new CustomEvent('open-sidebar'))}
-          className="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 shrink-0 cursor-pointer"
-          title="Open navigation menu"
+          className="lg:hidden -mr-3 p-2 rounded-xl text-slate-600 hover:bg-slate-100 shrink-0 cursor-pointer"
+          aria-label="Open navigation menu"
         >
           <MenuIcon size={20} />
         </button>
 
-        {/* Omnisearch Box (Figma Node 122:3166) */}
         <div className="flex-1 min-w-0">
           <HeaderGlobalSearch onNavigateToTab={(tab) => setActiveNavTab(tab)} />
         </div>
 
-        {/* User Profile Badge (Figma Node 122:3174 Frame 2147226782) */}
         <div ref={profileMenuRef} className="relative shrink-0">
           <button
             type="button"
-            onClick={() => setIsProfileMenuOpen(prev => !prev)}
-            className="flex items-center gap-2.5 p-1 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer text-left"
-            title="User Profile"
+            onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+            aria-expanded={isProfileMenuOpen}
+            className="flex h-11 items-center gap-2 rounded-lg border border-stroke-default px-2 py-1 text-left cursor-pointer hover:bg-slate-50 transition-colors"
           >
-            {/* 32x32 Avatar with Green Online Status Dot */}
-            <div className="relative shrink-0">
+            <span className="relative size-8 shrink-0">
               <img
                 src={profile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80'}
                 alt={profile.name || 'User'}
-                className="w-8 h-8 rounded-full object-cover border border-[#F4F6F8]"
+                className="size-8 rounded-full object-cover border-[0.667px] border-[#f4f6f8]"
               />
-              <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-[#36B37E] ring-1.5 ring-white" />
-            </div>
-
-            {/* User Name & Degree Subtitle matching Figma */}
-            <div className="hidden sm:flex flex-col text-left">
-              <span className="text-xs font-bold text-[#101828] leading-tight">
+              <span className="absolute bottom-[1.33px] right-[1.33px] size-[6.667px] rounded-full bg-success-main border-[0.667px] border-white" />
+            </span>
+            <span className="hidden sm:flex w-[145px] flex-col gap-1">
+              <span className="truncate text-[12px] leading-4 font-bold tracking-[-0.192px] text-text-primary">
                 {profile.name || 'Ingrid Bergman'}
               </span>
-              <span className="text-xs italic text-[#90A1B9] leading-tight mt-0.5">
+              <span className="truncate text-[12px] leading-4 italic tracking-[-0.192px] text-text-secondary">
                 {profile.degreeLevel || 'Masters'} • {profile.specializations?.[0] || 'UX & HCI'}
               </span>
-            </div>
+            </span>
           </button>
 
           {/* Profile Dropdown Menu */}
@@ -287,306 +257,67 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
         </div>
       </div>
 
-      {/* ROW 2: Title + Subtitle (Figma Frame 2147226783 Node 122:3185) */}
-      <div className="space-y-0.5">
-        <h1 className="text-base font-semibold text-[#101828] tracking-tight leading-6">
-          {title}
-        </h1>
-        <p className="text-sm text-[#475467] font-normal leading-5">
-          {subtitle}
-        </p>
-      </div>
-
-      {/* ROW 3: 4 Selection/Filter Fields (Figma Frame 2147226775 Node 122:3188) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
-        {/* 1. SUBJECT */}
-        <div className="relative" ref={subjectRef}>
-          <div className="absolute -top-2.5 left-3 px-1.5 bg-white text-[11px] font-semibold text-[#344054] flex items-center gap-1 z-10 rounded-sm">
-            <span>Subject</span>
+      {/* Row 2: title + match-mode toggle */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-start gap-3">
+          <div className="flex flex-1 min-w-0 flex-col gap-1">
+            <h1 className="text-[16px] leading-6 font-medium text-text-primary">{title}</h1>
+            <p className="text-[14px] leading-5 tracking-[-0.3424px] text-text-secondary">{subtitle}</p>
           </div>
-
-          <div 
-            onClick={() => setIsSubjectOpen(prev => !prev)}
-            className="h-12 border border-[#EAECF0] hover:border-[#D0D5DD] rounded-xl px-3 flex items-center justify-between bg-white cursor-pointer transition-all"
+          <ToggleGroup
+            type="single"
+            value={matchMode}
+            onValueChange={(v) => {
+              if (!v) return; // keep one option selected
+              setLocalMatchMode(v as MatchMode);
+              onMatchModeChange?.(v as MatchMode);
+            }}
+            aria-label="Result mode"
+            className="shrink-0"
           >
-            <div className="flex items-center gap-1.5 overflow-hidden flex-1 mr-2">
-              {selectedSubjects.length === 0 ? (
-                <span className="text-xs text-[#98A2B3]">Select subjects...</span>
-              ) : (
-                <>
-                  {selectedSubjects.slice(0, 2).map((s) => (
-                    <span 
-                      key={s} 
-                      className="bg-[#F2F4F7] text-[#344054] text-xs font-medium px-2 py-0.5 rounded-md flex items-center gap-1 shrink-0"
-                    >
-                      <span className="whitespace-nowrap">{s}</span>
-                      <span 
-                        onClick={(e) => removeSubject(s, e)}
-                        className="p-0.5 hover:text-red-500 rounded-xs cursor-pointer"
-                        title={`Remove ${s}`}
-                      >
-                        <XIcon size={11} />
-                      </span>
-                    </span>
-                  ))}
-                  {selectedSubjects.length > 2 && (
-                    <span className="bg-[#F2F4F7] text-[#344054] text-xs font-semibold px-1.5 py-0.5 rounded-md shrink-0">
-                      +{selectedSubjects.length - 2}
-                    </span>
-                  )}
-                </>
-              )}
-            </div>
-            <ChevronDownIcon size={16} 
-              className={`text-[#667085] shrink-0 transition-transform ${isSubjectOpen ? 'rotate-180' : ''}`} 
-            />
-          </div>
-
-          {isSubjectOpen && (
-            <div className="absolute left-0 top-full mt-1.5 w-72 bg-white rounded-xl border border-[#EAECF0] shadow-xl p-3 z-50 space-y-2.5 animate-in fade-in slide-in-from-top-1">
-              <div className="relative">
-                <SearchIcon size={14} className="text-[#98A2B3] absolute left-2.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={subjectSearch}
-                  onChange={(e) => setSubjectSearch(e.target.value)}
-                  placeholder="Search subject..."
-                  className="w-full h-8 pl-8 pr-3 text-xs bg-[#F8FAFC] border border-[#EAECF0] rounded-lg focus:outline-hidden focus:border-[#7150E7]"
-                  autoFocus
-                />
-              </div>
-              <div className="max-h-48 overflow-y-auto space-y-1 pr-1">
-                {filteredSubjectOptions.map((s) => {
-                  const isChecked = selectedSubjects.includes(s);
-                  return (
-                    <div
-                      key={s}
-                      onClick={() => toggleSubject(s)}
-                      className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs cursor-pointer transition-colors ${
-                        isChecked ? 'bg-[#EDE9FE] text-[#7150E7] font-semibold' : 'hover:bg-slate-50 text-[#344054]'
-                      }`}
-                    >
-                      <span>{s}</span>
-                      {isChecked && (
-                        <CircleCheckIcon size={14} className="text-[#7150E7]" />
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+            <ToggleGroupItem value="all" className={toggleItemClass}>
+              All
+            </ToggleGroupItem>
+            <ToggleGroupItem value="resume" className={toggleItemClass}>
+              Resume Customised
+            </ToggleGroupItem>
+          </ToggleGroup>
         </div>
 
-        {/* 2. DEGREE */}
-        <div className="relative" ref={degreeRef}>
-          <div className="absolute -top-2.5 left-3 px-1.5 bg-white text-[11px] font-semibold text-[#344054] flex items-center gap-1 z-10 rounded-sm">
-            <span>Degree</span>
-          </div>
-
-          <div 
-            onClick={() => setIsDegreeOpen(prev => !prev)}
-            className="h-12 border border-[#EAECF0] hover:border-[#D0D5DD] rounded-xl px-3 flex items-center justify-between bg-white cursor-pointer transition-all"
-          >
-            <div className="flex items-center gap-1.5 overflow-hidden flex-1 mr-2">
-              {selectedDegrees.length === 0 ? (
-                <span className="text-xs text-[#98A2B3]">Select degrees...</span>
-              ) : (
-                <>
-                  {selectedDegrees.slice(0, 2).map((d) => (
-                    <span 
-                      key={d} 
-                      className="bg-[#F2F4F7] text-[#344054] text-xs font-medium px-2 py-0.5 rounded-md flex items-center gap-1 shrink-0"
-                    >
-                      <span>{d}</span>
-                      <span 
-                        onClick={(e) => removeDegree(d, e)}
-                        className="p-0.5 hover:text-red-500 rounded-xs cursor-pointer"
-                        title={`Remove ${d}`}
-                      >
-                        <XIcon size={11} />
-                      </span>
-                    </span>
-                  ))}
-                  {selectedDegrees.length > 2 && (
-                    <span className="bg-[#F2F4F7] text-[#344054] text-xs font-semibold px-1.5 py-0.5 rounded-md shrink-0">
-                      +{selectedDegrees.length - 2}
-                    </span>
-                  )}
-                </>
-              )}
-            </div>
-            <ChevronDownIcon size={16} 
-              className={`text-[#667085] shrink-0 transition-transform ${isDegreeOpen ? 'rotate-180' : ''}`} 
-            />
-          </div>
-
-          {isDegreeOpen && (
-            <div className="absolute left-0 top-full mt-1.5 w-56 bg-white rounded-xl border border-[#EAECF0] shadow-xl p-3 z-50 space-y-1 animate-in fade-in slide-in-from-top-1">
-              {ALL_DEGREES.map((d) => {
-                const isChecked = selectedDegrees.includes(d);
-                return (
-                  <div
-                    key={d}
-                    onClick={() => toggleDegree(d)}
-                    className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs cursor-pointer transition-colors ${
-                      isChecked ? 'bg-[#EDE9FE] text-[#7150E7] font-semibold' : 'hover:bg-slate-50 text-[#344054]'
-                    }`}
-                  >
-                    <span>{d}</span>
-                    {isChecked && (
-                      <CircleCheckIcon size={14} className="text-[#7150E7]" />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* 3. COUNTRY */}
-        <div className="relative" ref={countryRef}>
-          <div className="absolute -top-2.5 left-3 px-1.5 bg-white text-[11px] font-semibold text-[#344054] flex items-center gap-1 z-10 rounded-sm">
-            <span>Country</span>
-          </div>
-
-          <div 
-            onClick={() => setIsCountryOpen(prev => !prev)}
-            className="h-12 border border-[#EAECF0] hover:border-[#D0D5DD] rounded-xl px-3 flex items-center justify-between bg-white cursor-pointer transition-all"
-          >
-            <div className="flex items-center gap-1.5 overflow-hidden flex-1 mr-2">
-              {selectedCountries.length === 0 ? (
-                <span className="text-xs text-[#98A2B3]">Select countries...</span>
-              ) : (
-                <>
-                  {selectedCountries.slice(0, 2).map((c) => (
-                    <span 
-                      key={c} 
-                      className="bg-[#F2F4F7] text-[#344054] text-xs font-medium px-2 py-0.5 rounded-md flex items-center gap-1 shrink-0"
-                    >
-                      <span>{c}</span>
-                      <span 
-                        onClick={(e) => removeCountry(c, e)}
-                        className="p-0.5 hover:text-red-500 rounded-xs cursor-pointer"
-                        title={`Remove ${c}`}
-                      >
-                        <XIcon size={11} />
-                      </span>
-                    </span>
-                  ))}
-                  {selectedCountries.length > 2 && (
-                    <span className="bg-[#F2F4F7] text-[#344054] text-xs font-semibold px-1.5 py-0.5 rounded-md shrink-0">
-                      +{selectedCountries.length - 2}
-                    </span>
-                  )}
-                </>
-              )}
-            </div>
-            <ChevronDownIcon size={16} 
-              className={`text-[#667085] shrink-0 transition-transform ${isCountryOpen ? 'rotate-180' : ''}`} 
-            />
-          </div>
-
-          {isCountryOpen && (
-            <div className="absolute left-0 top-full mt-1.5 w-64 bg-white rounded-xl border border-[#EAECF0] shadow-xl p-3 z-50 space-y-2.5 animate-in fade-in slide-in-from-top-1">
-              <div className="relative">
-                <SearchIcon size={14} className="text-[#98A2B3] absolute left-2.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={countrySearch}
-                  onChange={(e) => setCountrySearch(e.target.value)}
-                  placeholder="Search country..."
-                  className="w-full h-8 pl-8 pr-3 text-xs bg-[#F8FAFC] border border-[#EAECF0] rounded-lg focus:outline-hidden focus:border-[#7150E7]"
-                  autoFocus
-                />
-              </div>
-              <div className="max-h-48 overflow-y-auto space-y-1 pr-1">
-                {filteredCountryOptions.map((c) => {
-                  const isChecked = selectedCountries.includes(c);
-                  return (
-                    <div
-                      key={c}
-                      onClick={() => toggleCountry(c)}
-                      className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs cursor-pointer transition-colors ${
-                        isChecked ? 'bg-[#EDE9FE] text-[#7150E7] font-semibold' : 'hover:bg-slate-50 text-[#344054]'
-                      }`}
-                    >
-                      <span>{c}</span>
-                      {isChecked && (
-                        <CircleCheckIcon size={14} className="text-[#7150E7]" />
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* 4. ACCEPTANCE & FUNDING */}
-        <div className="relative" ref={fundingRef}>
-          <div className="absolute -top-2.5 left-3 px-1.5 bg-white text-[11px] font-semibold text-[#344054] flex items-center gap-1 z-10 rounded-sm">
-            <span>Acceptance &amp; Funding</span>
-          </div>
-
-          <div 
-            onClick={() => setIsFundingOpen(prev => !prev)}
-            className="h-12 border border-[#EAECF0] hover:border-[#D0D5DD] rounded-xl px-3 flex items-center justify-between bg-white cursor-pointer transition-all"
-          >
-            <div className="flex items-center gap-1.5 overflow-hidden flex-1 mr-2">
-              {selectedFunding.length === 0 ? (
-                <span className="text-xs text-[#98A2B3]">Select funding...</span>
-              ) : (
-                <>
-                  {selectedFunding.slice(0, 1).map((f) => (
-                    <span 
-                      key={f} 
-                      className="bg-[#F2F4F7] text-[#344054] text-xs font-medium px-2 py-0.5 rounded-md flex items-center gap-1 shrink-0"
-                    >
-                      <span className="whitespace-nowrap">{f}</span>
-                      <span 
-                        onClick={(e) => removeFunding(f, e)}
-                        className="p-0.5 hover:text-red-500 rounded-xs cursor-pointer"
-                        title={`Remove ${f}`}
-                      >
-                        <XIcon size={11} />
-                      </span>
-                    </span>
-                  ))}
-                  {selectedFunding.length > 1 && (
-                    <span className="bg-[#F2F4F7] text-[#344054] text-xs font-semibold px-1.5 py-0.5 rounded-md shrink-0">
-                      +{selectedFunding.length - 1}
-                    </span>
-                  )}
-                </>
-              )}
-            </div>
-            <ChevronDownIcon size={16} 
-              className={`text-[#667085] shrink-0 transition-transform ${isFundingOpen ? 'rotate-180' : ''}`} 
-            />
-          </div>
-
-          {isFundingOpen && (
-            <div className="absolute left-0 top-full mt-1.5 w-64 bg-white rounded-xl border border-[#EAECF0] shadow-xl p-3 z-50 space-y-1 animate-in fade-in slide-in-from-top-1">
-              {ALL_FUNDING.map((f) => {
-                const isChecked = selectedFunding.includes(f);
-                return (
-                  <div
-                    key={f}
-                    onClick={() => toggleFunding(f)}
-                    className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs cursor-pointer transition-colors ${
-                      isChecked ? 'bg-[#EDE9FE] text-[#7150E7] font-semibold' : 'hover:bg-slate-50 text-[#344054]'
-                    }`}
-                  >
-                    <span className="truncate">{f}</span>
-                    {isChecked && (
-                      <CircleCheckIcon size={14} className="text-[#7150E7] shrink-0" />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
+        {/* Row 3: filters */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <MultiSelectField
+            label="Subject"
+            options={ALL_SUBJECTS}
+            selected={selectedSubjects}
+            onChange={setSelectedSubjects}
+            searchable
+            placeholder="Select subjects..."
+          />
+          <MultiSelectField
+            label="Degree"
+            options={ALL_DEGREES}
+            selected={selectedDegrees}
+            onChange={setSelectedDegrees}
+            placeholder="Select degrees..."
+          />
+          <MultiSelectField
+            label="Country"
+            options={ALL_COUNTRIES}
+            selected={selectedCountries}
+            onChange={setSelectedCountries}
+            searchable
+            optionIcons={COUNTRY_FLAGS}
+            placeholder="Select countries..."
+          />
+          <MultiSelectField
+            label="Acceptance & Funding"
+            options={ALL_FUNDING}
+            selected={selectedFunding}
+            onChange={setSelectedFunding}
+            optionDescriptions={FUNDING_DESCRIPTIONS}
+            placeholder="Select funding..."
+          />
         </div>
       </div>
     </header>

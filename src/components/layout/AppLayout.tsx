@@ -3,15 +3,26 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/context/AppContext';
-import { ChevronsLeftIcon, CompassIcon, MenuIcon, SlidersHorizontalIcon, UsersIcon, XIcon, ZapIcon } from 'lucide-react';
-import { ChevronRight, Zap, LogOut, Settings, User, Sparkles, BookOpen } from 'lucide-react';
-import { HighScholarLogo } from './HighScholarLogo';
+import { MenuIcon, XIcon } from 'lucide-react';
+import { ChevronRight, Zap, LogOut, Settings, User, Sparkles } from 'lucide-react';
+import { Button } from '@/components/shadcn/button';
 import { HeaderGlobalSearch } from './HeaderGlobalSearch';
+import { useDesignScale } from '@/hooks/useDesignScale';
+
+type AppTab = 'scholarships' | 'opportunities' | 'professors' | 'research' | 'tracker' | 'profile';
+
+// Figma sidebar menu (183:4918) — Hugeicons, recoloured per state via mask
+const SIDEBAR_ITEMS: { tab: AppTab; label: string; icon: string; iconSize: number }[] = [
+  { tab: 'opportunities', label: 'Opportunity Feed', icon: '/sidebar/dashboard.svg', iconSize: 17.9167 },
+  { tab: 'scholarships', label: 'Scholarship Radar', icon: '/sidebar/radar.svg', iconSize: 18.1667 },
+  { tab: 'professors', label: 'Faculty & Research Labs', icon: '/sidebar/user-group.svg', iconSize: 20 },
+  { tab: 'research', label: 'Research Paper', icon: '/sidebar/license-draft.svg', iconSize: 20 },
+];
 
 interface AppLayoutProps {
   children: React.ReactNode;
-  activeTab: 'scholarships' | 'opportunities' | 'professors' | 'research' | 'tracker' | 'profile';
-  setActiveTab: (tab: 'scholarships' | 'opportunities' | 'professors' | 'research' | 'tracker' | 'profile') => void;
+  activeTab: AppTab;
+  setActiveTab: (tab: AppTab) => void;
   onOpenExtension: () => void;
   viewMode?: 'classic' | 'unified';
   onToggleViewMode?: () => void;
@@ -36,6 +47,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
+  useDesignScale();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -67,7 +79,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   }).length;
 
   return (
-    <div className="min-h-screen flex bg-[#f8fafc] text-[#101828]">
+    <div className="min-h-scaled-screen flex bg-surface-bg text-[#101828]" style={{ zoom: "var(--app-scale)" }}>
       
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
@@ -77,190 +89,99 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         />
       )}
 
-      {/* Sidebar matching User Provided Image */}
+      {/* Sidebar (Figma 183:4894) */}
       <aside
-        className={`fixed lg:sticky top-0 z-50 h-screen w-64 bg-white text-[#475467] border-r border-[#F1F5F9] flex flex-col justify-between transition-transform duration-200 ease-in-out shrink-0 ${
+        className={`fixed lg:sticky top-0 z-50 h-scaled-screen w-[260px] shrink-0 flex flex-col gap-4 px-4 pb-5 bg-surface-bg transition-transform duration-200 ease-in-out ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
-        <div className="flex-1 overflow-y-auto pt-5 px-3">
-          {/* Header: HighScholar Brand + PRO + Academic Discovery + Collapse Arrow */}
-          <div className="px-2 flex items-center justify-between mb-6">
-            <div 
+        {/* Brand row */}
+        <div className="flex h-[76px] items-center shrink-0">
+          <div className="flex flex-1 min-w-0 items-center gap-2">
+            <button
+              type="button"
               onClick={() => {
                 setActiveTab('opportunities');
                 setIsSidebarOpen(false);
               }}
-              className="flex items-center cursor-pointer"
+              className="flex flex-1 min-w-0 items-center gap-2 cursor-pointer text-left"
             >
-              <HighScholarLogo />
-            </div>
-            
+              <span aria-hidden className="relative h-9 w-[45.68px] shrink-0">
+                <img src="/sidebar/logo-back.svg" alt="" width={29.1005} height={35.6341} className="absolute left-[16.58px] top-0" />
+                <img src="/sidebar/logo-front.svg" alt="" width={17.7703} height={34.3125} className="absolute left-0 top-[1.69px]" />
+              </span>
+              <span className="flex flex-col min-w-0">
+                <span className="flex items-center gap-1.5">
+                  <span className="text-[14px] leading-5 font-bold tracking-[-0.5004px] text-text-primary whitespace-nowrap">
+                    Scholars’ ship
+                  </span>
+                  <span className="px-1.5 rounded-xl bg-brand-soft text-[10px] leading-[15px] font-bold tracking-[-0.0748px] text-[#4f46e5]">
+                    PRO
+                  </span>
+                </span>
+                <span className="text-[11px] leading-[16.5px] font-medium tracking-[-0.1275px] text-[#667085] whitespace-nowrap">
+                  Academic Discovery
+                </span>
+              </span>
+            </button>
             <button
+              type="button"
               onClick={() => setIsSidebarOpen(false)}
-              className="lg:hidden p-1 text-slate-400 hover:text-slate-700"
+              aria-label="Close menu"
+              className="lg:hidden p-1 text-slate-400 hover:text-slate-700 cursor-pointer"
             >
               <XIcon size={20} />
             </button>
             <button
-              className="hidden lg:flex p-1 rounded-md text-[#94A3B8] hover:text-[#475467] hover:bg-slate-50 transition-colors"
+              type="button"
+              aria-label="Collapse sidebar"
               title="Collapse sidebar"
+              className="hidden lg:flex items-center justify-center size-4 shrink-0 cursor-pointer"
             >
-              <ChevronsLeftIcon size={18} />
-            </button>
-          </div>
-
-          {/* Navigation Groups */}
-          <nav className="space-y-5 text-sm">
-            {/* Section 1: Discover & Opportunities */}
-            <div>
-              <div className="px-2 text-xs font-medium text-[#64748B] mb-2">
-                Discover &amp; Opportunities
-              </div>
-              <div className="space-y-1">
-                {/* Opportunity Feed */}
-                <button
-                  onClick={() => {
-                    setActiveTab('opportunities');
-                    setIsSidebarOpen(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium transition-all cursor-pointer relative overflow-hidden ${
-                    activeTab === 'opportunities'
-                      ? 'bg-[#F4F3FE] text-[#101828] font-semibold'
-                      : 'text-[#475467] hover:bg-[#F8FAFC] hover:text-[#101828]'
-                  }`}
-                >
-                  {/* Active Left Indicator Bar */}
-                  {activeTab === 'opportunities' && (
-                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#7150E7] rounded-r-md" />
-                  )}
-
-                  <div className="flex items-center gap-3">
-                    <ZapIcon size={18} 
-                      className={activeTab === 'opportunities' ? 'text-[#7150E7]' : 'text-[#64748B]'} 
-                    />
-                    <span className={activeTab === 'opportunities' ? 'text-[#101828] font-semibold' : 'text-[#475467]'}>
-                      Opportunity Feed
-                    </span>
-                  </div>
-                </button>
-
-                {/* Scholarship Radar */}
-                <button
-                  onClick={() => {
-                    setActiveTab('scholarships');
-                    setIsSidebarOpen(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium transition-all cursor-pointer relative overflow-hidden ${
-                    activeTab === 'scholarships'
-                      ? 'bg-[#F4F3FE] text-[#101828] font-semibold'
-                      : 'text-[#475467] hover:bg-[#F8FAFC] hover:text-[#101828]'
-                  }`}
-                >
-                  {activeTab === 'scholarships' && (
-                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#7150E7] rounded-r-md" />
-                  )}
-
-                  <div className="flex items-center gap-3">
-                    <CompassIcon size={18} 
-                      className={activeTab === 'scholarships' ? 'text-[#7150E7]' : 'text-[#64748B]'} 
-                    />
-                    <span className={activeTab === 'scholarships' ? 'text-[#101828] font-semibold' : 'text-[#475467]'}>
-                      Scholarship Radar
-                    </span>
-                  </div>
-                </button>
-
-                {/* Faculty & Research Labs */}
-                <button
-                  onClick={() => {
-                    setActiveTab('professors');
-                    setIsSidebarOpen(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium transition-all cursor-pointer relative overflow-hidden ${
-                    activeTab === 'professors'
-                      ? 'bg-[#F4F3FE] text-[#101828] font-semibold'
-                      : 'text-[#475467] hover:bg-[#F8FAFC] hover:text-[#101828]'
-                  }`}
-                >
-                  {activeTab === 'professors' && (
-                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#7150E7] rounded-r-md" />
-                  )}
-
-                  <div className="flex items-center gap-3">
-                    <UsersIcon size={18} 
-                      className={activeTab === 'professors' ? 'text-[#7150E7]' : 'text-[#64748B]'} 
-                    />
-                    <span className={activeTab === 'professors' ? 'text-[#101828] font-semibold' : 'text-[#475467]'}>
-                      Faculty &amp; Research Labs
-                    </span>
-                  </div>
-                </button>
-
-                {/* Research Paper */}
-                <button
-                  onClick={() => {
-                    setActiveTab('research');
-                    setIsSidebarOpen(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium transition-all cursor-pointer relative overflow-hidden ${
-                    activeTab === 'research'
-                      ? 'bg-[#F4F3FE] text-[#101828] font-semibold'
-                      : 'text-[#475467] hover:bg-[#F8FAFC] hover:text-[#101828]'
-                  }`}
-                >
-                  {activeTab === 'research' && (
-                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#7150E7] rounded-r-md" />
-                  )}
-
-                  <div className="flex items-center gap-3">
-                    <BookOpen 
-                      className={`w-4 h-4 ${activeTab === 'research' ? 'text-[#7150E7]' : 'text-[#64748B]'}`} 
-                    />
-                    <span className={activeTab === 'research' ? 'text-[#101828] font-semibold' : 'text-[#475467]'}>
-                      Research Paper
-                    </span>
-                  </div>
-                </button>
-              </div>
-            </div>
-          </nav>
-        </div>
-
-        {/* User profile row at bottom matching Figma exactly */}
-        <div className="p-3 border-t border-[#F1F5F9] bg-white">
-          <div 
-            onClick={() => {
-              setActiveTab('profile');
-              setIsSidebarOpen(false);
-            }}
-            className="flex items-center justify-between px-2 py-1.5 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer group"
-          >
-            <div className="flex items-center gap-3 min-w-0">
-              <img
-                src={profile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80'}
-                alt={profile.name || 'User'}
-                className="w-9 h-9 rounded-full object-cover shrink-0 border border-[#EAECF0]"
-              />
-              <div className="min-w-0 text-left">
-                <div className="text-xs font-semibold text-[#101828] leading-tight truncate">{profile.name || 'Alex Mercer'}</div>
-                <div className="text-[11px] text-[#64748B] leading-tight mt-0.5 truncate">
-                  {profile.degreeLevel || 'Masters'} • {profile.specializations?.[0] || 'UX & HCI'}
-                </div>
-              </div>
-            </div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsOnboardingOpen(true);
-              }}
-              className="p-1 rounded-md text-[#94A3B8] hover:text-[#7150E7] hover:bg-[#EDE9FE] transition-colors cursor-pointer"
-              title="Edit Profile Wizard"
-            >
-              <SlidersHorizontalIcon size={18} />
+              <img src="/sidebar/collapse.svg" alt="" width={16} height={16} />
             </button>
           </div>
         </div>
+
+        {/* Navigation */}
+        <nav className="flex flex-1 min-h-0 flex-col gap-2 overflow-y-auto" aria-label="Discover & Opportunities">
+          <p className="font-figtree text-[12px] leading-[18px] font-medium text-text-tertiary">
+            Discover &amp; Opportunities
+          </p>
+          <div className="flex flex-col gap-1">
+            {SIDEBAR_ITEMS.map((item) => {
+              const active = activeTab === item.tab;
+              return (
+                <Button
+                  key={item.tab}
+                  variant="ghost"
+                  onClick={() => {
+                    setActiveTab(item.tab);
+                    setIsSidebarOpen(false);
+                  }}
+                  aria-current={active ? 'page' : undefined}
+                  className={`h-auto w-full justify-start gap-4 py-2 pl-3 pr-2 font-figtree text-[15px] font-medium cursor-pointer ${
+                    active
+                      ? 'rounded-lg border-l-3 border-[#7050e6] bg-[#f4f2fd] leading-[18px] text-[#08261f] hover:bg-[#f4f2fd] hover:text-[#08261f]'
+                      : 'rounded-none rounded-r-2xl leading-5 text-text-secondary hover:bg-[#f4f2fd]/60 hover:text-text-primary'
+                  }`}
+                >
+                  <span aria-hidden className="flex items-center justify-center size-5 shrink-0">
+                    <span
+                      className={active ? 'bg-[#7050e6]' : 'bg-[#62748e]'}
+                      style={{
+                        width: item.iconSize,
+                        height: item.iconSize,
+                        mask: `url(${item.icon}) center / contain no-repeat`,
+                      }}
+                    />
+                  </span>
+                  {item.label}
+                </Button>
+              );
+            })}
+          </div>
+        </nav>
       </aside>
 
       {/* Main Content Area */}
