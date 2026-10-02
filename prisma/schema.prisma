@@ -88,6 +88,8 @@ model Scholarship {
   countries        String[]
   specializations  String[]
   requirementsJson Json?
+  admissionSummary String?
+  livingCost       String?
   officialUrl      String
   description      String
   featured         Boolean       @default(false)

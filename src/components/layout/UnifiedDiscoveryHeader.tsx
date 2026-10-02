@@ -57,7 +57,7 @@ export const ALL_FUNDING = [
 ];
 
 // Round flags in /public/flags, keyed by ALL_COUNTRIES value
-const COUNTRY_FLAGS: Record<string, string> = {
+export const COUNTRY_FLAGS: Record<string, string> = {
   USA: '/flags/us.svg',
   Germany: '/flags/de.svg',
   'United Kingdom': '/flags/gb.svg',

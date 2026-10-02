@@ -48,6 +48,10 @@ export interface Scholarship {
     minGre?: number;
     notes?: string;
   };
+  /** One-line admission bar shown on cards, e.g. "CGPA 3.2+, GRE Recommended, No Gap Time Restrictions" */
+  admissionSummary?: string;
+  /** Monthly cost of living at the study location, e.g. "Affordable Urban Living ($1,000/mo)" */
+  livingCost?: string;
   officialUrl: string;
   description: string;
   featured?: boolean;

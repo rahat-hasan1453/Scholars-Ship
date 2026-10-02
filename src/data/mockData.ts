@@ -16,8 +16,42 @@ export const initialUserProfile: UserProfile = {
   avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
 };
 
+// Approx. monthly student living cost per country (rent + food + transport)
+const LIVING_COST_BY_COUNTRY: Record<string, string> = {
+  'United Kingdom': 'High-Cost Urban Living (£1,300/mo)',
+  Germany: 'Affordable Urban Living (€950/mo)',
+  USA: 'Moderate Urban Living ($1,500/mo)',
+  Canada: 'Moderate Urban Living (C$1,600/mo)',
+  Australia: 'High-Cost Urban Living (A$2,000/mo)',
+  Switzerland: 'High-Cost Urban Living (CHF 1,900/mo)',
+  Sweden: 'Moderate Urban Living (SEK 10,000/mo)',
+  Finland: 'Moderate Urban Living (€900/mo)',
+  Netherlands: 'Moderate Urban Living (€1,200/mo)',
+  France: 'Moderate Urban Living (€1,000/mo)',
+  Austria: 'Moderate Urban Living (€1,000/mo)',
+  Ireland: 'High-Cost Urban Living (€1,400/mo)',
+  Italy: 'Affordable Urban Living (€850/mo)',
+  Hungary: 'Affordable Urban Living (€600/mo)',
+  Estonia: 'Affordable Urban Living (€700/mo)',
+  Turkey: 'Affordable Urban Living ($500/mo)',
+  Japan: 'Moderate Urban Living (¥120,000/mo)',
+  'South Korea': 'Affordable Urban Living (₩900,000/mo)',
+  Singapore: 'High-Cost Urban Living (S$1,800/mo)',
+  China: 'Affordable Urban Living (¥4,000/mo)',
+  'Saudi Arabia': 'Affordable Urban Living (SAR 2,500/mo)',
+};
+
+const buildAdmissionSummary = (r: Scholarship['requirements']): string => {
+  const parts: string[] = [];
+  if (r.minCgpa) parts.push(`CGPA ${r.minCgpa}+`);
+  if (r.minIelts) parts.push(`IELTS ${r.minIelts}+`);
+  else if (r.minToefl) parts.push(`TOEFL ${r.minToefl}+`);
+  parts.push(r.minGre ? `GRE ${r.minGre}+` : 'No GRE Required');
+  return parts.join(', ');
+};
+
 // 16 Real, Internet-Verified Global Scholarships across Worldwide Countries
-export const mockScholarships: Scholarship[] = [
+const baseScholarships: Scholarship[] = [
   {
     id: 'sch_chevening_uk_01',
     title: 'Chevening Scholarships (UK Government)',
@@ -764,6 +798,12 @@ export const mockScholarships: Scholarship[] = [
     tags: ['Austria Govt', 'OeAD Grant', 'Full Living Grant', 'Research Fellow'],
   },
 ];
+
+export const mockScholarships: Scholarship[] = baseScholarships.map((s) => ({
+  ...s,
+  admissionSummary: s.admissionSummary ?? buildAdmissionSummary(s.requirements),
+  livingCost: s.livingCost ?? LIVING_COST_BY_COUNTRY[s.countries[0]],
+}));
 
 // 21 Real, Renowned Research Professors & Labs Worldwide across UX/HCI, STEM, Biotech, AI, Energy & Economics
 export const mockProfessors: Professor[] = [
