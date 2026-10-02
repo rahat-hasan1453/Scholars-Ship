@@ -6,7 +6,7 @@ export interface SendEmailOptions {
   html: string;
 }
 
-export async function sendOtpEmail(toEmail: string, otpCode: string, appUrl: string, name?: string): Promise<{ success: boolean; error?: string }> {
+export async function sendOtpEmail(toEmail: string, otpCode: string, appUrl: string, name?: string): Promise<{ success: boolean; error?: string; notConfigured?: boolean }> {
   const recipientName = name?.trim() || 'Scholar';
   
   // Email clients can't render SVG, so the wordmark is a PNG served from the site itself.
@@ -56,7 +56,7 @@ export async function sendOtpEmail(toEmail: string, otpCode: string, appUrl: str
   return sendEmail({ to: toEmail, subject: `${otpCode} is your Scholars'ship sign-in code`, html: htmlContent });
 }
 
-export async function sendEmail({ to, subject, html }: SendEmailOptions): Promise<{ success: boolean; error?: string }> {
+export async function sendEmail({ to, subject, html }: SendEmailOptions): Promise<{ success: boolean; error?: string; notConfigured?: boolean }> {
   // 1. Check if Resend API Key is set
   const resendApiKey = process.env.RESEND_API_KEY;
   if (resendApiKey) {
@@ -143,6 +143,7 @@ export async function sendEmail({ to, subject, html }: SendEmailOptions): Promis
   console.warn(`[HighScholar Email Notice] No SMTP or Resend credentials configured in .env.local / Vercel Environment Variables. Undelivered email to ${to}: ${subject}`);
   return { 
     success: false, 
+    notConfigured: true,
     error: 'Email service credentials (SMTP_USER/SMTP_PASSWORD or RESEND_API_KEY) are not configured yet.' 
   };
 }

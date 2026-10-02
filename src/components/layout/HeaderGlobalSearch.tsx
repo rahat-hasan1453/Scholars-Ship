@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { Input } from '@/components/shadcn/input';
 import { useApp } from '@/context/AppContext';
 import { parseNaturalLanguageQuery, matchItemSemantically } from '@/lib/semanticSearch';
 import { Scholarship, Professor, HiringOpportunity } from '@/types';
 import { 
-  Search, 
   X, 
   Sparkles, 
   GraduationCap, 
@@ -171,15 +171,15 @@ export const HeaderGlobalSearch: React.FC<HeaderGlobalSearchProps> = ({
 
   return (
     <div ref={containerRef} className="relative w-full">
-      {/* Search Input matching Figma Node 122:3166 Frame 2147226771 */}
+      {/* Search Input (Figma 212:6324) */}
       <div 
-        className={`w-full h-11 bg-[#F7F7F7] rounded-lg transition-all flex items-center justify-between px-3.5 ${
+        className={`w-full h-11 bg-[#F7F7F7] rounded-lg transition-all flex items-center justify-between pl-2 pr-4 ${
           isOpen ? 'ring-2 ring-[#7150E7]/20 bg-white border border-[#7150E7]' : 'border-none'
         }`}
       >
-        <div className="flex items-center gap-2.5 flex-1 min-w-0 mr-2">
-          <Search className="w-4 h-4 text-[#90A1B9] shrink-0" />
-          <input
+        <div className="flex items-center gap-2 flex-1 min-w-0 mr-2">
+          <img src="/header/search.svg" alt="" width={16} height={16} className="shrink-0" />
+          <Input
             type="text"
             value={globalSearchQuery}
             onChange={(e) => {
@@ -188,8 +188,9 @@ export const HeaderGlobalSearch: React.FC<HeaderGlobalSearchProps> = ({
             }}
             onFocus={() => setIsOpen(true)}
             onKeyDown={handleKeyDown}
+            aria-label="Search scholarships, professors and opportunities"
             placeholder="Search scholarships by title, provider, or topic (e.g. Fulbright, AI, Germany)..."
-            className="w-full text-xs bg-transparent border-none text-[#101828] placeholder:text-[#90A1B9] placeholder:italic focus:outline-hidden"
+            className="h-4 w-full min-w-0 rounded-none border-0 bg-transparent p-0 text-[12px] leading-4 tracking-[-0.192px] text-text-primary shadow-none placeholder:italic placeholder:text-[#90A1B9] focus-visible:ring-0 md:text-[12px]"
           />
         </div>
 
