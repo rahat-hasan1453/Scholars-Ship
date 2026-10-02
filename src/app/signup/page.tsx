@@ -1,6 +1,9 @@
 import { redirect } from 'next/navigation';
+import { PasswordSignup } from '@/components/auth/password-signup';
+import { AUTH_METHOD } from '@/lib/authMethod';
 
-// Sign-up and sign-in are one passwordless flow now; keep this route so old links still work.
+// With AUTH_METHOD=code, sign-up and sign-in are one flow on /login.
 export default function SignupPage() {
-  redirect('/login');
+  if (AUTH_METHOD === 'code') redirect('/login');
+  return <PasswordSignup />;
 }

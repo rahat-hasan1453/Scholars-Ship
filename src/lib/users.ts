@@ -41,6 +41,10 @@ export async function findOrCreateUser(data: {
   return prisma.user.update({ where: { email }, data: updates });
 }
 
+export function setPasswordHash(email: string, passwordHash: string): Promise<User> {
+  return prisma.user.update({ where: { email: normalizeEmail(email) }, data: { passwordHash } });
+}
+
 export function completeOnboarding(email: string, profileData: Prisma.InputJsonValue, name?: string): Promise<User> {
   return prisma.user.update({
     where: { email: normalizeEmail(email) },

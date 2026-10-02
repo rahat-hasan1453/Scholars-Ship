@@ -40,6 +40,7 @@ model User {
   onboardingCompleted Boolean      @default(false)
   profileData         Json?
   emailVerifiedAt     DateTime?
+  passwordHash        String? // scrypt; null for Google-only or code-only accounts
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
   profile             UserProfile?

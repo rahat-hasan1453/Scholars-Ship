@@ -2,14 +2,15 @@ import { NextResponse } from 'next/server';
 import { issueLoginCode } from '@/lib/loginCodes';
 import { sendOtpEmail } from '@/lib/email';
 import { clientIp, rateLimitHit, waitText } from '@/lib/rateLimit';
-import { normalizeEmail } from '@/lib/users';
+import { getUserByEmail, normalizeEmail } from '@/lib/users';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_SENDS_PER_IP_PER_HOUR = 10;
 
 export async function POST(req: Request) {
   try {
-    const { email } = await req.json();
+    // purpose: 'login' (code sign-in, default) | 'signup' (verify a new account) | 'reset' (forgot password)
+    const { email, purpose } = await req.json();
     if (typeof email !== 'string' || !EMAIL_PATTERN.test(email.trim())) {
       return NextResponse.json({ success: false, error: 'Please enter a valid email address.' }, { status: 400 });
     }
@@ -22,6 +23,20 @@ export async function POST(req: Request) {
         { success: false, error: `Too many requests. Please try again in ${waitText(ip.retryAfterSeconds)}.`, retryAfterSeconds: ip.retryAfterSeconds, rateLimited: true },
         { status: 429, headers: { 'Retry-After': String(ip.retryAfterSeconds) } }
       );
+    }
+
+    if (purpose === 'signup' || purpose === 'reset') {
+      const existing = await getUserByEmail(normalizedEmail);
+      if (purpose === 'signup' && existing?.passwordHash) {
+        return NextResponse.json(
+          { success: false, accountExists: true, error: 'An account with this email already exists. Please log in.' },
+          { status: 409 }
+        );
+      }
+      // Same answer whether or not the account exists, and nothing is sent to unknown addresses.
+      if (purpose === 'reset' && !existing) {
+        return NextResponse.json({ success: true, message: `If an account exists for ${normalizedEmail}, we sent a 5-digit code.` });
+      }
     }
 
     const issued = await issueLoginCode(normalizedEmail);
@@ -53,7 +68,10 @@ export async function POST(req: Request) {
       );
     }
 
-    return NextResponse.json({ success: true, message: `We sent a 5-digit code to ${normalizedEmail}.` });
+    const message = purpose === 'reset'
+      ? `If an account exists for ${normalizedEmail}, we sent a 5-digit code.`
+      : `We sent a 5-digit code to ${normalizedEmail}.`;
+    return NextResponse.json({ success: true, message });
   } catch (error) {
     console.error('[HighScholar Auth] Send code error:', error);
     return NextResponse.json({ success: false, error: 'Failed to send the code. Please try again.' }, { status: 500 });

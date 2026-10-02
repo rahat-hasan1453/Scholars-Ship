@@ -22,6 +22,7 @@ export default defineConfig({
     timeout: 180_000,
     reuseExistingServer: true,
     // Test-only values; all /api/auth calls are mocked in the browser, so no DB, email or Google is used.
-    env: { SESSION_SECRET: 'test-only-session-secret-0123456789abcdef', NEXT_PUBLIC_APP_URL: `http://localhost:${PORT}` },
+    // NEXT_PUBLIC_AUTH_METHOD=code: tests/e2e/auth.spec.ts covers the emailed-code sign-in. Password mode is covered by tests/api.
+    env: { SESSION_SECRET: 'test-only-session-secret-0123456789abcdef', NEXT_PUBLIC_APP_URL: `http://localhost:${PORT}`, NEXT_PUBLIC_AUTH_METHOD: 'code' },
   },
 });
