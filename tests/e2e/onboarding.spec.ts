@@ -50,15 +50,13 @@ test.describe('Onboarding (5 steps)', () => {
     expect(consoleErrors, consoleErrors.join('\n')).toEqual([]);
   });
 
-  // BUG-17: if saving fails, the error is swallowed and the user is sent home anyway;
-  // home then sees onboardingCompleted=false and bounces back to /onboarding (answers lost).
+  // BUG-17 (fixed in PR #7): a failed save shows an error and keeps the user on step 5.
   test('shows an error and stays when saving the profile fails', async ({ page }) => {
-    test.fail();
     await installFakeBackend(page, { user: signedInUser({ onboardingCompleted: false }), failCompleteOnboarding: true });
     await walkToLastStep(page);
     await page.getByRole('button', { name: 'Complete Profile & Reveal Matches' }).click();
-    await page.waitForTimeout(1500);
+    await expect(page.getByRole('alert').filter({ hasText: /couldn’t save your profile/ })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Academic Background & Test Scores' })).toBeVisible();
-    await expect(page.getByText(/could not|failed|try again/i)).toBeVisible();
+    await expect(page).toHaveURL(/\/onboarding$/);
   });
 });
