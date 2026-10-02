@@ -1,10 +1,12 @@
 'use client';
 
-import type { ComponentProps, ReactNode } from 'react';
+import { useState, type ComponentProps, type ReactNode } from 'react';
 import Link from 'next/link';
+import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/shadcn/button';
 import { Checkbox } from '@/components/shadcn/checkbox';
 import { Input } from '@/components/shadcn/input';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/shadcn/input-otp';
 import { Label } from '@/components/shadcn/label';
 import { cn } from '@/lib/utils';
 
@@ -16,6 +18,88 @@ const fieldClass = 'h-11 rounded-[10px] bg-background shadow-none';
 
 export function AuthInput({ className, ...props }: ComponentProps<typeof Input>) {
   return <Input className={cn(fieldClass, 'px-2.5', className)} {...props} />;
+}
+
+/* Password input 184:5095 — same field, eye icon 16px (#737373) 10px from the right edge */
+export function AuthPasswordInput({ className, ...props }: Omit<ComponentProps<typeof Input>, 'type'>) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <div className="relative w-full">
+      <AuthInput type={visible ? 'text' : 'password'} className={cn('pr-9', className)} {...props} />
+      <button
+        type="button"
+        onClick={() => setVisible((v) => !v)}
+        aria-label={visible ? 'Hide password' : 'Show password'}
+        aria-pressed={visible}
+        className="absolute right-2.5 top-1/2 flex size-4 -translate-y-1/2 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
+      >
+        {visible ? <EyeOff size={16} /> : <Eye size={16} />}
+      </button>
+    </div>
+  );
+}
+
+/* InputOTP 185:6521 — 5 slots, 243 × 48 */
+export function AuthCodeInput({ value, onChange }: { value: string; onChange: (code: string) => void }) {
+  return (
+    <InputOTP
+      maxLength={5}
+      value={value}
+      onChange={(v) => onChange(v.replace(/\D/g, ''))}
+      inputMode="numeric"
+      pattern="^[0-9]*$"
+      autoComplete="one-time-code"
+      autoFocus
+      aria-label="Verification code"
+    >
+      <InputOTPGroup>
+        {Array.from({ length: 5 }, (_, idx) => (
+          <InputOTPSlot
+            key={idx}
+            index={idx}
+            className="h-12 w-[48.4px] bg-background text-foreground shadow-none first:w-[49.4px] first:rounded-l-[10px] last:rounded-r-[8px]"
+          />
+        ))}
+      </InputOTPGroup>
+    </InputOTP>
+  );
+}
+
+/* "← Change …" and "Resend code" under the code step (not in Figma; kept so users can recover) */
+export function CodeStepActions({
+  backLabel,
+  onBack,
+  onResend,
+  resendCooldown,
+  isSending,
+}: {
+  backLabel: string;
+  onBack: () => void;
+  onResend: () => void;
+  resendCooldown: number;
+  isSending: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-between">
+      <Button
+        type="button"
+        variant="link"
+        className="h-auto p-0 text-xs font-normal leading-4 text-text-secondary hover:text-text-primary hover:no-underline"
+        onClick={onBack}
+      >
+        ← {backLabel}
+      </Button>
+      <Button
+        type="button"
+        variant="link"
+        className="h-auto p-0 text-xs font-normal leading-4 text-brand-primary hover:no-underline disabled:text-text-secondary"
+        onClick={onResend}
+        disabled={resendCooldown > 0 || isSending}
+      >
+        {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
+      </Button>
+    </div>
+  );
 }
 
 /* Button 185:6449 — 36px, radius-sm 6, Brand/Primary, Body/2 M */
