@@ -41,12 +41,12 @@ export const ScholarshipRadarCard: React.FC<ScholarshipRadarCardProps> = ({
       style={{ height: FEED_CARD_HEIGHT }}
     >
       {/* Title row */}
-      <div className="relative flex items-center gap-2 px-4 pt-4 pb-3 bg-white border-b-[0.5px] border-[#f1f1f1] overflow-hidden shrink-0">
-        <div aria-hidden className="absolute right-0 top-0 h-[80px] w-[132px] pointer-events-none overflow-hidden">
+      <div className="relative flex items-center gap-2 px-4 py-3 bg-white border-b-[0.5px] border-[#f1f1f1] overflow-hidden shrink-0">
+        <div aria-hidden className="absolute -right-[0.5px] -top-[0.5px] h-[69px] w-[151px] pointer-events-none overflow-hidden">
           <img
             src="/opportunity-feed/card-deco.png"
             alt=""
-            className="absolute max-w-none left-[-42.89%] top-[0.14%] w-[143.41%] h-[106.73%]"
+            className="absolute max-w-none left-[-0.36%] top-[1.45%] w-[100.73%] h-[98.55%]"
           />
         </div>
         <div className="relative flex flex-1 min-w-0 items-center justify-between gap-2">
