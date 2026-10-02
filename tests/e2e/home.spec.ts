@@ -32,11 +32,8 @@ test.describe('Home', () => {
   });
 });
 
-// BUG-18: page.tsx reads window.location inside useState(), so the server renders the default tab and
-// the client a different one -> React "Hydration failed" error and the whole tree is re-rendered.
-test('deep link ?tab=scholarships renders without a hydration error', async ({ page, consoleErrors, browserName }) => {
-  test.skip(browserName === 'firefox', 'Firefox only sometimes surfaces the hydration error to the console');
-  test.fail();
+// BUG-18 (fixed in PR #8): the tab is read after mount, so SSR and client markup match.
+test('deep link ?tab=scholarships renders without a hydration error', async ({ page, consoleErrors }) => {
   await installFakeBackend(page, { user: signedInUser() });
   await page.goto('/?tab=scholarships');
   await page.waitForLoadState('networkidle');

@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| **কোড / Code under test** | `main` @ `5730706` (PR #1 passwordless auth, #2 onboarding, #3 lucide icons, #4 docs, #5 auth rate limits, #9 Terms consent) merged into the QA branch |
+| **কোড / Code under test** | `main` @ `a2d02a5` (PR #1 passwordless auth, #2 onboarding, #3 lucide icons, #4 docs, #5 auth rate limits, #6 QA suites, #7 onboarding save error, #8 contrast + `?tab=` fix, #9 Terms consent) merged into the QA branch |
 | **QA branch** | `claude/optimistic-blackburn-1aeb1b` (main + tests) |
-| **তারিখ / Date** | 2026-10-01 (run #1), 2026-10-02 (runs #2–#4) |
-| **রান / Run** | #4: re-tested after PR #5 and #9. BUG-02, BUG-03 and BUG-16 are **fixed**; their tests are now normal tests, plus new rate-limit tests. #3 (2026-10-02): E2E + axe accessibility in Chromium, Firefox, WebKit (desktop 1728) and Chromium mobile (375). #2: same checks re-run after merging `main`. `src/lib`, `src/app/api` and `prisma` are identical to run #1, so every auth/API finding still applies. E2E, visual, accessibility, performance: next runs |
+| **তারিখ / Date** | 2026-10-01 (run #1), 2026-10-02 (runs #2–#5) |
+| **রান / Run** | #5: re-tested after PR #7 and #8. BUG-17 and BUG-18 are **fixed** (tests now normal); BUG-19 is only **partly fixed** (see below). #4: re-tested after PR #5 and #9. BUG-02, BUG-03 and BUG-16 are **fixed**; their tests are now normal tests, plus new rate-limit tests. #3 (2026-10-02): E2E + axe accessibility in Chromium, Firefox, WebKit (desktop 1728) and Chromium mobile (375). #2: same checks re-run after merging `main`. `src/lib`, `src/app/api` and `prisma` are identical to run #1, so every auth/API finding still applies. E2E, visual, accessibility, performance: next runs |
 
 ## সারসংক্ষেপ / Summary
 
@@ -17,8 +17,8 @@
 | `npm audit` | ✅ prod: 0 | – | dev: 3 high (deepmerge-ts via prisma) | – |
 | Unit (Vitest), `tests/unit` | 38 | 0 | 5 | `AppContext` not yet covered |
 | API (Vitest), `tests/api` | 43 | 0 | 4 | `research/chat`, `professors` GET/POST not yet covered |
-| E2E (Playwright), `tests/e2e`: 4 projects | 70 | 0 | 7 (BUG-17, 18) | 3 (Firefox: clock-based resend test, hydration check; mobile: logout) |
-| Accessibility (axe, WCAG 2.1 AA) in E2E | 1 (Firefox home) | – | 11 (BUG-19) | – |
+| E2E (Playwright), `tests/e2e`: 4 projects | 78 | 0 | 0 | 2 (Firefox: clock-based resend test; mobile: logout) |
+| Accessibility (axe, WCAG 2.1 AA) in E2E | 1 (Firefox home) | – | 11 (BUG-19, partly fixed) | – |
 | Visual (Figma) / Lighthouse | – | – | – | Not run yet |
 
 **`it.fails` কী? / What is `it.fails`?** প্রতিটা জানা bug-এর জন্য একটা test আছে, যেটা bug থাকা পর্যন্ত "expected fail" দেখায়। তাই `npm test` এখন সবুজ। Bug ঠিক হলে test-টা লাল হবে, তখন `it.fails` বদলে `it` করতে হবে।
@@ -65,9 +65,9 @@ Each known bug has a test that is expected to fail while the bug exists, so `npm
 | BUG-11 | Low | Research search reports OpenAlex outage as success, 0 papers | GenOps (Home) |
 | BUG-12 | Low | `?limit=abc` returns no opportunities; `?tag=` ignored | GenOps (Home) |
 | BUG-15 | Low | Sessions can't be revoked server-side; send-code email links use Host header when `NEXT_PUBLIC_APP_URL` unset | Signup |
-| BUG-17 | **Medium** | Onboarding save failure is ignored: user sent home, then bounced back, answers lost | Onboarding |
-| BUG-18 | Medium | `/?tab=...` deep link causes a React hydration error (whole page re-rendered) | GenOps (Home) |
-| BUG-19 | Medium | Accessibility: low-contrast grey text everywhere, unnamed controls (WCAG 2.1 AA) | GenOps + Design |
+| BUG-17 | ~~Medium~~ ✅ **Fixed (PR #7)** | Onboarding save failure is ignored: user sent home, then bounced back, answers lost | Onboarding |
+| BUG-18 | ~~Medium~~ ✅ **Fixed (PR #8)** | `/?tab=...` deep link causes a React hydration error (whole page re-rendered) | GenOps (Home) |
+| BUG-19 | Medium → **Partly fixed (PR #8)** | Accessibility: remaining low-contrast text and unnamed controls (WCAG 2.1 AA) | GenOps + Design |
 | BUG-16 | ~~Low~~ ✅ **Fixed (PR #9)** | Terms checkbox can be unticked and sign-in still continues | Signup |
 | BUG-20 | Low | Route protection is client-side only (home renders, then redirects) | Signup / GenOps |
 
@@ -139,27 +139,32 @@ Each known bug has a test that is expected to fail while the bug exists, so `npm
 - `send-code/route.ts:28`: if `NEXT_PUBLIC_APP_URL` is not set, the email logo URL comes from the request's Host header. Make sure `NEXT_PUBLIC_APP_URL` is set on Vercel.
 - Dev-only: the sign-in code is printed to the server console when `NODE_ENV !== 'production'` (fine locally, and Vercel previews run as production).
 
-### BUG-17 · Medium · Onboarding save failure ignored / প্রোফাইল সেভ ব্যর্থ হলেও এগিয়ে যায়
+### BUG-17 · ✅ Fixed in PR #7 (was Medium) · Onboarding save failure ignored / প্রোফাইল সেভ ব্যর্থ হলেও এগিয়ে যায়
+- **Verified (run #5, all 4 browser projects):** a failed save now shows an alert ("We couldn’t save your profile…"), stays on step 5 and on `/onboarding`. Test: `tests/e2e/onboarding.spec.ts`.
 - **File:** `src/components/OnboardingModal.tsx:320-334`. The `fetch('/api/auth/complete-onboarding')` result is never checked, and the code always calls `router.push('/?welcome=true')`.
 - **বাংলা:** Server-এ প্রোফাইল সেভ না হলেও (যেমন 500 error বা session শেষ হয়ে গেলে) কোনো error দেখায় না, সরাসরি Home-এ পাঠিয়ে দেয়। Home তখন দেখে onboarding শেষ হয়নি, তাই আবার `/onboarding`-এ ফেরত পাঠায়। ফলে ব্যবহারকারীর সব উত্তর হারিয়ে যায়।
 - **English:** If the server save fails (500, expired session), no error is shown and the user is sent home. Home sees `onboardingCompleted=false` and bounces back to `/onboarding`, so the answers are lost.
 - **Repro:** `tests/e2e/onboarding.spec.ts` → "shows an error and stays when saving the profile fails".
 - **Expected:** Check `res.ok`, show an error, stay on step 5, offer a retry.
 
-### BUG-18 · Medium · Hydration error on `/?tab=`
+### BUG-18 · ✅ Fixed in PR #8 (was Medium) · Hydration error on `/?tab=`
+- **Verified (run #5, Chromium/WebKit/mobile):** `/?tab=scholarships` no longer logs a hydration error (the tab is read after mount). Test: `tests/e2e/home.spec.ts`.
 - **File:** `src/app/page.tsx:87-96`. `useState(() => window.location...)` picks the tab on the client, but the server rendered the default tab. React logs "Hydration failed…" and re-renders the whole tree, which is slower and can flash.
 - **Repro:** open `/?tab=scholarships` while signed in (Chromium/WebKit console). Test: `tests/e2e/home.spec.ts` → "deep link ?tab=scholarships renders without a hydration error".
 - **Expected:** Read the tab with `useSearchParams()`, or set it in an effect after mount.
 
-### BUG-19 · Medium · Accessibility (WCAG 2.1 AA, axe)
-| Page | Violations (serious/critical) |
+### BUG-19 · Partly fixed in PR #8 · Accessibility (WCAG 2.1 AA, axe)
+- **Fixed (run #5):** the main grey text token `#919EAB` (2.73:1) is gone. Home contrast violations dropped from 81 to 23 elements (desktop) and 21 (mobile); `/login` now has only the logo issue; Firefox reports nothing on home.
+- **Still open (run #5):**
+
+| Page | Remaining serious/critical violations |
 |---|---|
-| `/login` | `color-contrast` ×3: `text-text-secondary` **#919EAB on white = 2.73:1** (needs 4.5:1), `#98A2B3` 10px = 2.57:1. `aria-prohibited-attr`: `aria-label` on a plain `<div>` (logo) |
-| `/onboarding` | `aria-progressbar-name`: progress dots have no label. `color-contrast` ×2 (#919EAB subtitle; placeholder #C0C7D0 = 1.7:1). `aria-prohibited-attr` (logo div) |
-| `/` home | `color-contrast` ×81 (#919EAB, #90A1B9 = 2.63:1, #009966 = 3.65:1, brand #7150E7 on #EDE9FE 10px = 4.41:1). Mobile: **critical** `button-name`: the `lg:hidden` icon button has no label |
-- **বাংলা:** হালকা ধূসর লেখা (#919EAB) সাদা background-এর ওপর পড়তে কষ্ট হয়, বিশেষ করে যাঁদের চোখে সমস্যা আছে। রঙটা Figma token থেকে এসেছে, তাই Design-এর সাথে কথা বলে গাঢ় করতে হবে (যেমন #637381 ≈ 4.6:1)। Icon button-এ `aria-label`, আর progressbar-এ `aria-label="Step 1 of 5"` লাগবে।
-- **English:** The grey secondary text token fails contrast. It comes from Figma, so Design must darken it (e.g. #637381 ≈ 4.6:1). Add `aria-label` to the icon button and the progressbar, and `role="img"` (or remove `aria-label`) on the logo div.
-- **Repro:** `tests/e2e/a11y.spec.ts` (full JSON attached in the Playwright HTML report).
+| `/login` | `aria-prohibited-attr`: `aria-label` on a plain `<div>` (logo, `div[aria-label="Scholars'ship"]`) |
+| `/onboarding` | `aria-progressbar-name`: progress dots have no label. Same logo `aria-label`. `color-contrast`: input placeholder `#C0C7D0` on white = **1.7:1** |
+| `/` home | `color-contrast` (23): `#90A1B9` = 2.63:1, `#009966` green = 3.65:1 (and 3.46:1 on `#ECFDF5`), brand `#7150E7` on `#EDE9FE` 10px = 4.41:1. Mobile: **critical** `button-name`: the `lg:hidden` icon button (`<button class="lg:hidden p-1 text-slate-400">`) has no label |
+- **বাংলা:** মূল ধূসর রঙটা ঠিক হয়েছে, কিন্তু আরও কয়েকটা হালকা রং (`#90A1B9`, সবুজ `#009966`, placeholder `#C0C7D0`) এখনো নিয়মের চেয়ে অস্পষ্ট। Logo-র `aria-label`, progress bar-এর নাম আর mobile-এর icon বাটনের নাম এখনো নেই।
+- **English:** The main grey is fixed, but a few other light colors, the logo `aria-label`, the progressbar name and the mobile icon button label remain. Suggested: `#90A1B9` → about `#64748B`, `#009966` → about `#047857`, placeholder → about `#6B7280`, `role="img"` on the logo div, `aria-label="Step 1 of 5"` on the progressbar, `aria-label` on the icon button.
+- **Repro:** `tests/e2e/a11y.spec.ts` (still marked `test.fail()`; remove it once axe reports nothing). Full JSON is attached in the Playwright HTML report.
 
 ### BUG-16 · ✅ Fixed in PR #9 (was Low) · Terms checkbox not enforced
 - **Verified (run #4, all 4 browser projects):** Terms start unticked; "Continue with email" and Google stay disabled and Enter sends nothing until ticked.
