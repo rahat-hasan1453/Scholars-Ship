@@ -6,6 +6,7 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "postinstall": "prisma generate",
+    "db:seed": "tsx --env-file=.env.local prisma/seed.ts",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
@@ -45,6 +46,7 @@
     "postcss": "^8.5.28",
     "prisma": "^6.19.3",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^4.1.11"
   }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { FilterIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { ResearchPaper } from '@/types';
@@ -9,7 +9,7 @@ import { UnifiedDiscoveryHeader } from '@/components/layout/UnifiedDiscoveryHead
 import { ResearchPaperCard } from '@/components/ResearchPaperCard';
 import { ShortsPager } from '@/components/opportunity-feed/ShortsPager';
 import { OpportunityListBar, ViewMode } from '@/components/opportunity-feed/OpportunityListBar';
-import { useFeedGrid } from '@/hooks/useFeedGrid';
+import { useFeedGrid, FEED_CARD_HEIGHT, FEED_CARD_GAP } from '@/hooks/useFeedGrid';
 
 // Figma defaults (Research Paper, node 251:27009)
 const DEFAULT_SUBJECTS = ['UX & Product Design', 'HCI', 'Computer Science', 'Artificial Intelligence'];
@@ -29,10 +29,25 @@ export const ResearchPapersFeed: React.FC = () => {
   const [selectedCountries, setSelectedCountries] = useState<string[]>(DEFAULT_COUNTRIES);
   const [selectedFunding, setSelectedFunding] = useState<string[]>(DEFAULT_FUNDING);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [papers, setPapers] = useState<ResearchPaper[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/research/papers')
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error(`HTTP ${res.status}`))))
+      .then((body) => !cancelled && setPapers(body.data))
+      .catch((error) => {
+        console.error('Failed to load research papers, using bundled list', error);
+        if (!cancelled) setPapers(initialResearchPapers);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Papers have no degree/country/funding data; those filters only matter on the other tabs
   const filteredPapers = useMemo(() => {
-    return initialResearchPapers.filter((paper) => {
+    return (papers ?? []).filter((paper) => {
       // 1. Global search query
       if (globalSearchQuery.trim()) {
         const q = globalSearchQuery.toLowerCase();
@@ -64,7 +79,7 @@ export const ResearchPapersFeed: React.FC = () => {
 
       return true;
     });
-  }, [globalSearchQuery, selectedSubjects]);
+  }, [papers, globalSearchQuery, selectedSubjects]);
 
   // Any filter/search change sends the pager back to page 1
   const resetKey = JSON.stringify([globalSearchQuery, selectedSubjects, viewMode]);
@@ -102,7 +117,22 @@ export const ResearchPapersFeed: React.FC = () => {
             onViewModeChange={setViewMode}
           />
 
-          {filteredPapers.length === 0 ? (
+          {papers === null ? (
+            <div
+              aria-busy
+              aria-label="Loading research papers"
+              className="grid"
+              style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gap: FEED_CARD_GAP }}
+            >
+              {Array.from({ length: cols * grid.rows }, (_, i) => (
+                <div
+                  key={i}
+                  className="rounded-[16px] border-[0.5px] border-[#f1f1f1] bg-[#fafafa] animate-pulse motion-reduce:animate-none"
+                  style={{ height: FEED_CARD_HEIGHT }}
+                />
+              ))}
+            </div>
+          ) : filteredPapers.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center">
               <div className="w-12 h-12 rounded-full bg-[#EDE9FE] text-[#7150E7] flex items-center justify-center">
                 <FilterIcon size={24} />
