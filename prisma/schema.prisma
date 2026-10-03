@@ -285,6 +285,13 @@ model ResearchPaper {
   fieldsOfStudy     String[]
   tags              String[]
   isOpenAccess      Boolean       @default(false)
+  // Details modal (Figma 261:3390). Unknown values stay null and their rows are hidden.
+  venueShort        String? // "CHI 2025"
+  paperType         String? // "Conference paper" | "Journal article" | "Preprint"
+  peerReviewed      Boolean?
+  institution       String? // lead institution, shown in Facts
+  funding           String? // "NSF IIS-2214567"
+  keyFindings       Json? // [{ label, text, value, met }]
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
   authors           PaperAuthor[]

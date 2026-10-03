@@ -3,6 +3,38 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 
+/* ---------- Top bar (details page and details modal) ---------- */
+
+export function TopBarIcon({ src, width, height }: { src: string; width: number; height: number }) {
+  return (
+    <span aria-hidden className="flex items-center justify-center size-4 shrink-0">
+      <span className="bg-current" style={{ width, height, mask: `url(${src}) center / contain no-repeat` }} />
+    </span>
+  );
+}
+
+export const topBarButtonClass =
+  'flex items-center gap-1 px-3 py-1.5 rounded-[6px] border border-[#e1e8f0] text-[12px] leading-4 font-medium text-[#64748b] hover:bg-[#fafafa] hover:text-[#344054] transition-colors cursor-pointer disabled:cursor-not-allowed disabled:hover:bg-transparent';
+
+/** Share sheet when available, else copies the URL; `copied` is true for 2s after a copy */
+export function useShareLink() {
+  const [copied, setCopied] = useState(false);
+  const share = async (url = window.location.href) => {
+    try {
+      if (navigator.share) {
+        await navigator.share({ url, title: document.title });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // User closed the share sheet or clipboard is blocked
+    }
+  };
+  return { copied, share };
+}
+
 // Building blocks for every details page (Figma 249:2596). Pages pass data only; layout lives here.
 // Figma warning text #b76e00 is darkened to #7a4100 for WCAG AA.
 
@@ -33,10 +65,12 @@ export interface DetailHeaderProps {
   /** Round photo next to the title, e.g. the professor (Figma 262:4434) */
   avatarUrl?: string;
   chips?: { label: string; tone?: ChipTone }[];
+  /** Wraps the <h1>, e.g. in a dialog's title so the modal is labelled by it */
+  wrapTitle?: (heading: React.ReactElement) => React.ReactNode;
 }
 
-export function DetailHeader({ eyebrow, meta, title, avatarUrl, chips = [] }: DetailHeaderProps) {
-  const heading = <h1 className="text-[24px] leading-8 font-semibold text-[#101828]">{title}</h1>;
+export function DetailHeader({ eyebrow, meta, title, avatarUrl, chips = [], wrapTitle = (h) => h }: DetailHeaderProps) {
+  const heading = wrapTitle(<h1 className="text-[24px] leading-8 font-semibold text-[#101828]">{title}</h1>);
   return (
     <header className="flex flex-col gap-3">
       <div className="flex flex-col gap-0.5">
@@ -144,12 +178,21 @@ export function DetailText({ children }: { children: React.ReactNode }) {
   return <p className="text-[14px] leading-[18px] text-[#101828]">{children}</p>;
 }
 
-export function ValueRows({ rows }: { rows: { label: string; value: string }[] }) {
+/** `href` links the label to another page, e.g. an author's faculty page */
+export function ValueRows({ rows }: { rows: { label: string; value: string; href?: string }[] }) {
   return (
     <dl className="flex flex-col gap-2 text-[14px] text-[#101828]">
       {rows.map((r) => (
         <div key={r.label} className="flex items-start justify-between gap-4">
-          <dt className="leading-[18px]">{r.label}</dt>
+          <dt className="leading-[18px]">
+            {r.href ? (
+              <Link href={r.href} className="hover:text-[#7150e7] hover:underline">
+                {r.label}
+              </Link>
+            ) : (
+              r.label
+            )}
+          </dt>
           <dd className="leading-5 font-medium text-right">{r.value}</dd>
         </div>
       ))}
@@ -159,7 +202,8 @@ export function ValueRows({ rows }: { rows: { label: string; value: string }[] }
 
 export type CheckRow = { label: string; requirement: string; you: string; met: boolean };
 
-export function CheckList({ rows }: { rows: CheckRow[] }) {
+/** `srLabels`: what ✓ and ! mean for screen readers, e.g. ['Finding:', 'Caveat:'] */
+export function CheckList({ rows, srLabels = ['Met:', 'Not met:'] }: { rows: CheckRow[]; srLabels?: [string, string] }) {
   return (
     <ul className="flex flex-col gap-2">
       {rows.map((r) => (
@@ -167,7 +211,7 @@ export function CheckList({ rows }: { rows: CheckRow[] }) {
           <span aria-hidden className={`w-4 shrink-0 text-[14px] leading-5 font-semibold ${r.met ? 'text-[#1b806a]' : 'text-[#7a4100]'}`}>
             {r.met ? '✓' : '!'}
           </span>
-          <span className="sr-only">{r.met ? 'Met:' : 'Not met:'}</span>
+          <span className="sr-only">{r.met ? srLabels[0] : srLabels[1]}</span>
           <span className="w-[140px] shrink-0 text-[14px] leading-[18px] text-[#101828]">{r.label}</span>
           <span className="flex-1 min-w-0 text-[14px] leading-[18px] text-[#101828]">{r.requirement}</span>
           <span className={`shrink-0 text-[13px] leading-5 italic whitespace-nowrap ${r.met ? 'text-[#1b806a]' : 'text-[#7a4100]'}`}>

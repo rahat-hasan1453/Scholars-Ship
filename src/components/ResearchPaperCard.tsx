@@ -1,19 +1,14 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { ResearchPaper } from '@/types';
 import { useApp } from '@/context/AppContext';
 import { FEED_CARD_HEIGHT } from '@/hooks/useFeedGrid';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/shadcn/dialog';
 
 interface ResearchPaperCardProps {
   paper: ResearchPaper;
+  /** Opens the details modal (Figma 261:3390) */
+  onOpen: (paper: ResearchPaper) => void;
 }
 
 // Roughly three lines of the 14px abstract at card width, as in Figma
@@ -29,16 +24,41 @@ function MaskIcon({ src, size, color }: { src: string; size: number; color: stri
   );
 }
 
-// Figma: "Research Paper" card (node 251:23294)
-export const ResearchPaperCard: React.FC<ResearchPaperCardProps> = ({ paper }) => {
-  const { toggleSavePaper, isPaperSaved } = useApp();
-  const [abstractOpen, setAbstractOpen] = useState(false);
-
-  const isSaved = isPaperSaved(paper.id);
-  const authorsText = paper.authors.map((a) => a.name).join(' • ');
+/** Google Scholar + Download PDF, shared by the card footer and the details modal footer */
+export function PaperLinks({ paper }: { paper: ResearchPaper }) {
   const scholarUrl =
     paper.googleScholarUrl || `https://scholar.google.com/scholar?q=${encodeURIComponent(paper.title)}`;
   const pdfUrl = paper.pdfUrl || paper.semanticScholarUrl || scholarUrl;
+  return (
+    <div className="flex flex-1 min-w-0 gap-4">
+      <a
+        href={scholarUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex flex-1 min-w-0 items-center justify-center gap-1 h-8 px-2 rounded-[6px] border border-[#7150e7] font-[family-name:var(--font-inter)] text-[12px] leading-[16px] font-medium text-[#7150e7] hover:bg-[#f4f2fd] transition-colors"
+      >
+        <span className="truncate">Google Scholar</span>
+        <img src="/opportunity-feed/external-link.svg" alt="" width={12} height={12} className="shrink-0" />
+      </a>
+      <a
+        href={pdfUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex flex-1 min-w-0 items-center justify-center gap-1 h-8 px-2 rounded-[6px] bg-[#7150e7] font-[family-name:var(--font-inter)] text-[12px] leading-[16px] font-medium text-[#fafafa] hover:bg-[#5f3fd6] transition-colors"
+      >
+        <span className="truncate">Download PDF</span>
+        <img src="/research-papers/download.svg" alt="" width={12} height={12} className="shrink-0" />
+      </a>
+    </div>
+  );
+}
+
+// Figma: "Research Paper" card (node 251:23294)
+export const ResearchPaperCard: React.FC<ResearchPaperCardProps> = ({ paper, onOpen }) => {
+  const { toggleSavePaper, isPaperSaved } = useApp();
+
+  const isSaved = isPaperSaved(paper.id);
+  const authorsText = paper.authors.map((a) => a.name).join(' • ');
   const preview =
     paper.abstract.length > ABSTRACT_PREVIEW_CHARS
       ? `${paper.abstract.slice(0, ABSTRACT_PREVIEW_CHARS).trimEnd()}...`
@@ -55,7 +75,9 @@ export const ResearchPaperCard: React.FC<ResearchPaperCardProps> = ({ paper }) =
       {/* Title */}
       <div className="px-4 py-3 bg-white shrink-0">
         <h3 className="line-clamp-2 text-[16px] leading-[24px] font-semibold text-[#101828]" title={paper.title}>
-          {paper.title}
+          <button type="button" onClick={() => onOpen(paper)} className="text-left hover:text-[#7150e7] cursor-pointer">
+            {paper.title}
+          </button>
         </h3>
       </div>
 
@@ -65,7 +87,7 @@ export const ResearchPaperCard: React.FC<ResearchPaperCardProps> = ({ paper }) =
           {preview}{' '}
           <button
             type="button"
-            onClick={() => setAbstractOpen(true)}
+            onClick={() => onOpen(paper)}
             className="inline text-[12px] leading-none font-semibold text-[#7050e6] hover:underline cursor-pointer"
           >
             Read full abstract
@@ -84,7 +106,7 @@ export const ResearchPaperCard: React.FC<ResearchPaperCardProps> = ({ paper }) =
         <div className="flex flex-wrap items-center gap-2 w-full">
           <span className="flex items-center gap-1 h-6 px-2 shrink-0 rounded-full bg-[#fffae5] whitespace-nowrap">
             <span aria-hidden className="text-[11px] leading-[14.667px] font-bold">📊</span>
-            <span className="text-[12px] leading-[16px] font-medium italic tracking-[-0.192px] text-[#b76e00]">
+            <span className="text-[12px] leading-[16px] font-medium italic tracking-[-0.192px] text-[#7a4100]">
               {paper.citationCount.toLocaleString('en-US')} Citations
             </span>
           </span>
@@ -111,50 +133,8 @@ export const ResearchPaperCard: React.FC<ResearchPaperCardProps> = ({ paper }) =
           <MaskIcon src="/research-papers/bookmark.svg" size={20} color={isSaved ? '#7150e7' : '#627181'} />
         </button>
         <img src="/opportunity-feed/divider.svg" alt="" width={1} height={15.5} className="shrink-0" />
-        <div className="flex flex-1 min-w-0 gap-4">
-          <a
-            href={scholarUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex flex-1 min-w-0 items-center justify-center gap-1 h-8 px-2 rounded-[6px] border border-[#7150e7] font-[family-name:var(--font-inter)] text-[12px] leading-[16px] font-medium text-[#7150e7] hover:bg-[#f4f2fd] transition-colors"
-          >
-            <span className="truncate">Google Scholar</span>
-            <img src="/opportunity-feed/external-link.svg" alt="" width={12} height={12} className="shrink-0" />
-          </a>
-          <a
-            href={pdfUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex flex-1 min-w-0 items-center justify-center gap-1 h-8 px-2 rounded-[6px] bg-[#7150e7] font-[family-name:var(--font-inter)] text-[12px] leading-[16px] font-medium text-[#fafafa] hover:bg-[#5f3fd6] transition-colors"
-          >
-            <span className="truncate">Download PDF</span>
-            <img src="/research-papers/download.svg" alt="" width={12} height={12} className="shrink-0" />
-          </a>
-        </div>
+        <PaperLinks paper={paper} />
       </div>
-
-      <Dialog open={abstractOpen} onOpenChange={setAbstractOpen}>
-        <DialogContent className="sm:max-w-[560px]">
-          <DialogHeader>
-            <DialogTitle className="text-[16px] leading-[24px] font-semibold text-[#101828]">{paper.title}</DialogTitle>
-            <DialogDescription className="text-[12px] leading-[16.5px] text-[#627181]">
-              {[paper.venue, paper.year].filter(Boolean).join(' · ')}
-            </DialogDescription>
-          </DialogHeader>
-          <p className="text-[14px] leading-[20px] italic font-medium text-[#101828]">{authorsText}</p>
-          <p className="max-h-[50vh] overflow-y-auto text-[14px] leading-[20px] text-[#475467]">{paper.abstract}</p>
-          {paper.doi && (
-            <a
-              href={`https://doi.org/${paper.doi}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[12px] font-semibold text-[#7050e6] hover:underline"
-            >
-              DOI: {paper.doi}
-            </a>
-          )}
-        </DialogContent>
-      </Dialog>
     </article>
   );
 };

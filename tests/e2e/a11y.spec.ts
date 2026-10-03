@@ -8,6 +8,7 @@ const pages = [
   { name: 'scholarship details', path: '/scholarships/sch_daad_design_02', user: signedInUser() },
   { name: 'opportunity details', path: '/opportunities/opp_bremen_ux_03', user: signedInUser() },
   { name: 'faculty details', path: '/professors/prof_baudisch_hpi_06', user: signedInUser() },
+  { name: 'research paper modal', path: '/?tab=research&paper=paper-ux-01', user: signedInUser(), waitFor: 'dialog' },
 ];
 
 for (const p of pages) {
@@ -15,6 +16,10 @@ for (const p of pages) {
     await installFakeBackend(page, { user: p.user });
     await page.goto(p.path);
     await page.waitForLoadState('networkidle');
+    if ('waitFor' in p) {
+      await page.getByRole('dialog').waitFor();
+      await page.waitForTimeout(400); // open animation (opacity) skews colour-contrast checks
+    }
     const { violations } = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
     const summary = violations.map((v) => `${v.impact} ${v.id} (${v.nodes.length}): ${v.help}\n` +
       v.nodes.slice(0, 3).map((n) => `    ${n.target.join(' ')} :: ${(n.failureSummary ?? '').split('\n').slice(1, 2).join('').trim()} :: ${n.html.slice(0, 90)}`).join('\n'));
