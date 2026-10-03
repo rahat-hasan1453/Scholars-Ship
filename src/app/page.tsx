@@ -74,14 +74,15 @@ export default function HomePage() {
   useAuthGuard();
 
   // Start with the same tab on server and client; the effect below applies ?tab= after hydration (BUG-18).
-  const [activeTab, setActiveTab] = useState<'scholarships' | 'opportunities' | 'professors' | 'research' | 'tracker' | 'profile'>('opportunities');
+  // Shared with the header profile menu, so its "Profile" item can switch tabs too
+  const activeTab = activeNavTab;
+  const setActiveTab = setActiveNavTab;
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get('tab') as any;
       if (tabParam && ['opportunities', 'scholarships', 'professors', 'research', 'tracker', 'profile'].includes(tabParam)) {
-        setActiveTab(tabParam);
         setActiveNavTab(tabParam);
       }
     }
