@@ -169,6 +169,59 @@ model Professor {
   updatedAt      DateTime      @updatedAt
   followers      ProfFollow[]
   papers         PaperAuthor[]
+  opportunities  Opportunity[]
+}
+
+// Opportunity Feed: a funded position posted by a professor or lab.
+// List card: Figma 212:6186 · Details page: Figma 258:3269
+model Opportunity {
+  id              String        @id
+  title           String
+  authorName      String
+  authorTitle     String
+  authorAvatar    String?
+  /// Set when the author matches a seeded Professor row by name
+  professorId     String?
+  professor       Professor?    @relation(fields: [professorId], references: [id], onDelete: SetNull)
+  institution     String
+  labName         String?
+  country         String
+  city            String?
+  /// linkedin | twitter | lab_website | web | reddit
+  source          String
+  sourceUrl       String
+  postedAt        DateTime
+  content         String
+  funding         String
+  /// Values from the Acceptance & Funding filter, e.g. "Full Funding"
+  fundingTags     String[]
+  degreeLevels    DegreeLevel[]
+  fieldTags       String[]
+  /// Values from the Subject filter, e.g. "HCI"
+  subjectTags     String[]
+  minCgpa         Float?
+  minIelts        Float?
+  /// "none" | "preferred" | "required"
+  publications    String        @default("none")
+  // List card lines
+  admission       String
+  livingCost      String
+  rankRange       String
+  acceptanceRate  Int
+  // Details page
+  positionType    String
+  startDate       String
+  deadline        DateTime
+  /// [{ label, value }] rows for the Position Details section
+  positionDetails Json
+  aboutLab        String
+  applySteps      String[]      @default([])
+  contactEmail    String?
+  officialUrl     String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([country])
 }
 
 model ProfFollow {

@@ -6,6 +6,7 @@ const pages = [
   { name: 'onboarding', path: '/onboarding', user: signedInUser({ onboardingCompleted: false }) },
   { name: 'home', path: '/', user: signedInUser() },
   { name: 'scholarship details', path: '/scholarships/sch_daad_design_02', user: signedInUser() },
+  { name: 'opportunity details', path: '/opportunities/opp_bremen_ux_03', user: signedInUser() },
 ];
 
 for (const p of pages) {

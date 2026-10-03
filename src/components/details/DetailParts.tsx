@@ -89,25 +89,32 @@ export function ChipList({ items }: { items: string[] }) {
   );
 }
 
-/** Long text clamped to 3 lines with a "Show more" toggle */
-export function ExpandableText({ text }: { text: string }) {
+const textLink = 'self-start text-[13px] leading-[18px] font-medium text-[#7150e7] hover:underline cursor-pointer';
+
+/** Long text clamped to 3 lines with a "Show more" toggle, plus an optional external link below it */
+export function ExpandableText({ text, link }: { text: string; link?: { label: string; href: string } }) {
   const [open, setOpen] = useState(false);
   const long = text.length > 280;
   return (
     <>
       <p className={`text-[14px] leading-[18px] text-[#101828] ${long && !open ? 'line-clamp-3' : ''}`}>{text}</p>
       {long && (
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-expanded={open}
-          className="self-start text-[13px] leading-[18px] font-medium text-[#7150e7] hover:underline cursor-pointer"
-        >
+        <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} className={textLink}>
           {open ? 'Show less' : 'Show more'}
         </button>
       )}
+      {link && (
+        <a href={link.href} target="_blank" rel="noopener noreferrer" className={textLink}>
+          {link.label}
+        </a>
+      )}
     </>
   );
+}
+
+/** Plain paragraph for short sections such as "About the Lab" */
+export function DetailText({ children }: { children: React.ReactNode }) {
+  return <p className="text-[14px] leading-[18px] text-[#101828]">{children}</p>;
 }
 
 export function ValueRows({ rows }: { rows: { label: string; value: string }[] }) {
@@ -183,8 +190,8 @@ export function ActionCard({ title, note, primary, secondary = [] }: ActionCardP
       {note && <p className="text-[13px] leading-[18px] font-medium text-[#7a4100] whitespace-pre-wrap">{note}</p>}
       <a
         href={primary.href}
-        target="_blank"
-        rel="noopener noreferrer"
+        // mailto: links open the mail app; everything else opens in a new tab
+        {...(primary.href.startsWith('mailto:') ? {} : { target: '_blank', rel: 'noopener noreferrer' })}
         className={`${sidebarButton} w-full bg-[#7150e7] text-white hover:bg-[#5f3fd6]`}
       >
         {primary.label}

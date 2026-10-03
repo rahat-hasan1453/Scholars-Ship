@@ -1,19 +1,21 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { CardHeader } from '@/components/opportunity-feed/CardHeader';
-import type { UniversityProgram } from '@/data/universityPrograms';
+import type { Opportunity } from '@/types';
+import { countryFlagSrc, countryShortLabel } from '@/lib/opportunityDetails';
 import { FEED_CARD_HEIGHT } from '@/hooks/useFeedGrid';
 
 interface UniversityOpportunityCardProps {
-  program: UniversityProgram;
+  opportunity: Opportunity;
   isBookmarked: boolean;
   onToggleBookmark: (id: string) => void;
 }
 
 // Figma: "Opportunity card" (node 212:6186)
 export const UniversityOpportunityCard: React.FC<UniversityOpportunityCardProps> = ({
-  program,
+  opportunity: o,
   isBookmarked,
   onToggleBookmark,
 }) => {
@@ -23,10 +25,10 @@ export const UniversityOpportunityCard: React.FC<UniversityOpportunityCardProps>
       style={{ height: FEED_CARD_HEIGHT }}
     >
       <CardHeader
-        title={program.university}
-        subtitle={program.subjects}
-        flagSrc={`/flags/${program.countryCode}.svg`}
-        countryLabel={program.countryLabel}
+        title={o.institution}
+        subtitle={o.fieldTags.slice(0, 2).join(', ')}
+        flagSrc={countryFlagSrc(o.country) ?? undefined}
+        countryLabel={countryShortLabel(o.country)}
       />
 
       {/* Details */}
@@ -36,22 +38,22 @@ export const UniversityOpportunityCard: React.FC<UniversityOpportunityCardProps>
             <div className="flex items-start gap-[6px]">
               <dt className="w-[100px] shrink-0 text-[14px] leading-[20px] font-medium text-[#101828]">💰 Financial:</dt>
               <dd className="flex-1 min-w-0 text-[14px] leading-[20px] italic font-medium text-[#627181]">
-                {program.financial}
+                {o.funding}
               </dd>
             </div>
             <div className="flex items-start gap-[6px] text-[14px]">
               <dt className="w-[100px] shrink-0 leading-[20px] font-medium text-[#101828]">🎓 Admission:</dt>
-              <dd className="flex-1 min-w-0 leading-[18px] text-[#627181]">{program.admission}</dd>
+              <dd className="flex-1 min-w-0 leading-[18px] text-[#627181]">{o.admission}</dd>
             </div>
             <div className="flex items-start gap-[6px] text-[14px]">
               <dt className="w-[100px] shrink-0 leading-[20px] font-medium text-[#101828]">🏡 Living:</dt>
-              <dd className="flex-1 min-w-0 leading-[18px] text-[#627181]">{program.living}</dd>
+              <dd className="flex-1 min-w-0 leading-[18px] text-[#627181]">{o.livingCost}</dd>
             </div>
           </dl>
         </div>
         <div className="flex items-center h-6 w-full px-2 rounded-[4px] border-l-2 border-[#1b806a] bg-[#ebfdef] shrink-0">
           <p className="truncate text-[14px] leading-[18px] text-[#1b806a]">
-            Rank {program.rankRange} • Acceptance Rate ({program.acceptanceRate}%)
+            Rank {o.rankRange} • Acceptance Rate ({o.acceptanceRate}%)
           </p>
         </div>
       </div>
@@ -60,9 +62,9 @@ export const UniversityOpportunityCard: React.FC<UniversityOpportunityCardProps>
       <div className="flex items-center gap-4 px-4 py-3 bg-white border-t-[0.5px] border-[#f1f1f1] shrink-0">
         <button
           type="button"
-          onClick={() => onToggleBookmark(program.id)}
+          onClick={() => onToggleBookmark(o.id)}
           aria-pressed={isBookmarked}
-          aria-label={isBookmarked ? `Remove ${program.university} from saved` : `Save ${program.university}`}
+          aria-label={isBookmarked ? `Remove ${o.institution} from saved` : `Save ${o.institution}`}
           className="flex items-center justify-center size-8 shrink-0 rounded-[6px] bg-[#fafafa] cursor-pointer hover:bg-[#f1f1f1] transition-colors"
         >
           {isBookmarked ? (
@@ -78,7 +80,7 @@ export const UniversityOpportunityCard: React.FC<UniversityOpportunityCardProps>
         <img src="/opportunity-feed/divider.svg" alt="" width={1} height={15.5} className="shrink-0" />
         <div className="flex flex-1 min-w-0 gap-4">
           <a
-            href={program.officialUrl}
+            href={o.officialUrl ?? o.sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex flex-1 min-w-0 items-center justify-center gap-1 h-8 px-2 rounded-[6px] border border-[#7150e7] font-[family-name:var(--font-inter)] text-[12px] leading-[16px] font-medium text-[#7150e7] hover:bg-[#f4f2fd] transition-colors"
@@ -86,13 +88,13 @@ export const UniversityOpportunityCard: React.FC<UniversityOpportunityCardProps>
             <span className="truncate">Official Link</span>
             <img src="/opportunity-feed/external-link.svg" alt="" width={16} height={16} className="shrink-0" />
           </a>
-          <button
-            type="button"
+          <Link
+            href={`/opportunities/${o.id}`}
             className="flex flex-1 min-w-0 items-center justify-center gap-1 h-8 px-2 rounded-[6px] bg-[#7150e7] font-[family-name:var(--font-inter)] text-[12px] leading-[16px] font-medium text-[#fafafa] cursor-pointer hover:bg-[#5f3fd6] transition-colors"
           >
-            <span className="truncate">{program.ctaLabel}</span>
+            <span className="truncate">Explore More</span>
             <img src="/opportunity-feed/arrow-right.svg" alt="" width={20} height={20} className="shrink-0" />
-          </button>
+          </Link>
         </div>
       </div>
     </article>

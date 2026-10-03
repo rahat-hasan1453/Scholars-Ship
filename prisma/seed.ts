@@ -1,10 +1,11 @@
-// Seeds the mock research papers into the database. Safe to re-run: papers are matched by DOI.
+// Seeds the mock research papers, scholarships and opportunity listings. Safe to re-run: rows are upserted.
 // Run: npm run db:seed
 import { PrismaClient } from '@prisma/client';
 import { initialResearchPapers } from '../src/data/researchPapers';
 import { mockScholarships } from '../src/data/mockData';
 import { degreeToDb } from '../src/lib/scholarships';
 import { semanticScholarIdFromUrl } from '../src/lib/researchPapers';
+import { OPPORTUNITY_LISTINGS } from '../src/data/opportunityPosts';
 
 const prisma = new PrismaClient();
 
@@ -79,8 +80,59 @@ async function seedScholarships() {
   console.log(`Seeded ${mockScholarships.length} scholarships.`);
 }
 
+// Upserts the Opportunity Feed listings by id, so list and details URLs match.
+// Authors are linked to Professor rows by exact name when one exists.
+async function seedOpportunities() {
+  const professors = await prisma.professor.findMany({ select: { id: true, name: true } });
+  const professorIdByName = new Map(professors.map((p) => [p.name.toLowerCase(), p.id]));
+  let linked = 0;
+
+  for (const o of OPPORTUNITY_LISTINGS) {
+    const professorId = professorIdByName.get(o.authorName.toLowerCase()) ?? null;
+    if (professorId) linked++;
+    const data = {
+      title: o.title,
+      authorName: o.authorName,
+      authorTitle: o.authorTitle,
+      authorAvatar: o.authorAvatar ?? null,
+      professorId,
+      institution: o.institution,
+      labName: o.labName ?? null,
+      country: o.country,
+      city: o.city ?? null,
+      source: o.source,
+      sourceUrl: o.sourceUrl,
+      postedAt: new Date(o.postedAt),
+      content: o.content,
+      funding: o.funding,
+      fundingTags: o.fundingTags,
+      degreeLevels: o.degreeLevels.map(degreeToDb),
+      fieldTags: o.fieldTags,
+      subjectTags: o.subjectTags,
+      minCgpa: o.minCgpa ?? null,
+      minIelts: o.minIelts ?? null,
+      publications: o.publications,
+      admission: o.admission,
+      livingCost: o.livingCost,
+      rankRange: o.rankRange,
+      acceptanceRate: o.acceptanceRate,
+      positionType: o.positionType,
+      startDate: o.startDate,
+      deadline: new Date(o.deadline),
+      positionDetails: o.positionDetails,
+      aboutLab: o.aboutLab,
+      applySteps: o.applySteps,
+      contactEmail: o.contactEmail ?? null,
+      officialUrl: o.officialUrl ?? null,
+    };
+    await prisma.opportunity.upsert({ where: { id: o.id }, create: { id: o.id, ...data }, update: data });
+  }
+  console.log(`Seeded ${OPPORTUNITY_LISTINGS.length} opportunities (${linked} linked to professors).`);
+}
+
 seedResearchPapers()
   .then(seedScholarships)
+  .then(seedOpportunities)
   .catch((e) => {
     console.error(e);
     process.exitCode = 1;

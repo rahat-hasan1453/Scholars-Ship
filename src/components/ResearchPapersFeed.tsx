@@ -119,6 +119,7 @@ export const ResearchPapersFeed: React.FC = () => {
 
           {papers === null ? (
             <div
+              role="status"
               aria-busy
               aria-label="Loading research papers"
               className="grid"
