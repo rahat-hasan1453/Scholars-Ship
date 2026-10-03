@@ -5,6 +5,8 @@ import React from 'react';
 export type ViewMode = 'grid' | 'list';
 
 interface OpportunityListBarProps {
+  /** Heading above the cards, e.g. "Scholarship List" */
+  title?: string;
   count: number;
   acceptanceRange: string | null;
   /** Figma uses #1b806a on Scholarship Radar, #36b37e on Faculty & Research Labs */
@@ -25,6 +27,7 @@ function ViewToggleIcon({ src, size, active }: { src: string; size: number; acti
 
 // Figma: list bar above the cards (Opportunity Feed 183:4558, Scholarship Radar 233:8930)
 export const OpportunityListBar: React.FC<OpportunityListBarProps> = ({
+  title = 'Opportunity List',
   count,
   acceptanceRange,
   acceptanceColor = '#1b806a',
@@ -35,7 +38,7 @@ export const OpportunityListBar: React.FC<OpportunityListBarProps> = ({
     <div className="flex flex-col gap-1 min-w-0">
       <div className="flex items-center gap-1">
         <h2 className="text-[20px] leading-[28px] font-semibold text-[#101828] whitespace-nowrap">
-          Opportunity List
+          {title}
         </h2>
         <span className="flex items-center h-[25px] text-[14px] leading-[18px] text-[#627181] whitespace-nowrap">
           / {count} Items
