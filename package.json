@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build --webpack",
+    "vercel-build": "node prisma/vercel-build.mjs",
     "postinstall": "prisma generate",
     "db:seed": "tsx --env-file=.env.local prisma/seed.ts",
     "start": "next start",
