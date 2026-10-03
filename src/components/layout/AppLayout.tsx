@@ -11,12 +11,12 @@ import { useDesignScale } from '@/hooks/useDesignScale';
 
 export type AppTab = 'scholarships' | 'opportunities' | 'professors' | 'research' | 'tracker' | 'profile';
 
-// Figma sidebar menu (183:4918) — Hugeicons, recoloured per state via mask
-const SIDEBAR_ITEMS: { tab: AppTab; label: string; icon: string; iconSize: number }[] = [
-  { tab: 'opportunities', label: 'Opportunity Feed', icon: '/sidebar/dashboard.svg', iconSize: 17.9167 },
-  { tab: 'scholarships', label: 'Scholarship Radar', icon: '/sidebar/radar.svg', iconSize: 18.1667 },
-  { tab: 'professors', label: 'Faculty & Research Labs', icon: '/sidebar/user-group.svg', iconSize: 20 },
-  { tab: 'research', label: 'Research Paper', icon: '/sidebar/license-draft.svg', iconSize: 20 },
+// Figma sidebar icons (273:3998): a stroke icon for the default state, a duotone filled icon when selected
+const SIDEBAR_ITEMS: { tab: AppTab; label: string; icon: string }[] = [
+  { tab: 'opportunities', label: 'Opportunity Feed', icon: 'dashboard' },
+  { tab: 'scholarships', label: 'Scholarship Radar', icon: 'radar' },
+  { tab: 'professors', label: 'Faculty & Research Labs', icon: 'user-group' },
+  { tab: 'research', label: 'Research Paper', icon: 'license-draft' },
 ];
 
 interface AppLayoutProps {
@@ -166,16 +166,13 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                       : 'rounded-none rounded-r-2xl leading-5 text-text-secondary hover:bg-[#f4f2fd]/60 hover:text-text-primary'
                   }`}
                 >
-                  <span aria-hidden className="flex items-center justify-center size-5 shrink-0">
-                    <span
-                      className={active ? 'bg-[#7050e6]' : 'bg-[#62748e]'}
-                      style={{
-                        width: item.iconSize,
-                        height: item.iconSize,
-                        mask: `url(${item.icon}) center / contain no-repeat`,
-                      }}
-                    />
-                  </span>
+                  <img
+                    src={`/sidebar/${item.icon}-${active ? 'selected' : 'default'}.svg`}
+                    alt=""
+                    width={20}
+                    height={20}
+                    className="size-5 shrink-0"
+                  />
                   {item.label}
                 </Button>
               );
