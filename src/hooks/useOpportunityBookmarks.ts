@@ -2,14 +2,15 @@
 
 import { useCallback, useMemo, useSyncExternalStore } from 'react';
 
-// Opportunity bookmarks live in localStorage until a saved-items table exists.
-// Shared by the feed cards and the details page so both show the same state.
-const BOOKMARKS_KEY = 'highscholar_bookmarked_programs';
+// Bookmarks live in localStorage until a saved-items table exists.
+// Shared by the feed cards and the details pages so both show the same state.
+const OPPORTUNITY_KEY = 'highscholar_bookmarked_programs';
+const PROFESSOR_KEY = 'highscholar_bookmarked_professors';
 const BOOKMARKS_EVENT = 'highscholar-bookmarks-change';
 
-function readBookmarksRaw(): string {
+function readBookmarksRaw(key: string): string {
   try {
-    return localStorage.getItem(BOOKMARKS_KEY) ?? '[]';
+    return localStorage.getItem(key) ?? '[]';
   } catch {
     return '[]';
   }
@@ -33,19 +34,26 @@ function parseBookmarks(raw: string): Set<string> {
   }
 }
 
-export function useOpportunityBookmarks() {
-  const raw = useSyncExternalStore(subscribeBookmarks, readBookmarksRaw, () => '[]');
+function useBookmarks(key: string) {
+  const read = useCallback(() => readBookmarksRaw(key), [key]);
+  const raw = useSyncExternalStore(subscribeBookmarks, read, () => '[]');
   const bookmarks = useMemo(() => parseBookmarks(raw), [raw]);
 
-  const toggleBookmark = useCallback((id: string) => {
-    const next = parseBookmarks(readBookmarksRaw());
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    try {
-      localStorage.setItem(BOOKMARKS_KEY, JSON.stringify([...next]));
-    } catch {}
-    window.dispatchEvent(new Event(BOOKMARKS_EVENT));
-  }, []);
+  const toggleBookmark = useCallback(
+    (id: string) => {
+      const next = parseBookmarks(readBookmarksRaw(key));
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      try {
+        localStorage.setItem(key, JSON.stringify([...next]));
+      } catch {}
+      window.dispatchEvent(new Event(BOOKMARKS_EVENT));
+    },
+    [key],
+  );
 
   return { bookmarks, toggleBookmark };
 }
+
+export const useOpportunityBookmarks = () => useBookmarks(OPPORTUNITY_KEY);
+export const useProfessorBookmarks = () => useBookmarks(PROFESSOR_KEY);

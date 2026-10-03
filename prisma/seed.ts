@@ -1,13 +1,84 @@
-// Seeds the mock research papers, scholarships and opportunity listings. Safe to re-run: rows are upserted.
+// Seeds the mock faculty, research papers, scholarships and opportunity listings. Safe to re-run: rows are upserted.
 // Run: npm run db:seed
 import { PrismaClient } from '@prisma/client';
 import { initialResearchPapers } from '../src/data/researchPapers';
-import { mockScholarships } from '../src/data/mockData';
+import { mockProfessors, mockScholarships } from '../src/data/mockData';
+import { withFacultyDefaults } from '../src/lib/professorDetails';
 import { degreeToDb } from '../src/lib/scholarships';
 import { semanticScholarIdFromUrl } from '../src/lib/researchPapers';
 import { OPPORTUNITY_LISTINGS } from '../src/data/opportunityPosts';
 
 const prisma = new PrismaClient();
+
+// Upserts University → ResearchLab → Professor (+ latest Grant) from the mock faculty list.
+// Professor ids match the list cards, so /professors/<id> works for both DB and mock data.
+// Runs first so papers and opportunities can link their authors to these rows.
+async function seedFaculty() {
+  for (const mock of mockProfessors) {
+    const p = withFacultyDefaults(mock);
+    const university = await prisma.university.upsert({
+      where: { name_country: { name: p.university, country: p.country } },
+      create: { name: p.university, country: p.country, city: p.city ?? null },
+      update: { city: p.city ?? null },
+    });
+
+    const labData = {
+      department: p.department,
+      website: p.labWebsite ?? null,
+      researchTags: p.researchTags,
+      openPositions: p.openPositions,
+      fundingSummary: p.fundingSummary ?? null,
+      fundingType: p.fundingType ?? 'FULL',
+      fundingSource: p.fundingSource ?? null,
+      degreeLevels: (p.degreeLevels ?? []).map(degreeToDb),
+      acceptingTerms: p.acceptingTerms,
+    };
+    const lab = p.labName
+      ? await prisma.researchLab.upsert({
+          where: { universityId_name: { universityId: university.id, name: p.labName } },
+          create: { name: p.labName, universityId: university.id, ...labData },
+          update: labData,
+        })
+      : null;
+
+    const data = {
+      name: p.name,
+      title: p.title,
+      university: p.university,
+      department: p.department,
+      country: p.country,
+      universityId: university.id,
+      labId: lab?.id ?? null,
+      labName: p.labName ?? null,
+      researchTags: p.researchTags,
+      openPositions: p.openPositions,
+      recentGrants: p.recentGrants ?? null,
+      email: p.email ?? null,
+      linkedInUrl: p.linkedInUrl ?? null,
+      googleScholar: p.googleScholar ?? null,
+      labWebsite: p.labWebsite ?? null,
+      avatarUrl: p.avatarUrl,
+      acceptingTerms: p.acceptingTerms,
+      school: p.school ?? null,
+      bio: p.bio ?? null,
+      lookingFor: p.lookingFor,
+      contactSteps: p.contactSteps ?? [],
+    };
+    await prisma.professor.upsert({ where: { id: p.id }, create: { id: p.id, ...data }, update: data });
+
+    if (p.recentGrant) {
+      const grant = {
+        title: p.recentGrant.title,
+        amount: p.recentGrant.amount,
+        year: p.recentGrant.year ?? null,
+        labId: lab?.id ?? null,
+        professorId: p.id,
+      };
+      await prisma.grant.upsert({ where: { id: `grant_${p.id}` }, create: { id: `grant_${p.id}`, ...grant }, update: grant });
+    }
+  }
+  console.log(`Seeded ${mockProfessors.length} professors with their universities, labs and grants.`);
+}
 
 async function seedResearchPapers() {
   const professors = await prisma.professor.findMany({ select: { id: true, name: true } });
@@ -130,7 +201,8 @@ async function seedOpportunities() {
   console.log(`Seeded ${OPPORTUNITY_LISTINGS.length} opportunities (${linked} linked to professors).`);
 }
 
-seedResearchPapers()
+seedFaculty()
+  .then(seedResearchPapers)
   .then(seedScholarships)
   .then(seedOpportunities)
   .catch((e) => {

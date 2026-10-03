@@ -123,53 +123,87 @@ model University {
 
 // Faculty & Research Labs card (Figma 251:22151): lab bar, Financial, Target Terms, chips
 model ResearchLab {
-  id             String        @id @default(uuid())
-  name           String
-  universityId   String
-  university     University    @relation(fields: [universityId], references: [id], onDelete: Cascade)
-  department     String?
-  website        String?
-  researchTags   String[]
-  openPositions  Boolean       @default(true)
-  fundingSummary String? // "Merit-Based Scholarships + $1,500/mo Graduate Assistantship"
-  fundingType    String        @default("FULL") // FULL | PARTIAL, same as Scholarship.fundingType
-  fundingSource  String? // "German Academic Exchange Service (DAAD)"
-  degreeLevels   DegreeLevel[]
-  acceptingTerms String[]
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  professors     Professor[]
+  id                String        @id @default(uuid())
+  name              String
+  universityId      String
+  university        University    @relation(fields: [universityId], references: [id], onDelete: Cascade)
+  department        String?
+  website           String?
+  researchTags      String[]
+  openPositions     Boolean       @default(true)
+  fundingSummary    String? // "Merit-Based Scholarships + $1,500/mo Graduate Assistantship"
+  fundingType       String        @default("FULL") // FULL | PARTIAL, same as Scholarship.fundingType
+  fundingSource     String? // "German Academic Exchange Service (DAAD)"
+  degreeLevels      DegreeLevel[]
+  acceptingTerms    String[]
+  // Details page "Lab at a Glance" (Figma 258:3622); null = unknown, row is hidden
+  phdStudents       Int?
+  postdocs          Int?
+  openPositionCount Int?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  professors        Professor[]
+  grants            Grant[]
 
   @@unique([universityId, name])
 }
 
+// Research funding won by a lab or professor ("Recent grant" on the Faculty details page).
+// Later filled by the grant-signal pipeline (NSF, NIH, UKRI, CORDIS).
+model Grant {
+  id          String       @id
+  title       String
+  funder      String?
+  /// Display amount with currency, e.g. "SEK 4.2M"
+  amount      String
+  year        Int?
+  labId       String?
+  lab         ResearchLab? @relation(fields: [labId], references: [id], onDelete: SetNull)
+  professorId String?
+  professor   Professor?   @relation(fields: [professorId], references: [id], onDelete: Cascade)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([professorId])
+}
+
 model Professor {
-  id             String        @id @default(uuid())
-  name           String
-  title          String
+  id               String        @id @default(uuid())
+  name             String
+  title            String
   // Plain-text copies stay until the data pipeline links every row to University / ResearchLab
-  university     String
-  department     String
-  country        String
-  universityId   String?
-  universityRef  University?   @relation(fields: [universityId], references: [id], onDelete: SetNull)
-  labId          String?
-  lab            ResearchLab?  @relation(fields: [labId], references: [id], onDelete: SetNull)
-  labName        String?
-  researchTags   String[]
-  openPositions  Boolean       @default(true)
-  recentGrants   String?
-  email          String?
-  linkedInUrl    String?
-  googleScholar  String?
-  labWebsite     String?
-  avatarUrl      String?
-  acceptingTerms String[]
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  followers      ProfFollow[]
-  papers         PaperAuthor[]
-  opportunities  Opportunity[]
+  university       String
+  department       String
+  country          String
+  universityId     String?
+  universityRef    University?   @relation(fields: [universityId], references: [id], onDelete: SetNull)
+  labId            String?
+  lab              ResearchLab?  @relation(fields: [labId], references: [id], onDelete: SetNull)
+  labName          String?
+  researchTags     String[]
+  openPositions    Boolean       @default(true)
+  recentGrants     String?
+  email            String?
+  linkedInUrl      String?
+  googleScholar    String?
+  labWebsite       String?
+  avatarUrl        String?
+  acceptingTerms   String[]
+  // Faculty details page (Figma 258:3503)
+  /// School or faculty inside the university, e.g. "School of EECS"
+  school           String?
+  bio              String?
+  publicationCount Int?
+  hIndex           Int?
+  /// { degree, minCgpa?, minIelts?, minToefl?, experience?, publications } for "What They Look For"
+  lookingFor       Json?
+  contactSteps     String[]      @default([])
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  followers        ProfFollow[]
+  grants           Grant[]
+  papers           PaperAuthor[]
+  opportunities    Opportunity[]
 }
 
 // Opportunity Feed: a funded position posted by a professor or lab.

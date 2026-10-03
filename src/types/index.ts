@@ -90,6 +90,47 @@ export interface Professor {
   fundingType?: 'FULL' | 'PARTIAL';
   fundingSource?: string;
   degreeLevels?: DegreeLevel[];
+  // Details page (Figma 258:3503)
+  /** School or faculty inside the university, e.g. "School of EECS" */
+  school?: string;
+  city?: string;
+  phdStudents?: number;
+  postdocs?: number;
+  publicationCount?: number;
+  hIndex?: number;
+  openPositionCount?: number;
+  recentGrant?: ProfessorGrant;
+  lookingFor?: LookingFor;
+  contactSteps?: string[];
+  recentPapers?: ProfessorPaper[];
+  /** ISO date the profile was last updated (database rows only) */
+  updatedAt?: string;
+}
+
+export interface ProfessorGrant {
+  /** "SEK 4.2M" */
+  amount: string;
+  title: string;
+  year?: number;
+}
+
+/** "What They Look For" checklist on the Faculty details page (a type alias so it fits Prisma's Json column) */
+export type LookingFor = {
+  /** "Master's in HCI, CS or Design" */
+  degree: string;
+  minCgpa?: number;
+  minIelts?: number;
+  minToefl?: number;
+  /** "Prior user studies" */
+  experience?: string;
+  publications: 'none' | 'preferred' | 'required';
+};
+
+export interface ProfessorPaper {
+  id: string;
+  title: string;
+  venue?: string;
+  year?: number;
 }
 
 export interface ApplicationTask {

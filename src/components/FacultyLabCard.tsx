@@ -1,22 +1,19 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { Professor } from '@/types';
-import { useApp } from '@/context/AppContext';
 import { FEED_CARD_HEIGHT } from '@/hooks/useFeedGrid';
 
 interface FacultyLabCardProps {
   professor: Professor;
-  onOpenDetail?: (prof: Professor) => void;
 }
 
 const FALLBACK_AVATAR =
   'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80';
 
 // Figma: "Faculty or Researchlab" card (node 251:22151)
-export const FacultyLabCard: React.FC<FacultyLabCardProps> = ({ professor, onOpenDetail }) => {
-  const { setSelectedProfessor } = useApp();
-
+export const FacultyLabCard: React.FC<FacultyLabCardProps> = ({ professor }) => {
   const searchName = encodeURIComponent(`${professor.name} ${professor.university}`);
   const linkedInUrl =
     professor.linkedInUrl || `https://www.linkedin.com/search/results/all/?keywords=${searchName}`;
@@ -26,11 +23,6 @@ export const FacultyLabCard: React.FC<FacultyLabCardProps> = ({ professor, onOpe
   const degree = professor.degreeLevels?.[0] || 'Masters';
   const fundingLabel = professor.fundingType === 'PARTIAL' ? 'Partial Funding' : 'Fully Funded';
   const terms = professor.acceptingTerms?.length ? professor.acceptingTerms.join(', ') : 'Not specified';
-
-  const handleExplore = () => {
-    if (onOpenDetail) onOpenDetail(professor);
-    else setSelectedProfessor(professor);
-  };
 
   const chipClass =
     'flex items-center h-6 px-2 rounded-full bg-[#f0f3f4] font-[family-name:var(--font-figtree)] text-[12px] leading-[18px] font-medium italic text-[#212b36] whitespace-nowrap';
@@ -146,14 +138,13 @@ export const FacultyLabCard: React.FC<FacultyLabCardProps> = ({ professor, onOpe
             <span className="truncate">Official Link</span>
             <img src="/opportunity-feed/external-link.svg" alt="" width={12} height={12} className="shrink-0" />
           </a>
-          <button
-            type="button"
-            onClick={handleExplore}
+          <Link
+            href={`/professors/${professor.id}`}
             className="flex flex-1 min-w-0 items-center justify-center gap-1 h-8 px-2 rounded-[6px] bg-[#7150e7] font-[family-name:var(--font-inter)] text-[12px] leading-[16px] font-medium text-[#fafafa] cursor-pointer hover:bg-[#5f3fd6] transition-colors"
           >
             <span className="truncate">Explore More</span>
             <img src="/opportunity-feed/arrow-right.svg" alt="" width={12} height={12} className="shrink-0" />
-          </button>
+          </Link>
         </div>
       </div>
     </article>
