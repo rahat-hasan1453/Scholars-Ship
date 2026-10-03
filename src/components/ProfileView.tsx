@@ -58,13 +58,6 @@ const ASK_AI_PROMPTS = [
   'Find professors in my field',
 ];
 
-const PIPELINE_STATS = [
-  { label: '🔖 Saved scholarships', value: '12', note: '3 close this month' },
-  { label: '📋 Applications tracked', value: '4', note: '1 submitted · 3 in progress' },
-  { label: '👥 Professors followed', value: '7', note: '2 replied to you' },
-  { label: '🎯 Average match', value: '84%', note: 'Across your saved items' },
-];
-
 const PIPELINE_COLUMNS: { title: string; cards: { title: string; sub: string; chip: string; match: string }[] }[] = [
   { title: 'Wishlist', cards: [{ title: 'Erasmus Mundus HCI', sub: 'European Commission', chip: '⏰ Due 10 Jan 2027', match: '92%' }] },
   { title: 'Preparing', cards: [{ title: 'Chevening Scholarship', sub: 'FCDO · UK', chip: '⏰ Due 5 Nov 2026', match: '78%' }] },
@@ -374,18 +367,6 @@ const SavedTab: React.FC = () => {
     </>
   );
 };
-
-const PipelineStats: React.FC = () => (
-  <div className="grid w-full grid-cols-2 gap-[16px] lg:grid-cols-4">
-    {PIPELINE_STATS.map((s) => (
-      <Card key={s.label} className="gap-[6px] p-[16px]">
-        <p className="text-[12px] leading-[18px] text-[#627181]">{s.label}</p>
-        <p className="text-[24px] leading-[32px] font-[590] text-[#101828]">{s.value}</p>
-        <p className="text-[12px] leading-[18px] italic text-[#627181]">{s.note}</p>
-      </Card>
-    ))}
-  </div>
-);
 
 const PipelineTab: React.FC = () => (
   <div className="flex w-full gap-[16px] overflow-x-auto pb-[4px]">
@@ -771,7 +752,6 @@ export const ProfileView: React.FC<{ onNavigateToTracker?: () => void }> = () =>
             onUpdateResume={() => setTab('documents')}
             onEdit={() => openSettings('personal')}
           />
-          {tab === 'pipeline' && <PipelineStats />}
           <Tabs tabs={tabs} active={tab} onChange={setTab} />
           {tab === 'overview' && (
             <OverviewTab
