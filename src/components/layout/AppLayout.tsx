@@ -9,7 +9,7 @@ import { Button } from '@/components/shadcn/button';
 import { HeaderGlobalSearch } from './HeaderGlobalSearch';
 import { useDesignScale } from '@/hooks/useDesignScale';
 
-type AppTab = 'scholarships' | 'opportunities' | 'professors' | 'research' | 'tracker' | 'profile';
+export type AppTab = 'scholarships' | 'opportunities' | 'professors' | 'research' | 'tracker' | 'profile';
 
 // Figma sidebar menu (183:4918) — Hugeicons, recoloured per state via mask
 const SIDEBAR_ITEMS: { tab: AppTab; label: string; icon: string; iconSize: number }[] = [

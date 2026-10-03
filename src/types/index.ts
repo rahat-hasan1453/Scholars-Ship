@@ -46,12 +46,21 @@ export interface Scholarship {
     minIelts?: number;
     minToefl?: number;
     minGre?: number;
+    minWorkYears?: number;
     notes?: string;
   };
   /** One-line admission bar shown on cards, e.g. "CGPA 3.2+, GRE Recommended, No Gap Time Restrictions" */
   admissionSummary?: string;
   /** Monthly cost of living at the study location, e.g. "Affordable Urban Living ($1,000/mo)" */
   livingCost?: string;
+  /** Short provider name, e.g. "DAAD" */
+  providerShort?: string;
+  fieldOfStudy?: string;
+  /** Rows for the details page Funding section */
+  fundingBreakdown?: { label: string; value: string }[];
+  applySteps?: string[];
+  /** ISO date the listing was added (database rows only) */
+  createdAt?: string;
   officialUrl: string;
   description: string;
   featured?: boolean;

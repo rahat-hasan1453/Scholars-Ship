@@ -91,6 +91,14 @@ model Scholarship {
   requirementsJson Json?
   admissionSummary String?
   livingCost       String?
+  /// Short provider name for the facts grid, e.g. "DAAD"
+  providerShort    String?
+  /// Field of study line for the facts grid
+  fieldOfStudy     String?
+  /// [{ label, value }] rows for the Funding section
+  fundingBreakdown Json?
+  applySteps       String[]      @default([])
+  tags             String[]      @default([])
   officialUrl      String
   description      String
   featured         Boolean       @default(false)

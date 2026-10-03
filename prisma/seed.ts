@@ -2,6 +2,8 @@
 // Run: npm run db:seed
 import { PrismaClient } from '@prisma/client';
 import { initialResearchPapers } from '../src/data/researchPapers';
+import { mockScholarships } from '../src/data/mockData';
+import { degreeToDb } from '../src/lib/scholarships';
 import { semanticScholarIdFromUrl } from '../src/lib/researchPapers';
 
 const prisma = new PrismaClient();
@@ -48,7 +50,37 @@ async function seedResearchPapers() {
   console.log(`Seeded ${initialResearchPapers.length} research papers (${linked} authors linked to professors).`);
 }
 
+// Upserts the mock scholarships by id, so the details page URLs stay the same as the list's.
+async function seedScholarships() {
+  for (const s of mockScholarships) {
+    const data = {
+      title: s.title,
+      provider: s.provider,
+      deadline: new Date(s.deadline),
+      fundingAmount: s.fundingAmount,
+      fundingType: s.fundingType,
+      degreeLevels: s.degreeLevels.map(degreeToDb),
+      countries: s.countries,
+      specializations: s.specializations,
+      requirementsJson: s.requirements,
+      admissionSummary: s.admissionSummary ?? null,
+      livingCost: s.livingCost ?? null,
+      providerShort: s.providerShort ?? null,
+      fieldOfStudy: s.fieldOfStudy ?? null,
+      fundingBreakdown: s.fundingBreakdown ?? [],
+      applySteps: s.applySteps ?? [],
+      tags: s.tags,
+      officialUrl: s.officialUrl,
+      description: s.description,
+      featured: s.featured ?? false,
+    };
+    await prisma.scholarship.upsert({ where: { id: s.id }, create: { id: s.id, ...data }, update: data });
+  }
+  console.log(`Seeded ${mockScholarships.length} scholarships.`);
+}
+
 seedResearchPapers()
+  .then(seedScholarships)
   .catch((e) => {
     console.error(e);
     process.exitCode = 1;

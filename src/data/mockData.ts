@@ -1,4 +1,5 @@
 import { Scholarship, Professor, UserProfile, Application } from '@/types';
+import { withDetailDefaults } from '@/lib/scholarshipDetails';
 
 export const initialUserProfile: UserProfile = {
   id: 'usr_default_01',
@@ -65,6 +66,7 @@ const baseScholarships: Scholarship[] = [
     requirements: {
       minCgpa: 3.2,
       minIelts: 6.5,
+      minWorkYears: 2,
       notes: 'Requires at least 2 years (2,800 hours) of work/internship experience and an undergraduate degree.',
     },
     officialUrl: 'https://www.chevening.org',
@@ -87,6 +89,12 @@ const baseScholarships: Scholarship[] = [
       minIelts: 6.5,
       notes: 'Requires submission of a design work portfolio (max 30 pages PDF) demonstrating creative expertise.',
     },
+    fieldOfStudy: 'UX, Interaction & Product Design',
+    applySteps: [
+      'Choose an eligible Master’s programme at a German university',
+      'Prepare a design portfolio (max 30 pages, PDF)',
+      'Submit the application through the DAAD portal before 15 Oct 2026',
+    ],
     officialUrl: 'https://www.daad.de/en/study-and-research-in-germany/scholarships/',
     description: 'Supports foreign graduates in the fields of Design, Interface Design, Visual Communication, and Film to complete a postgraduate or Master’s degree at a state-recognized German university.',
     featured: true,
@@ -799,11 +807,13 @@ const baseScholarships: Scholarship[] = [
   },
 ];
 
-export const mockScholarships: Scholarship[] = baseScholarships.map((s) => ({
-  ...s,
-  admissionSummary: s.admissionSummary ?? buildAdmissionSummary(s.requirements),
-  livingCost: s.livingCost ?? LIVING_COST_BY_COUNTRY[s.countries[0]],
-}));
+export const mockScholarships: Scholarship[] = baseScholarships.map((s) =>
+  withDetailDefaults({
+    ...s,
+    admissionSummary: s.admissionSummary ?? buildAdmissionSummary(s.requirements),
+    livingCost: s.livingCost ?? LIVING_COST_BY_COUNTRY[s.countries[0]],
+  }),
+);
 
 // 21 Real, Renowned Research Professors & Labs Worldwide across UX/HCI, STEM, Biotech, AI, Energy & Economics
 const baseProfessors: Professor[] = [
