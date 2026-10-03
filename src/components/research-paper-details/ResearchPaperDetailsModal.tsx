@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useAutoHideScrollbar } from '@/hooks/useAutoHideScrollbar';
 import { Dialog as DialogPrimitive } from 'radix-ui';
 import { Dialog, DialogClose, DialogContent } from '@/components/shadcn/dialog';
 import {
@@ -64,6 +65,7 @@ export function ResearchPaperDetailsModal({ paper, onClose }: ResearchPaperDetai
 function PaperDetails({ paper }: { paper: ResearchPaper }) {
   const { profile: userProfile, toggleSavePaper, isPaperSaved } = useApp();
   const { copied, share } = useShareLink();
+  const bodyRef = useAutoHideScrollbar<HTMLDivElement>();
   const saved = isPaperSaved(paper.id);
 
   const match = relevance(paper, userProfile);
@@ -117,7 +119,7 @@ function PaperDetails({ paper }: { paper: ResearchPaper }) {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-6 min-w-0">
+      <div ref={bodyRef} className="scrollbar-autohide flex-1 min-h-0 overflow-y-auto flex flex-col gap-6 min-w-0 pr-3">
         <DetailHeader
           eyebrow={venueLine(paper)}
           meta={metaLine(paper)}
