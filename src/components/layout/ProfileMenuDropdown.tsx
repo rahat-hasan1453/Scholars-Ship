@@ -1,24 +1,29 @@
 'use client';
 
 import React from 'react';
+import { BriefcaseBusiness, LifeBuoy, type LucideIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 
 const FALLBACK_AVATAR = '/profile/avatar-fallback.png';
 
-/** Lets the header menu's "Settings" open My Profile straight into Edit Profile */
-export const PROFILE_SETTINGS_EVENT = 'open-profile-settings';
-let pendingSettingsRequest = false;
+/** Lets header menu items open My Profile on a specific view (Edit Profile, Pipeline) */
+export const PROFILE_VIEW_EVENT = 'open-profile-view';
+export type ProfileViewRequest = 'settings' | 'pipeline';
+let pendingViewRequest: ProfileViewRequest | null = null;
 
-export function consumeProfileSettingsRequest() {
-  const pending = pendingSettingsRequest;
-  pendingSettingsRequest = false;
+export function consumeProfileViewRequest() {
+  const pending = pendingViewRequest;
+  pendingViewRequest = null;
   return pending;
 }
 
-function requestProfileSettings() {
-  pendingSettingsRequest = true;
-  window.dispatchEvent(new CustomEvent(PROFILE_SETTINGS_EVENT));
+function requestProfileView(view: ProfileViewRequest) {
+  pendingViewRequest = view;
+  window.dispatchEvent(new CustomEvent(PROFILE_VIEW_EVENT));
 }
+
+// Set NEXT_PUBLIC_SUPPORT_EMAIL to change where feedback goes
+const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'rahat.ux4@gmail.com';
 
 async function logout() {
   try {
@@ -28,7 +33,7 @@ async function logout() {
   window.location.href = '/login';
 }
 
-const MenuItem: React.FC<{ icon: string; label: string; onClick: () => void; danger?: boolean }> = ({
+const MenuItem: React.FC<{ icon: string | LucideIcon; label: string; onClick: () => void; danger?: boolean }> = ({
   icon,
   label,
   onClick,
@@ -44,8 +49,13 @@ const MenuItem: React.FC<{ icon: string; label: string; onClick: () => void; dan
         : 'flex w-full items-center gap-[6px] rounded-[6px] px-[6px] py-[4px] text-left transition-colors hover:bg-[#f4f6f8]'
     }
   >
-    {/* eslint-disable-next-line @next/next/no-img-element */}
-    <img src={icon} alt="" width={16} height={16} className="shrink-0" />
+    {typeof icon === 'string' ? (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={icon} alt="" width={16} height={16} className="shrink-0" />
+    ) : (
+      // Lucide at the same 0.75 stroke and #95A3B6 as the Figma menu icons
+      React.createElement(icon, { size: 16, strokeWidth: 0.75, color: '#95A3B6', className: 'shrink-0', 'aria-hidden': true })
+    )}
     <span
       className={`min-w-0 flex-1 truncate font-[family-name:var(--font-inter)] text-[14px] leading-[20px] ${
         danger ? 'text-[#e7000b]' : 'text-[#627181]'
@@ -60,8 +70,8 @@ const MenuItem: React.FC<{ icon: string; label: string; onClick: () => void; dan
 export const ProfileMenuDropdown: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const { profile, setActiveNavTab } = useApp();
 
-  const go = (settings: boolean) => {
-    if (settings) requestProfileSettings();
+  const go = (view?: ProfileViewRequest) => {
+    if (view) requestProfileView(view);
     setActiveNavTab('profile');
     onClose();
   };
@@ -88,8 +98,17 @@ export const ProfileMenuDropdown: React.FC<{ onClose: () => void }> = ({ onClose
         </div>
       </div>
       <div className="flex w-full flex-col px-[4px] py-[4px]">
-        <MenuItem icon="/profile/menu-user.svg" label="Profile" onClick={() => go(false)} />
-        <MenuItem icon="/profile/menu-settings.svg" label="Settings" onClick={() => go(true)} />
+        <MenuItem icon="/profile/menu-user.svg" label="Profile" onClick={() => go()} />
+        <MenuItem icon={BriefcaseBusiness} label="My Applications" onClick={() => go('pipeline')} />
+        <MenuItem icon="/profile/menu-settings.svg" label="Settings" onClick={() => go('settings')} />
+        <MenuItem
+          icon={LifeBuoy}
+          label="Help & Feedback"
+          onClick={() => {
+            onClose();
+            window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent('Scholars’ ship feedback')}`;
+          }}
+        />
       </div>
       <hr className="w-full border-0 border-t border-[#e1e8f0]" />
       <div className="flex w-full flex-col p-[4px]">

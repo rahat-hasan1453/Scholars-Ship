@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
+import { BookOpen, FileText, GraduationCap, Lock, User, type LucideIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { cn } from '@/lib/utils';
 import type { DegreeLevel, ResearchPaper } from '@/types';
@@ -12,7 +13,7 @@ import { ScholarshipRadarCard } from '@/components/ScholarshipRadarCard';
 import { UniversityOpportunityCard } from '@/components/opportunity-feed/UniversityOpportunityCard';
 import { FacultyLabCard } from '@/components/FacultyLabCard';
 import { ResearchPaperCard } from '@/components/ResearchPaperCard';
-import { PROFILE_SETTINGS_EVENT, consumeProfileSettingsRequest } from '@/components/layout/ProfileMenuDropdown';
+import { PROFILE_VIEW_EVENT, consumeProfileViewRequest, type ProfileViewRequest } from '@/components/layout/ProfileMenuDropdown';
 import { ResearchPaperDetailsModal } from '@/components/research-paper-details/ResearchPaperDetailsModal';
 import {
   AccountCards,
@@ -73,14 +74,13 @@ const PIPELINE_COLUMNS: { title: string; cards: { title: string; sub: string; ch
   { title: 'Decision', cards: [] },
 ];
 
-const SETTINGS_NAV: { key: SettingsSection; label: string }[] = [
-  { key: 'personal', label: '👤  Personal info' },
-  { key: 'academic', label: '🎓  Academic background' },
-  { key: 'preferences', label: '🌍  Study preferences' },
-  { key: 'documents', label: '📄  Documents' },
-  { key: 'account', label: '🔐  Account & sign-in' },
+const SETTINGS_NAV: { key: SettingsSection; label: string; icon: LucideIcon }[] = [
+  { key: 'personal', label: 'Personal info', icon: User },
+  { key: 'academic', label: 'Academic background', icon: GraduationCap },
+  { key: 'preferences', label: 'Study preferences', icon: BookOpen },
+  { key: 'documents', label: 'Documents', icon: FileText },
+  { key: 'account', label: 'Account & sign-in', icon: Lock },
 ];
-
 const DEFAULT_BIO =
   'UX designer with 3 years of industry experience, looking for a funded Master’s in HCI. Interested in accessible interfaces and in how AI tools change the way designers prototype and test.';
 
@@ -459,10 +459,11 @@ const SettingsView: React.FC<{
               onClick={() => onSectionChange(n.key)}
               aria-current={isActive ? 'page' : undefined}
               className={cn(
-                'flex shrink-0 items-start rounded-[8px] px-[12px] py-[10px] text-left text-[16px] leading-[20px] whitespace-pre transition-colors lg:w-full',
+                'flex shrink-0 items-center gap-[8px] rounded-[8px] px-[12px] py-[10px] text-left text-[16px] leading-[20px] whitespace-nowrap transition-colors lg:w-full',
                 isActive ? 'bg-[#f4f2fd] text-[#7150e7]' : 'text-[#627181] hover:bg-[#fafafa]',
               )}
             >
+              <n.icon size={18} strokeWidth={1.5} className="shrink-0" aria-hidden />
               {n.label}
             </button>
           );
@@ -633,8 +634,10 @@ const SettingsView: React.FC<{
 export const ProfileView: React.FC<{ onNavigateToTracker?: () => void }> = () => {
   const { profile, updateProfile } = useApp();
 
-  const [mode, setMode] = useState<'view' | 'edit'>(() => (consumeProfileSettingsRequest() ? 'edit' : 'view'));
-  const [tab, setTab] = useState<ProfileTab>('overview');
+  // A header menu request (Settings / My Applications) picks the first view
+  const [initialRequest] = useState<ProfileViewRequest | null>(consumeProfileViewRequest);
+  const [mode, setMode] = useState<'view' | 'edit'>(initialRequest === 'settings' ? 'edit' : 'view');
+  const [tab, setTab] = useState<ProfileTab>(initialRequest === 'pipeline' ? 'pipeline' : 'overview');
   const [section, setSection] = useState<SettingsSection>('personal');
   const [saved, setSaved] = useState(false);
 
@@ -667,15 +670,20 @@ export const ProfileView: React.FC<{ onNavigateToTracker?: () => void }> = () =>
   const [extra, setExtra] = useState({ bio: DEFAULT_BIO, field: 'UX Design & HCI', gradYear: '2023', intake: 'Fall 2027' });
   const [form, setForm] = useState<SettingsForm>(initialForm);
 
-  // Header menu "Settings" while this page is already open
+  // Header menu request while this page is already open
   useEffect(() => {
     const onRequest = () => {
-      consumeProfileSettingsRequest();
-      setSection('personal');
-      setMode('edit');
+      const view = consumeProfileViewRequest();
+      if (view === 'settings') {
+        setSection('personal');
+        setMode('edit');
+      } else if (view === 'pipeline') {
+        setTab('pipeline');
+        setMode('view');
+      }
     };
-    window.addEventListener(PROFILE_SETTINGS_EVENT, onRequest);
-    return () => window.removeEventListener(PROFILE_SETTINGS_EVENT, onRequest);
+    window.addEventListener(PROFILE_VIEW_EVENT, onRequest);
+    return () => window.removeEventListener(PROFILE_VIEW_EVENT, onRequest);
   }, []);
 
   const openSettings = (s: SettingsSection = 'personal') => {
