@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useApp } from '@/context/AppContext';
 import { cn } from '@/lib/utils';
 import type { DegreeLevel, ResearchPaper } from '@/types';
@@ -12,6 +12,7 @@ import { ScholarshipRadarCard } from '@/components/ScholarshipRadarCard';
 import { UniversityOpportunityCard } from '@/components/opportunity-feed/UniversityOpportunityCard';
 import { FacultyLabCard } from '@/components/FacultyLabCard';
 import { ResearchPaperCard } from '@/components/ResearchPaperCard';
+import { PROFILE_SETTINGS_EVENT, consumeProfileSettingsRequest } from '@/components/layout/ProfileMenuDropdown';
 import { ResearchPaperDetailsModal } from '@/components/research-paper-details/ResearchPaperDetailsModal';
 import {
   AccountCards,
@@ -632,7 +633,7 @@ const SettingsView: React.FC<{
 export const ProfileView: React.FC<{ onNavigateToTracker?: () => void }> = () => {
   const { profile, updateProfile } = useApp();
 
-  const [mode, setMode] = useState<'view' | 'edit'>('view');
+  const [mode, setMode] = useState<'view' | 'edit'>(() => (consumeProfileSettingsRequest() ? 'edit' : 'view'));
   const [tab, setTab] = useState<ProfileTab>('overview');
   const [section, setSection] = useState<SettingsSection>('personal');
   const [saved, setSaved] = useState(false);
@@ -665,6 +666,17 @@ export const ProfileView: React.FC<{ onNavigateToTracker?: () => void }> = () =>
   // Fields the profile model does not store yet stay in local state
   const [extra, setExtra] = useState({ bio: DEFAULT_BIO, field: 'UX Design & HCI', gradYear: '2023', intake: 'Fall 2027' });
   const [form, setForm] = useState<SettingsForm>(initialForm);
+
+  // Header menu "Settings" while this page is already open
+  useEffect(() => {
+    const onRequest = () => {
+      consumeProfileSettingsRequest();
+      setSection('personal');
+      setMode('edit');
+    };
+    window.addEventListener(PROFILE_SETTINGS_EVENT, onRequest);
+    return () => window.removeEventListener(PROFILE_SETTINGS_EVENT, onRequest);
+  }, []);
 
   const openSettings = (s: SettingsSection = 'personal') => {
     setForm(initialForm());
