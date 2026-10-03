@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { AppLayout, type AppTab } from '@/components/layout/AppLayout';
 import { useAuthGuard } from '@/hooks/useAuthGuard';
+import { useAutoHideScrollbar } from '@/hooks/useAutoHideScrollbar';
 import { TopBarIcon, topBarButtonClass, useShareLink } from '@/components/details/DetailParts';
 
 export interface DetailPageShellProps {
@@ -23,24 +24,7 @@ export const DetailPageShell: React.FC<DetailPageShellProps> = ({ activeTab, bac
   useAuthGuard();
   const router = useRouter();
   const { copied, share } = useShareLink();
-  const mainRef = useRef<HTMLDivElement>(null);
-
-  // Show the main column's scrollbar only while the user scrolls (see .scrollbar-autohide in globals.css)
-  useEffect(() => {
-    const el = mainRef.current;
-    if (!el) return;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const onScroll = () => {
-      el.classList.add('is-scrolling');
-      clearTimeout(timer);
-      timer = setTimeout(() => el.classList.remove('is-scrolling'), 800);
-    };
-    el.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      el.removeEventListener('scroll', onScroll);
-      clearTimeout(timer);
-    };
-  }, []);
+  const mainRef = useAutoHideScrollbar<HTMLDivElement>();
 
   return (
     <AppLayout
