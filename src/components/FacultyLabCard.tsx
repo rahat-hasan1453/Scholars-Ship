@@ -51,7 +51,7 @@ export const FacultyLabCard: React.FC<FacultyLabCardProps> = ({ professor }) => 
               className="size-10 shrink-0 rounded-full border-2 border-white object-cover shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]"
             />
             <div className="flex flex-col gap-[2px] min-w-0">
-              <h3 className="truncate text-[14px] leading-[20px] font-bold tracking-[-0.3424px] text-[#101828]">
+              <h3 className="truncate text-[14px] leading-[20px] font-[590] tracking-[-0.3424px] text-[#101828]">
                 {professor.name}
               </h3>
               <div className="flex flex-col gap-[2px] min-w-0 text-[12px] leading-[16.5px] font-medium tracking-[-0.1275px] text-[#627181]">
