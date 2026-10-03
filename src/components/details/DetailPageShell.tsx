@@ -31,10 +31,10 @@ export const DetailPageShell: React.FC<DetailPageShellProps> = ({ activeTab, bac
       onOpenExtension={() => router.push('/')}
     >
       <div className="relative h-scaled-screen flex flex-col min-w-0 lg:py-5 lg:pl-5 lg:pr-[30px]">
-        <div className="flex-1 min-h-0 overflow-y-auto bg-white lg:rounded-[16px]">
-          <div className="flex flex-col gap-6 px-4 pt-6 pb-8 lg:px-8">
+        {/* Top bar stays put; on xl only the main column scrolls and the sidebar stays fixed (Figma 270:3942) */}
+        <div className="flex-1 min-h-0 flex flex-col overflow-hidden bg-white lg:rounded-[16px]">
             {/* Top bar */}
-            <div className="flex items-center justify-between gap-3">
+            <div className="shrink-0 flex items-center justify-between gap-3 px-4 pt-6 pb-6 lg:px-8">
               <Link
                 href={back.href}
                 className="text-[14px] leading-5 font-medium text-[#64748b] hover:text-[#344054] transition-colors whitespace-pre"
@@ -59,11 +59,10 @@ export const DetailPageShell: React.FC<DetailPageShellProps> = ({ activeTab, bac
               </div>
             </div>
 
-            <div className="flex flex-col xl:flex-row items-start gap-8">
-              <div className="flex flex-1 min-w-0 w-full flex-col gap-6">{main}</div>
-              <aside className="flex w-full xl:w-[380px] shrink-0 flex-col gap-4">{sidebar}</aside>
+            <div className="flex-1 min-h-0 overflow-y-auto xl:overflow-hidden flex flex-col xl:flex-row items-start gap-8 px-4 lg:px-8">
+              <div className="flex flex-1 min-w-0 w-full flex-col gap-6 pb-8 xl:h-full xl:overflow-y-auto">{main}</div>
+              <aside className="flex w-full xl:w-[380px] shrink-0 flex-col gap-4 pb-8 xl:h-full xl:overflow-y-auto">{sidebar}</aside>
             </div>
-          </div>
         </div>
       </div>
     </AppLayout>

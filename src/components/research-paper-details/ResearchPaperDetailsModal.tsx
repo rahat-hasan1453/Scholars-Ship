@@ -53,7 +53,7 @@ export function ResearchPaperDetailsModal({ paper, onClose }: ResearchPaperDetai
           (e.currentTarget as HTMLElement).focus();
         }}
         overlayClassName="bg-[#0f1729]/45"
-        className="flex flex-col gap-6 w-[calc(100%-2rem)] max-w-[1008px] sm:max-w-[1008px] max-h-[calc(100dvh-2rem)] overflow-y-auto px-4 pt-6 pb-8 sm:px-8 rounded-[24px] border-0 bg-white shadow-[0_24px_48px_-12px_rgba(15,23,41,0.18)]"
+        className="flex flex-col gap-6 w-[calc(100%-2rem)] max-w-[1008px] sm:max-w-[1008px] max-h-[calc(100dvh-2rem)] overflow-hidden px-4 pt-6 pb-8 sm:px-8 rounded-[24px] border-0 bg-white shadow-[0_24px_48px_-12px_rgba(15,23,41,0.18)]"
       >
         {paper && <PaperDetails paper={paper} />}
       </DialogContent>
@@ -98,8 +98,8 @@ function PaperDetails({ paper }: { paper: ResearchPaper }) {
 
   return (
     <>
-      {/* Top bar */}
-      <div className="flex items-center justify-between gap-3">
+      {/* Top bar stays put; only the paper body scrolls (Figma 270:3942) */}
+      <div className="shrink-0 flex items-center justify-between gap-3">
         <p className="text-[14px] leading-5 font-medium text-[#64748b]">📄 Research Paper</p>
         <div className="flex items-start gap-2">
           <button type="button" onClick={() => toggleSavePaper(paper.id)} aria-pressed={saved} className={topBarButtonClass}>
@@ -117,7 +117,7 @@ function PaperDetails({ paper }: { paper: ResearchPaper }) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-6 min-w-0">
+      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-6 min-w-0">
         <DetailHeader
           eyebrow={venueLine(paper)}
           meta={metaLine(paper)}
@@ -144,6 +144,7 @@ function PaperDetails({ paper }: { paper: ResearchPaper }) {
           <DetailSection label="Key Findings">
             <CheckList
               srLabels={['Finding:', 'Caveat:']}
+              compactValues
               rows={paper.keyFindings.map((f) => ({ label: f.label, requirement: f.text, you: f.value, met: f.met }))}
             />
           </DetailSection>
@@ -156,7 +157,7 @@ function PaperDetails({ paper }: { paper: ResearchPaper }) {
       </div>
 
       {/* Footer */}
-      <div className="flex justify-end pt-5 border-t border-[#e4e7ec]">
+      <div className="shrink-0 flex justify-end pt-5 border-t border-[#e4e7ec]">
         <div className="flex w-full sm:w-[416px]">
           <PaperLinks paper={paper} />
         </div>
