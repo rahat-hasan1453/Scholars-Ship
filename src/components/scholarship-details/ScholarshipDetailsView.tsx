@@ -103,7 +103,7 @@ export const ScholarshipDetailsView: React.FC<Props> = ({ scholarship: s, others
       </DetailSection>
       {s.livingCost && (
         <DetailSection label="Living Cost">
-          <p className="text-[14px] leading-[18px] text-[#101828]">{s.livingCost}</p>
+          <p className="text-[16px] leading-5 text-[#101828]">{s.livingCost}</p>
         </DetailSection>
       )}
       {s.applySteps && s.applySteps.length > 0 && (

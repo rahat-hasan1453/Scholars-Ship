@@ -134,7 +134,7 @@ export function FactsGrid({ facts }: { facts: Fact[] }) {
 export function DetailSection({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <section className="flex flex-col sm:flex-row items-start gap-3 sm:gap-6 pt-5 border-t border-[#f1f1f1]">
-      <h2 className="w-[150px] shrink-0 text-[12px] leading-[18px] font-semibold tracking-[0.6px] text-[#627181]">{label}</h2>
+      <h2 className="w-[150px] shrink-0 text-[16px] leading-5 text-[#627181]">{label}</h2>
       <div className="flex flex-1 min-w-0 w-full flex-col gap-2">{children}</div>
     </section>
   );
@@ -150,7 +150,7 @@ export function ChipList({ items }: { items: string[] }) {
   );
 }
 
-const textLink = 'self-start text-[13px] leading-[18px] font-medium text-[#7150e7] hover:underline cursor-pointer';
+const textLink = 'self-start text-[16px] leading-5 text-[#7150e7] hover:underline cursor-pointer';
 
 /** Long text clamped to 3 lines with a "Show more" toggle, plus an optional external link below it */
 export function ExpandableText({ text, link }: { text: string; link?: { label: string; href: string } }) {
@@ -158,7 +158,7 @@ export function ExpandableText({ text, link }: { text: string; link?: { label: s
   const long = text.length > 280;
   return (
     <>
-      <p className={`text-[14px] leading-[18px] text-[#101828] ${long && !open ? 'line-clamp-3' : ''}`}>{text}</p>
+      <p className={`text-[16px] leading-5 text-[#101828] ${long && !open ? 'line-clamp-3' : ''}`}>{text}</p>
       {long && (
         <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} className={textLink}>
           {open ? 'Show less' : 'Show more'}
@@ -175,16 +175,16 @@ export function ExpandableText({ text, link }: { text: string; link?: { label: s
 
 /** Plain paragraph for short sections such as "About the Lab" */
 export function DetailText({ children }: { children: React.ReactNode }) {
-  return <p className="text-[14px] leading-[18px] text-[#101828]">{children}</p>;
+  return <p className="text-[16px] leading-5 text-[#101828]">{children}</p>;
 }
 
 /** `href` links the label to another page, e.g. an author's faculty page */
 export function ValueRows({ rows }: { rows: { label: string; value: string; href?: string }[] }) {
   return (
-    <dl className="flex flex-col gap-2 text-[14px] text-[#101828]">
+    <dl className="flex flex-col gap-2 text-[16px] leading-5 text-[#101828]">
       {rows.map((r) => (
         <div key={r.label} className="flex items-start justify-between gap-4">
-          <dt className="leading-[18px]">
+          <dt>
             {r.href ? (
               <Link href={r.href} className="hover:text-[#7150e7] hover:underline">
                 {r.label}
@@ -193,7 +193,7 @@ export function ValueRows({ rows }: { rows: { label: string; value: string; href
               r.label
             )}
           </dt>
-          <dd className="leading-5 font-medium text-right">{r.value}</dd>
+          <dd className="text-right">{r.value}</dd>
         </div>
       ))}
     </dl>
@@ -203,7 +203,16 @@ export function ValueRows({ rows }: { rows: { label: string; value: string; href
 export type CheckRow = { label: string; requirement: string; you: string; met: boolean };
 
 /** `srLabels`: what ✓ and ! mean for screen readers, e.g. ['Finding:', 'Caveat:'] */
-export function CheckList({ rows, srLabels = ['Met:', 'Not met:'] }: { rows: CheckRow[]; srLabels?: [string, string] }) {
+export function CheckList({
+  rows,
+  srLabels = ['Met:', 'Not met:'],
+  compactValues = false,
+}: {
+  rows: CheckRow[];
+  srLabels?: [string, string];
+  /** 13px italic right-hand values (Research Paper modal); default is 16px regular (details pages) */
+  compactValues?: boolean;
+}) {
   return (
     <ul className="flex flex-col gap-2">
       {rows.map((r) => (
@@ -212,9 +221,9 @@ export function CheckList({ rows, srLabels = ['Met:', 'Not met:'] }: { rows: Che
             {r.met ? '✓' : '!'}
           </span>
           <span className="sr-only">{r.met ? srLabels[0] : srLabels[1]}</span>
-          <span className="w-[140px] shrink-0 text-[14px] leading-[18px] text-[#101828]">{r.label}</span>
-          <span className="flex-1 min-w-0 text-[14px] leading-[18px] text-[#101828]">{r.requirement}</span>
-          <span className={`shrink-0 text-[13px] leading-5 italic whitespace-nowrap ${r.met ? 'text-[#1b806a]' : 'text-[#7a4100]'}`}>
+          <span className="w-[140px] shrink-0 text-[16px] leading-5 text-[#101828]">{r.label}</span>
+          <span className="flex-1 min-w-0 text-[16px] leading-5 text-[#101828]">{r.requirement}</span>
+          <span className={`shrink-0 leading-5 whitespace-nowrap ${compactValues ? 'text-[13px] italic' : 'text-[16px]'} ${r.met ? 'text-[#1b806a]' : 'text-[#7a4100]'}`}>
             {r.you}
           </span>
         </li>
@@ -225,7 +234,7 @@ export function CheckList({ rows, srLabels = ['Met:', 'Not met:'] }: { rows: Che
 
 export function StepList({ steps }: { steps: string[] }) {
   return (
-    <ol className="flex flex-col gap-2 text-[14px] leading-[18px] text-[#101828]">
+    <ol className="flex flex-col gap-2 text-[16px] leading-5 text-[#101828]">
       {steps.map((s, i) => (
         <li key={s} className="whitespace-pre-wrap">{`${i + 1}.  ${s}`}</li>
       ))}
