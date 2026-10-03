@@ -8,6 +8,7 @@ const DEGREE_TO_DB: Record<DegreeLevel, DbDegreeLevel> = { Bachelors: 'BACHELORS
 const DEGREE_FROM_DB: Record<DbDegreeLevel, DegreeLevel> = { BACHELORS: 'Bachelors', MASTERS: 'Masters', PHD: 'PhD' };
 
 export const degreeToDb = (d: DegreeLevel): DbDegreeLevel => DEGREE_TO_DB[d];
+export const degreeFromDb = (d: DbDegreeLevel): DegreeLevel => DEGREE_FROM_DB[d];
 
 /** Maps a database row to the `Scholarship` shape the UI uses. */
 export function toScholarship(row: ScholarshipRow): Scholarship {

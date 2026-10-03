@@ -144,6 +144,46 @@ export interface HiringOpportunity {
   officialUrl?: string;
 }
 
+export type OpportunitySource = HiringOpportunity['source'];
+
+/** One Opportunity Feed listing: a funded position posted by a professor or lab. */
+export interface Opportunity {
+  id: string;
+  title: string;
+  authorName: string;
+  authorTitle: string;
+  authorAvatar?: string;
+  institution: string;
+  labName?: string;
+  /** Same values as the Country filter, e.g. "United Kingdom" */
+  country: string;
+  city?: string;
+  source: OpportunitySource;
+  sourceUrl: string;
+  postedAt: string; // ISO date
+  content: string;
+  funding: string;
+  fundingTags: string[];
+  degreeLevels: DegreeLevel[];
+  fieldTags: string[];
+  subjectTags: string[];
+  minCgpa?: number;
+  minIelts?: number;
+  publications: 'none' | 'preferred' | 'required';
+  admission: string;
+  livingCost: string;
+  rankRange: string;
+  acceptanceRate: number;
+  positionType: string;
+  startDate: string;
+  deadline: string; // ISO date
+  positionDetails: { label: string; value: string }[];
+  aboutLab: string;
+  applySteps: string[];
+  contactEmail?: string;
+  officialUrl?: string;
+}
+
 export interface OutreachRecord {
   id: string;
   opportunityId?: string;

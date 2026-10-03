@@ -1,16 +1,17 @@
 'use client';
 
-import React, { useState, useMemo, useCallback, useSyncExternalStore } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { FilterIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { UnifiedDiscoveryHeader } from '@/components/layout/UnifiedDiscoveryHeader';
 import { UniversityOpportunityCard } from '@/components/opportunity-feed/UniversityOpportunityCard';
 import { ShortsPager } from '@/components/opportunity-feed/ShortsPager';
 import { OpportunityListBar, ViewMode } from '@/components/opportunity-feed/OpportunityListBar';
-import { UNIVERSITY_PROGRAMS, UniversityProgram } from '@/data/universityPrograms';
-import { useFeedGrid } from '@/hooks/useFeedGrid';
-
-const BOOKMARKS_KEY = 'highscholar_bookmarked_programs';
+import type { Opportunity } from '@/types';
+import { OPPORTUNITY_LISTINGS } from '@/data/opportunityPosts';
+import { useSessionState } from '@/hooks/useSessionState';
+import { useOpportunityBookmarks } from '@/hooks/useOpportunityBookmarks';
+import { FEED_CARD_GAP, FEED_CARD_HEIGHT, useFeedGrid } from '@/hooks/useFeedGrid';
 
 // Figma defaults (Opportunity Feed, node 183:4449)
 const DEFAULT_SUBJECTS = ['UX & Product Design', 'HCI', 'Computer Science', 'Artificial Intelligence'];
@@ -22,82 +23,58 @@ const DEFAULT_FUNDING = ['Safe Regional'];
 const matchesAny = (selected: string[], values: string[]) =>
   selected.length === 0 || values.some((v) => selected.includes(v));
 
-// Bookmarks live in localStorage until a saved-items table exists
-const BOOKMARKS_EVENT = 'highscholar-bookmarks-change';
-
-function readBookmarksRaw(): string {
-  try {
-    return localStorage.getItem(BOOKMARKS_KEY) ?? '[]';
-  } catch {
-    return '[]';
-  }
-}
-
-function subscribeBookmarks(onChange: () => void) {
-  window.addEventListener('storage', onChange);
-  window.addEventListener(BOOKMARKS_EVENT, onChange);
-  return () => {
-    window.removeEventListener('storage', onChange);
-    window.removeEventListener(BOOKMARKS_EVENT, onChange);
-  };
-}
-
-function parseBookmarks(raw: string): Set<string> {
-  try {
-    const ids: unknown = JSON.parse(raw);
-    return new Set(Array.isArray(ids) ? ids.filter((x): x is string => typeof x === 'string') : []);
-  } catch {
-    return new Set();
-  }
-}
-
 export const OpportunitiesFeed: React.FC = () => {
   const { globalSearchQuery } = useApp();
   const grid = useFeedGrid();
 
-  const [selectedSubjects, setSelectedSubjects] = useState<string[]>(DEFAULT_SUBJECTS);
-  const [selectedDegrees, setSelectedDegrees] = useState<string[]>(DEFAULT_DEGREES);
-  const [selectedCountries, setSelectedCountries] = useState<string[]>(DEFAULT_COUNTRIES);
-  const [selectedFunding, setSelectedFunding] = useState<string[]>(DEFAULT_FUNDING);
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
-  const bookmarksRaw = useSyncExternalStore(subscribeBookmarks, readBookmarksRaw, () => '[]');
-  const bookmarks = useMemo(() => parseBookmarks(bookmarksRaw), [bookmarksRaw]);
+  // Kept in sessionStorage so list → details → back returns to the same list
+  const [selectedSubjects, setSelectedSubjects] = useSessionState<string[]>('feed:subjects', DEFAULT_SUBJECTS);
+  const [selectedDegrees, setSelectedDegrees] = useSessionState<string[]>('feed:degrees', DEFAULT_DEGREES);
+  const [selectedCountries, setSelectedCountries] = useSessionState<string[]>('feed:countries', DEFAULT_COUNTRIES);
+  const [selectedFunding, setSelectedFunding] = useSessionState<string[]>('feed:funding', DEFAULT_FUNDING);
+  const [viewMode, setViewMode] = useSessionState<ViewMode>('feed:view', 'grid');
+  const [listings, setListings] = useState<Opportunity[] | null>(null);
 
-  const toggleBookmark = useCallback((id: string) => {
-    const next = parseBookmarks(readBookmarksRaw());
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    try {
-      localStorage.setItem(BOOKMARKS_KEY, JSON.stringify([...next]));
-    } catch {}
-    window.dispatchEvent(new Event(BOOKMARKS_EVENT));
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/opportunities')
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error(`HTTP ${res.status}`))))
+      .then((body) => !cancelled && setListings(body.data))
+      .catch((error) => {
+        console.error('Failed to load opportunities, using bundled list', error);
+        if (!cancelled) setListings(OPPORTUNITY_LISTINGS);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
+  const { bookmarks, toggleBookmark } = useOpportunityBookmarks();
 
-  const filteredPrograms = useMemo(() => {
+  const filteredListings = useMemo(() => {
     const q = globalSearchQuery.trim().toLowerCase();
-    return UNIVERSITY_PROGRAMS.filter((p) => {
+    return (listings ?? []).filter((p) => {
       if (q) {
-        const haystack = [p.university, p.subjects, p.country, p.financial, ...p.subjectTags]
+        const haystack = [p.title, p.institution, p.authorName, p.labName ?? '', p.country, p.funding, ...p.fieldTags, ...p.subjectTags]
           .join(' ')
           .toLowerCase();
         if (!haystack.includes(q)) return false;
       }
       return (
         matchesAny(selectedSubjects, p.subjectTags) &&
-        matchesAny(selectedDegrees, p.degrees) &&
+        matchesAny(selectedDegrees, p.degreeLevels) &&
         matchesAny(selectedCountries, [p.country]) &&
         matchesAny(selectedFunding, p.fundingTags)
       );
     });
-  }, [globalSearchQuery, selectedSubjects, selectedDegrees, selectedCountries, selectedFunding]);
+  }, [listings, globalSearchQuery, selectedSubjects, selectedDegrees, selectedCountries, selectedFunding]);
 
   const acceptanceRange = useMemo(() => {
-    if (filteredPrograms.length === 0) return null;
-    const rates = filteredPrograms.map((p) => p.acceptanceRate);
+    if (filteredListings.length === 0) return null;
+    const rates = filteredListings.map((p) => p.acceptanceRate);
     const min = Math.min(...rates);
     const max = Math.max(...rates);
     return min === max ? `${min}%` : `${min}% – ${max}%`;
-  }, [filteredPrograms]);
+  }, [filteredListings]);
 
   // Any filter/search change sends the pager back to page 1
   const resetKey = JSON.stringify([
@@ -135,20 +112,36 @@ export const OpportunitiesFeed: React.FC = () => {
 
         <section className="flex-1 min-h-0 flex flex-col gap-5 p-5">
           <OpportunityListBar
-            count={filteredPrograms.length}
+            count={filteredListings.length}
             acceptanceRange={acceptanceRange}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
           />
 
-          {filteredPrograms.length === 0 ? (
+          {listings === null ? (
+            <div
+              role="status"
+              aria-busy
+              aria-label="Loading opportunities"
+              className="grid"
+              style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gap: FEED_CARD_GAP }}
+            >
+              {Array.from({ length: cols * grid.rows }, (_, i) => (
+                <div
+                  key={i}
+                  className="rounded-[16px] border-[0.5px] border-[#f1f1f1] bg-[#fafafa] animate-pulse motion-reduce:animate-none"
+                  style={{ height: FEED_CARD_HEIGHT }}
+                />
+              ))}
+            </div>
+          ) : filteredListings.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center">
               <div className="w-12 h-12 rounded-full bg-[#EDE9FE] text-[#7150E7] flex items-center justify-center">
                 <FilterIcon size={24} />
               </div>
               <h3 className="text-base font-bold text-[#101828]">No matching opportunities found</h3>
               <p className="text-xs text-[#667085] max-w-md">
-                Try removing some subject or country filters to see more universities.
+                Try removing some subject or country filters to see more opportunities.
               </p>
               <button
                 type="button"
@@ -159,15 +152,15 @@ export const OpportunitiesFeed: React.FC = () => {
               </button>
             </div>
           ) : (
-            <ShortsPager<UniversityProgram>
+            <ShortsPager<Opportunity>
               key={resetKey}
-              items={filteredPrograms}
+              items={filteredListings}
               cols={cols}
               rows={grid.rows}
               getKey={(p) => p.id}
               renderItem={(p) => (
                 <UniversityOpportunityCard
-                  program={p}
+                  opportunity={p}
                   isBookmarked={bookmarks.has(p.id)}
                   onToggleBookmark={toggleBookmark}
                 />

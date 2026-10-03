@@ -43,7 +43,8 @@ export const ALL_COUNTRIES = [
   'Norway',
   'France',
   'Japan',
-  'Singapore'
+  'Singapore',
+  'South Korea'
 ];
 
 export const ALL_FUNDING = [
@@ -70,6 +71,7 @@ export const COUNTRY_FLAGS: Record<string, string> = {
   France: '/flags/fr.svg',
   Japan: '/flags/jp.svg',
   Singapore: '/flags/sg.svg',
+  'South Korea': '/flags/kr.svg',
 };
 
 export const FUNDING_DESCRIPTIONS: Record<string, string> = {
