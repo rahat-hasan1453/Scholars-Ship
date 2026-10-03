@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
+import { useSessionState } from '@/hooks/useSessionState';
 import { FilterIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { Professor } from '@/types';
@@ -23,11 +24,12 @@ export const FacultyLabsFeed: React.FC = () => {
   const { professors, globalSearchQuery } = useApp();
   const grid = useFeedGrid();
 
-  const [selectedSubjects, setSelectedSubjects] = useState<string[]>(DEFAULT_SUBJECTS);
-  const [selectedDegrees, setSelectedDegrees] = useState<string[]>(DEFAULT_DEGREES);
-  const [selectedCountries, setSelectedCountries] = useState<string[]>(DEFAULT_COUNTRIES);
-  const [selectedFunding, setSelectedFunding] = useState<string[]>(DEFAULT_FUNDING);
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  // Kept in sessionStorage so "Back to Faculty & Research Labs" returns to the same filters
+  const [selectedSubjects, setSelectedSubjects] = useSessionState<string[]>('faculty:subjects', DEFAULT_SUBJECTS);
+  const [selectedDegrees, setSelectedDegrees] = useSessionState<string[]>('faculty:degrees', DEFAULT_DEGREES);
+  const [selectedCountries, setSelectedCountries] = useSessionState<string[]>('faculty:countries', DEFAULT_COUNTRIES);
+  const [selectedFunding, setSelectedFunding] = useSessionState<string[]>('faculty:funding', DEFAULT_FUNDING);
+  const [viewMode, setViewMode] = useSessionState<ViewMode>('faculty:view', 'grid');
 
   const filteredProfessors = useMemo(() => {
     return professors.filter((prof) => {

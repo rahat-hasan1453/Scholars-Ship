@@ -22,6 +22,7 @@ interface AppContextType {
   updateApplicationNotes: (appId: string, notes: string) => void;
   removeApplication: (appId: string) => void;
   saveOpportunityToOutreach: (opp: HiringOpportunity, status?: OutreachStatus) => void;
+  saveProfessorToOutreach: (prof: Professor, status?: OutreachStatus) => void;
   updateOutreachStatus: (recordId: string, status: OutreachStatus) => void;
   updateOutreachNotes: (recordId: string, notes: string) => void;
   removeOutreachRecord: (recordId: string) => void;
@@ -462,6 +463,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   };
 
+  const saveProfessorToOutreach = (prof: Professor, status: OutreachStatus = 'Prospect') => {
+    setOutreachRecords((prev) => {
+      if (prev.some((r) => r.professorId === prof.id)) return prev;
+      return [
+        {
+          id: `outreach_${Date.now()}`,
+          professorId: prof.id,
+          professorName: prof.name,
+          labName: prof.labName,
+          institution: prof.university,
+          status,
+          notes: `Target: ${prof.labName ?? prof.department}`,
+          coldEmailDraft: '',
+          emailSubject: `Prospective student: ${prof.researchTags[0] || 'research'} in your lab`,
+          updatedAt: new Date().toISOString(),
+          country: prof.country,
+          sourceUrl: prof.labWebsite,
+        },
+        ...prev,
+      ];
+    });
+  };
+
   const updateOutreachStatus = (recordId: string, status: OutreachStatus) => {
     setOutreachRecords((prev) =>
       prev.map((r) => (r.id === recordId ? { ...r, status, updatedAt: new Date().toISOString() } : r))
@@ -589,6 +613,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateApplicationNotes,
         removeApplication,
         saveOpportunityToOutreach,
+        saveProfessorToOutreach,
         updateOutreachStatus,
         updateOutreachNotes,
         removeOutreachRecord,

@@ -6,12 +6,14 @@ import Link from 'next/link';
 // Building blocks for every details page (Figma 249:2596). Pages pass data only; layout lives here.
 // Figma warning text #b76e00 is darkened to #7a4100 for WCAG AA.
 
-export type ChipTone = 'neutral' | 'success' | 'warning';
+/** `live`: status chips such as "● Accepting Students" (Figma 258:3576) */
+export type ChipTone = 'neutral' | 'success' | 'warning' | 'live';
 
 const CHIP_TONES: Record<ChipTone, string> = {
   neutral: 'bg-[#f0f3f4] text-[#101828]',
   success: 'bg-[#ebfdef] text-[#1b806a]',
   warning: 'bg-[#fffae5] text-[#7a4100]',
+  live: 'bg-[#ebfdef] text-[#047857]',
 };
 
 export function DetailChip({ tone = 'neutral', children }: { tone?: ChipTone; children: React.ReactNode }) {
@@ -28,17 +30,33 @@ export interface DetailHeaderProps {
   /** Small italic line under the eyebrow, e.g. "🇩🇪 Germany · Added 3 days ago" */
   meta?: string;
   title: string;
+  /** Round photo next to the title, e.g. the professor (Figma 262:4434) */
+  avatarUrl?: string;
   chips?: { label: string; tone?: ChipTone }[];
 }
 
-export function DetailHeader({ eyebrow, meta, title, chips = [] }: DetailHeaderProps) {
+export function DetailHeader({ eyebrow, meta, title, avatarUrl, chips = [] }: DetailHeaderProps) {
+  const heading = <h1 className="text-[24px] leading-8 font-semibold text-[#101828]">{title}</h1>;
   return (
     <header className="flex flex-col gap-3">
       <div className="flex flex-col gap-0.5">
         <p className="text-[14px] leading-5 font-medium text-[#101828]">{eyebrow}</p>
         {meta && <p className="text-[12px] leading-[18px] italic text-[#627181] whitespace-pre-wrap">{meta}</p>}
       </div>
-      <h1 className="text-[24px] leading-8 font-semibold text-[#101828]">{title}</h1>
+      {avatarUrl ? (
+        <div className="flex items-start gap-3">
+          <img
+            src={avatarUrl}
+            alt=""
+            width={40}
+            height={40}
+            className="size-10 shrink-0 rounded-full border-2 border-white object-cover shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]"
+          />
+          {heading}
+        </div>
+      ) : (
+        heading
+      )}
       {chips.length > 0 && (
         <div className="flex flex-wrap items-center gap-2">
           {chips.map((c) => (
@@ -52,7 +70,8 @@ export function DetailHeader({ eyebrow, meta, title, chips = [] }: DetailHeaderP
   );
 }
 
-export type Fact = { icon: string; label: string; value: string };
+/** `href` turns the value into an external link, e.g. a lab website */
+export type Fact = { icon: string; label: string; value: string; href?: string };
 
 export function FactsGrid({ facts }: { facts: Fact[] }) {
   return (
@@ -63,7 +82,15 @@ export function FactsGrid({ facts }: { facts: Fact[] }) {
             <span aria-hidden>{f.icon} </span>
             {f.label}
           </dt>
-          <dd className="text-[14px] leading-5 font-medium text-[#101828] truncate">{f.value}</dd>
+          <dd className="text-[14px] leading-5 font-medium text-[#101828] truncate" title={f.value}>
+            {f.href ? (
+              <a href={f.href} target="_blank" rel="noopener noreferrer" className="hover:text-[#7150e7] hover:underline">
+                {f.value}
+              </a>
+            ) : (
+              f.value
+            )}
+          </dd>
         </div>
       ))}
     </dl>
@@ -180,14 +207,20 @@ export interface ActionCardProps {
   title: string;
   /** Deadline line, e.g. "⏰ Closes 15 Oct 2026 · 12 days left" */
   note?: string;
+  /** `success` for good news such as "● Accepting PhD students" (Figma 258:3671) */
+  noteTone?: 'warning' | 'success';
   primary: { label: string; href: string };
   secondary?: { label: string; onClick: () => void; pressed?: boolean }[];
 }
 
-export function ActionCard({ title, note, primary, secondary = [] }: ActionCardProps) {
+export function ActionCard({ title, note, noteTone = 'warning', primary, secondary = [] }: ActionCardProps) {
   return (
     <SidebarCard title={title}>
-      {note && <p className="text-[13px] leading-[18px] font-medium text-[#7a4100] whitespace-pre-wrap">{note}</p>}
+      {note && (
+        <p className={`text-[13px] leading-[18px] font-medium whitespace-pre-wrap ${noteTone === 'success' ? 'text-[#047857]' : 'text-[#7a4100]'}`}>
+          {note}
+        </p>
+      )}
       <a
         href={primary.href}
         // mailto: links open the mail app; everything else opens in a new tab
