@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useMemo } from 'react';
+import { useAuthGuard } from '@/hooks/useAuthGuard';
 import { Professor } from '@/types';
 import { useApp } from '@/context/AppContext';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -70,21 +70,8 @@ export default function HomePage() {
     setActiveNavTab,
   } = useApp();
 
-  const router = useRouter();
-
   // Route protection & onboarding check
-  useEffect(() => {
-    fetch('/api/auth/me')
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (!data?.authenticated) {
-          router.replace('/login');
-        } else if (!data.user?.onboardingCompleted) {
-          router.replace('/onboarding');
-        }
-      })
-      .catch(() => {});
-  }, [router]);
+  useAuthGuard();
 
   // Start with the same tab on server and client; the effect below applies ?tab= after hydration (BUG-18).
   const [activeTab, setActiveTab] = useState<'scholarships' | 'opportunities' | 'professors' | 'research' | 'tracker' | 'profile'>('opportunities');

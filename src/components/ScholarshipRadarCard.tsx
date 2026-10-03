@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { CardHeader } from '@/components/opportunity-feed/CardHeader';
 import { Scholarship } from '@/types';
 import { useApp } from '@/context/AppContext';
@@ -10,15 +11,13 @@ import { FEED_CARD_HEIGHT } from '@/hooks/useFeedGrid';
 
 interface ScholarshipRadarCardProps {
   scholarship: Scholarship;
-  onOpenDetail?: (sch: Scholarship) => void;
 }
 
 // Figma: "Scholarship Radar" card (node 239:10612)
 export const ScholarshipRadarCard: React.FC<ScholarshipRadarCardProps> = ({
   scholarship,
-  onOpenDetail,
 }) => {
-  const { profile, saveScholarshipToTracker, applications, setSelectedScholarship } = useApp();
+  const { profile, saveScholarshipToTracker, applications } = useApp();
 
   const isTracked = applications.some((app) => app.scholarshipId === scholarship.id);
   const matchScore = calculateMatchScore(scholarship, profile) || 85;
@@ -27,11 +26,6 @@ export const ScholarshipRadarCard: React.FC<ScholarshipRadarCardProps> = ({
   const countryLabel = country === 'United Kingdom' ? 'UK' : country;
   const degree = scholarship.degreeLevels?.[0] || 'Masters';
   const fundingLabel = scholarship.fundingType === 'FULL' ? 'Fully Funded' : 'Partial Funding';
-
-  const handleExplore = () => {
-    if (onOpenDetail) onOpenDetail(scholarship);
-    else setSelectedScholarship(scholarship);
-  };
 
   const chipClass =
     'flex items-center h-6 px-2 rounded-full bg-[#f0f3f4] font-[family-name:var(--font-figtree)] text-[12px] leading-[18px] font-medium italic text-[#212b36] whitespace-nowrap';
@@ -116,14 +110,13 @@ export const ScholarshipRadarCard: React.FC<ScholarshipRadarCardProps> = ({
             <span className="truncate">Official Link</span>
             <img src="/opportunity-feed/external-link.svg" alt="" width={12} height={12} className="shrink-0" />
           </a>
-          <button
-            type="button"
-            onClick={handleExplore}
+          <Link
+            href={`/scholarships/${scholarship.id}`}
             className="flex flex-1 min-w-0 items-center justify-center gap-1 h-8 px-2 rounded-[6px] bg-[#7150e7] font-[family-name:var(--font-inter)] text-[12px] leading-[16px] font-medium text-[#fafafa] cursor-pointer hover:bg-[#5f3fd6] transition-colors"
           >
-            <span className="truncate">Explore More</span>
+            <span className="truncate">See Details</span>
             <img src="/opportunity-feed/arrow-right.svg" alt="" width={12} height={12} className="shrink-0" />
-          </button>
+          </Link>
         </div>
       </div>
     </article>
