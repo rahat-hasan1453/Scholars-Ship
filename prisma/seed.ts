@@ -1,11 +1,11 @@
 // Seeds the mock faculty, research papers, scholarships and opportunity listings. Safe to re-run: rows are upserted.
 // Run: npm run db:seed
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { initialResearchPapers } from '../src/data/researchPapers';
 import { mockProfessors, mockScholarships } from '../src/data/mockData';
 import { withFacultyDefaults } from '../src/lib/professorDetails';
 import { degreeToDb } from '../src/lib/scholarships';
-import { semanticScholarIdFromUrl } from '../src/lib/researchPapers';
+import { leadInstitution, semanticScholarIdFromUrl } from '../src/lib/researchPapers';
 import { OPPORTUNITY_LISTINGS } from '../src/data/opportunityPosts';
 
 const prisma = new PrismaClient();
@@ -99,6 +99,12 @@ async function seedResearchPapers() {
       fieldsOfStudy: paper.fieldsOfStudy,
       tags: paper.tags,
       isOpenAccess: paper.isOpenAccess,
+      venueShort: paper.venueShort ?? null,
+      paperType: paper.paperType ?? null,
+      peerReviewed: paper.peerReviewed ?? null,
+      institution: leadInstitution(paper) ?? null,
+      funding: paper.funding ?? null,
+      keyFindings: paper.keyFindings ? (paper.keyFindings as unknown as Prisma.InputJsonValue) : Prisma.DbNull,
     };
     const authors = paper.authors.map((a, position) => {
       const professorId = professorIdByName.get(a.name.toLowerCase()) ?? null;
@@ -107,13 +113,12 @@ async function seedResearchPapers() {
     });
 
     await prisma.$transaction(async (tx) => {
-      const row = paper.doi
-        ? await tx.researchPaper.upsert({
-            where: { doi: paper.doi },
-            create: { id: paper.id, doi: paper.doi, ...data },
-            update: data,
-          })
-        : await tx.researchPaper.upsert({ where: { id: paper.id }, create: { id: paper.id, ...data }, update: data });
+      // By id, so /?tab=research&paper=<id> links stay the same for DB and mock data
+      const row = await tx.researchPaper.upsert({
+        where: { id: paper.id },
+        create: { id: paper.id, doi: paper.doi ?? null, ...data },
+        update: { doi: paper.doi ?? null, ...data },
+      });
       await tx.paperAuthor.deleteMany({ where: { paperId: row.id } });
       await tx.paperAuthor.createMany({ data: authors.map((a) => ({ ...a, paperId: row.id })) });
     });

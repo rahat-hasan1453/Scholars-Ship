@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { AppLayout, type AppTab } from '@/components/layout/AppLayout';
 import { useAuthGuard } from '@/hooks/useAuthGuard';
+import { TopBarIcon, topBarButtonClass, useShareLink } from '@/components/details/DetailParts';
 
 export interface DetailPageShellProps {
   /** Sidebar tab to highlight; clicking another tab goes back to `/?tab=<tab>` */
@@ -17,40 +18,11 @@ export interface DetailPageShellProps {
   sidebar: React.ReactNode;
 }
 
-function MaskIcon({ src, width, height }: { src: string; width: number; height: number }) {
-  return (
-    <span aria-hidden className="flex items-center justify-center size-4 shrink-0">
-      <span
-        className="bg-current"
-        style={{ width, height, mask: `url(${src}) center / contain no-repeat` }}
-      />
-    </span>
-  );
-}
-
-const topButton =
-  'flex items-center gap-1 px-3 py-1.5 rounded-[6px] border border-[#e1e8f0] text-[12px] leading-4 font-medium text-[#64748b] hover:bg-[#fafafa] hover:text-[#344054] transition-colors cursor-pointer disabled:cursor-not-allowed disabled:hover:bg-transparent';
-
 // Figma: details page frame (249:2596) — app sidebar + white content panel with a top bar and two columns
 export const DetailPageShell: React.FC<DetailPageShellProps> = ({ activeTab, back, onSave, saved, main, sidebar }) => {
   useAuthGuard();
   const router = useRouter();
-  const [copied, setCopied] = useState(false);
-
-  const share = async () => {
-    const url = window.location.href;
-    try {
-      if (navigator.share) {
-        await navigator.share({ url, title: document.title });
-        return;
-      }
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // User closed the share sheet or clipboard is blocked
-    }
-  };
+  const { copied, share } = useShareLink();
 
   return (
     <AppLayout
@@ -71,18 +43,18 @@ export const DetailPageShell: React.FC<DetailPageShellProps> = ({ activeTab, bac
               </Link>
               <div className="flex items-start gap-2">
                 {onSave && (
-                  <button type="button" onClick={onSave} aria-pressed={saved} className={topButton}>
+                  <button type="button" onClick={onSave} aria-pressed={saved} className={topBarButtonClass}>
                     {saved ? 'Saved' : 'Save'}
-                    <MaskIcon src="/details/bookmark.svg" width={11.6667} height={14.3333} />
+                    <TopBarIcon src="/details/bookmark.svg" width={11.6667} height={14.3333} />
                   </button>
                 )}
-                <button type="button" onClick={share} className={topButton}>
+                <button type="button" onClick={() => share()} className={topBarButtonClass}>
                   <span aria-live="polite">{copied ? 'Link copied' : 'Share'}</span>
-                  <MaskIcon src="/details/share.svg" width={16} height={16} />
+                  <TopBarIcon src="/details/share.svg" width={16} height={16} />
                 </button>
-                <button type="button" disabled title="Reporting is coming soon" className={topButton}>
+                <button type="button" disabled title="Reporting is coming soon" className={topBarButtonClass}>
                   Report
-                  <MaskIcon src="/details/flag.svg" width={16} height={16} />
+                  <TopBarIcon src="/details/flag.svg" width={16} height={16} />
                 </button>
               </div>
             </div>

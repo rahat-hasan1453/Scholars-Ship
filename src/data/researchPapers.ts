@@ -21,6 +21,13 @@ export const initialResearchPapers: ResearchPaper[] = [
     googleScholarUrl: 'https://scholar.google.com/scholar?q=Generative+AI+as+a+Design+Partner+Evaluating+AI-Assisted+UI/UX+Workflows',
     semanticScholarUrl: 'https://www.semanticscholar.org/paper/Generative-AI-as-a-Design-Partner',
     isOpenAccess: true,
+    venueShort: 'CHI 2025',
+    paperType: 'Conference paper',
+    peerReviewed: true,
+    keyFindings: [
+      { label: 'Iteration', text: 'Fewer high-fidelity iteration cycles', value: '−43%', met: true },
+      { label: 'Sample', text: 'Graduate designers studied over 6 months', value: '120', met: true },
+    ],
   },
   {
     id: 'paper-ai-02',
@@ -42,6 +49,9 @@ export const initialResearchPapers: ResearchPaper[] = [
     googleScholarUrl: 'https://scholar.google.com/scholar?q=Attention+Is+All+You+Need',
     semanticScholarUrl: 'https://www.semanticscholar.org/paper/Attention-is-All-you-Need-Vaswani-Shazeer/204e307384f4137149327e3660fb41a293f0b2f1',
     isOpenAccess: true,
+    venueShort: 'NeurIPS',
+    paperType: 'Conference paper',
+    peerReviewed: true,
   },
   {
     id: 'paper-biotech-03',
@@ -62,6 +72,9 @@ export const initialResearchPapers: ResearchPaper[] = [
     googleScholarUrl: 'https://scholar.google.com/scholar?q=CRISPR-Cas9+Mediated+Genome+Editing+in+Human+Stem+Cells',
     semanticScholarUrl: 'https://www.semanticscholar.org/paper/CRISPR-Cas9-Genome-Editing-Doudna',
     isOpenAccess: true,
+    venueShort: 'Nature Biotechnology',
+    paperType: 'Journal article',
+    peerReviewed: true,
   },
   {
     id: 'paper-robotics-04',
@@ -82,6 +95,13 @@ export const initialResearchPapers: ResearchPaper[] = [
     googleScholarUrl: 'https://scholar.google.com/scholar?q=Autonomous+Mobile+Robot+Navigation+using+Deep+Reinforcement+Learning',
     semanticScholarUrl: 'https://www.semanticscholar.org/paper/Autonomous-Mobile-Robot-Navigation-ETH',
     isOpenAccess: true,
+    venueShort: 'ICRA 2025',
+    paperType: 'Conference paper',
+    peerReviewed: true,
+    keyFindings: [
+      { label: 'Safety', text: 'Collision-free navigation rate', value: '99.4%', met: true },
+      { label: 'Scale', text: 'Outdoor trial distance', value: '50 km', met: true },
+    ],
   },
   {
     id: 'paper-econ-05',
@@ -102,6 +122,12 @@ export const initialResearchPapers: ResearchPaper[] = [
     googleScholarUrl: 'https://scholar.google.com/scholar?q=Impact+of+Fully-Funded+International+Fellowships+Duflo',
     semanticScholarUrl: 'https://www.semanticscholar.org/paper/Impact-International-Fellowships-Duflo',
     isOpenAccess: true,
+    venueShort: 'AER',
+    paperType: 'Journal article',
+    peerReviewed: true,
+    keyFindings: [
+      { label: 'Scope', text: 'Years of awardee trajectories analysed', value: '25 years', met: true },
+    ],
   },
   {
     id: 'paper-hci-06',
@@ -122,6 +148,12 @@ export const initialResearchPapers: ResearchPaper[] = [
     googleScholarUrl: 'https://scholar.google.com/scholar?q=Designing+Accessible+Mobile+Interfaces+Higher+Education',
     semanticScholarUrl: 'https://www.semanticscholar.org/paper/Designing-Accessible-Interfaces-Ladner',
     isOpenAccess: true,
+    venueShort: 'ASSETS 2025',
+    paperType: 'Conference paper',
+    peerReviewed: true,
+    keyFindings: [
+      { label: 'Standard', text: 'Accessibility level the interface follows', value: 'WCAG 2.2 AAA', met: true },
+    ],
   },
   {
     id: 'paper-ai-07',
@@ -142,6 +174,12 @@ export const initialResearchPapers: ResearchPaper[] = [
     googleScholarUrl: 'https://scholar.google.com/scholar?q=Large+Language+Models+for+Automated+Literature+Review+Generation',
     semanticScholarUrl: 'https://www.semanticscholar.org/paper/Large-Language-Models-Literature-Review-Chen',
     isOpenAccess: true,
+    venueShort: 'ACL 2025',
+    paperType: 'Conference paper',
+    peerReviewed: true,
+    keyFindings: [
+      { label: 'Accuracy', text: 'Factual consistency verified by peer-review panels', value: '94.2%', met: true },
+    ],
   },
   {
     id: 'paper-ux-08',
@@ -162,6 +200,12 @@ export const initialResearchPapers: ResearchPaper[] = [
     googleScholarUrl: 'https://scholar.google.com/scholar?q=Spatial+Computing+and+VR+Interfaces+Remote+Higher+Education',
     semanticScholarUrl: 'https://www.semanticscholar.org/paper/Spatial-Computing-VR-Interfaces-Billinghurst',
     isOpenAccess: true,
+    venueShort: 'IEEE TVCG',
+    paperType: 'Journal article',
+    peerReviewed: true,
+    keyFindings: [
+      { label: 'Sample', text: 'Graduate students in the evaluation', value: '450', met: true },
+    ],
   },
   {
     id: 'paper-biotech-09',
@@ -182,6 +226,9 @@ export const initialResearchPapers: ResearchPaper[] = [
     googleScholarUrl: 'https://scholar.google.com/scholar?q=AlphaFold+3+High-Accuracy+Structure+Prediction+of+Molecular+Complexes',
     semanticScholarUrl: 'https://www.semanticscholar.org/paper/AlphaFold-3-Hassabis',
     isOpenAccess: true,
+    venueShort: 'Nature',
+    paperType: 'Journal article',
+    peerReviewed: true,
   },
   {
     id: 'paper-quantum-10',
@@ -202,5 +249,11 @@ export const initialResearchPapers: ResearchPaper[] = [
     googleScholarUrl: 'https://scholar.google.com/scholar?q=Fault-Tolerant+Quantum+Computing+with+Logical+Qubits+Neutral+Atom',
     semanticScholarUrl: 'https://www.semanticscholar.org/paper/Fault-Tolerant-Quantum-Computing-Lukin',
     isOpenAccess: true,
+    venueShort: 'Nature Physics',
+    paperType: 'Journal article',
+    peerReviewed: true,
+    keyFindings: [
+      { label: 'Scale', text: 'Logical qubits under programmable control', value: '48', met: true },
+    ],
   }
 ];

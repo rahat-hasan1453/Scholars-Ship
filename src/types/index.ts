@@ -247,6 +247,16 @@ export interface ResearchPaperAuthor {
   name: string;
   institution?: string;
   googleScholarUrl?: string;
+  /** Set when the author is a Professor in our database (links to /professors/<id>) */
+  professorId?: string;
+}
+
+/** One row of a paper's Key Findings; `met: false` marks a caveat or risk */
+export interface PaperFinding {
+  label: string;
+  text: string;
+  value: string;
+  met: boolean;
 }
 
 export interface ResearchPaper {
@@ -266,6 +276,13 @@ export interface ResearchPaper {
   semanticScholarUrl?: string;
   isOpenAccess: boolean;
   isSaved?: boolean;
+  /** Details modal fields; missing means unknown and the row is hidden */
+  venueShort?: string;
+  paperType?: string;
+  peerReviewed?: boolean;
+  institution?: string;
+  funding?: string;
+  keyFindings?: PaperFinding[];
 }
 
 

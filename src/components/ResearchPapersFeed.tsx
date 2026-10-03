@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { FilterIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
+import { useSessionState } from '@/hooks/useSessionState';
 import { ResearchPaper } from '@/types';
 import { initialResearchPapers } from '@/data/researchPapers';
 import { UnifiedDiscoveryHeader } from '@/components/layout/UnifiedDiscoveryHeader';
 import { ResearchPaperCard } from '@/components/ResearchPaperCard';
+import { ResearchPaperDetailsModal } from '@/components/research-paper-details/ResearchPaperDetailsModal';
 import { ShortsPager } from '@/components/opportunity-feed/ShortsPager';
 import { OpportunityListBar, ViewMode } from '@/components/opportunity-feed/OpportunityListBar';
 import { useFeedGrid, FEED_CARD_HEIGHT, FEED_CARD_GAP } from '@/hooks/useFeedGrid';
@@ -24,12 +26,53 @@ export const ResearchPapersFeed: React.FC = () => {
   const { globalSearchQuery } = useApp();
   const grid = useFeedGrid();
 
-  const [selectedSubjects, setSelectedSubjects] = useState<string[]>(DEFAULT_SUBJECTS);
-  const [selectedDegrees, setSelectedDegrees] = useState<string[]>(DEFAULT_DEGREES);
-  const [selectedCountries, setSelectedCountries] = useState<string[]>(DEFAULT_COUNTRIES);
-  const [selectedFunding, setSelectedFunding] = useState<string[]>(DEFAULT_FUNDING);
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [selectedSubjects, setSelectedSubjects] = useSessionState<string[]>('research:subjects', DEFAULT_SUBJECTS);
+  const [selectedDegrees, setSelectedDegrees] = useSessionState<string[]>('research:degrees', DEFAULT_DEGREES);
+  const [selectedCountries, setSelectedCountries] = useSessionState<string[]>('research:countries', DEFAULT_COUNTRIES);
+  const [selectedFunding, setSelectedFunding] = useSessionState<string[]>('research:funding', DEFAULT_FUNDING);
+  const [viewMode, setViewMode] = useSessionState<ViewMode>('research:view', 'grid');
   const [papers, setPapers] = useState<ResearchPaper[] | null>(null);
+
+  // Open paper lives in the URL (?tab=research&paper=<id>) so it can be shared and Back closes it.
+  // Read after hydration, like page.tsx does for ?tab= (BUG-18).
+  const [openPaperId, setOpenPaperId] = useState<string | null>(null);
+  const pushedRef = useRef(false);
+
+  useEffect(() => {
+    const sync = () => {
+      const id = new URLSearchParams(window.location.search).get('paper');
+      setOpenPaperId(id);
+      if (!id) pushedRef.current = false;
+    };
+    sync();
+    window.addEventListener('popstate', sync);
+    return () => window.removeEventListener('popstate', sync);
+  }, []);
+
+  const urlWithPaper = (id: string | null) => {
+    const params = new URLSearchParams(window.location.search);
+    params.set('tab', 'research');
+    if (id) params.set('paper', id);
+    else params.delete('paper');
+    return `${window.location.pathname}?${params}`;
+  };
+
+  const openPaper = useCallback((paper: ResearchPaper) => {
+    window.history.pushState(null, '', urlWithPaper(paper.id));
+    pushedRef.current = true;
+    setOpenPaperId(paper.id);
+  }, []);
+
+  const closePaper = useCallback(() => {
+    setOpenPaperId(null);
+    // Opened from a card: step back so Back doesn't reopen it. Opened from a shared link: just drop the param.
+    if (pushedRef.current) {
+      pushedRef.current = false;
+      window.history.back();
+    } else {
+      window.history.replaceState(null, '', urlWithPaper(null));
+    }
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -93,6 +136,21 @@ export const ResearchPapersFeed: React.FC = () => {
 
   const cols = viewMode === 'list' ? 1 : grid.cols;
 
+  // Search the full list so a deep link works even when filters hide that paper
+  const openPaperData = useMemo(
+    () => (openPaperId ? papers?.find((p) => p.id === openPaperId) ?? null : null),
+    [papers, openPaperId],
+  );
+
+  // Unknown id in the URL: drop it once the list has loaded
+  useEffect(() => {
+    if (papers && openPaperId && !openPaperData) {
+      window.history.replaceState(null, '', urlWithPaper(null));
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sync with the URL we just changed
+      setOpenPaperId(null);
+    }
+  }, [papers, openPaperId, openPaperData]);
+
   return (
     // Fixed-height shell: only the card area moves, header + list bar stay put
     <div className="relative h-scaled-screen flex flex-col min-w-0 lg:py-5 lg:pl-5 lg:pr-[30px]">
@@ -112,7 +170,6 @@ export const ResearchPapersFeed: React.FC = () => {
           <OpportunityListBar
             count={filteredPapers.length}
             acceptanceRange={filteredPapers.length > 0 ? ACCEPTANCE_RANGE : null}
-            acceptanceColor="#36b37e"
             viewMode={viewMode}
             onViewModeChange={setViewMode}
           />
@@ -157,7 +214,7 @@ export const ResearchPapersFeed: React.FC = () => {
               cols={cols}
               rows={grid.rows}
               getKey={(p) => p.id}
-              renderItem={(p) => <ResearchPaperCard paper={p} />}
+              renderItem={(p) => <ResearchPaperCard paper={p} onOpen={openPaper} />}
               renderIndicator={(indicator) =>
                 indicator && (
                   <div className="absolute right-[9px] top-1/2 -translate-y-1/2 z-10 hidden lg:block">
@@ -169,6 +226,8 @@ export const ResearchPapersFeed: React.FC = () => {
           )}
         </section>
       </div>
+
+      <ResearchPaperDetailsModal paper={openPaperData} onClose={closePaper} />
     </div>
   );
 };
