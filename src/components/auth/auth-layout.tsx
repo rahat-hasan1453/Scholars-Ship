@@ -139,7 +139,7 @@ export function AuthMessage({ error, success }: { error?: string; success?: stri
 /* Scholars'ship wordmark (Title Area 167:2890) */
 export function BrandLogo() {
   return (
-    <div className="flex items-center gap-2" aria-label="Scholars'ship">
+    <div className="flex items-center gap-2" role="img" aria-label="Scholars'ship">
       <div className="relative h-[35.635px] w-[45.68px] shrink-0">
         <img src="/signup/logo-mark-back.svg" alt="" className="absolute left-0 top-[1.69px] h-[34.313px] w-[17.77px]" />
         <img src="/signup/logo-mark-front.svg" alt="" className="absolute left-[16.58px] top-0 h-[35.635px] w-[29.1px]" />
@@ -217,7 +217,7 @@ export function AuthLayout({ children, footer }: { children: ReactNode; footer: 
       </div>
 
       {/* Right canvas — card centred at x = 1280 of 1728 */}
-      <div className="flex flex-1 items-center justify-center px-4 py-8 lg:pl-[22px] lg:pr-0 lg:py-10">
+      <main className="flex flex-1 items-center justify-center px-4 py-8 lg:pl-[22px] lg:pr-0 lg:py-10">
         <div className="w-full max-w-[472px] overflow-hidden">
           <div className="flex w-full flex-col gap-2.5 rounded-t-[24px] bg-surface-white px-6 py-9">
             <BrandLogo />
@@ -241,7 +241,7 @@ export function AuthLayout({ children, footer }: { children: ReactNode; footer: 
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

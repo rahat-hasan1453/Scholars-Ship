@@ -229,7 +229,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                   <span className="text-xs font-bold text-[#101828] leading-tight">
                     {profile.name || 'Ingrid Bergman'}
                   </span>
-                  <span className="text-xs italic text-[#90A1B9] leading-tight mt-0.5">
+                  <span className="text-xs italic text-[#64748B] leading-tight mt-0.5">
                     {profile.degreeLevel || 'Masters'} • {profile.specializations?.[0] || 'UX & HCI'}
                   </span>
                 </div>

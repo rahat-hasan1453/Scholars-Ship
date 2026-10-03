@@ -1158,7 +1158,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
 
                     {/* Rank Chip (Frame 2147226703) */}
                     <div className="pt-0.5">
-                      <span className="bg-[#ECFDF5] border border-[#A7F3D0] text-[#009966] text-[11px] font-semibold px-2.5 py-0.5 rounded-full inline-block">
+                      <span className="bg-[#ECFDF5] border border-[#A7F3D0] text-[#047857] text-[11px] font-semibold px-2.5 py-0.5 rounded-full inline-block">
                         {uni.rankBadge}
                       </span>
                     </div>
@@ -1251,7 +1251,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                         <span className="text-sm font-bold text-[#101828] group-hover:text-[#7050E6] transition-colors truncate">
                           {uni.name}
                         </span>
-                        <span className="bg-[#ECFDF5] border border-[#A7F3D0] text-[#009966] text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0">
+                        <span className="bg-[#ECFDF5] border border-[#A7F3D0] text-[#047857] text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0">
                           {uni.rankBadge}
                         </span>
                       </div>
@@ -1492,7 +1492,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                         <span className="text-sm font-bold text-[#101828] truncate group-hover:text-[#7150E7] transition-colors">
                           {sch.title}
                         </span>
-                        <span className="bg-[#ECFDF5] border border-[#A7F3D0] text-[#009966] text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0">
+                        <span className="bg-[#ECFDF5] border border-[#A7F3D0] text-[#047857] text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0">
                           {sch.fundingType.replace('_', ' ')}
                         </span>
                       </div>
@@ -1612,7 +1612,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                           ({prof.title})
                         </span>
                         {prof.openPositions && (
-                          <span className="bg-[#ECFDF5] border border-[#A7F3D0] text-[#009966] text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0">
+                          <span className="bg-[#ECFDF5] border border-[#A7F3D0] text-[#047857] text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0">
                             ✓ Hiring Students
                           </span>
                         )}

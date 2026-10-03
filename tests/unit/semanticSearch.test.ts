@@ -42,8 +42,14 @@ describe('matchItemSemantically', () => {
     expect(r.matches).toBe(true);
     expect(r.score).toBeGreaterThanOrEqual(40);
   });
-  // BUG-04: for USA, any country containing "us" passes (Australia, Austria, Russia, Belarus...).
-  it.fails('does not treat Australia as a USA match', () => {
-    expect(matchItemSemantically('PhD position', 'Australia', parseNaturalLanguageQuery('phd position usa')).matches).toBe(false);
+  it('does not treat Australia, Austria, Russia, Belarus or Cyprus as a USA match', () => {
+    for (const c of ['Australia', 'Austria', 'Russia', 'Belarus', 'Cyprus']) {
+      expect(matchItemSemantically('PhD position', c, parseNaturalLanguageQuery('phd position usa')).matches).toBe(false);
+    }
+  });
+  it('still matches USA aliases', () => {
+    for (const c of ['USA', 'US', 'United States', 'United States of America']) {
+      expect(matchItemSemantically('PhD position', c, parseNaturalLanguageQuery('phd position usa')).matches).toBe(true);
+    }
   });
 });

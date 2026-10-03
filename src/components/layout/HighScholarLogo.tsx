@@ -33,7 +33,7 @@ export const HighScholarLogo: React.FC<HighScholarLogoProps> = ({
           <span className="font-bold text-sm tracking-tight text-[#101828]">
             HighScholar
           </span>
-          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-[#EDE9FE] text-[#7150E7]">
+          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-[#EDE9FE] text-[#5B3FD1]">
             PRO
           </span>
         </div>
