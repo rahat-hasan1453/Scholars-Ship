@@ -230,6 +230,22 @@ body {
   background: #98a2b3;
 }
 
+/* Scrollbar that only appears while scrolling; DetailPageShell toggles .is-scrolling */
+.scrollbar-autohide {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s;
+}
+.scrollbar-autohide.is-scrolling {
+  scrollbar-color: #d0d5dd transparent;
+}
+.scrollbar-autohide::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+.scrollbar-autohide.is-scrolling::-webkit-scrollbar-thumb {
+  background: #d0d5dd;
+}
+
 /* Viewport heights inside the zoomed app shell: 100dvh gets zoomed too, so divide it back out */
 @utility h-scaled-screen {
   height: calc(100dvh / var(--app-scale, 1));

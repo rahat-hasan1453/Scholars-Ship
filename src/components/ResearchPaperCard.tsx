@@ -1,5 +1,6 @@
 'use client';
 
+import { ChevronRight } from 'lucide-react';
 import React from 'react';
 import { ResearchPaper } from '@/types';
 import { useApp } from '@/context/AppContext';
@@ -24,22 +25,27 @@ function MaskIcon({ src, size, color }: { src: string; size: number; color: stri
   );
 }
 
-/** Google Scholar + Download PDF, shared by the card footer and the details modal footer */
-export function PaperLinks({ paper }: { paper: ResearchPaper }) {
+/**
+ * Download PDF plus a secondary button, shared by the card footer and the details modal footer.
+ * With `onSeeMore` (card) the secondary button opens the details modal; without it (modal) it links to Google Scholar.
+ */
+export function PaperLinks({ paper, onSeeMore }: { paper: ResearchPaper; onSeeMore?: () => void }) {
   const scholarUrl =
     paper.googleScholarUrl || `https://scholar.google.com/scholar?q=${encodeURIComponent(paper.title)}`;
   const pdfUrl = paper.pdfUrl || paper.semanticScholarUrl || scholarUrl;
   return (
     <div className="flex flex-1 min-w-0 gap-4">
-      <a
-        href={scholarUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex flex-1 min-w-0 items-center justify-center gap-1 h-8 px-2 rounded-[6px] border border-[#7150e7] font-[family-name:var(--font-inter)] text-[12px] leading-[16px] font-medium text-[#7150e7] hover:bg-[#f4f2fd] transition-colors"
-      >
-        <span className="truncate">Google Scholar</span>
-        <img src="/opportunity-feed/external-link.svg" alt="" width={12} height={12} className="shrink-0" />
-      </a>
+      {onSeeMore ? (
+        <button type="button" onClick={onSeeMore} className={`${secondaryButton} cursor-pointer`}>
+          <span className="truncate">See More</span>
+          <ChevronRight aria-hidden size={14} strokeWidth={2} className="shrink-0" />
+        </button>
+      ) : (
+        <a href={scholarUrl} target="_blank" rel="noopener noreferrer" className={secondaryButton}>
+          <span className="truncate">Google Scholar</span>
+          <img src="/opportunity-feed/external-link.svg" alt="" width={12} height={12} className="shrink-0" />
+        </a>
+      )}
       <a
         href={pdfUrl}
         target="_blank"
@@ -52,6 +58,9 @@ export function PaperLinks({ paper }: { paper: ResearchPaper }) {
     </div>
   );
 }
+
+const secondaryButton =
+  'flex flex-1 min-w-0 items-center justify-center gap-1 h-8 px-2 rounded-[6px] border border-[#7150e7] font-[family-name:var(--font-inter)] text-[12px] leading-[16px] font-medium text-[#7150e7] hover:bg-[#f4f2fd] transition-colors';
 
 // Figma: "Research Paper" card (node 251:23294)
 export const ResearchPaperCard: React.FC<ResearchPaperCardProps> = ({ paper, onOpen }) => {
@@ -133,7 +142,7 @@ export const ResearchPaperCard: React.FC<ResearchPaperCardProps> = ({ paper, onO
           <MaskIcon src="/research-papers/bookmark.svg" size={20} color={isSaved ? '#7150e7' : '#627181'} />
         </button>
         <img src="/opportunity-feed/divider.svg" alt="" width={1} height={15.5} className="shrink-0" />
-        <PaperLinks paper={paper} />
+        <PaperLinks paper={paper} onSeeMore={() => onOpen(paper)} />
       </div>
     </article>
   );

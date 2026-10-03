@@ -119,6 +119,7 @@ export const ScholarshipRadarFeed: React.FC = () => {
 
         <section className="flex-1 min-h-0 flex flex-col gap-5 p-5">
           <OpportunityListBar
+            title="Scholarship List"
             count={filteredScholarships.length}
             acceptanceRange={filteredScholarships.length > 0 ? ACCEPTANCE_RANGE : null}
             viewMode={viewMode}

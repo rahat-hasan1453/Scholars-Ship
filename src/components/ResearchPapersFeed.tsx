@@ -168,6 +168,7 @@ export const ResearchPapersFeed: React.FC = () => {
 
         <section className="flex-1 min-h-0 flex flex-col gap-5 p-5">
           <OpportunityListBar
+            title="Research Paper List"
             count={filteredPapers.length}
             acceptanceRange={filteredPapers.length > 0 ? ACCEPTANCE_RANGE : null}
             viewMode={viewMode}

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { AppLayout, type AppTab } from '@/components/layout/AppLayout';
@@ -23,6 +23,24 @@ export const DetailPageShell: React.FC<DetailPageShellProps> = ({ activeTab, bac
   useAuthGuard();
   const router = useRouter();
   const { copied, share } = useShareLink();
+  const mainRef = useRef<HTMLDivElement>(null);
+
+  // Show the main column's scrollbar only while the user scrolls (see .scrollbar-autohide in globals.css)
+  useEffect(() => {
+    const el = mainRef.current;
+    if (!el) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const onScroll = () => {
+      el.classList.add('is-scrolling');
+      clearTimeout(timer);
+      timer = setTimeout(() => el.classList.remove('is-scrolling'), 800);
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      el.removeEventListener('scroll', onScroll);
+      clearTimeout(timer);
+    };
+  }, []);
 
   return (
     <AppLayout
@@ -60,8 +78,14 @@ export const DetailPageShell: React.FC<DetailPageShellProps> = ({ activeTab, bac
             </div>
 
             <div className="flex-1 min-h-0 overflow-y-auto xl:overflow-hidden flex flex-col xl:flex-row items-start gap-8 px-4 lg:px-8">
-              <div className="flex flex-1 min-w-0 w-full flex-col gap-6 pb-8 xl:h-full xl:overflow-y-auto">{main}</div>
-              <aside className="flex w-full xl:w-[380px] shrink-0 flex-col gap-4 pb-8 xl:h-full xl:overflow-y-auto">{sidebar}</aside>
+              <div
+                ref={mainRef}
+                className="scrollbar-autohide flex flex-1 min-w-0 w-full flex-col gap-6 pb-8 xl:h-full xl:overflow-y-auto xl:pr-3"
+              >
+                {main}
+              </div>
+              {/* Sidebar never scrolls; 8px gaps keep all cards inside the screen */}
+              <aside className="flex w-full xl:w-[380px] shrink-0 flex-col gap-2 pb-8 xl:h-full xl:overflow-hidden">{sidebar}</aside>
             </div>
         </div>
       </div>

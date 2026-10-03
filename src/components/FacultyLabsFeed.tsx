@@ -115,6 +115,7 @@ export const FacultyLabsFeed: React.FC = () => {
 
         <section className="flex-1 min-h-0 flex flex-col gap-5 p-5">
           <OpportunityListBar
+            title="Faculty & Lab List"
             count={filteredProfessors.length}
             acceptanceRange={filteredProfessors.length > 0 ? ACCEPTANCE_RANGE : null}
             acceptanceColor="#36b37e"
