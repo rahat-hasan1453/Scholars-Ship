@@ -186,7 +186,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         
         {/* Figma Header matching Node 122:3164 (Header - HighScholar | Global Scholarship & Professor Finder Portal) */}
         {/* On discovery tabs (opportunities, scholarships, professors, research), Node 122:3164 is rendered inside their dedicated feed as the unified header container */}
-        {!['opportunities', 'scholarships', 'professors', 'research'].includes(activeTab) && (
+        {!['opportunities', 'scholarships', 'professors', 'research', 'profile'].includes(activeTab) && (
           <header className="sticky top-0 z-40 h-[72px] bg-white/95 backdrop-blur-md border-b border-[#EAECF0] px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-5">
             {/* Mobile Menu Toggle */}
             <button
@@ -323,7 +323,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         )}
 
         {/* Dynamic Page Content */}
-        <main className={['opportunities', 'scholarships', 'professors', 'research'].includes(activeTab) ? "flex-1 flex flex-col min-w-0" : "flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6"}>
+        <main className={['opportunities', 'scholarships', 'professors', 'research'].includes(activeTab) ? "flex-1 flex flex-col min-w-0" : activeTab === 'profile' ? "flex-1 flex flex-col min-w-0 lg:py-5 lg:pl-5 lg:pr-[30px]" : "flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6"}>
           {children}
         </main>
       </div>
