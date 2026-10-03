@@ -228,7 +228,7 @@ function NavButtons({
 /* Progress 161:1445 */
 function ProgressDots({ step }: { step: number }) {
   return (
-    <div className="flex items-center gap-1" role="progressbar" aria-valuemin={1} aria-valuemax={TOTAL_STEPS} aria-valuenow={step}>
+    <div className="flex items-center gap-1" role="progressbar" aria-label={`Step ${step} of ${TOTAL_STEPS}`} aria-valuemin={1} aria-valuemax={TOTAL_STEPS} aria-valuenow={step}>
       {Array.from({ length: TOTAL_STEPS }, (_, i) => (
         <span
           key={i}
@@ -246,7 +246,7 @@ interface OnboardingFlowProps {
   account?: { name?: string | null; email?: string | null } | null;
 }
 
-export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onFinish, account }) => {
+export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ isStandalonePage, onFinish, account }) => {
   const router = useRouter();
   const { profile, updateProfile, setIsOnboardingOpen } = useApp();
 
@@ -386,8 +386,10 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onFinish, accoun
     : step === 4 ? 'Select at least one country.'
     : '';
 
+  const Root = isStandalonePage ? 'main' : 'div';
+
   return (
-    <div className="relative flex min-h-screen w-full select-none flex-col overflow-hidden bg-surface-white text-text-primary">
+    <Root className="relative flex min-h-screen w-full select-none flex-col overflow-hidden bg-surface-white text-text-primary">
       {/* Decorative sails — 178:1166 */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden xl:block">
         <img
@@ -624,7 +626,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onFinish, accoun
           <NavButtons step={step} saving={saving} onPrev={() => goTo(step - 1)} onNext={next} />
         </div>
       </div>
-    </div>
+    </Root>
   );
 };
 

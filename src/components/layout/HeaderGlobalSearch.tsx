@@ -190,7 +190,7 @@ export const HeaderGlobalSearch: React.FC<HeaderGlobalSearchProps> = ({
             onKeyDown={handleKeyDown}
             aria-label="Search scholarships, professors and opportunities"
             placeholder="Search scholarships by title, provider, or topic (e.g. Fulbright, AI, Germany)..."
-            className="h-4 w-full min-w-0 rounded-none border-0 bg-transparent p-0 text-[12px] leading-4 tracking-[-0.192px] text-text-primary shadow-none placeholder:italic placeholder:text-[#90A1B9] focus-visible:ring-0 md:text-[12px]"
+            className="h-4 w-full min-w-0 rounded-none border-0 bg-transparent p-0 text-[12px] leading-4 tracking-[-0.192px] text-text-primary shadow-none placeholder:italic placeholder:text-[#64748B] focus-visible:ring-0 md:text-[12px]"
           />
         </div>
 
@@ -201,7 +201,7 @@ export const HeaderGlobalSearch: React.FC<HeaderGlobalSearchProps> = ({
               setGlobalSearchQuery('');
               setIsOpen(false);
             }}
-            className="p-1 text-[#90A1B9] hover:text-[#475467] cursor-pointer shrink-0"
+            className="p-1 text-[#64748B] hover:text-[#475467] cursor-pointer shrink-0"
           >
             <X className="w-3.5 h-3.5" />
           </button>

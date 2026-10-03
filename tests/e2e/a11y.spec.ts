@@ -9,11 +9,6 @@ const pages = [
 
 for (const p of pages) {
   test(`axe WCAG 2.1 AA: ${p.name} has no serious/critical violations`, async ({ page, browserName }, info) => {
-    // BUG-19 (partly fixed in PR #8: the #919EAB grey is gone). Still open: other low-contrast text
-    // (#90A1B9, #009966, #C0C7D0 placeholder, brand on lilac 4.41:1), unnamed progressbar, aria-label on a plain
-    // div (logo), unlabeled mobile menu button. Remove test.fail() once axe reports nothing.
-    // Firefox reports nothing on home, so it is not marked there.
-    test.fail(!(browserName === 'firefox' && p.name === 'home'));
     await installFakeBackend(page, { user: p.user });
     await page.goto(p.path);
     await page.waitForLoadState('networkidle');

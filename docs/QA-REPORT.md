@@ -54,7 +54,7 @@ Each known bug has a test that is expected to fail while the bug exists, so `npm
 | BUG-02 | ~~High~~ ✅ **Fixed (PR #5)** | Login code brute force across re-issued codes | Signup |
 | BUG-01 | Medium | Local `npm run build` fails because of `'` in folder path | GenOps |
 | BUG-03 | ~~Medium~~ ✅ **Fixed (PR #5)** | No per-IP rate limit on send-code (email bombing) | Signup |
-| BUG-04 | Medium | Search "USA" matches Australia/Austria/Russia | GenOps (Home) |
+| BUG-04 | ~~Medium~~ ✅ **Fixed** | Search "USA" matches Australia/Austria/Russia | GenOps (Home) |
 | BUG-13 | Medium | Professor search invents data (open positions, PI title, random photo) | GenOps (Home) |
 | BUG-05 | Low | Degree/category keyword false positives ("systems" = Masters) | GenOps (Home) |
 | BUG-09 | Low | `complete-onboarding` stores any JSON with no validation/size limit | Signup / Onboarding |
@@ -68,7 +68,7 @@ Each known bug has a test that is expected to fail while the bug exists, so `npm
 | BUG-15 | Low | Sessions can't be revoked server-side; send-code email links use Host header when `NEXT_PUBLIC_APP_URL` unset | Signup |
 | BUG-17 | ~~Medium~~ ✅ **Fixed (PR #7)** | Onboarding save failure is ignored: user sent home, then bounced back, answers lost | Onboarding |
 | BUG-18 | ~~Medium~~ ✅ **Fixed (PR #8)** | `/?tab=...` deep link causes a React hydration error (whole page re-rendered) | GenOps (Home) |
-| BUG-19 | Medium → **Partly fixed (PR #8)** | Accessibility: remaining low-contrast text and unnamed controls (WCAG 2.1 AA) | GenOps + Design |
+| BUG-19 | ~~Medium~~ ✅ **Fixed** (PR #8 + this fix) | Accessibility: remaining low-contrast text and unnamed controls (WCAG 2.1 AA) | GenOps + Design |
 | BUG-16 | ~~Low~~ ✅ **Fixed (PR #9)** | Terms checkbox can be unticked and sign-in still continues | Signup |
 | BUG-20 | Low | Route protection is client-side only (home renders, then redirects) | Signup / GenOps |
 
@@ -94,7 +94,7 @@ Each known bug has a test that is expected to fail while the bug exists, so `npm
 - **Repro:** `tests/api/auth-routes.test.ts` → "rate-limits one client sending codes to many addresses" (30 different emails, all return 200).
 - **Expected:** Per-IP and global limits (e.g. Vercel KV/Upstash, or the Vercel Firewall rate limit), and a CAPTCHA after N requests.
 
-### BUG-04 · Medium · "USA" search matches Australia etc.
+### BUG-04 · ✅ Fixed (was Medium) · "USA" search matches Australia etc.
 - **File:** `src/lib/semanticSearch.ts:157`. `c.includes('us')` is true for Australia, Austria, Russia, Belarus and Cyprus.
 - **Repro:** `matchItemSemantically('PhD position', 'Australia', parse('phd position usa'))` → `matches: true`.
 - **Expected:** Exact or alias match (`usa`, `united states`, `us`).
@@ -154,7 +154,7 @@ Each known bug has a test that is expected to fail while the bug exists, so `npm
 - **Repro:** open `/?tab=scholarships` while signed in (Chromium/WebKit console). Test: `tests/e2e/home.spec.ts` → "deep link ?tab=scholarships renders without a hydration error".
 - **Expected:** Read the tab with `useSearchParams()`, or set it in an effect after mount.
 
-### BUG-19 · Partly fixed in PR #8 · Accessibility (WCAG 2.1 AA, axe)
+### BUG-19 · ✅ Fixed (PR #8 + follow-up; axe now reports nothing in 4 browsers) · Accessibility (WCAG 2.1 AA, axe)
 - **Fixed (run #5):** the main grey text token `#919EAB` (2.73:1) is gone. Home contrast violations dropped from 81 to 23 elements (desktop) and 21 (mobile); `/login` now has only the logo issue; Firefox reports nothing on home.
 - **Still open (run #5):**
 

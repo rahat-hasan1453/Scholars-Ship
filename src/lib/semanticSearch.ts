@@ -139,6 +139,31 @@ export function parseNaturalLanguageQuery(query: string): ParsedSearchIntent {
   };
 }
 
+const COUNTRY_ALIASES: Record<string, string[]> = {
+  usa: ['usa', 'us', 'u.s.', 'u.s.a.', 'united states', 'united states of america', 'america'],
+  uk: ['uk', 'u.k.', 'united kingdom', 'britain', 'great britain', 'england'],
+};
+
+function countryTerms(value: string): string[] {
+  const v = value.trim();
+  for (const terms of Object.values(COUNTRY_ALIASES)) {
+    if (terms.includes(v)) return terms;
+  }
+  return [v];
+}
+
+/** Whole-word match so "us" never matches Australia/Austria/Russia. */
+function containsWord(haystack: string, needle: string): boolean {
+  const esc = needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(^|[^a-z])${esc}($|[^a-z])`).test(haystack);
+}
+
+function countryMatches(itemCountry: string, detected: string): boolean {
+  const itemTerms = countryTerms(itemCountry);
+  const wanted = countryTerms(detected);
+  return wanted.some((w) => itemTerms.some((t) => t === w || containsWord(itemCountry, w) || containsWord(detected, t)));
+}
+
 export function matchItemSemantically(
   itemText: string,
   itemCountry: string | string[],
@@ -154,7 +179,7 @@ export function matchItemSemantically(
   // 1. Country match
   if (intent.detectedCountry) {
     const dc = intent.detectedCountry.toLowerCase();
-    const hasCountry = countries.some((c) => c.includes(dc) || dc.includes(c) || (dc === 'usa' && (c.includes('united states') || c.includes('us'))));
+    const hasCountry = countries.some((c) => countryMatches(c, dc));
     if (hasCountry) {
       score += 40;
     } else if (countries.length > 0 && !countries.includes('global') && !countries.includes('international')) {

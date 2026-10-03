@@ -215,7 +215,7 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({ opportunity })
 
         {/* Mint Green Acceptance Badge matching Figma Frame 2147226703 */}
         <div className="mt-3 mb-2">
-          <span className="bg-[#ECFDF5] border border-[#A7F3D0] text-[#009966] text-[11px] font-semibold px-3 py-1 rounded-full inline-block select-none">
+          <span className="bg-[#ECFDF5] border border-[#A7F3D0] text-[#047857] text-[11px] font-semibold px-3 py-1 rounded-full inline-block select-none">
             {rankText} • High Acceptance ({acceptancePercent})
           </span>
         </div>
