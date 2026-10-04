@@ -1,5 +1,6 @@
 'use client';
 
+import { formatPercentRange } from '@/lib/utils';
 import React, { useEffect, useState, useMemo } from 'react';
 import { FilterIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
@@ -69,11 +70,7 @@ export const OpportunitiesFeed: React.FC = () => {
   }, [listings, globalSearchQuery, selectedSubjects, selectedDegrees, selectedCountries, selectedFunding]);
 
   const acceptanceRange = useMemo(() => {
-    if (filteredListings.length === 0) return null;
-    const rates = filteredListings.map((p) => p.acceptanceRate);
-    const min = Math.min(...rates);
-    const max = Math.max(...rates);
-    return min === max ? `${min}%` : `${min}% – ${max}%`;
+    return formatPercentRange(filteredListings.map((p) => p.acceptanceRate));
   }, [filteredListings]);
 
   // Any filter/search change sends the pager back to page 1

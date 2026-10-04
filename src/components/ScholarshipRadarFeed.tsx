@@ -10,6 +10,7 @@ import { ScholarshipRadarCard } from '@/components/ScholarshipRadarCard';
 import { ShortsPager } from '@/components/opportunity-feed/ShortsPager';
 import { OpportunityListBar, ViewMode } from '@/components/opportunity-feed/OpportunityListBar';
 import { useFeedGrid } from '@/hooks/useFeedGrid';
+import { calculateMatchScore, formatPercentRange } from '@/lib/utils';
 
 // Figma defaults (Scholarship Radar, node 233:8924)
 const DEFAULT_SUBJECTS = ['UX & Product Design', 'HCI', 'Computer Science', 'Artificial Intelligence'];
@@ -18,10 +19,9 @@ const DEFAULT_COUNTRIES = ['USA', 'Germany', 'Norway', 'United Kingdom', 'Canada
 const DEFAULT_FUNDING = ['Safe Regional'];
 
 // Scholarships carry no acceptance-rate data yet, so the Figma range is shown as-is
-const ACCEPTANCE_RANGE = '85% – 95%';
 
 export const ScholarshipRadarFeed: React.FC = () => {
-  const { scholarships, globalSearchQuery } = useApp();
+  const { scholarships, globalSearchQuery, profile } = useApp();
   const grid = useFeedGrid();
 
   // Kept in sessionStorage so "Back to Scholarship Radar" returns to the same filters
@@ -121,7 +121,7 @@ export const ScholarshipRadarFeed: React.FC = () => {
           <OpportunityListBar
             title="Scholarship List"
             count={filteredScholarships.length}
-            acceptanceRange={filteredScholarships.length > 0 ? ACCEPTANCE_RANGE : null}
+            acceptanceRange={formatPercentRange(filteredScholarships.map((s) => calculateMatchScore(s, profile)))}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
           />
