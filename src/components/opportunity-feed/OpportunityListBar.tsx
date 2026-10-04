@@ -9,6 +9,8 @@ interface OpportunityListBarProps {
   title?: string;
   count: number;
   acceptanceRange: string | null;
+  /** Word after the range: "Acceptance Rate" (Opportunity Feed) or "Match" (pages that use match scores) */
+  rangeLabel?: string;
   /** Figma uses #1b806a on Scholarship Radar, #36b37e on Faculty & Research Labs */
   acceptanceColor?: string;
   viewMode: ViewMode;
@@ -30,6 +32,7 @@ export const OpportunityListBar: React.FC<OpportunityListBarProps> = ({
   title = 'Opportunity List',
   count,
   acceptanceRange,
+  rangeLabel = 'Acceptance Rate',
   acceptanceColor = '#1b806a',
   viewMode,
   onViewModeChange,
@@ -46,8 +49,7 @@ export const OpportunityListBar: React.FC<OpportunityListBarProps> = ({
       </div>
       {acceptanceRange && (
         <p className="text-[14px] leading-[18px] text-[#627181] truncate">
-          <span className="font-bold italic" style={{ color: acceptanceColor }}>✓ {acceptanceRange}</span> Acceptance Rate
-          on your customise filter
+          <span className="font-bold italic" style={{ color: acceptanceColor }}>✓ {acceptanceRange}</span> {rangeLabel} on your customise filter
         </p>
       )}
     </div>

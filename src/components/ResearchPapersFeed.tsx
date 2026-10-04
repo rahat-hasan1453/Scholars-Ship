@@ -171,6 +171,7 @@ export const ResearchPapersFeed: React.FC = () => {
           <OpportunityListBar
             title="Research Paper List"
             count={filteredPapers.length}
+            rangeLabel="Match"
             acceptanceRange={formatPercentRange(
               filteredPapers.map((p) => relevance(p, profile)).filter((v): v is number => v !== null),
             )}

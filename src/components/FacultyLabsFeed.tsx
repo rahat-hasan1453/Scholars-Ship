@@ -118,6 +118,7 @@ export const FacultyLabsFeed: React.FC = () => {
           <OpportunityListBar
             title="Faculty & Lab List"
             count={filteredProfessors.length}
+            rangeLabel="Match"
             acceptanceRange={formatPercentRange(filteredProfessors.map((p) => matchScore(p, profile)))}
             acceptanceColor="#36b37e"
             viewMode={viewMode}

@@ -121,6 +121,7 @@ export const ScholarshipRadarFeed: React.FC = () => {
           <OpportunityListBar
             title="Scholarship List"
             count={filteredScholarships.length}
+            rangeLabel="Match"
             acceptanceRange={formatPercentRange(filteredScholarships.map((s) => calculateMatchScore(s, profile)))}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
