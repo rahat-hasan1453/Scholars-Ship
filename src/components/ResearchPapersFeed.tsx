@@ -12,6 +12,8 @@ import { ResearchPaperDetailsModal } from '@/components/research-paper-details/R
 import { ShortsPager } from '@/components/opportunity-feed/ShortsPager';
 import { OpportunityListBar, ViewMode } from '@/components/opportunity-feed/OpportunityListBar';
 import { useFeedGrid, FEED_CARD_HEIGHT, FEED_CARD_GAP } from '@/hooks/useFeedGrid';
+import { relevance } from '@/lib/researchPapers';
+import { formatPercentRange } from '@/lib/utils';
 
 // Figma defaults (Research Paper, node 251:27009)
 const DEFAULT_SUBJECTS = ['UX & Product Design', 'HCI', 'Computer Science', 'Artificial Intelligence'];
@@ -20,10 +22,9 @@ const DEFAULT_COUNTRIES = ['USA', 'Germany', 'Norway', 'United Kingdom', 'Canada
 const DEFAULT_FUNDING = ['Safe Regional'];
 
 // Papers carry no acceptance-rate data, so the Figma range is shown as-is
-const ACCEPTANCE_RANGE = '85% – 95%';
 
 export const ResearchPapersFeed: React.FC = () => {
-  const { globalSearchQuery } = useApp();
+  const { globalSearchQuery, profile } = useApp();
   const grid = useFeedGrid();
 
   const [selectedSubjects, setSelectedSubjects] = useSessionState<string[]>('research:subjects', DEFAULT_SUBJECTS);
@@ -170,7 +171,9 @@ export const ResearchPapersFeed: React.FC = () => {
           <OpportunityListBar
             title="Research Paper List"
             count={filteredPapers.length}
-            acceptanceRange={filteredPapers.length > 0 ? ACCEPTANCE_RANGE : null}
+            acceptanceRange={formatPercentRange(
+              filteredPapers.map((p) => relevance(p, profile)).filter((v): v is number => v !== null),
+            )}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
           />

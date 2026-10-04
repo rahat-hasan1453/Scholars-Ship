@@ -10,6 +10,8 @@ import { FacultyLabCard } from '@/components/FacultyLabCard';
 import { ShortsPager } from '@/components/opportunity-feed/ShortsPager';
 import { OpportunityListBar, ViewMode } from '@/components/opportunity-feed/OpportunityListBar';
 import { useFeedGrid } from '@/hooks/useFeedGrid';
+import { matchScore } from '@/lib/professorDetails';
+import { formatPercentRange } from '@/lib/utils';
 
 // Figma defaults (Faculty & Research Labs, node 251:22127)
 const DEFAULT_SUBJECTS = ['UX & Product Design', 'HCI', 'Computer Science', 'Artificial Intelligence'];
@@ -18,10 +20,9 @@ const DEFAULT_COUNTRIES = ['USA', 'Germany', 'Norway', 'United Kingdom', 'Canada
 const DEFAULT_FUNDING = ['Safe Regional'];
 
 // Labs carry no acceptance-rate data yet, so the Figma range is shown as-is
-const ACCEPTANCE_RANGE = '85% – 95%';
 
 export const FacultyLabsFeed: React.FC = () => {
-  const { professors, globalSearchQuery } = useApp();
+  const { professors, globalSearchQuery, profile } = useApp();
   const grid = useFeedGrid();
 
   // Kept in sessionStorage so "Back to Faculty & Research Labs" returns to the same filters
@@ -117,7 +118,7 @@ export const FacultyLabsFeed: React.FC = () => {
           <OpportunityListBar
             title="Faculty & Lab List"
             count={filteredProfessors.length}
-            acceptanceRange={filteredProfessors.length > 0 ? ACCEPTANCE_RANGE : null}
+            acceptanceRange={formatPercentRange(filteredProfessors.map((p) => matchScore(p, profile)))}
             acceptanceColor="#36b37e"
             viewMode={viewMode}
             onViewModeChange={setViewMode}

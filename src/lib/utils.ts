@@ -50,6 +50,14 @@ export function calculateCountdown(deadlineStr: string): CountdownInfo {
   return { days, hours, minutes, isExpired: false, urgency, formatted };
 }
 
+/** "85% – 95%" from a list of percentages; a single value when min = max; null when the list is empty */
+export function formatPercentRange(values: number[]): string | null {
+  if (values.length === 0) return null;
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  return min === max ? `${min}%` : `${min}% – ${max}%`;
+}
+
 export function calculateMatchScore(scholarship: Scholarship, profile: UserProfile): number {
   let score = 50; // base score
 

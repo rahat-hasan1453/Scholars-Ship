@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { calculateCountdown, calculateMatchScore, formatFunding } from '@/lib/utils';
+import { calculateCountdown, calculateMatchScore, formatFunding, formatPercentRange } from '@/lib/utils';
 import type { Scholarship, UserProfile } from '@/types';
 
 const scholarship = (over: Partial<Scholarship> = {}) =>
@@ -58,4 +58,10 @@ describe('calculateCountdown', () => {
   it.fails('handles an invalid deadline without NaN', () => {
     expect(calculateCountdown('not-a-date').formatted).not.toContain('NaN');
   });
+});
+
+describe('formatPercentRange', () => {
+  it('returns null for an empty list', () => expect(formatPercentRange([])).toBeNull());
+  it('returns a single value when min equals max', () => expect(formatPercentRange([85, 85])).toBe('85%'));
+  it('returns min – max', () => expect(formatPercentRange([92, 75, 88])).toBe('75% – 92%'));
 });
