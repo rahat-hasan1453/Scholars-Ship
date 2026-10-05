@@ -6,13 +6,14 @@ import { FilterIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { UnifiedDiscoveryHeader } from '@/components/layout/UnifiedDiscoveryHeader';
 import { UniversityOpportunityCard } from '@/components/opportunity-feed/UniversityOpportunityCard';
-import { ShortsPager } from '@/components/opportunity-feed/ShortsPager';
-import { OpportunityListBar, ViewMode } from '@/components/opportunity-feed/OpportunityListBar';
+import { FeedShell } from '@/components/opportunity-feed/FeedShell';
+import { FeedGrid, FeedSkeleton } from '@/components/opportunity-feed/FeedGrid';
+import { OpportunityListBar, MatchMode, ViewMode } from '@/components/opportunity-feed/OpportunityListBar';
 import type { Opportunity } from '@/types';
 import { OPPORTUNITY_LISTINGS } from '@/data/opportunityPosts';
 import { useSessionState } from '@/hooks/useSessionState';
 import { useOpportunityBookmarks } from '@/hooks/useOpportunityBookmarks';
-import { FEED_CARD_GAP, FEED_CARD_HEIGHT, useFeedGrid } from '@/hooks/useFeedGrid';
+import { isOpportunityEligible } from '@/lib/eligibility';
 
 // Figma defaults (Opportunity Feed, node 183:4449)
 const DEFAULT_SUBJECTS = ['UX & Product Design', 'HCI', 'Computer Science', 'Artificial Intelligence'];
@@ -25,8 +26,7 @@ const matchesAny = (selected: string[], values: string[]) =>
   selected.length === 0 || values.some((v) => selected.includes(v));
 
 export const OpportunitiesFeed: React.FC = () => {
-  const { globalSearchQuery } = useApp();
-  const grid = useFeedGrid();
+  const { globalSearchQuery, profile } = useApp();
 
   // Kept in sessionStorage so list → details → back returns to the same list
   const [selectedSubjects, setSelectedSubjects] = useSessionState<string[]>('feed:subjects', DEFAULT_SUBJECTS);
@@ -34,6 +34,7 @@ export const OpportunitiesFeed: React.FC = () => {
   const [selectedCountries, setSelectedCountries] = useSessionState<string[]>('feed:countries', DEFAULT_COUNTRIES);
   const [selectedFunding, setSelectedFunding] = useSessionState<string[]>('feed:funding', DEFAULT_FUNDING);
   const [viewMode, setViewMode] = useSessionState<ViewMode>('feed:view', 'grid');
+  const [matchMode, setMatchMode] = useSessionState<MatchMode>('feed:match', 'all');
   const [listings, setListings] = useState<Opportunity[] | null>(null);
 
   useEffect(() => {
@@ -60,6 +61,7 @@ export const OpportunitiesFeed: React.FC = () => {
           .toLowerCase();
         if (!haystack.includes(q)) return false;
       }
+      if (matchMode === 'eligible' && !isOpportunityEligible(p, profile)) return false;
       return (
         matchesAny(selectedSubjects, p.subjectTags) &&
         matchesAny(selectedDegrees, p.degreeLevels) &&
@@ -67,19 +69,20 @@ export const OpportunitiesFeed: React.FC = () => {
         matchesAny(selectedFunding, p.fundingTags)
       );
     });
-  }, [listings, globalSearchQuery, selectedSubjects, selectedDegrees, selectedCountries, selectedFunding]);
+  }, [listings, globalSearchQuery, matchMode, profile, selectedSubjects, selectedDegrees, selectedCountries, selectedFunding]);
 
   const acceptanceRange = useMemo(() => {
     return formatPercentRange(filteredListings.map((p) => p.acceptanceRate));
   }, [filteredListings]);
 
-  // Any filter/search change sends the pager back to page 1
-  const resetKey = JSON.stringify([
+  // Any filter, search or mode change scrolls the cards back to the top
+  const scrollResetKey = JSON.stringify([
     globalSearchQuery,
     selectedSubjects,
     selectedDegrees,
     selectedCountries,
     selectedFunding,
+    matchMode,
     viewMode,
   ]);
 
@@ -90,55 +93,44 @@ export const OpportunitiesFeed: React.FC = () => {
     setSelectedFunding(DEFAULT_FUNDING);
   };
 
-  const cols = viewMode === 'list' ? 1 : grid.cols;
-
   return (
-    // Fixed-height shell: only the card area moves, header + list bar stay put
-    <div className="relative h-scaled-screen flex flex-col min-w-0 lg:py-5 lg:pl-5 lg:pr-[30px]">
-      <div className="flex-1 min-h-0 flex flex-col bg-white lg:rounded-[16px] overflow-hidden">
-        <UnifiedDiscoveryHeader
-          selectedSubjects={selectedSubjects}
-          setSelectedSubjects={setSelectedSubjects}
-          selectedDegrees={selectedDegrees}
-          setSelectedDegrees={setSelectedDegrees}
-          selectedCountries={selectedCountries}
-          setSelectedCountries={setSelectedCountries}
-          selectedFunding={selectedFunding}
-          setSelectedFunding={setSelectedFunding}
-        />
-
-        <section className="flex-1 min-h-0 flex flex-col gap-5 p-5">
-          <OpportunityListBar
-            count={filteredListings.length}
-            acceptanceRange={acceptanceRange}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
+    <FeedShell
+      scrollResetKey={scrollResetKey}
+        header={
+          <UnifiedDiscoveryHeader
+            selectedSubjects={selectedSubjects}
+            setSelectedSubjects={setSelectedSubjects}
+            selectedDegrees={selectedDegrees}
+            setSelectedDegrees={setSelectedDegrees}
+            selectedCountries={selectedCountries}
+            setSelectedCountries={setSelectedCountries}
+            selectedFunding={selectedFunding}
+            setSelectedFunding={setSelectedFunding}
           />
-
-          {listings === null ? (
-            <div
-              role="status"
-              aria-busy
-              aria-label="Loading opportunities"
-              className="grid"
-              style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gap: FEED_CARD_GAP }}
-            >
-              {Array.from({ length: cols * grid.rows }, (_, i) => (
-                <div
-                  key={i}
-                  className="rounded-[16px] border-[0.5px] border-[#f1f1f1] bg-[#fafafa] animate-pulse motion-reduce:animate-none"
-                  style={{ height: FEED_CARD_HEIGHT }}
-                />
-              ))}
-            </div>
-          ) : filteredListings.length === 0 ? (
+        }
+      listBar={
+        <OpportunityListBar
+          count={filteredListings.length}
+          acceptanceRange={acceptanceRange}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          matchMode={matchMode}
+          onMatchModeChange={setMatchMode}
+        />
+      }
+    >
+      {listings === null ? (
+        <FeedSkeleton viewMode={viewMode} label="Loading opportunities" />
+      ) : filteredListings.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center">
               <div className="w-12 h-12 rounded-full bg-[#EDE9FE] text-[#7150E7] flex items-center justify-center">
                 <FilterIcon size={24} />
               </div>
               <h3 className="text-base font-bold text-[#101828]">No matching opportunities found</h3>
               <p className="text-xs text-[#667085] max-w-md">
-                Try removing some subject or country filters to see more opportunities.
+                {matchMode === 'eligible'
+                  ? 'None of these match your current profile. Switch to "All" to see every listing.'
+                  : 'Try removing some subject or country filters to see more opportunities.'}
               </p>
               <button
                 type="button"
@@ -148,31 +140,18 @@ export const OpportunitiesFeed: React.FC = () => {
                 Reset to Default Filters
               </button>
             </div>
-          ) : (
-            <ShortsPager<Opportunity>
-              key={resetKey}
-              items={filteredListings}
-              cols={cols}
-              rows={grid.rows}
-              getKey={(p) => p.id}
-              renderItem={(p) => (
-                <UniversityOpportunityCard
-                  opportunity={p}
-                  isBookmarked={bookmarks.has(p.id)}
-                  onToggleBookmark={toggleBookmark}
-                />
-              )}
-              renderIndicator={(indicator) =>
-                indicator && (
-                  <div className="absolute right-[9px] top-1/2 -translate-y-1/2 z-10 hidden lg:block">
-                    {indicator}
-                  </div>
-                )
-              }
+      ) : (
+        <FeedGrid viewMode={viewMode}>
+          {filteredListings.map((p) => (
+            <UniversityOpportunityCard
+              key={p.id}
+              opportunity={p}
+              isBookmarked={bookmarks.has(p.id)}
+              onToggleBookmark={toggleBookmark}
             />
-          )}
-        </section>
-      </div>
-    </div>
+          ))}
+        </FeedGrid>
+      )}
+    </FeedShell>
   );
 };

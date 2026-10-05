@@ -1,8 +1,12 @@
 'use client';
 
 import React from 'react';
+import { SegmentedToggle, type SegmentedOption } from '@/components/feed/SegmentedToggle';
 
 export type ViewMode = 'grid' | 'list';
+
+/** "All" shows every listing; "Eligible Now" only the ones the student can apply to with their current profile */
+export type MatchMode = 'all' | 'eligible';
 
 interface OpportunityListBarProps {
   /** Heading above the cards, e.g. "Scholarship List" */
@@ -15,19 +19,33 @@ interface OpportunityListBarProps {
   acceptanceColor?: string;
   viewMode: ViewMode;
   onViewModeChange: (mode: ViewMode) => void;
+  /** Shows the All / Eligible Now switch when both are given */
+  matchMode?: MatchMode;
+  onMatchModeChange?: (mode: MatchMode) => void;
 }
 
-function ViewToggleIcon({ src, size, active }: { src: string; size: number; active: boolean }) {
+function ViewToggleIcon({ src, size }: { src: string; size: number }) {
+  // Takes the colour of the segment text: brand purple when on, grey when off
   return (
     <span
       aria-hidden
-      className={active ? 'bg-[#7150e7]' : 'bg-[#627181]'}
+      className="bg-current"
       style={{ width: size, height: size, mask: `url(${src}) center / contain no-repeat` }}
     />
   );
 }
 
-// Figma: list bar above the cards (Opportunity Feed 183:4558, Scholarship Radar 233:8930)
+const MATCH_OPTIONS: SegmentedOption<MatchMode>[] = [
+  { value: 'all', label: 'All' },
+  { value: 'eligible', label: 'Eligible Now' },
+];
+
+const VIEW_OPTIONS: SegmentedOption<ViewMode>[] = [
+  { value: 'grid', ariaLabel: 'Grid view', icon: <ViewToggleIcon src="/opportunity-feed/grid-view.svg" size={14.3333} /> },
+  { value: 'list', ariaLabel: 'List view', icon: <ViewToggleIcon src="/opportunity-feed/list-view.svg" size={13.3334} /> },
+];
+
+// Figma: list bar above the cards (Opportunity Feed 183:4558 + toggles 295:5069, Scholarship Radar 233:8930)
 export const OpportunityListBar: React.FC<OpportunityListBarProps> = ({
   title = 'Opportunity List',
   count,
@@ -36,6 +54,8 @@ export const OpportunityListBar: React.FC<OpportunityListBarProps> = ({
   acceptanceColor = '#1b806a',
   viewMode,
   onViewModeChange,
+  matchMode,
+  onMatchModeChange,
 }) => (
   <div className="flex items-center justify-between gap-3 shrink-0">
     <div className="flex flex-col gap-1 min-w-0">
@@ -54,37 +74,11 @@ export const OpportunityListBar: React.FC<OpportunityListBarProps> = ({
       )}
     </div>
 
-    <div className="flex items-center shrink-0" role="group" aria-label="View mode">
-      <button
-        type="button"
-        onClick={() => onViewModeChange('grid')}
-        aria-pressed={viewMode === 'grid'}
-        aria-label="Grid view"
-        className={`flex items-center justify-center h-8 w-9 rounded-l-[10px] cursor-pointer ${
-          viewMode === 'grid'
-            ? 'bg-[#ede9fc] border border-[#7150e7]'
-            : 'bg-white border-y border-l border-[#e1e8f0]'
-        }`}
-      >
-        <span className="flex items-center justify-center size-4">
-          <ViewToggleIcon src="/opportunity-feed/grid-view.svg" size={14.3333} active={viewMode === 'grid'} />
-        </span>
-      </button>
-      <button
-        type="button"
-        onClick={() => onViewModeChange('list')}
-        aria-pressed={viewMode === 'list'}
-        aria-label="List view"
-        className={`flex items-center justify-center h-8 w-9 rounded-r-[10px] cursor-pointer ${
-          viewMode === 'list'
-            ? 'bg-[#ede9fc] border border-[#7150e7]'
-            : 'bg-white border-y border-r border-[#e1e8f0]'
-        }`}
-      >
-        <span className="flex items-center justify-center size-4">
-          <ViewToggleIcon src="/opportunity-feed/list-view.svg" size={13.3334} active={viewMode === 'list'} />
-        </span>
-      </button>
+    <div className="flex items-center justify-end gap-4 shrink-0">
+      {matchMode && onMatchModeChange && (
+        <SegmentedToggle label="Show" value={matchMode} onValueChange={onMatchModeChange} options={MATCH_OPTIONS} />
+      )}
+      <SegmentedToggle label="View mode" value={viewMode} onValueChange={onViewModeChange} options={VIEW_OPTIONS} />
     </div>
   </div>
 );

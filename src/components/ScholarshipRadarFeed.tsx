@@ -4,12 +4,12 @@ import React, { useMemo } from 'react';
 import { useSessionState } from '@/hooks/useSessionState';
 import { FilterIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
-import { Scholarship } from '@/types';
 import { UnifiedDiscoveryHeader } from '@/components/layout/UnifiedDiscoveryHeader';
 import { ScholarshipRadarCard } from '@/components/ScholarshipRadarCard';
-import { ShortsPager } from '@/components/opportunity-feed/ShortsPager';
-import { OpportunityListBar, ViewMode } from '@/components/opportunity-feed/OpportunityListBar';
-import { useFeedGrid } from '@/hooks/useFeedGrid';
+import { FeedShell } from '@/components/opportunity-feed/FeedShell';
+import { FeedGrid } from '@/components/opportunity-feed/FeedGrid';
+import { OpportunityListBar, MatchMode, ViewMode } from '@/components/opportunity-feed/OpportunityListBar';
+import { isScholarshipEligible } from '@/lib/eligibility';
 import { calculateMatchScore, formatPercentRange } from '@/lib/utils';
 
 // Figma defaults (Scholarship Radar, node 233:8924)
@@ -22,7 +22,6 @@ const DEFAULT_FUNDING = ['Safe Regional'];
 
 export const ScholarshipRadarFeed: React.FC = () => {
   const { scholarships, globalSearchQuery, profile } = useApp();
-  const grid = useFeedGrid();
 
   // Kept in sessionStorage so "Back to Scholarship Radar" returns to the same filters
   const [selectedSubjects, setSelectedSubjects] = useSessionState<string[]>('radar:subjects', DEFAULT_SUBJECTS);
@@ -30,6 +29,7 @@ export const ScholarshipRadarFeed: React.FC = () => {
   const [selectedCountries, setSelectedCountries] = useSessionState<string[]>('radar:countries', DEFAULT_COUNTRIES);
   const [selectedFunding, setSelectedFunding] = useSessionState<string[]>('radar:funding', DEFAULT_FUNDING);
   const [viewMode, setViewMode] = useSessionState<ViewMode>('radar:view', 'grid');
+  const [matchMode, setMatchMode] = useSessionState<MatchMode>('radar:match', 'all');
 
   const filteredScholarships = useMemo(() => {
     return scholarships.filter((sch) => {
@@ -43,6 +43,9 @@ export const ScholarshipRadarFeed: React.FC = () => {
         const inSpecs = sch.specializations?.some(s => s.toLowerCase().includes(q));
         if (!inTitle && !inProvider && !inDesc && !inTags && !inSpecs) return false;
       }
+
+      // Eligible Now: degree level and every stated minimum score met with the current profile
+      if (matchMode === 'eligible' && !isScholarshipEligible(sch, profile)) return false;
 
       // 2. Degree filter
       if (selectedDegrees.length > 0 && sch.degreeLevels?.length) {
@@ -81,15 +84,16 @@ export const ScholarshipRadarFeed: React.FC = () => {
 
       return true;
     });
-  }, [scholarships, globalSearchQuery, selectedDegrees, selectedCountries, selectedSubjects]);
+  }, [scholarships, globalSearchQuery, matchMode, profile, selectedDegrees, selectedCountries, selectedSubjects]);
 
-  // Any filter/search change sends the pager back to page 1
-  const resetKey = JSON.stringify([
+  // Any filter, search or mode change scrolls the cards back to the top
+  const scrollResetKey = JSON.stringify([
     globalSearchQuery,
     selectedSubjects,
     selectedDegrees,
     selectedCountries,
     selectedFunding,
+    matchMode,
     viewMode,
   ]);
 
@@ -100,12 +104,10 @@ export const ScholarshipRadarFeed: React.FC = () => {
     setSelectedFunding(DEFAULT_FUNDING);
   };
 
-  const cols = viewMode === 'list' ? 1 : grid.cols;
-
   return (
-    // Fixed-height shell: only the card area moves, header + list bar stay put
-    <div className="relative h-scaled-screen flex flex-col min-w-0 lg:py-5 lg:pl-5 lg:pr-[30px]">
-      <div className="flex-1 min-h-0 flex flex-col bg-white lg:rounded-[16px] overflow-hidden">
+    <FeedShell
+      scrollResetKey={scrollResetKey}
+      header={
         <UnifiedDiscoveryHeader
           selectedSubjects={selectedSubjects}
           setSelectedSubjects={setSelectedSubjects}
@@ -116,53 +118,46 @@ export const ScholarshipRadarFeed: React.FC = () => {
           selectedFunding={selectedFunding}
           setSelectedFunding={setSelectedFunding}
         />
-
-        <section className="flex-1 min-h-0 flex flex-col gap-5 p-5">
-          <OpportunityListBar
-            title="Scholarship List"
-            count={filteredScholarships.length}
-            rangeLabel="Match"
-            acceptanceRange={formatPercentRange(filteredScholarships.map((s) => calculateMatchScore(s, profile)))}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-          />
-
-          {filteredScholarships.length === 0 ? (
-            <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center">
-              <div className="w-12 h-12 rounded-full bg-[#EDE9FE] text-[#7150E7] flex items-center justify-center">
-                <FilterIcon size={24} />
-              </div>
-              <h3 className="text-base font-bold text-[#101828]">No matching scholarships found</h3>
-              <p className="text-xs text-[#667085] max-w-md">
-                Try expanding your degree, country, or subject filters to discover more scholarship opportunities.
-              </p>
-              <button
-                type="button"
-                onClick={resetFilters}
-                className="px-4 py-2 bg-[#7150E7] text-white text-xs font-semibold rounded-full hover:bg-[#5f3fd6] transition-colors cursor-pointer"
-              >
-                Reset to Default Filters
-              </button>
-            </div>
-          ) : (
-            <ShortsPager<Scholarship>
-              key={resetKey}
-              items={filteredScholarships}
-              cols={cols}
-              rows={grid.rows}
-              getKey={(s) => s.id}
-              renderItem={(s) => <ScholarshipRadarCard scholarship={s} />}
-              renderIndicator={(indicator) =>
-                indicator && (
-                  <div className="absolute right-[9px] top-1/2 -translate-y-1/2 z-10 hidden lg:block">
-                    {indicator}
-                  </div>
-                )
-              }
-            />
-          )}
-        </section>
-      </div>
-    </div>
+      }
+      listBar={
+        <OpportunityListBar
+          title="Scholarship List"
+          count={filteredScholarships.length}
+          rangeLabel="Match"
+          acceptanceRange={formatPercentRange(filteredScholarships.map((s) => calculateMatchScore(s, profile)))}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          matchMode={matchMode}
+          onMatchModeChange={setMatchMode}
+        />
+      }
+    >
+      {filteredScholarships.length === 0 ? (
+        <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center">
+          <div className="w-12 h-12 rounded-full bg-[#EDE9FE] text-[#7150E7] flex items-center justify-center">
+            <FilterIcon size={24} />
+          </div>
+          <h3 className="text-base font-bold text-[#101828]">No matching scholarships found</h3>
+          <p className="text-xs text-[#667085] max-w-md">
+            {matchMode === 'eligible'
+              ? 'None of these match your current profile. Switch to "All" to see every listing.'
+              : 'Try expanding your degree, country, or subject filters to discover more scholarship opportunities.'}
+          </p>
+          <button
+            type="button"
+            onClick={resetFilters}
+            className="px-4 py-2 bg-[#7150E7] text-white text-xs font-semibold rounded-full hover:bg-[#5f3fd6] transition-colors cursor-pointer"
+          >
+            Reset to Default Filters
+          </button>
+        </div>
+      ) : (
+        <FeedGrid viewMode={viewMode}>
+          {filteredScholarships.map((s) => (
+            <ScholarshipRadarCard key={s.id} scholarship={s} />
+          ))}
+        </FeedGrid>
+      )}
+    </FeedShell>
   );
 };

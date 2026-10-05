@@ -6,7 +6,6 @@ import { useApp } from '@/context/AppContext';
 import { ProfileMenuDropdown } from './ProfileMenuDropdown';
 import { HeaderGlobalSearch } from '@/components/layout/HeaderGlobalSearch';
 import { MenuIcon } from 'lucide-react';
-import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group';
 import { MultiSelectField } from '@/components/layout/MultiSelectField';
 import { UserAvatar } from '@/components/UserAvatar';
 
@@ -85,8 +84,6 @@ export const FUNDING_DESCRIPTIONS: Record<string, string> = {
   'University Fellowship': "A merit award from the university — no work required",
 };
 
-export type MatchMode = 'all' | 'resume';
-
 export interface UnifiedDiscoveryHeaderProps {
   selectedSubjects: string[];
   setSelectedSubjects: React.Dispatch<React.SetStateAction<string[]>>;
@@ -98,8 +95,6 @@ export interface UnifiedDiscoveryHeaderProps {
   setSelectedFunding: React.Dispatch<React.SetStateAction<string[]>>;
   title?: string;
   subtitle?: string;
-  matchMode?: MatchMode;
-  onMatchModeChange?: (mode: MatchMode) => void;
 }
 
 export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
@@ -113,15 +108,10 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
   setSelectedFunding,
   title = 'Find Your Desired Scholarship, Lab & Safe Universities',
   subtitle = 'A quick search links you to scholarships, expert professors, and trusted regional universities.',
-  matchMode: matchModeProp,
-  onMatchModeChange,
 }) => {
   const { profile, setActiveNavTab } = useApp();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
-  // "All / Resume Customised" — UI only for now; uncontrolled unless the page passes it in
-  const [localMatchMode, setLocalMatchMode] = useState<MatchMode>('all');
-  const matchMode = matchModeProp ?? localMatchMode;
 
   useEffect(() => {
     if (!isProfileMenuOpen) return;
@@ -131,9 +121,6 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isProfileMenuOpen]);
-
-  const toggleItemClass =
-    'h-8 min-w-0 px-[10px] font-[family-name:var(--font-inter)] text-[14px] leading-5 font-medium cursor-pointer border border-[#e1e8f0] bg-white text-text-secondary hover:bg-[#f4f2fd] hover:text-text-secondary data-[state=on]:z-10 data-[state=on]:border-[#7150e7] data-[state=on]:bg-[#ede9fc] data-[state=on]:text-[#6f4fe4] data-[spacing=0]:first:rounded-l-[10px] data-[spacing=0]:last:rounded-r-[10px] data-[spacing=0]:last:-ml-px';
 
   return (
     // Figma header (212:6322)
@@ -184,31 +171,13 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
         </div>
       </div>
 
-      {/* Row 2: title + match-mode toggle */}
+      {/* Row 2: title */}
       <div className="flex flex-col gap-3">
         <div className="flex items-start gap-3">
           <div className="flex flex-1 min-w-0 flex-col gap-1">
             <h1 className="text-[16px] leading-6 font-medium text-text-primary">{title}</h1>
             <p className="text-[14px] leading-5 tracking-[-0.3424px] text-text-secondary">{subtitle}</p>
           </div>
-          <ToggleGroup
-            type="single"
-            value={matchMode}
-            onValueChange={(v) => {
-              if (!v) return; // keep one option selected
-              setLocalMatchMode(v as MatchMode);
-              onMatchModeChange?.(v as MatchMode);
-            }}
-            aria-label="Result mode"
-            className="shrink-0"
-          >
-            <ToggleGroupItem value="all" className={toggleItemClass}>
-              All
-            </ToggleGroupItem>
-            <ToggleGroupItem value="resume" className={toggleItemClass}>
-              Resume Customised
-            </ToggleGroupItem>
-          </ToggleGroup>
         </div>
 
         {/* Row 3: filters */}

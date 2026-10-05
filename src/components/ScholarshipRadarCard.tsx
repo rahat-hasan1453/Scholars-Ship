@@ -7,7 +7,7 @@ import { Scholarship } from '@/types';
 import { useApp } from '@/context/AppContext';
 import { calculateMatchScore } from '@/lib/utils';
 import { COUNTRY_FLAGS } from '@/components/layout/UnifiedDiscoveryHeader';
-import { FEED_CARD_HEIGHT } from '@/hooks/useFeedGrid';
+import { FEED_CARD_HEIGHT } from '@/components/opportunity-feed/FeedGrid';
 
 interface ScholarshipRadarCardProps {
   scholarship: Scholarship;

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useId, useRef, useState } from 'react';
+import { ChevronDown, X } from 'lucide-react';
 import { Badge } from '@/components/shadcn/badge';
 import { Checkbox } from '@/components/shadcn/checkbox';
 import {
@@ -120,7 +121,7 @@ export function MultiSelectField({
                         aria-label={`Remove ${value}`}
                         className="flex size-4 cursor-pointer items-center justify-center rounded-full hover:bg-black/5"
                       >
-                        <img src="/header/cancel.svg" alt="" width={10.8333} height={10.8333} />
+                        <X aria-hidden strokeWidth={1.5} className="size-3 text-text-secondary" />
                       </button>
                     </Badge>
                   ))}
@@ -140,12 +141,10 @@ export function MultiSelectField({
                 aria-label={`${label} options`}
                 className="flex size-4 shrink-0 cursor-pointer items-center justify-center"
               >
-                <img
-                  src="/header/chevron-down.svg"
-                  alt=""
-                  width={16}
-                  height={16}
-                  className={cn('transition-transform', open && 'rotate-180')}
+                <ChevronDown
+                  aria-hidden
+                  strokeWidth={1.5}
+                  className={cn('size-4 text-text-secondary transition-transform', open && 'rotate-180')}
                 />
               </button>
             </PopoverTrigger>
@@ -190,7 +189,7 @@ export function MultiSelectField({
                       value={option}
                       onSelect={() => toggle(option)}
                       className={cn(
-                        'cursor-pointer gap-2 rounded-md px-2 py-1.5 text-[13px] text-text-primary data-[selected=true]:bg-[#f4f2fd]',
+                        'cursor-pointer gap-2 rounded-md px-2 py-1.5 text-[13px] text-text-secondary data-[selected=true]:bg-[#f4f2fd]',
                         optionDescriptions?.[option] && 'items-start [&>[data-slot=checkbox]]:mt-0.5'
                       )}
                     >

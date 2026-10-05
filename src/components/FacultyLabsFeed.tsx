@@ -4,12 +4,12 @@ import React, { useMemo } from 'react';
 import { useSessionState } from '@/hooks/useSessionState';
 import { FilterIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
-import { Professor } from '@/types';
 import { UnifiedDiscoveryHeader } from '@/components/layout/UnifiedDiscoveryHeader';
 import { FacultyLabCard } from '@/components/FacultyLabCard';
-import { ShortsPager } from '@/components/opportunity-feed/ShortsPager';
-import { OpportunityListBar, ViewMode } from '@/components/opportunity-feed/OpportunityListBar';
-import { useFeedGrid } from '@/hooks/useFeedGrid';
+import { FeedShell } from '@/components/opportunity-feed/FeedShell';
+import { FeedGrid } from '@/components/opportunity-feed/FeedGrid';
+import { OpportunityListBar, MatchMode, ViewMode } from '@/components/opportunity-feed/OpportunityListBar';
+import { isProfessorEligible } from '@/lib/eligibility';
 import { matchScore } from '@/lib/professorDetails';
 import { formatPercentRange } from '@/lib/utils';
 
@@ -23,7 +23,6 @@ const DEFAULT_FUNDING = ['Safe Regional'];
 
 export const FacultyLabsFeed: React.FC = () => {
   const { professors, globalSearchQuery, profile } = useApp();
-  const grid = useFeedGrid();
 
   // Kept in sessionStorage so "Back to Faculty & Research Labs" returns to the same filters
   const [selectedSubjects, setSelectedSubjects] = useSessionState<string[]>('faculty:subjects', DEFAULT_SUBJECTS);
@@ -31,6 +30,7 @@ export const FacultyLabsFeed: React.FC = () => {
   const [selectedCountries, setSelectedCountries] = useSessionState<string[]>('faculty:countries', DEFAULT_COUNTRIES);
   const [selectedFunding, setSelectedFunding] = useSessionState<string[]>('faculty:funding', DEFAULT_FUNDING);
   const [viewMode, setViewMode] = useSessionState<ViewMode>('faculty:view', 'grid');
+  const [matchMode, setMatchMode] = useSessionState<MatchMode>('faculty:match', 'all');
 
   const filteredProfessors = useMemo(() => {
     return professors.filter((prof) => {
@@ -44,6 +44,9 @@ export const FacultyLabsFeed: React.FC = () => {
         const inTags = prof.researchTags?.some(t => t.toLowerCase().includes(q));
         if (!inName && !inUni && !inDept && !inLab && !inTags) return false;
       }
+
+      // Eligible Now: the lab takes the student's degree level and its stated minimums are met
+      if (matchMode === 'eligible' && !isProfessorEligible(prof, profile)) return false;
 
       // 2. Degree filter
       if (selectedDegrees.length > 0 && prof.degreeLevels?.length) {
@@ -78,15 +81,16 @@ export const FacultyLabsFeed: React.FC = () => {
 
       return true;
     });
-  }, [professors, globalSearchQuery, selectedDegrees, selectedCountries, selectedSubjects]);
+  }, [professors, globalSearchQuery, matchMode, profile, selectedDegrees, selectedCountries, selectedSubjects]);
 
-  // Any filter/search change sends the pager back to page 1
-  const resetKey = JSON.stringify([
+  // Any filter, search or mode change scrolls the cards back to the top
+  const scrollResetKey = JSON.stringify([
     globalSearchQuery,
     selectedSubjects,
     selectedDegrees,
     selectedCountries,
     selectedFunding,
+    matchMode,
     viewMode,
   ]);
 
@@ -97,12 +101,10 @@ export const FacultyLabsFeed: React.FC = () => {
     setSelectedFunding(DEFAULT_FUNDING);
   };
 
-  const cols = viewMode === 'list' ? 1 : grid.cols;
-
   return (
-    // Fixed-height shell: only the card area moves, header + list bar stay put
-    <div className="relative h-scaled-screen flex flex-col min-w-0 lg:py-5 lg:pl-5 lg:pr-[30px]">
-      <div className="flex-1 min-h-0 flex flex-col bg-white lg:rounded-[16px] overflow-hidden">
+    <FeedShell
+      scrollResetKey={scrollResetKey}
+      header={
         <UnifiedDiscoveryHeader
           selectedSubjects={selectedSubjects}
           setSelectedSubjects={setSelectedSubjects}
@@ -113,54 +115,47 @@ export const FacultyLabsFeed: React.FC = () => {
           selectedFunding={selectedFunding}
           setSelectedFunding={setSelectedFunding}
         />
-
-        <section className="flex-1 min-h-0 flex flex-col gap-5 p-5">
-          <OpportunityListBar
-            title="Faculty & Lab List"
-            count={filteredProfessors.length}
-            rangeLabel="Match"
-            acceptanceRange={formatPercentRange(filteredProfessors.map((p) => matchScore(p, profile)))}
-            acceptanceColor="#36b37e"
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-          />
-
-          {filteredProfessors.length === 0 ? (
-            <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center">
-              <div className="w-12 h-12 rounded-full bg-[#EDE9FE] text-[#7150E7] flex items-center justify-center">
-                <FilterIcon size={24} />
-              </div>
-              <h3 className="text-base font-bold text-[#101828]">No faculty or research labs found</h3>
-              <p className="text-xs text-[#667085] max-w-md">
-                Try removing some filters to discover faculty members and funded research laboratories worldwide.
-              </p>
-              <button
-                type="button"
-                onClick={resetFilters}
-                className="px-4 py-2 bg-[#7150E7] text-white text-xs font-semibold rounded-full hover:bg-[#5f3fd6] transition-colors cursor-pointer"
-              >
-                Reset to Default Filters
-              </button>
-            </div>
-          ) : (
-            <ShortsPager<Professor>
-              key={resetKey}
-              items={filteredProfessors}
-              cols={cols}
-              rows={grid.rows}
-              getKey={(p) => p.id}
-              renderItem={(p) => <FacultyLabCard professor={p} />}
-              renderIndicator={(indicator) =>
-                indicator && (
-                  <div className="absolute right-[9px] top-1/2 -translate-y-1/2 z-10 hidden lg:block">
-                    {indicator}
-                  </div>
-                )
-              }
-            />
-          )}
-        </section>
-      </div>
-    </div>
+      }
+      listBar={
+        <OpportunityListBar
+          title="Faculty & Lab List"
+          count={filteredProfessors.length}
+          rangeLabel="Match"
+          acceptanceRange={formatPercentRange(filteredProfessors.map((p) => matchScore(p, profile)))}
+          acceptanceColor="#36b37e"
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          matchMode={matchMode}
+          onMatchModeChange={setMatchMode}
+        />
+      }
+    >
+      {filteredProfessors.length === 0 ? (
+        <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center">
+          <div className="w-12 h-12 rounded-full bg-[#EDE9FE] text-[#7150E7] flex items-center justify-center">
+            <FilterIcon size={24} />
+          </div>
+          <h3 className="text-base font-bold text-[#101828]">No faculty or research labs found</h3>
+          <p className="text-xs text-[#667085] max-w-md">
+            {matchMode === 'eligible'
+              ? 'None of these match your current profile. Switch to "All" to see every listing.'
+              : 'Try removing some filters to discover faculty members and funded research laboratories worldwide.'}
+          </p>
+          <button
+            type="button"
+            onClick={resetFilters}
+            className="px-4 py-2 bg-[#7150E7] text-white text-xs font-semibold rounded-full hover:bg-[#5f3fd6] transition-colors cursor-pointer"
+          >
+            Reset to Default Filters
+          </button>
+        </div>
+      ) : (
+        <FeedGrid viewMode={viewMode}>
+          {filteredProfessors.map((p) => (
+            <FacultyLabCard key={p.id} professor={p} />
+          ))}
+        </FeedGrid>
+      )}
+    </FeedShell>
   );
 };

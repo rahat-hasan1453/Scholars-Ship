@@ -12,7 +12,7 @@ function computeScale(): number {
   const { innerWidth: w, innerHeight: h } = window;
   if (w < SCALE_BREAKPOINT) return 1;
   const scale = Math.min(w / DESIGN_WIDTH, h / DESIGN_HEIGHT);
-  // No lower limit: laptops/PCs always fit the full 2-row feed page, shrinking as needed
+  // No lower limit: the whole shell shrinks proportionally so laptops keep the desktop layout
   return Math.min(1, scale);
 }
 

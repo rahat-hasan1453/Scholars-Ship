@@ -165,7 +165,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
   // Multi-select display helper
   const renderMultiContent = () => {
     if (selectedValues.length === 0) {
-      return <span className="text-[#98A2B3]">{placeholder}</span>;
+      return <span className="text-text-secondary">{placeholder}</span>;
     }
     if (selectedValues.includes('ALL')) {
       const allOpt = normalizedOptions.find((o) => o.value === 'ALL');
@@ -232,12 +232,13 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
                 <span>{currentSelectedOption.label}</span>
               </span>
             ) : (
-              <span className="text-[#98A2B3]">{placeholder}</span>
+              <span className="text-text-secondary">{placeholder}</span>
             )}
           </div>
         )}
 
         <ChevronDown
+          strokeWidth={1.5}
           className={`w-4 h-4 shrink-0 ${
             variant === 'card' ? 'text-[#7150E7]' : 'text-[#667085]'
           } transition-transform duration-200 ${
@@ -255,22 +256,22 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
           {/* Search Bar */}
           {showSearch && normalizedOptions.length > 5 && (
             <div className="relative mb-2">
-              <Search className="w-3.5 h-3.5 text-[#98A2B3] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Search strokeWidth={1.5} className="w-3.5 h-3.5 text-text-secondary absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={searchPlaceholder}
-                className="w-full bg-[#F8FAFC] border border-[#E4E7EC] rounded-xl pl-8 pr-7 py-1.5 text-xs text-[#101828] placeholder-[#98A2B3] focus:outline-hidden focus:border-[#7150E7]"
+                className="w-full bg-[#F8FAFC] border border-[#E4E7EC] rounded-xl pl-8 pr-7 py-1.5 text-xs text-[#101828] placeholder-text-secondary focus:outline-hidden focus:border-[#7150E7]"
                 autoFocus
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary cursor-pointer"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  <X strokeWidth={1.5} className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
@@ -326,7 +327,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
                     className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors cursor-pointer text-left ${
                       isSelected
                         ? 'bg-[#F4F3FE] text-[#7150E7] font-semibold'
-                        : 'text-[#344054] hover:bg-[#F8FAFC]'
+                        : 'text-text-secondary hover:bg-[#F8FAFC]'
                     }`}
                   >
                     <span className="inline-flex items-center gap-2 truncate">
@@ -342,11 +343,11 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
                             : 'border-[#D0D5DD] bg-white'
                         }`}
                       >
-                        {isSelected && <Check className="w-3 h-3 stroke-[2.5]" />}
+                        {isSelected && <Check strokeWidth={1.5} className="w-3 h-3" />}
                       </div>
                     ) : (
                       isSelected && (
-                        <Check className="w-4 h-4 text-[#7150E7] stroke-[2.5] shrink-0 ml-2" />
+                        <Check strokeWidth={1.5} className="w-4 h-4 text-[#7150E7] shrink-0 ml-2" />
                       )
                     )}
                   </button>
@@ -355,7 +356,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
             })}
 
             {filteredOptions.length === 0 && (
-              <div className="py-4 text-center text-xs text-[#98A2B3]">
+              <div className="py-4 text-center text-xs text-text-secondary">
                 No options found
               </div>
             )}

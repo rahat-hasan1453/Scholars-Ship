@@ -4,7 +4,7 @@ import { ChevronRight } from 'lucide-react';
 import React from 'react';
 import { ResearchPaper } from '@/types';
 import { useApp } from '@/context/AppContext';
-import { FEED_CARD_HEIGHT } from '@/hooks/useFeedGrid';
+import { FEED_CARD_HEIGHT } from '@/components/opportunity-feed/FeedGrid';
 
 interface ResearchPaperCardProps {
   paper: ResearchPaper;
