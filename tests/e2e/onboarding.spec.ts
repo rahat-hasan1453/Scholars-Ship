@@ -6,7 +6,7 @@ const next = (page: Page) => page.getByRole('button', { name: 'Next' }).click();
 async function walkToLastStep(page: Page) {
   await page.goto('/onboarding');
   await expect(page.getByRole('heading', { name: /scholar profile/ })).toBeVisible();
-  await expect(page.getByLabel('Email')).toHaveValue(TEST_EMAIL);
+  await expect(page.getByLabel('Email')).toContainText(TEST_EMAIL);
   await page.getByLabel('Full name').fill('QA Student');
   await next(page);
   await page.getByRole('radio', { name: /PhD/ }).click();
@@ -26,7 +26,7 @@ test.describe('Onboarding (5 steps)', () => {
   test('step 1 requires a name', async ({ page }) => {
     await installFakeBackend(page, { user: signedInUser({ onboardingCompleted: false, name: '' }) });
     await page.goto('/onboarding');
-    await expect(page.getByLabel('Email')).toHaveValue(TEST_EMAIL); // account loaded from /api/auth/me
+    await expect(page.getByLabel('Email')).toContainText(TEST_EMAIL); // account loaded from /api/auth/me
     await page.getByLabel('Full name').fill('x');
     await page.getByLabel('Full name').fill('');
     await next(page);
@@ -40,8 +40,8 @@ test.describe('Onboarding (5 steps)', () => {
     await page.getByRole('button', { name: 'Back' }).click();
     await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '4');
     await next(page);
-    await page.getByPlaceholder('3.79').fill('3.6');
-    await page.getByPlaceholder('7.5').fill('7.5');
+    await page.getByLabel('CGPA (4.0 scale)').fill('3.6');
+    await page.getByLabel('English Band (IELTS / TOEFL)').fill('7.5');
     await page.getByRole('button', { name: 'Complete Profile & Reveal Matches' }).click();
     await expect(page).toHaveURL(/\/\?welcome=true$|\/$/);
     expect(backend.onboardingPayload).toMatchObject({

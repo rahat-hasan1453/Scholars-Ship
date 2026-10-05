@@ -9,6 +9,7 @@ import { Button } from '@/components/shadcn/button';
 import { ProfileMenuDropdown } from './ProfileMenuDropdown';
 import { HeaderGlobalSearch } from './HeaderGlobalSearch';
 import { useDesignScale } from '@/hooks/useDesignScale';
+import { UserAvatar } from '@/components/UserAvatar';
 
 export type AppTab = 'scholarships' | 'opportunities' | 'professors' | 'research' | 'tracker' | 'profile';
 
@@ -214,10 +215,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
               >
                 {/* 32x32 Avatar with Green Online Status Dot */}
                 <div className="relative shrink-0">
-                  <img
-                    src={profile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80'}
-                    alt={profile.name || 'User'}
-                    className="w-8 h-8 rounded-full object-cover border border-[#F4F6F8]"
+                  <UserAvatar
+                    src={profile.avatar}
+                    name={profile.name}
+                    email={profile.email}
+                    className="w-8 h-8 border border-[#F4F6F8]"
                   />
                   <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-[#36B37E] ring-1.5 ring-white" />
                 </div>
@@ -225,7 +227,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                 {/* User Name & Degree Subtitle matching Figma 122:3181 */}
                 <div className="hidden sm:flex flex-col text-left">
                   <span className="text-xs font-bold text-[#101828] leading-tight">
-                    {profile.name || 'Ingrid Bergman'}
+                    {profile.name || profile.email}
                   </span>
                   <span className="text-xs italic text-[#64748B] leading-tight mt-0.5">
                     {profile.degreeLevel || 'Masters'} • {profile.specializations?.[0] || 'UX & HCI'}

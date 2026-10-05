@@ -1,6 +1,7 @@
 import type { Prisma, User } from '@prisma/client';
 import { prisma } from './prisma';
 import type { AuthSessionUser } from './auth';
+import { gravatarUrl } from './avatar';
 
 export function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
@@ -57,7 +58,7 @@ export function toSessionUser(user: User): AuthSessionUser {
     id: user.id,
     email: user.email,
     name: user.name,
-    avatar: user.avatar ?? undefined,
+    avatar: user.avatar || gravatarUrl(user.email),
     googleId: user.googleId ?? undefined,
     onboardingCompleted: user.onboardingCompleted,
   };

@@ -11,7 +11,6 @@ import {
   AuthPasswordInput,
   AuthSubmitButton,
   GoogleButton,
-  TermsCheckbox,
 } from '@/components/auth/auth-layout';
 import { postJson, startGoogleSignIn, useFinishSignIn, useGoogleError } from '@/components/auth/use-auth-flow';
 
@@ -21,7 +20,6 @@ export function PasswordLogin() {
   const finishSignIn = useFinishSignIn();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [agreeTerms, setAgreeTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [error, setError] = useState('');
@@ -32,7 +30,6 @@ export function PasswordLogin() {
     setError('');
     if (!email.trim() || !email.includes('@')) return setError('Please enter a valid email address');
     if (!password) return setError('Please enter your password');
-    if (!agreeTerms) return setError('Please agree to the Terms of Service and Privacy Policy to continue');
 
     setIsLoading(true);
     try {
@@ -54,7 +51,7 @@ export function PasswordLogin() {
               setIsGoogleLoading(true);
               startGoogleSignIn();
             }}
-            disabled={!agreeTerms || isGoogleLoading || isLoading}
+            disabled={isGoogleLoading || isLoading}
             isLoading={isGoogleLoading}
           />
           <AuthFooterLink prompt="Don’t have an account?" href="/signup" label="Sign up now!" />
@@ -92,10 +89,9 @@ export function PasswordLogin() {
                 Forgot password?
               </Link>
             </div>
-            <TermsCheckbox checked={agreeTerms} onCheckedChange={setAgreeTerms} />
           </div>
 
-          <AuthSubmitButton disabled={!agreeTerms || isLoading || isGoogleLoading}>
+          <AuthSubmitButton disabled={isLoading || isGoogleLoading}>
             {isLoading ? 'Logging in...' : 'Login'}
           </AuthSubmitButton>
         </form>
