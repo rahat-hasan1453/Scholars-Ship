@@ -12,7 +12,6 @@ import {
   AuthMessage,
   AuthSubmitButton,
   GoogleButton,
-  TermsCheckbox,
 } from '@/components/auth/auth-layout';
 
 // Figma: zLYU2tCsLDvZNnUXk7Cpgw — email step adapted from Login (179:1438), code step = OTP Verification (179:5183).
@@ -34,7 +33,6 @@ export function CodeLogin() {
   const [step, setStep] = useState<'email' | 'code'>('email');
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
-  const [agreeTerms, setAgreeTerms] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [isSending, setIsSending] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -91,10 +89,6 @@ export function CodeLogin() {
       setError('Please enter a valid email address');
       return;
     }
-    if (!agreeTerms) {
-      setError("Please agree to the Terms of Service and Privacy Policy to continue");
-      return;
-    }
     sendCode();
   };
 
@@ -149,7 +143,7 @@ export function CodeLogin() {
         <GoogleButton
           caption={step === 'email' ? 'Or continue with' : undefined}
           onClick={handleGoogleAuth}
-          disabled={!agreeTerms || isGoogleLoading || isSending || isVerifying}
+          disabled={isGoogleLoading || isSending || isVerifying}
           isLoading={isGoogleLoading}
         />
       }
@@ -172,10 +166,9 @@ export function CodeLogin() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              <TermsCheckbox checked={agreeTerms} onCheckedChange={setAgreeTerms} />
             </div>
 
-            <AuthSubmitButton disabled={!agreeTerms || isSending || isGoogleLoading}>
+            <AuthSubmitButton disabled={isSending || isGoogleLoading}>
               {isSending ? 'Sending code...' : 'Continue with email'}
             </AuthSubmitButton>
           </form>

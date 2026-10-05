@@ -4,10 +4,8 @@ import { useState, type ComponentProps, type ReactNode } from 'react';
 import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/shadcn/button';
-import { Checkbox } from '@/components/shadcn/checkbox';
 import { Input } from '@/components/shadcn/input';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/shadcn/input-otp';
-import { Label } from '@/components/shadcn/label';
 import { cn } from '@/lib/utils';
 
 // Shared shell for the auth screens — Figma: Signup 167:2884, OTP 179:5183, Login 179:1438.
@@ -107,21 +105,6 @@ export function AuthSubmitButton({ className, ...props }: ComponentProps<typeof 
   return <Button type="submit" className={cn('h-9 w-full rounded-[6px] px-2 font-[510] leading-5', className)} {...props} />;
 }
 
-/* Terms checkbox 185:6594 */
-export function TermsCheckbox({ checked, onCheckedChange }: { checked: boolean; onCheckedChange: (v: boolean) => void }) {
-  return (
-    <div className="flex items-center gap-2">
-      <Checkbox id="terms" checked={checked} onCheckedChange={(v) => onCheckedChange(v === true)} className="shadow-none" />
-      <Label htmlFor="terms" className="text-xs font-normal italic leading-4 text-text-body">
-        <span>
-          I agree to Scholars&apos;ship&apos;s <span className="text-brand-primary">Terms of Service</span> and{' '}
-          <span className="text-brand-primary">Privacy Policy</span>.
-        </span>
-      </Label>
-    </div>
-  );
-}
-
 export function AuthMessage({ error, success }: { error?: string; success?: string }) {
   if (error) {
     return (
@@ -185,7 +168,7 @@ export function GoogleButton({
     >
       <img src="/signup/google.svg" alt="" className="size-[31px]" />
       <span className="flex flex-col items-start gap-0.5">
-        {caption && <span className="text-[10px] italic leading-4 text-text-caption">{caption}</span>}
+        {caption && <span className="text-[10px] italic leading-4 text-[#64748b]">{caption}</span>}
         <span className="text-sm leading-[18px] text-text-secondary">{isLoading ? 'Connecting...' : 'Continue with Google'}</span>
       </span>
     </Button>
@@ -217,7 +200,7 @@ export function AuthLayout({ children, footer }: { children: ReactNode; footer: 
       </div>
 
       {/* Right canvas — card centred at x = 1280 of 1728 */}
-      <main className="flex flex-1 items-center justify-center px-4 py-8 lg:pl-[22px] lg:pr-0 lg:py-10">
+      <main className="relative flex flex-1 flex-col items-center justify-center gap-4 px-4 py-8 lg:pl-[22px] lg:pr-0 lg:py-10">
         <div className="w-full max-w-[472px] overflow-hidden">
           <div className="flex w-full flex-col gap-2.5 rounded-t-[24px] bg-surface-white px-6 py-9">
             <BrandLogo />
@@ -241,7 +224,24 @@ export function AuthLayout({ children, footer }: { children: ReactNode; footer: 
             </div>
           </div>
         </div>
+
+        <LegalLinks />
       </main>
     </div>
+  );
+}
+
+/* Terms + Privacy, bottom-right of the auth screen (replaces the old consent checkbox) */
+function LegalLinks() {
+  const linkClass = 'h-auto p-0 text-xs font-normal leading-4 text-text-secondary hover:text-brand-primary hover:no-underline';
+  return (
+    <nav aria-label="Legal" className="flex items-center gap-4 self-end lg:absolute lg:bottom-4 lg:right-6">
+      <Button asChild variant="link" className={linkClass}>
+        <Link href="/terms">Terms of Service</Link>
+      </Button>
+      <Button asChild variant="link" className={linkClass}>
+        <Link href="/privacy">Privacy Policy</Link>
+      </Button>
+    </nav>
   );
 }

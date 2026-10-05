@@ -3,8 +3,7 @@
 import React from 'react';
 import { BriefcaseBusiness, LifeBuoy, type LucideIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
-
-const FALLBACK_AVATAR = '/profile/avatar-fallback.png';
+import { UserAvatar } from '@/components/UserAvatar';
 
 /** Lets header menu items open My Profile on a specific view (Edit Profile, Pipeline) */
 export const PROFILE_VIEW_EVENT = 'open-profile-view';
@@ -82,13 +81,11 @@ export const ProfileMenuDropdown: React.FC<{ onClose: () => void }> = ({ onClose
       className="absolute right-0 top-full z-50 mt-2 flex w-max min-w-[197px] max-w-[280px] flex-col items-start rounded-[10px] border border-[#e1e8f0] bg-white shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-2px_rgba(0,0,0,0.1)] animate-in fade-in slide-in-from-top-2 duration-150"
     >
       <div className="flex w-full items-center gap-[8px] border-b border-[#e1e8f0] px-[10px] py-[4px]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={profile.avatar || FALLBACK_AVATAR}
-          alt=""
-          width={36}
-          height={36}
-          className="size-[36px] shrink-0 rounded-full border border-[#f4f6f8] object-cover"
+        <UserAvatar
+          src={profile.avatar}
+          name={profile.name}
+          email={profile.email}
+          className="size-[36px] border border-[#f4f6f8]"
         />
         <div className="flex min-w-0 flex-1 flex-col justify-center">
           <p className="-mb-[2px] truncate text-[16px] leading-[24px] font-[590] text-[#101828]">

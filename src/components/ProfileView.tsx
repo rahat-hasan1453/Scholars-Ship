@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { BookOpen, FileText, GraduationCap, Lock, User, type LucideIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
+import { UserAvatar } from '@/components/UserAvatar';
 import { cn } from '@/lib/utils';
 import type { DegreeLevel, ResearchPaper } from '@/types';
 import { WORLD_COUNTRIES } from '@/data/countries';
@@ -35,7 +36,6 @@ import {
 type ProfileTab = 'overview' | 'saved' | 'pipeline' | 'documents' | 'account';
 type SettingsSection = 'personal' | 'academic' | 'preferences' | 'documents' | 'account';
 
-const FALLBACK_AVATAR = '/profile/avatar-fallback.png';
 
 const DEGREE_LABELS: Record<DegreeLevel, string> = {
   Bachelors: 'Bachelors (BS / BSc)',
@@ -127,7 +127,7 @@ const ProfileBanner: React.FC<{
   name: string;
   subtitle: string;
   contact: string;
-  avatar: string;
+  avatar?: string;
   onUpdateResume: () => void;
   onEdit: () => void;
 }> = ({ name, subtitle, contact, avatar, onUpdateResume, onEdit }) => (
@@ -141,17 +141,7 @@ const ProfileBanner: React.FC<{
       />
     </div>
     <div className="relative flex min-w-0 flex-1 items-center gap-[20px]">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={avatar}
-        alt={name}
-        width={96}
-        height={96}
-        className="size-[72px] shrink-0 rounded-full object-cover md:size-[96px]"
-        onError={(e) => {
-          if (!e.currentTarget.src.endsWith(FALLBACK_AVATAR)) e.currentTarget.src = FALLBACK_AVATAR;
-        }}
-      />
+      <UserAvatar src={avatar} name={name} email={contact} alt={name} className="size-[72px] md:size-[96px]" />
       <div className="flex min-w-0 flex-1 flex-col items-start gap-[4px]">
         <h1 className="w-full truncate text-[24px] leading-[32px] font-[590] text-[#101828]">{name}</h1>
         <div className="flex min-w-0 flex-col items-start gap-[2px]">
@@ -430,7 +420,7 @@ const SettingsView: React.FC<{
   form: SettingsForm;
   setForm: React.Dispatch<React.SetStateAction<SettingsForm>>;
   email: string;
-  avatar: string;
+  avatar?: string;
   interests: string[];
   countries: string[];
   onChangePhoto: (dataUrl: string) => void;
@@ -479,17 +469,7 @@ const SettingsView: React.FC<{
                 description="This is how professors and providers see you when you contact them."
               />
               <div className="flex flex-wrap items-center gap-[16px]">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={avatar}
-                  alt=""
-                  width={64}
-                  height={64}
-                  className="size-[64px] rounded-full object-cover"
-                  onError={(e) => {
-                    if (!e.currentTarget.src.endsWith(FALLBACK_AVATAR)) e.currentTarget.src = FALLBACK_AVATAR;
-                  }}
-                />
+                <UserAvatar src={avatar} name={form.name} email={email} className="size-[64px]" />
                 <input
                   ref={photoInput}
                   type="file"
@@ -641,7 +621,7 @@ export const ProfileView: React.FC<{ onNavigateToTracker?: () => void }> = () =>
   const [section, setSection] = useState<SettingsSection>('personal');
   const [saved, setSaved] = useState(false);
 
-  const avatar = profile.avatar || FALLBACK_AVATAR;
+  const avatar = profile.avatar;
   const interests = profile.specializations?.length ? profile.specializations : ['UX Design', 'HCI'];
   const countries = profile.targetCountries?.length ? profile.targetCountries : ['Germany'];
 

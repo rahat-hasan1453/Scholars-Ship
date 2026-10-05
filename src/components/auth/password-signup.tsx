@@ -12,7 +12,6 @@ import {
   AuthSubmitButton,
   CodeStepActions,
   GoogleButton,
-  TermsCheckbox,
 } from '@/components/auth/auth-layout';
 import { postJson, RESEND_COOLDOWN_SECONDS, startGoogleSignIn, useCooldown, useFinishSignIn, useGoogleError } from '@/components/auth/use-auth-flow';
 
@@ -27,7 +26,6 @@ export function PasswordSignup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [agreeTerms, setAgreeTerms] = useState(false);
   const [code, setCode] = useState('');
   const [resendCooldown, setResendCooldown] = useCooldown();
   const [isSending, setIsSending] = useState(false);
@@ -69,7 +67,6 @@ export function PasswordSignup() {
     if (!cleanEmail || !cleanEmail.includes('@')) return setError('Please enter a valid email address');
     if (password.length < MIN_PASSWORD) return setError(`Password must be at least ${MIN_PASSWORD} characters (numbers only is fine)`);
     if (password !== confirmPassword) return setError('Passwords do not match');
-    if (!agreeTerms) return setError('Please agree to the Terms of Service and Privacy Policy to continue');
     sendCode();
   };
 
@@ -99,7 +96,7 @@ export function PasswordSignup() {
               setIsGoogleLoading(true);
               startGoogleSignIn();
             }}
-            disabled={!agreeTerms || isGoogleLoading || isSending || isVerifying}
+            disabled={isGoogleLoading || isSending || isVerifying}
             isLoading={isGoogleLoading}
           />
           <AuthFooterLink prompt="Already have an account?" href="/login" label="Log in Now!" />
@@ -142,10 +139,9 @@ export function PasswordSignup() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
-              <TermsCheckbox checked={agreeTerms} onCheckedChange={setAgreeTerms} />
             </div>
 
-            <AuthSubmitButton disabled={!agreeTerms || isSending || isGoogleLoading}>
+            <AuthSubmitButton disabled={isSending || isGoogleLoading}>
               {isSending ? 'Sending code...' : 'Create Account'}
             </AuthSubmitButton>
           </form>

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, ArrowRight, Check, CircleHelp } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Info, Mail } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { DegreeLevel } from '@/types';
 import { WORLD_COUNTRIES } from '@/data/countries';
@@ -92,15 +92,16 @@ function SpecializationChip({ label, selected, onClick }: { label: string; selec
       type="button"
       onClick={onClick}
       aria-pressed={selected}
+      title={label}
       className={cn(
-        'flex shrink-0 items-center gap-1.5 rounded-full px-[14px] py-1.5 text-xs leading-4 tracking-[-0.192px] outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+        'flex max-w-[260px] shrink-0 items-center gap-1.5 rounded-full px-[14px] py-1.5 text-xs leading-4 tracking-[-0.192px] outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
         selected
           ? 'bg-brand-primary font-semibold text-white shadow-[0_1px_0_rgba(0,0,0,0.05)]'
           : 'bg-chip-bg font-medium text-slate-700',
       )}
     >
-      {label}
-      {selected ? <Check className="size-[14px]" /> : <span>+</span>}
+      <span className="min-w-0 truncate">{label}</span>
+      {selected ? <Check className="size-[14px] shrink-0" /> : <span className="shrink-0">+</span>}
     </button>
   );
 }
@@ -173,17 +174,17 @@ function ScoreCard({
   onChange: (v: string) => void;
 }) {
   return (
-    <label className="flex h-[142px] min-w-0 flex-1 flex-col justify-between rounded-[10px] bg-surface-bg px-2 py-4">
+    <label className="flex h-[142px] min-w-0 flex-1 flex-col justify-between rounded-[10px] border border-[#e2e8f0] bg-[#fafafa] px-2 py-4">
       <span className="text-xs font-bold leading-4 tracking-[-0.192px] text-slate-700">{label}</span>
       <span className="flex flex-col gap-1">
         <Input
           inputMode="decimal"
           value={value}
-          placeholder={placeholder}
+          placeholder={hint}
+          aria-describedby={undefined}
           onChange={(e) => onChange(e.target.value.replace(/[^0-9.]/g, ''))}
           className={fieldClass}
         />
-        <span className="text-[11px] font-normal leading-[16.5px] tracking-[-0.1275px] text-slate-500">{hint}</span>
       </span>
     </label>
   );
@@ -281,6 +282,8 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ isStandalonePage
   const [extraCountries, setExtraCountries] = useState<string[]>(() =>
     countries.filter((c) => !FIGMA_COUNTRY_VALUES.includes(c)),
   );
+  const allCountryValues = [...MAIN_COUNTRIES.map((c) => c.value), ...extraCountries];
+  const allCountriesSelected = allCountryValues.length > 0 && allCountryValues.every((v) => countries.includes(v));
 
   const closeCustomSpec = () => {
     const value = customSpec.trim();
@@ -417,26 +420,38 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ isStandalonePage
                 <StepHeading
                   title="Let’s begin with your scholar profile"
                   subtitle="Enter your name and contact details to register your application dashboard."
-                  titleClass="max-w-[211px]"
+                  titleClass="max-w-[200px]"
                 />
                 <div className="flex w-full flex-col gap-4">
-                  <Input aria-label="Full name" placeholder="Enter Your Name" value={name} onChange={(e) => setName(e.target.value)} className={fieldClass} />
-                  <Input
-                    aria-label="Email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={email}
-                    // Verified sign-in email: read-only once the session provides it (the API saves the session email anyway).
-                    readOnly={emailLocked}
-                    aria-readonly={emailLocked}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className={cn(fieldClass, 'placeholder:text-text-placeholder', emailLocked && 'cursor-default text-text-placeholder')}
-                  />
+                  {emailLocked ? (
+                    // Figma 295:5183: verified sign-in email as a read-only grey box, helper text inside it
+                    <div className="flex w-full flex-col gap-1 rounded-[8px] bg-[#f8fafc] p-2">
+                      <p aria-label="Email" className="flex items-center gap-1.5 text-base leading-5 text-[#627181]">
+                        <Mail aria-hidden className="size-3.5 shrink-0" strokeWidth={1.5} />
+                        <span className="min-w-0 truncate">{email}</span>
+                      </p>
+                      <p className="text-xs italic leading-4 text-[#64748b]">
+                        Used for deadline alerts and application tracking summaries.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="flex w-full flex-col gap-1">
+                      <Input
+                        aria-label="Email"
+                        type="email"
+                        placeholder="you@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className={cn(fieldClass, 'placeholder:text-text-placeholder')}
+                      />
+                      <p className="text-xs italic leading-4 text-[#64748b]">
+                        Used for deadline alerts and application tracking summaries.
+                      </p>
+                    </div>
+                  )}
+                  <Input aria-label="Full name" placeholder="Enter Your Name*" value={name} onChange={(e) => setName(e.target.value)} className={fieldClass} />
                 </div>
               </div>
-              <p className="w-full text-xs leading-4 text-text-secondary">
-                Used for deadline alerts and application tracking summaries.
-              </p>
             </div>
           )}
 
@@ -568,6 +583,23 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ isStandalonePage
                     </Command>
                   </PopoverContent>
                 </Popover>
+                <label className="col-span-1 flex h-[46px] cursor-pointer items-center gap-2 px-1 text-xs leading-4 text-slate-600 sm:col-span-1">
+                  <Checkbox
+                    checked={allCountriesSelected}
+                    onCheckedChange={(v) => setCountries(v ? allCountryValues : [])}
+                    aria-label="Select all countries"
+                  />
+                  Select All
+                </label>
+              </div>
+              <div className="flex w-full justify-end">
+                <button
+                  type="button"
+                  onClick={() => setCountries([])}
+                  className="text-xs leading-4 text-brand-primary underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:ring-ring/50 outline-none cursor-pointer"
+                >
+                  Reset
+                </button>
               </div>
             </div>
           )}
@@ -591,9 +623,9 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ isStandalonePage
                     onChange={setGre}
                   />
                 </div>
-                <div className="flex w-full items-start gap-2 rounded-[8px] border border-warning-main bg-warning-lightest p-3">
-                  <CircleHelp className="mt-0.5 size-3 shrink-0 text-warning-main" />
-                  <p className="min-w-0 flex-1 text-xs leading-4 tracking-[-0.192px] text-warning-darker">
+                <div className="flex w-full items-start gap-2 rounded-[8px] bg-[#ebf2ff] p-3">
+                  <Info aria-hidden className="mt-0.5 size-3 shrink-0 text-[#234e94]" strokeWidth={1.5} />
+                  <p className="min-w-0 flex-1 text-xs leading-4 tracking-[-0.192px] text-[#234e94]">
                     HighScholar automatically matches your scores against historical admission cut-offs and flags scholarships where you exceed requirements!
                   </p>
                 </div>

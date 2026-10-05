@@ -8,6 +8,7 @@ import { HeaderGlobalSearch } from '@/components/layout/HeaderGlobalSearch';
 import { MenuIcon } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group';
 import { MultiSelectField } from '@/components/layout/MultiSelectField';
+import { UserAvatar } from '@/components/UserAvatar';
 
 export const ALL_SUBJECTS = [
   'UX & Product Design',
@@ -157,19 +158,21 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
             type="button"
             onClick={() => setIsProfileMenuOpen((prev) => !prev)}
             aria-expanded={isProfileMenuOpen}
+            aria-label={`Account menu for ${profile.name || 'your account'}`}
             className="flex h-11 items-center gap-2 rounded-lg px-2 py-1 text-left cursor-pointer hover:bg-slate-50 transition-colors"
           >
             <span className="relative size-8 shrink-0">
-              <img
-                src={profile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80'}
-                alt={profile.name || 'User'}
-                className="size-8 rounded-full object-cover border-[0.667px] border-[#f4f6f8]"
+              <UserAvatar
+                src={profile.avatar}
+                name={profile.name}
+                email={profile.email}
+                className="size-8 border-[0.667px] border-[#f4f6f8]"
               />
               <span className="absolute bottom-[1.33px] right-[1.33px] size-[6.667px] rounded-full bg-success-main border-[0.667px] border-white" />
             </span>
             <span className="hidden sm:flex w-[145px] flex-col gap-1">
               <span className="truncate text-[12px] leading-4 font-bold tracking-[-0.192px] text-text-primary">
-                {profile.name || 'Ingrid Bergman'}
+                {profile.name || profile.email}
               </span>
               <span className="truncate text-[12px] leading-4 italic tracking-[-0.192px] text-text-secondary">
                 {profile.degreeLevel || 'Masters'} • {profile.specializations?.[0] || 'UX & HCI'}

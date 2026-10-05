@@ -5,7 +5,6 @@ async function requestCode(page: Page, email = TEST_EMAIL) {
   await page.goto('/login');
   await page.waitForLoadState('networkidle'); // let React hydrate before typing (Firefox + dev server is slow)
   await page.getByLabel('Email').fill(email);
-  await page.getByRole('checkbox').check(); // Terms must be accepted (PR #9)
   await page.getByRole('button', { name: 'Continue with email' }).click();
   await expect(page.getByRole('heading', { name: 'Verify your email' })).toBeVisible();
 }
@@ -90,7 +89,6 @@ test.describe('Passwordless sign-in', () => {
     await page.goto('/login');
     await page.waitForLoadState('networkidle');
     await page.getByLabel('Email').fill('a@b');
-    await page.getByRole('checkbox').check();
     await page.getByRole('button', { name: 'Continue with email' }).click();
     await expect(page.getByText('Please enter a valid email address.')).toBeVisible();
     expect(backend.sendCodeCalls).toEqual([]);
@@ -104,20 +102,22 @@ test.describe('Passwordless sign-in', () => {
     await expect(page.getByText('Google sign-in failed. Please try again or use your email.')).toBeVisible();
   });
 
-  // BUG-16 (fixed in PR #9): Terms start unticked; email and Google are disabled until accepted.
-  test('cannot continue without accepting the Terms', async ({ page }) => {
-    const backend = await installFakeBackend(page);
+  // The Terms checkbox was removed; buttons work right away and the legal pages are linked instead.
+  test('no Terms checkbox; Terms and Privacy links open their pages', async ({ page }) => {
+    await installFakeBackend(page);
     await page.goto('/login');
     await page.waitForLoadState('networkidle');
-    await page.getByLabel('Email').fill(TEST_EMAIL);
-    await expect(page.getByRole('checkbox')).not.toBeChecked();
-    await expect(page.getByRole('button', { name: 'Continue with email' })).toBeDisabled();
-    await expect(page.getByRole('button', { name: /Google/ })).toBeDisabled();
-    await page.getByLabel('Email').press('Enter');
-    expect(backend.sendCodeCalls).toEqual([]);
-    await page.getByRole('checkbox').check();
+    await expect(page.getByRole('checkbox')).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Continue with email' })).toBeEnabled();
     await expect(page.getByRole('button', { name: /Google/ })).toBeEnabled();
+    const legal = page.getByRole('navigation', { name: 'Legal' });
+    await legal.getByRole('link', { name: 'Terms of Service' }).click();
+    await expect(page).toHaveURL(/\/terms$/);
+    await expect(page.getByRole('heading', { name: 'Terms of Service' })).toBeVisible();
+    await page.goto('/login');
+    await page.getByRole('navigation', { name: 'Legal' }).getByRole('link', { name: 'Privacy Policy' }).click();
+    await expect(page).toHaveURL(/\/privacy$/);
+    await expect(page.getByRole('heading', { name: 'Privacy Policy' })).toBeVisible();
   });
 });
 
