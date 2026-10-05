@@ -9,9 +9,10 @@ import { initialResearchPapers } from '@/data/researchPapers';
 import { UnifiedDiscoveryHeader } from '@/components/layout/UnifiedDiscoveryHeader';
 import { ResearchPaperCard } from '@/components/ResearchPaperCard';
 import { ResearchPaperDetailsModal } from '@/components/research-paper-details/ResearchPaperDetailsModal';
-import { ShortsPager } from '@/components/opportunity-feed/ShortsPager';
-import { OpportunityListBar, ViewMode } from '@/components/opportunity-feed/OpportunityListBar';
-import { useFeedGrid, FEED_CARD_HEIGHT, FEED_CARD_GAP } from '@/hooks/useFeedGrid';
+import { FeedShell } from '@/components/opportunity-feed/FeedShell';
+import { FeedGrid, FeedSkeleton } from '@/components/opportunity-feed/FeedGrid';
+import { OpportunityListBar, MatchMode, ViewMode } from '@/components/opportunity-feed/OpportunityListBar';
+import { isPaperEligible } from '@/lib/eligibility';
 import { relevance } from '@/lib/researchPapers';
 import { formatPercentRange } from '@/lib/utils';
 
@@ -25,13 +26,13 @@ const DEFAULT_FUNDING = ['Safe Regional'];
 
 export const ResearchPapersFeed: React.FC = () => {
   const { globalSearchQuery, profile } = useApp();
-  const grid = useFeedGrid();
 
   const [selectedSubjects, setSelectedSubjects] = useSessionState<string[]>('research:subjects', DEFAULT_SUBJECTS);
   const [selectedDegrees, setSelectedDegrees] = useSessionState<string[]>('research:degrees', DEFAULT_DEGREES);
   const [selectedCountries, setSelectedCountries] = useSessionState<string[]>('research:countries', DEFAULT_COUNTRIES);
   const [selectedFunding, setSelectedFunding] = useSessionState<string[]>('research:funding', DEFAULT_FUNDING);
   const [viewMode, setViewMode] = useSessionState<ViewMode>('research:view', 'grid');
+  const [matchMode, setMatchMode] = useSessionState<MatchMode>('research:match', 'all');
   const [papers, setPapers] = useState<ResearchPaper[] | null>(null);
 
   // Open paper lives in the URL (?tab=research&paper=<id>) so it can be shared and Back closes it.
@@ -104,6 +105,9 @@ export const ResearchPapersFeed: React.FC = () => {
         if (!inTitle && !inAbstract && !inVenue && !inAuthors && !inFields && !inTags) return false;
       }
 
+      // Eligible Now: papers have no admission rules, so this keeps the ones relevant to the student's interests
+      if (matchMode === 'eligible' && !isPaperEligible(paper, profile)) return false;
+
       // 2. Subject filter
       if (selectedSubjects.length > 0) {
         const paperFields = [...(paper.fieldsOfStudy || []), ...(paper.tags || [])];
@@ -123,10 +127,10 @@ export const ResearchPapersFeed: React.FC = () => {
 
       return true;
     });
-  }, [papers, globalSearchQuery, selectedSubjects]);
+  }, [papers, globalSearchQuery, matchMode, profile, selectedSubjects]);
 
-  // Any filter/search change sends the pager back to page 1
-  const resetKey = JSON.stringify([globalSearchQuery, selectedSubjects, viewMode]);
+  // Any filter, search or mode change scrolls the cards back to the top
+  const scrollResetKey = JSON.stringify([globalSearchQuery, selectedSubjects, matchMode, viewMode]);
 
   const resetFilters = () => {
     setSelectedSubjects(DEFAULT_SUBJECTS);
@@ -134,8 +138,6 @@ export const ResearchPapersFeed: React.FC = () => {
     setSelectedCountries(DEFAULT_COUNTRIES);
     setSelectedFunding(DEFAULT_FUNDING);
   };
-
-  const cols = viewMode === 'list' ? 1 : grid.cols;
 
   // Search the full list so a deep link works even when filters hide that paper
   const openPaperData = useMemo(
@@ -153,21 +155,22 @@ export const ResearchPapersFeed: React.FC = () => {
   }, [papers, openPaperId, openPaperData]);
 
   return (
-    // Fixed-height shell: only the card area moves, header + list bar stay put
-    <div className="relative h-scaled-screen flex flex-col min-w-0 lg:py-5 lg:pl-5 lg:pr-[30px]">
-      <div className="flex-1 min-h-0 flex flex-col bg-white lg:rounded-[16px] overflow-hidden">
-        <UnifiedDiscoveryHeader
-          selectedSubjects={selectedSubjects}
-          setSelectedSubjects={setSelectedSubjects}
-          selectedDegrees={selectedDegrees}
-          setSelectedDegrees={setSelectedDegrees}
-          selectedCountries={selectedCountries}
-          setSelectedCountries={setSelectedCountries}
-          selectedFunding={selectedFunding}
-          setSelectedFunding={setSelectedFunding}
-        />
-
-        <section className="flex-1 min-h-0 flex flex-col gap-5 p-5">
+    <>
+      <FeedShell
+        scrollResetKey={scrollResetKey}
+        header={
+          <UnifiedDiscoveryHeader
+            selectedSubjects={selectedSubjects}
+            setSelectedSubjects={setSelectedSubjects}
+            selectedDegrees={selectedDegrees}
+            setSelectedDegrees={setSelectedDegrees}
+            selectedCountries={selectedCountries}
+            setSelectedCountries={setSelectedCountries}
+            selectedFunding={selectedFunding}
+            setSelectedFunding={setSelectedFunding}
+          />
+        }
+        listBar={
           <OpportunityListBar
             title="Research Paper List"
             count={filteredPapers.length}
@@ -177,62 +180,42 @@ export const ResearchPapersFeed: React.FC = () => {
             )}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
+            matchMode={matchMode}
+            onMatchModeChange={setMatchMode}
           />
-
-          {papers === null ? (
-            <div
-              role="status"
-              aria-busy
-              aria-label="Loading research papers"
-              className="grid"
-              style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gap: FEED_CARD_GAP }}
+        }
+      >
+        {papers === null ? (
+          <FeedSkeleton viewMode={viewMode} label="Loading research papers" />
+        ) : filteredPapers.length === 0 ? (
+          <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center">
+            <div className="w-12 h-12 rounded-full bg-[#EDE9FE] text-[#7150E7] flex items-center justify-center">
+              <FilterIcon size={24} />
+            </div>
+            <h3 className="text-base font-bold text-[#101828]">No matching research papers found</h3>
+            <p className="text-xs text-[#667085] max-w-md">
+              {matchMode === 'eligible'
+                ? 'None of these match your current interests. Switch to "All" to see every paper.'
+                : 'Try broadening your subject filter or search query to explore trending academic publications.'}
+            </p>
+            <button
+              type="button"
+              onClick={resetFilters}
+              className="px-4 py-2 bg-[#7150E7] text-white text-xs font-semibold rounded-full hover:bg-[#5f3fd6] transition-colors cursor-pointer"
             >
-              {Array.from({ length: cols * grid.rows }, (_, i) => (
-                <div
-                  key={i}
-                  className="rounded-[16px] border-[0.5px] border-[#f1f1f1] bg-[#fafafa] animate-pulse motion-reduce:animate-none"
-                  style={{ height: FEED_CARD_HEIGHT }}
-                />
-              ))}
-            </div>
-          ) : filteredPapers.length === 0 ? (
-            <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center">
-              <div className="w-12 h-12 rounded-full bg-[#EDE9FE] text-[#7150E7] flex items-center justify-center">
-                <FilterIcon size={24} />
-              </div>
-              <h3 className="text-base font-bold text-[#101828]">No matching research papers found</h3>
-              <p className="text-xs text-[#667085] max-w-md">
-                Try broadening your subject filter or search query to explore trending academic publications.
-              </p>
-              <button
-                type="button"
-                onClick={resetFilters}
-                className="px-4 py-2 bg-[#7150E7] text-white text-xs font-semibold rounded-full hover:bg-[#5f3fd6] transition-colors cursor-pointer"
-              >
-                Reset to Default Filters
-              </button>
-            </div>
-          ) : (
-            <ShortsPager<ResearchPaper>
-              key={resetKey}
-              items={filteredPapers}
-              cols={cols}
-              rows={grid.rows}
-              getKey={(p) => p.id}
-              renderItem={(p) => <ResearchPaperCard paper={p} onOpen={openPaper} />}
-              renderIndicator={(indicator) =>
-                indicator && (
-                  <div className="absolute right-[9px] top-1/2 -translate-y-1/2 z-10 hidden lg:block">
-                    {indicator}
-                  </div>
-                )
-              }
-            />
-          )}
-        </section>
-      </div>
+              Reset to Default Filters
+            </button>
+          </div>
+        ) : (
+          <FeedGrid viewMode={viewMode}>
+            {filteredPapers.map((p) => (
+              <ResearchPaperCard key={p.id} paper={p} onOpen={openPaper} />
+            ))}
+          </FeedGrid>
+        )}
+      </FeedShell>
 
       <ResearchPaperDetailsModal paper={openPaperData} onClose={closePaper} />
-    </div>
+    </>
   );
 };

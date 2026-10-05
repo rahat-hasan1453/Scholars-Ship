@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Professor } from '@/types';
-import { FEED_CARD_HEIGHT } from '@/hooks/useFeedGrid';
+import { FEED_CARD_HEIGHT } from '@/components/opportunity-feed/FeedGrid';
 
 interface FacultyLabCardProps {
   professor: Professor;

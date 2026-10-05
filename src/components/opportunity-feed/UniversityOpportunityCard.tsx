@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { CardHeader } from '@/components/opportunity-feed/CardHeader';
 import type { Opportunity } from '@/types';
 import { countryFlagSrc, countryShortLabel } from '@/lib/opportunityDetails';
-import { FEED_CARD_HEIGHT } from '@/hooks/useFeedGrid';
+import { FEED_CARD_HEIGHT } from '@/components/opportunity-feed/FeedGrid';
 
 interface UniversityOpportunityCardProps {
   opportunity: Opportunity;
