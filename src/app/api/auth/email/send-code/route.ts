@@ -54,7 +54,8 @@ export async function POST(req: Request) {
       console.log(`[HighScholar Auth] Sign-in code for ${normalizedEmail}: ${issued.code}`);
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || new URL(req.url).origin;
+    // The logo in the email must load from the host that actually serves it, so prefer the request's own origin over the env var.
+    const appUrl = new URL(req.url).origin;
     const emailResult = await sendOtpEmail(normalizedEmail, issued.code, appUrl);
     // Local dev without email credentials: the code is already printed to the server log above.
     if (!emailResult.success && emailResult.notConfigured && process.env.NODE_ENV === 'development') {
