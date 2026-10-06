@@ -4,6 +4,19 @@ export interface SendEmailOptions {
   to: string;
   subject: string;
   html: string;
+  /** Plain-text alternative; generated from the HTML when omitted (mail without one is more likely to land in spam) */
+  text?: string;
+}
+
+function htmlToText(html: string): string {
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<br\s*\/?>|<\/(p|div|h[1-6]|tr)>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }
 
 export async function sendOtpEmail(toEmail: string, otpCode: string, appUrl: string, name?: string): Promise<{ success: boolean; error?: string; notConfigured?: boolean }> {
@@ -56,7 +69,7 @@ export async function sendOtpEmail(toEmail: string, otpCode: string, appUrl: str
   return sendEmail({ to: toEmail, subject: `${otpCode} is your Scholars'ship sign-in code`, html: htmlContent });
 }
 
-export async function sendEmail({ to, subject, html }: SendEmailOptions): Promise<{ success: boolean; error?: string; notConfigured?: boolean }> {
+export async function sendEmail({ to, subject, html, text }: SendEmailOptions): Promise<{ success: boolean; error?: string; notConfigured?: boolean }> {
   // 1. Check if Resend API Key is set
   const resendApiKey = process.env.RESEND_API_KEY;
   if (resendApiKey) {
@@ -72,6 +85,7 @@ export async function sendEmail({ to, subject, html }: SendEmailOptions): Promis
           to: [to],
           subject,
           html,
+          text: text ?? htmlToText(html),
         }),
       });
 
@@ -123,6 +137,7 @@ export async function sendEmail({ to, subject, html }: SendEmailOptions): Promis
         to,
         subject,
         html,
+        text: text ?? htmlToText(html),
       });
 
       console.log(`[Email] Sent "${subject}" via SMTP to ${to}`);
