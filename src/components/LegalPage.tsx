@@ -9,7 +9,7 @@ export function LegalPage({ title, children }: { title: string; children: ReactN
         ← Back
       </Link>
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-[510] leading-8 text-text-primary">{title}</h1>
+        <h1 className="text-2xl font-medium leading-8 text-text-primary">{title}</h1>
         <p className="text-sm leading-5 text-text-secondary">Draft — this page will be updated before launch.</p>
       </div>
       <div className="flex flex-col gap-4 text-sm leading-6 text-text-body">{children}</div>

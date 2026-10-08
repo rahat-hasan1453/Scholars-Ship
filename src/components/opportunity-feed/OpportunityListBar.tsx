@@ -69,7 +69,7 @@ export const OpportunityListBar: React.FC<OpportunityListBarProps> = ({
       </div>
       {acceptanceRange && (
         <p className="text-[14px] leading-[18px] text-[#627181] truncate">
-          <span className="font-bold italic" style={{ color: acceptanceColor }}>✓ {acceptanceRange}</span> {rangeLabel} on your customise filter
+          <span className="font-semibold italic" style={{ color: acceptanceColor }}>✓ {acceptanceRange}</span> {rangeLabel} on your customise filter
         </p>
       )}
     </div>

@@ -158,7 +158,7 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
               <span className="absolute bottom-[1.33px] right-[1.33px] size-[6.667px] rounded-full bg-success-main border-[0.667px] border-white" />
             </span>
             <span className="hidden sm:flex w-[145px] flex-col gap-1">
-              <span className="truncate text-[12px] leading-4 font-bold tracking-[-0.192px] text-text-primary">
+              <span className="truncate text-[12px] leading-4 font-semibold tracking-[-0.192px] text-text-primary">
                 {profile.name || profile.email}
               </span>
               <span className="truncate text-[12px] leading-4 italic tracking-[-0.192px] text-text-secondary">

@@ -138,7 +138,7 @@ export const ChromeExtensionDrawer: React.FC<ChromeExtensionDrawerProps> = ({ is
               <Puzzle className="w-5 h-5 text-amber-300" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900">Chrome Extension Simulator & API</h3>
+              <h3 className="text-base font-semibold text-slate-900">Chrome Extension Simulator & API</h3>
               <p className="text-xs text-slate-500">Phase 6: Ingest Opportunities via External Scraper</p>
             </div>
           </div>
@@ -159,7 +159,7 @@ export const ChromeExtensionDrawer: React.FC<ChromeExtensionDrawerProps> = ({ is
               POST /api/{activeTab}s
             </code>
           </div>
-          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+          <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
             Key Authenticated
           </span>
         </div>
@@ -168,7 +168,7 @@ export const ChromeExtensionDrawer: React.FC<ChromeExtensionDrawerProps> = ({ is
         <div className="flex border-b border-slate-200 px-5 pt-3 gap-2">
           <button
             onClick={() => setActiveTab('scholarship')}
-            className={`pb-2.5 text-xs font-bold border-b-2 transition-all ${
+            className={`pb-2.5 text-xs font-semibold border-b-2 transition-all ${
               activeTab === 'scholarship'
                 ? 'border-indigo-600 text-indigo-900'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
@@ -178,7 +178,7 @@ export const ChromeExtensionDrawer: React.FC<ChromeExtensionDrawerProps> = ({ is
           </button>
           <button
             onClick={() => setActiveTab('professor')}
-            className={`pb-2.5 text-xs font-bold border-b-2 transition-all ${
+            className={`pb-2.5 text-xs font-semibold border-b-2 transition-all ${
               activeTab === 'professor'
                 ? 'border-indigo-600 text-indigo-900'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
@@ -200,7 +200,7 @@ export const ChromeExtensionDrawer: React.FC<ChromeExtensionDrawerProps> = ({ is
           {activeTab === 'scholarship' ? (
             <div className="space-y-3 text-xs">
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Scholarship Title</label>
+                <label className="font-semibold text-slate-700 block mb-1">Scholarship Title</label>
                 <input
                   type="text"
                   value={title}
@@ -211,7 +211,7 @@ export const ChromeExtensionDrawer: React.FC<ChromeExtensionDrawerProps> = ({ is
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Provider / University</label>
+                  <label className="font-semibold text-slate-700 block mb-1">Provider / University</label>
                   <input
                     type="text"
                     value={provider}
@@ -220,7 +220,7 @@ export const ChromeExtensionDrawer: React.FC<ChromeExtensionDrawerProps> = ({ is
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Countries (comma separated)</label>
+                  <label className="font-semibold text-slate-700 block mb-1">Countries (comma separated)</label>
                   <input
                     type="text"
                     value={countries}
@@ -231,7 +231,7 @@ export const ChromeExtensionDrawer: React.FC<ChromeExtensionDrawerProps> = ({ is
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Funding Amount & Perks</label>
+                <label className="font-semibold text-slate-700 block mb-1">Funding Amount & Perks</label>
                 <input
                   type="text"
                   value={fundingAmount}
@@ -241,7 +241,7 @@ export const ChromeExtensionDrawer: React.FC<ChromeExtensionDrawerProps> = ({ is
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Eligible Specializations</label>
+                <label className="font-semibold text-slate-700 block mb-1">Eligible Specializations</label>
                 <input
                   type="text"
                   value={specializations}
@@ -251,7 +251,7 @@ export const ChromeExtensionDrawer: React.FC<ChromeExtensionDrawerProps> = ({ is
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Official Application URL</label>
+                <label className="font-semibold text-slate-700 block mb-1">Official Application URL</label>
                 <input
                   type="text"
                   value={officialUrl}
@@ -261,7 +261,7 @@ export const ChromeExtensionDrawer: React.FC<ChromeExtensionDrawerProps> = ({ is
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Program Summary</label>
+                <label className="font-semibold text-slate-700 block mb-1">Program Summary</label>
                 <textarea
                   rows={3}
                   value={description}
@@ -272,7 +272,7 @@ export const ChromeExtensionDrawer: React.FC<ChromeExtensionDrawerProps> = ({ is
 
               <button
                 onClick={handlePushScholarship}
-                className="w-full py-2.5 bg-indigo-900 hover:bg-indigo-800 text-white font-bold rounded-xl shadow-md shadow-indigo-950/20 flex items-center justify-center gap-2 text-xs transition-all"
+                className="w-full py-2.5 bg-indigo-900 hover:bg-indigo-800 text-white font-semibold rounded-xl shadow-md shadow-indigo-950/20 flex items-center justify-center gap-2 text-xs transition-all"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>Simulate Scrape & Push via API</span>
@@ -281,7 +281,7 @@ export const ChromeExtensionDrawer: React.FC<ChromeExtensionDrawerProps> = ({ is
           ) : (
             <div className="space-y-3 text-xs">
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Professor Name</label>
+                <label className="font-semibold text-slate-700 block mb-1">Professor Name</label>
                 <input
                   type="text"
                   value={profName}
@@ -292,7 +292,7 @@ export const ChromeExtensionDrawer: React.FC<ChromeExtensionDrawerProps> = ({ is
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">University</label>
+                  <label className="font-semibold text-slate-700 block mb-1">University</label>
                   <input
                     type="text"
                     value={university}
@@ -301,7 +301,7 @@ export const ChromeExtensionDrawer: React.FC<ChromeExtensionDrawerProps> = ({ is
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Country</label>
+                  <label className="font-semibold text-slate-700 block mb-1">Country</label>
                   <input
                     type="text"
                     value={profCountry}
@@ -312,7 +312,7 @@ export const ChromeExtensionDrawer: React.FC<ChromeExtensionDrawerProps> = ({ is
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Academic Title & Lab Role</label>
+                <label className="font-semibold text-slate-700 block mb-1">Academic Title & Lab Role</label>
                 <input
                   type="text"
                   value={profTitle}
@@ -322,7 +322,7 @@ export const ChromeExtensionDrawer: React.FC<ChromeExtensionDrawerProps> = ({ is
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Research Publication Topics</label>
+                <label className="font-semibold text-slate-700 block mb-1">Research Publication Topics</label>
                 <input
                   type="text"
                   value={researchTags}
@@ -332,7 +332,7 @@ export const ChromeExtensionDrawer: React.FC<ChromeExtensionDrawerProps> = ({ is
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Active Grant / Funding Notice</label>
+                <label className="font-semibold text-slate-700 block mb-1">Active Grant / Funding Notice</label>
                 <input
                   type="text"
                   value={grants}
@@ -342,7 +342,7 @@ export const ChromeExtensionDrawer: React.FC<ChromeExtensionDrawerProps> = ({ is
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Contact Email</label>
+                <label className="font-semibold text-slate-700 block mb-1">Contact Email</label>
                 <input
                   type="email"
                   value={profEmail}
@@ -353,7 +353,7 @@ export const ChromeExtensionDrawer: React.FC<ChromeExtensionDrawerProps> = ({ is
 
               <button
                 onClick={handlePushProfessor}
-                className="w-full py-2.5 bg-indigo-900 hover:bg-indigo-800 text-white font-bold rounded-xl shadow-md shadow-indigo-950/20 flex items-center justify-center gap-2 text-xs transition-all"
+                className="w-full py-2.5 bg-indigo-900 hover:bg-indigo-800 text-white font-semibold rounded-xl shadow-md shadow-indigo-950/20 flex items-center justify-center gap-2 text-xs transition-all"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>Push Professor to Portal</span>
@@ -363,7 +363,7 @@ export const ChromeExtensionDrawer: React.FC<ChromeExtensionDrawerProps> = ({ is
 
           {/* cURL Code Snippet */}
           <div className="pt-4 border-t border-slate-200">
-            <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider block mb-1.5 flex items-center gap-1">
+            <span className="text-[11px] font-semibold text-slate-600 uppercase tracking-wider block mb-1.5 flex items-center gap-1">
               <Code2 className="w-3.5 h-3.5 text-indigo-600" />
               <span>Chrome Extension cURL Integration</span>
             </span>

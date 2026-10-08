@@ -144,6 +144,12 @@ body {
   overflow-x: hidden;
 }
 
+/* Design rule: nothing heavier than semibold (600). Browsers default <b>/<strong> to 700. */
+b,
+strong {
+  font-weight: 600;
+}
+
 /* Uxcel Card Style */
 .uxcel-card {
   background-color: var(--bg-surface);

@@ -37,7 +37,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenE
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-lg tracking-tight text-slate-900">HighScholar</span>
+                <span className="font-semibold text-lg tracking-tight text-slate-900">HighScholar</span>
                 <span className="text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/60">
                   Global Portal
                 </span>
@@ -110,7 +110,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenE
               onClick={() => setIsOnboardingOpen(true)}
               className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-indigo-200/80 bg-indigo-50/70 hover:bg-indigo-100/80 transition-all text-left shadow-2xs group"
             >
-              <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs font-bold shadow-2xs">
+              <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs font-semibold shadow-2xs">
                 {profile.degreeLevel === 'PhD' ? 'PhD' : profile.degreeLevel === 'Masters' ? 'MS' : 'BS'}
               </div>
               <div className="hidden sm:block text-left pr-1">

@@ -67,7 +67,7 @@ export const ProfessorDetailModal: React.FC<ProfessorDetailModalProps> = ({ prof
             />
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2 mb-1">
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-50 text-[#7150E7] border border-purple-200">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-50 text-[#7150E7] border border-purple-200">
                   <GraduationCap className="w-3.5 h-3.5 text-[#7150E7]" />
                   Faculty &amp; PI
                 </span>
@@ -78,7 +78,7 @@ export const ProfessorDetailModal: React.FC<ProfessorDetailModalProps> = ({ prof
                   </span>
                 )}
               </div>
-              <h2 className="text-xl font-bold text-slate-900 leading-snug truncate">{professor.name}</h2>
+              <h2 className="text-xl font-semibold text-slate-900 leading-snug truncate">{professor.name}</h2>
               <p className="text-xs text-slate-600 font-medium mt-0.5 flex flex-wrap items-center gap-1.5">
                 <span>{professor.title}</span>
                 <span>•</span>
@@ -102,24 +102,24 @@ export const ProfessorDetailModal: React.FC<ProfessorDetailModalProps> = ({ prof
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 bg-[#F9F5FF] border border-[#F4EBFF] rounded-xl text-xs">
             <div>
               <p className="text-[11px] text-[#7150E7] font-semibold uppercase tracking-wider">Department</p>
-              <p className="font-bold text-slate-900 mt-0.5 truncate">{professor.department}</p>
+              <p className="font-semibold text-slate-900 mt-0.5 truncate">{professor.department}</p>
             </div>
             <div>
               <p className="text-[11px] text-[#7150E7] font-semibold uppercase tracking-wider">Location</p>
-              <p className="font-bold text-slate-900 mt-0.5 flex items-center gap-1">
+              <p className="font-semibold text-slate-900 mt-0.5 flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5 text-slate-400" />
                 <span>{professor.country}</span>
               </p>
             </div>
             <div>
               <p className="text-[11px] text-[#7150E7] font-semibold uppercase tracking-wider">Lab Name</p>
-              <p className="font-bold text-slate-900 mt-0.5 truncate">{professor.labName || 'Research Group'}</p>
+              <p className="font-semibold text-slate-900 mt-0.5 truncate">{professor.labName || 'Research Group'}</p>
             </div>
           </div>
 
           {/* Research Focus & Tags */}
           <div className="space-y-2">
-            <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+            <h4 className="text-xs font-semibold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
               <FlaskConical className="w-3.5 h-3.5 text-[#7150E7]" />
               Research Areas &amp; Specializations
             </h4>
@@ -137,7 +137,7 @@ export const ProfessorDetailModal: React.FC<ProfessorDetailModalProps> = ({ prof
 
           {/* Biography & Research Overview */}
           <div className="space-y-2">
-            <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+            <h4 className="text-xs font-semibold text-slate-900 uppercase tracking-wider">
               Research Overview &amp; Lab Mission
             </h4>
             <div className="p-4 bg-slate-50 border border-slate-100 rounded-xl leading-relaxed text-slate-700 text-xs sm:text-sm">
@@ -148,7 +148,7 @@ export const ProfessorDetailModal: React.FC<ProfessorDetailModalProps> = ({ prof
           {/* Funding & Grants */}
           {professor.recentGrants && (
             <div className="space-y-2">
-              <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+              <h4 className="text-xs font-semibold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                 <Award className="w-3.5 h-3.5 text-emerald-600" />
                 Active Grants &amp; Funding Support
               </h4>
@@ -165,7 +165,7 @@ export const ProfessorDetailModal: React.FC<ProfessorDetailModalProps> = ({ prof
                 href={professor.labWebsite}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
               >
                 <Globe className="w-3.5 h-3.5 text-[#7150E7]" />
                 <span>Lab Website</span>
@@ -177,7 +177,7 @@ export const ProfessorDetailModal: React.FC<ProfessorDetailModalProps> = ({ prof
                 href={professor.googleScholar}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
               >
                 <GraduationCap className="w-3.5 h-3.5 text-purple-600" />
                 <span>Google Scholar</span>
@@ -187,7 +187,7 @@ export const ProfessorDetailModal: React.FC<ProfessorDetailModalProps> = ({ prof
             {professor.email && (
               <a
                 href={`mailto:${professor.email}`}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
               >
                 <Mail className="w-3.5 h-3.5 text-emerald-600" />
                 <span>{professor.email}</span>
@@ -201,7 +201,7 @@ export const ProfessorDetailModal: React.FC<ProfessorDetailModalProps> = ({ prof
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800 transition-colors cursor-pointer"
+            className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 transition-colors cursor-pointer"
           >
             Close
           </button>
@@ -209,7 +209,7 @@ export const ProfessorDetailModal: React.FC<ProfessorDetailModalProps> = ({ prof
           <button
             type="button"
             onClick={handleOpenColdEmail}
-            className="px-5 py-2 rounded-full text-xs font-bold bg-[#7150E7] hover:bg-[#5E3CD4] text-white shadow-md inline-flex items-center gap-2 transition-all cursor-pointer"
+            className="px-5 py-2 rounded-full text-xs font-semibold bg-[#7150E7] hover:bg-[#5E3CD4] text-white shadow-md inline-flex items-center gap-2 transition-all cursor-pointer"
           >
             <Sparkles className="w-4 h-4 text-amber-300 fill-amber-300" />
             <span>Draft AI Cold Email</span>

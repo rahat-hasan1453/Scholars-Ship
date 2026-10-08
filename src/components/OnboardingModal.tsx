@@ -149,7 +149,7 @@ function CountryCell({
       <span
         className={cn(
           'min-w-0 flex-1 truncate text-xs leading-4 tracking-[-0.192px] text-brand-primary',
-          selected ? 'font-[590]' : 'font-medium',
+          selected ? 'font-semibold' : 'font-medium',
         )}
       >
         {label}
@@ -175,7 +175,7 @@ function ScoreCard({
 }) {
   return (
     <label className="flex h-[142px] min-w-0 flex-1 flex-col justify-between rounded-[10px] border border-[#e2e8f0] bg-[#fafafa] px-2 py-4">
-      <span className="text-xs font-bold leading-4 tracking-[-0.192px] text-slate-700">{label}</span>
+      <span className="text-xs font-semibold leading-4 tracking-[-0.192px] text-slate-700">{label}</span>
       <span className="flex flex-col gap-1">
         <Input
           inputMode="decimal"
@@ -191,7 +191,7 @@ function ScoreCard({
 }
 
 /* Footer buttons 203:605 (Back) / 203:613 (Next) — shadcn Button, 36px, radius-sm 6, Body/2 M */
-const navButtonClass = 'h-9 gap-1 rounded-[6px] px-2 text-sm font-[510] leading-5 shadow-none';
+const navButtonClass = 'h-9 gap-1 rounded-[6px] px-2 text-sm font-medium leading-5 shadow-none';
 
 function NavButtons({
   step,
@@ -476,7 +476,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ isStandalonePage
                       )}
                     >
                       <span className="flex min-w-0 flex-1 flex-col">
-                        <span className={cn('text-base font-[510] leading-6', selected ? 'text-brand-primary' : 'text-text-primary')}>
+                        <span className={cn('text-base font-medium leading-6', selected ? 'text-brand-primary' : 'text-text-primary')}>
                           {opt.title}
                         </span>
                         <span className="pt-0.5 text-xs leading-4 tracking-[-0.192px] text-text-secondary">{opt.subtitle}</span>
@@ -564,7 +564,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ isStandalonePage
                       type="button"
                       className="flex h-[46px] min-w-0 items-center gap-2 overflow-hidden rounded-[10px] border border-stroke-default p-[10px] text-left outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
                     >
-                      <span className="min-w-0 flex-1 truncate text-xs font-[590] leading-4 tracking-[-0.192px] text-text-primary">Other</span>
+                      <span className="min-w-0 flex-1 truncate text-xs font-semibold leading-4 tracking-[-0.192px] text-text-primary">Other</span>
                       <span className="shrink-0 text-base font-medium leading-4 tracking-[-0.192px] text-slate-700">+</span>
                     </button>
                   </PopoverTrigger>
@@ -643,7 +643,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ isStandalonePage
               {saveError.startsWith('Your session') && (
                 <>
                   {' '}
-                  <Link href="/login" className="font-[510] underline underline-offset-2">
+                  <Link href="/login" className="font-medium underline underline-offset-2">
                     Sign in
                   </Link>
                 </>

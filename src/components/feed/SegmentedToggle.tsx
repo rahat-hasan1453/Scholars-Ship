@@ -52,7 +52,7 @@ export function SegmentedToggle<T extends string>({ value, onValueChange, option
           {o.count !== undefined && (
             <span
               className={cn(
-                'rounded-[6px] px-[6px] text-[12px] leading-[18px] font-[510] text-[#344054]',
+                'rounded-[6px] px-[6px] text-[12px] leading-[18px] font-medium text-[#344054]',
                 value === o.value ? 'bg-white' : 'bg-[#eef2f6]',
               )}
             >

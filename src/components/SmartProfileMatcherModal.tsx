@@ -119,12 +119,12 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#7150E7] bg-[#EDE9FC] px-2.5 py-0.5 rounded-full">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#7150E7] bg-[#EDE9FC] px-2.5 py-0.5 rounded-full">
                   Higher Study AI Matcher
                 </span>
                 <span className="text-xs text-slate-500 font-medium">Personalized Evaluation</span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight mt-0.5">
+              <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight mt-0.5">
                 Find Your Ideal Scholarship & Safe Universities
               </h2>
             </div>
@@ -151,7 +151,7 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
               {/* Row 1: Target Degree & Discipline */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">Target Degree Level</label>
+                  <label className="text-xs font-semibold text-slate-700">Target Degree Level</label>
                   <div className="grid grid-cols-3 gap-2">
                     {(['Masters', 'PhD', 'Bachelors'] as const).map((d) => (
                       <button
@@ -171,7 +171,7 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">Intended Field / Subject</label>
+                  <label className="text-xs font-semibold text-slate-700">Intended Field / Subject</label>
                   <CustomDropdown
                     variant="pill"
                     align="left"
@@ -196,7 +196,7 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
               {/* Row 2: CGPA & Study Gap */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">Your Bachelor / Master CGPA</label>
+                  <label className="text-xs font-semibold text-slate-700">Your Bachelor / Master CGPA</label>
                   <CustomDropdown
                     variant="pill"
                     align="left"
@@ -215,7 +215,7 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">Study / Career Gap</label>
+                  <label className="text-xs font-semibold text-slate-700">Study / Career Gap</label>
                   <CustomDropdown
                     variant="pill"
                     align="left"
@@ -236,7 +236,7 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
               {/* Row 3: Tests & Waivers */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">English Test Status</label>
+                  <label className="text-xs font-semibold text-slate-700">English Test Status</label>
                   <CustomDropdown
                     variant="pill"
                     align="left"
@@ -254,7 +254,7 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">GRE Status</label>
+                  <label className="text-xs font-semibold text-slate-700">GRE Status</label>
                   <CustomDropdown
                     variant="pill"
                     align="left"
@@ -273,7 +273,7 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
 
               {/* Row 4: University Ranking Strategy */}
               <div className="space-y-2 pt-1">
-                <label className="text-xs font-bold text-slate-800 flex items-center justify-between">
+                <label className="text-xs font-semibold text-slate-800 flex items-center justify-between">
                   <span>University Strategy & Risk Tolerance</span>
                   <span className="text-[11px] text-[#7150E7] font-semibold">Recommended for High Funding Success</span>
                 </label>
@@ -309,8 +309,8 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
                       }`}
                     >
                       <div>
-                        <div className="text-xs font-bold text-slate-900">{s.title}</div>
-                        <div className="text-[10px] font-bold text-[#7150E7] mt-0.5">{s.rank}</div>
+                        <div className="text-xs font-semibold text-slate-900">{s.title}</div>
+                        <div className="text-[10px] font-semibold text-[#7150E7] mt-0.5">{s.rank}</div>
                       </div>
                       <p className="text-[11px] text-slate-500 mt-2 leading-relaxed">{s.desc}</p>
                     </button>
@@ -320,7 +320,7 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
 
               {/* Target Country Preference */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">Preferred Country (Optional)</label>
+                <label className="text-xs font-semibold text-slate-700">Preferred Country (Optional)</label>
                 <CustomDropdown
                   variant="pill"
                   align="left"
@@ -344,7 +344,7 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-5 h-5" />
-                    <span className="text-xs uppercase font-extrabold tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full">
+                    <span className="text-xs uppercase font-semibold tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full">
                       Match Ready
                     </span>
                   </div>
@@ -352,7 +352,7 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
                     Strategy: {strategy === 'SAFE_GEMS' ? 'Rank 1,000–5,000+ Safe Gems' : 'Comprehensive Target'}
                   </span>
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold mt-2">
+                <h3 className="text-lg sm:text-xl font-semibold mt-2">
                   Your High-Probability Higher Study & Scholarship Roadmap
                 </h3>
                 <p className="text-xs text-emerald-50 mt-1 leading-relaxed">
@@ -363,11 +363,11 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
               {/* Section 1: Safe Bet & 100% Free Tuition Universities (Rank 1,000 - 5,000+) */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-700">
+                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-700">
                     <Building2 className="w-4 h-4 text-emerald-600" />
                     <span>🟢 Safe Bet Universities with 100% Free Tuition / TA-RA (Rank 1,000 – 5,000+)</span>
                   </div>
-                  <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
                     High Acceptance (85%+)
                   </span>
                 </div>
@@ -380,7 +380,7 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
                     >
                       <div>
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-slate-900">{uni.name}</span>
+                          <span className="text-xs font-semibold text-slate-900">{uni.name}</span>
                           <span className="text-xs">{uni.country}</span>
                         </div>
                         <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full inline-block mt-1">
@@ -401,7 +401,7 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
                         href={uni.link}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-100/60 hover:bg-emerald-100 py-2 rounded-xl transition-all"
+                        className="inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-emerald-700 hover:text-emerald-800 bg-emerald-100/60 hover:bg-emerald-100 py-2 rounded-xl transition-all"
                       >
                         <span>Official Admissions & Funding Page</span>
                         <ExternalLink className="w-3 h-3" />
@@ -414,7 +414,7 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
               {/* Section 2: Top Matched Scholarships with 100% Free Tuition */}
               {matchingScholarships.length > 0 && (
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-700">
+                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-700">
                     <Award className="w-4 h-4 text-[#7150E7]" />
                     <span>🏆 Matched 100% Free Scholarships for {field}</span>
                   </div>
@@ -427,8 +427,8 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
                       >
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-slate-900">{sch.title}</span>
-                            <span className="text-[10px] font-bold text-[#7150E7] bg-[#EDE9FC] px-2 py-0.5 rounded-full">
+                            <span className="text-xs font-semibold text-slate-900">{sch.title}</span>
+                            <span className="text-[10px] font-semibold text-[#7150E7] bg-[#EDE9FC] px-2 py-0.5 rounded-full">
                               {sch.countries.join(', ')}
                             </span>
                           </div>
@@ -458,7 +458,7 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
               {/* Section 3: Recommended Professors in Field currently hiring */}
               {matchingProfessors.length > 0 && (
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-700">
+                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-700">
                     <GraduationCap className="w-4 h-4 text-purple-600" />
                     <span>👨‍🏫 Recommended Professors & Labs in {field} (Open Positions)</span>
                   </div>
@@ -467,7 +467,7 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
                     {matchingProfessors.map((p) => (
                       <div key={p.id} className="p-3.5 rounded-2xl border border-slate-200 bg-white space-y-2 flex flex-col justify-between">
                         <div>
-                          <div className="text-xs font-bold text-slate-900">{p.name}</div>
+                          <div className="text-xs font-semibold text-slate-900">{p.name}</div>
                           <div className="text-[11px] text-slate-500">{p.university} • {p.country}</div>
                           <div className="text-[10px] text-purple-700 font-semibold bg-purple-50 px-2 py-0.5 rounded-full inline-block mt-1">
                             {p.labName}
@@ -477,7 +477,7 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
                         {p.email && (
                           <a
                             href={`mailto:${p.email}?subject=Prospective ${degree} Student Inquiry - ${field}`}
-                            className="text-[11px] font-bold text-purple-700 hover:text-purple-900 flex items-center gap-1.5 pt-1"
+                            className="text-[11px] font-semibold text-purple-700 hover:text-purple-900 flex items-center gap-1.5 pt-1"
                           >
                             <Mail className="w-3 h-3" />
                             <span>Contact: {p.email}</span>

@@ -114,7 +114,7 @@ export const ResearchPaperCard: React.FC<ResearchPaperCardProps> = ({ paper, onO
 
         <div className="flex flex-wrap items-center gap-2 w-full">
           <span className="flex items-center gap-1 h-6 px-2 shrink-0 rounded-full bg-[#fffae5] whitespace-nowrap">
-            <span aria-hidden className="text-[11px] leading-[14.667px] font-bold">📊</span>
+            <span aria-hidden className="text-[11px] leading-[14.667px] font-semibold">📊</span>
             <span className="text-[12px] leading-[16px] font-medium italic tracking-[-0.192px] text-[#7a4100]">
               {paper.citationCount.toLocaleString('en-US')} Citations
             </span>

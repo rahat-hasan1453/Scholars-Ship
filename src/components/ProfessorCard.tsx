@@ -23,7 +23,7 @@ export const ProfessorCard: React.FC<ProfessorCardProps> = ({ professor }) => {
 
             <div className="min-w-0">
               <h3 
-                className="text-base font-bold text-[#101828] leading-tight truncate"
+                className="text-base font-semibold text-[#101828] leading-tight truncate"
                 title={professor.name}
               >
                 {professor.name}
@@ -70,9 +70,9 @@ export const ProfessorCard: React.FC<ProfessorCardProps> = ({ professor }) => {
           {professor.recentGrants && (
             <div className="p-3 bg-[#FEF6EE] border border-[#FEE4E2]/60 rounded-xl">
               <div className="flex items-start gap-2 text-xs">
-                <span className="font-extrabold text-[#93370D] shrink-0 leading-none mt-0.5">$</span>
+                <span className="font-semibold text-[#93370D] shrink-0 leading-none mt-0.5">$</span>
                 <div className="text-[#93370D] leading-tight min-w-0">
-                  <span className="font-bold">Active Funding: </span>
+                  <span className="font-semibold">Active Funding: </span>
                   <span className="italic font-medium">{professor.recentGrants}</span>
                 </div>
               </div>

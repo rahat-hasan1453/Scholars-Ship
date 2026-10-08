@@ -961,7 +961,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
         {/* Top White Section */}
         <div className="p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-t-3xl">
           <div className="space-y-1">
-            <h1 className="text-xl sm:text-2xl lg:text-[26px] font-bold text-[#101828] tracking-tight">
+            <h1 className="text-xl sm:text-2xl lg:text-[26px] font-semibold text-[#101828] tracking-tight">
               {headerTitle}
             </h1>
             <p className="text-xs sm:text-sm text-[#475467] font-normal">
@@ -1097,7 +1097,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3">
             <div>
               <div className="flex items-baseline gap-1.5">
-                <h2 className="text-base sm:text-lg font-bold text-[#101828]">
+                <h2 className="text-base sm:text-lg font-semibold text-[#101828]">
                   Opportunity List
                 </h2>
                 <span className="text-xs italic text-[#98A2B3] font-normal">
@@ -1108,7 +1108,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                 Safe-Bet Universities with Guaranteed Funding &amp; Assistantships
               </p>
             </div>
-            <span className="text-xs text-[#006045] bg-[#ECFDF5] px-3.5 py-1 rounded-full font-bold border border-[#A7F3D0] self-start sm:self-auto">
+            <span className="text-xs text-[#006045] bg-[#ECFDF5] px-3.5 py-1 rounded-full font-semibold border border-[#A7F3D0] self-start sm:self-auto">
               ✓ 85% – 95% Acceptance Rate
             </span>
           </div>
@@ -1124,7 +1124,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                   <div className="space-y-3">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <h3 className="text-base font-bold text-[#101828] leading-snug group-hover:text-[#7050E6] transition-colors truncate">
+                        <h3 className="text-base font-semibold text-[#101828] leading-snug group-hover:text-[#7050E6] transition-colors truncate">
                           {uni.name}
                         </h3>
                         <p className="text-xs text-text-secondary font-medium mt-0.5 truncate">
@@ -1141,17 +1141,17 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                     {/* Middle Details Container (Frame 2147226738) */}
                     <div className="bg-[#F8FAFC] rounded-lg p-3 text-xs space-y-1.5">
                       <p className="text-xs leading-snug">
-                        <span className="font-bold text-[#101828]">💰 Financial: </span>
+                        <span className="font-semibold text-[#101828]">💰 Financial: </span>
                         <span className="text-[#101828]">{uni.financialBase}</span>
-                        <span className="font-bold italic text-[#101828]">{uni.financialHighlight}</span>
+                        <span className="font-semibold italic text-[#101828]">{uni.financialHighlight}</span>
                         <span className="text-[#101828]">{uni.financialSuffix}</span>
                       </p>
                       <p className="text-xs leading-snug">
-                        <span className="font-bold text-[#101828]">🎓 Admission: </span>
+                        <span className="font-semibold text-[#101828]">🎓 Admission: </span>
                         <span className="text-text-secondary">{uni.admission}</span>
                       </p>
                       <p className="text-xs leading-snug">
-                        <span className="font-bold text-[#101828]">🏡 Living: </span>
+                        <span className="font-semibold text-[#101828]">🏡 Living: </span>
                         <span className="text-text-secondary">{uni.living}</span>
                       </p>
                     </div>
@@ -1189,7 +1189,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                           href={uni.officialLink}
                           target="_blank"
                           rel="noreferrer"
-                          className="h-10 px-4 rounded-full bg-[#F8FAFC] hover:bg-slate-100 text-[#7050E6] border border-[#7050E6] text-xs font-bold flex-1 inline-flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                          className="h-10 px-4 rounded-full bg-[#F8FAFC] hover:bg-slate-100 text-[#7050E6] border border-[#7050E6] text-xs font-semibold flex-1 inline-flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                         >
                           <span>Official Link</span>
                           <ArrowUpRight className="w-3.5 h-3.5 text-[#7050E6]" />
@@ -1222,7 +1222,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                               });
                             }
                           }}
-                          className="h-10 px-4 rounded-full bg-[#7050E6] hover:bg-[#5E3CD4] text-white text-xs font-bold flex-1 inline-flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                          className="h-10 px-4 rounded-full bg-[#7050E6] hover:bg-[#5E3CD4] text-white text-xs font-semibold flex-1 inline-flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer"
                         >
                           <span>See Details</span>
                           <ArrowRight className="w-3.5 h-3.5 text-white" />
@@ -1248,7 +1248,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-bold text-[#101828] group-hover:text-[#7050E6] transition-colors truncate">
+                        <span className="text-sm font-semibold text-[#101828] group-hover:text-[#7050E6] transition-colors truncate">
                           {uni.name}
                         </span>
                         <span className="bg-[#ECFDF5] border border-[#A7F3D0] text-[#047857] text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0">
@@ -1258,7 +1258,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                       <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-[#667085]">
                         <span className="font-semibold text-slate-800">{uni.field}</span>
                         <span>•</span>
-                        <span className="text-[#101828] font-bold">💰 {uni.financialHighlight}</span>
+                        <span className="text-[#101828] font-semibold">💰 {uni.financialHighlight}</span>
                         <span>•</span>
                         <span className="text-text-secondary">🎓 {uni.admission}</span>
                       </div>
@@ -1278,7 +1278,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                       href={uni.officialLink}
                       target="_blank"
                       rel="noreferrer"
-                      className="px-3.5 py-1.5 rounded-full border border-[#7050E6] bg-[#F8FAFC] hover:bg-slate-100 text-[#7050E6] text-xs font-bold inline-flex items-center gap-1 transition-colors cursor-pointer"
+                      className="px-3.5 py-1.5 rounded-full border border-[#7050E6] bg-[#F8FAFC] hover:bg-slate-100 text-[#7050E6] text-xs font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer"
                     >
                       <span>Portal</span>
                       <ArrowUpRight className="w-3.5 h-3.5" />
@@ -1308,7 +1308,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                           });
                         }
                       }}
-                      className="px-4 py-1.5 rounded-full bg-[#7050E6] hover:bg-[#5E3CD4] text-white text-xs font-bold inline-flex items-center gap-1 transition-all shadow-xs cursor-pointer"
+                      className="px-4 py-1.5 rounded-full bg-[#7050E6] hover:bg-[#5E3CD4] text-white text-xs font-semibold inline-flex items-center gap-1 transition-all shadow-xs cursor-pointer"
                     >
                       <span>Details</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -1326,11 +1326,11 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
         <section className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#F1F5F9] pb-3">
             <div>
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#7150E7]">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#7150E7]">
                 <Zap className="w-4 h-4 text-[#7150E7]" />
                 <span>Live Lab Hiring &amp; Graduate Research Assistantships</span>
               </div>
-              <h2 className="text-lg sm:text-xl font-bold text-[#101828] mt-0.5">
+              <h2 className="text-lg sm:text-xl font-semibold text-[#101828] mt-0.5">
                 Active Lab Openings with Stipend &amp; Tuition Remission ({fieldOpportunities.length})
               </h2>
             </div>
@@ -1345,7 +1345,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                   setTimeout(() => setLiveSyncMessage(null), 4000);
                 }}
                 disabled={isSyncingOpportunities}
-                className="h-9 px-4 rounded-full bg-[#7150E7] hover:bg-[#5E3CD4] disabled:opacity-50 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer select-none"
+                className="h-9 px-4 rounded-full bg-[#7150E7] hover:bg-[#5E3CD4] disabled:opacity-50 text-white text-xs font-semibold inline-flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer select-none"
               >
                 <Zap className={`w-3.5 h-3.5 ${isSyncingOpportunities ? 'animate-spin' : ''}`} />
                 <span>{isSyncingOpportunities ? 'Crawling Academic Web...' : 'Fetch Live Web Postings (PhD/RA)'}</span>
@@ -1380,16 +1380,16 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                   className="px-5 py-3.5 hover:bg-slate-50 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-3 group"
                 >
                   <div className="flex items-start md:items-center gap-3 min-w-0 flex-1">
-                    <div className="w-8 h-8 rounded-xl bg-[#F4F3FE] text-[#7150E7] flex items-center justify-center font-bold text-xs shrink-0">
+                    <div className="w-8 h-8 rounded-xl bg-[#F4F3FE] text-[#7150E7] flex items-center justify-center font-semibold text-xs shrink-0">
                       🧪
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-bold text-[#101828] truncate group-hover:text-[#7150E7] transition-colors">
+                        <span className="text-sm font-semibold text-[#101828] truncate group-hover:text-[#7150E7] transition-colors">
                           {opp.title}
                         </span>
                         {opp.matchType === 'exact' && (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
                             Exact Match
                           </span>
                         )}
@@ -1424,7 +1424,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                         };
                         onOpenColdEmail?.(fakeProf);
                       }}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#7150E7] hover:bg-[#5E3CD4] text-white transition-colors cursor-pointer shadow-xs"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#7150E7] hover:bg-[#5E3CD4] text-white transition-colors cursor-pointer shadow-xs"
                     >
                       <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                       <span>AI Cold Email</span>
@@ -1451,11 +1451,11 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
         <section className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/60 pb-3">
             <div>
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#7150E7]">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#7150E7]">
                 <Award className="w-4 h-4 text-[#7150E7]" />
                 <span>Verified Global Scholarships</span>
               </div>
-              <h2 className="text-lg sm:text-xl font-bold text-slate-900 mt-0.5">
+              <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mt-0.5">
                 Full-Ride &amp; Tuition Waiver Scholarships ({filteredScholarships.length})
               </h2>
             </div>
@@ -1484,12 +1484,12 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                   onClick={() => onOpenScholarshipDetail(sch)}
                 >
                   <div className="flex items-start md:items-center gap-3 min-w-0 flex-1">
-                    <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs shrink-0 border border-amber-200">
+                    <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-semibold text-xs shrink-0 border border-amber-200">
                       🏆
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-bold text-[#101828] truncate group-hover:text-[#7150E7] transition-colors">
+                        <span className="text-sm font-semibold text-[#101828] truncate group-hover:text-[#7150E7] transition-colors">
                           {sch.title}
                         </span>
                         <span className="bg-[#ECFDF5] border border-[#A7F3D0] text-[#047857] text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0">
@@ -1501,7 +1501,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                         <span>•</span>
                         <span>{sch.countries.join(', ')}</span>
                         <span>•</span>
-                        <span className="text-emerald-700 font-bold">{sch.fundingAmount}</span>
+                        <span className="text-emerald-700 font-semibold">{sch.fundingAmount}</span>
                         <span>•</span>
                         <span className="text-slate-500 font-medium">🎓 {sch.degreeLevels.join(', ')}</span>
                       </div>
@@ -1514,7 +1514,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                     <button
                       type="button"
                       onClick={() => onOpenScholarshipDetail(sch)}
-                      className="px-4 py-1.5 rounded-full bg-[#7150E7] hover:bg-[#5E3CD4] text-white text-xs font-bold inline-flex items-center gap-1 transition-all shadow-xs cursor-pointer"
+                      className="px-4 py-1.5 rounded-full bg-[#7150E7] hover:bg-[#5E3CD4] text-white text-xs font-semibold inline-flex items-center gap-1 transition-all shadow-xs cursor-pointer"
                     >
                       <span>View Details</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -1532,7 +1532,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
         <section className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/60 pb-3">
             <div>
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-purple-700">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-purple-700">
                 <GraduationCap className="w-4 h-4 text-purple-600" />
                 <span>Faculty &amp; Research Supervisors</span>
                 {isLiveSearchingProfessors && (
@@ -1541,7 +1541,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                   </span>
                 )}
               </div>
-              <h2 className="text-lg sm:text-xl font-bold text-slate-900 mt-0.5">
+              <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mt-0.5">
                 Professors &amp; Labs with Open Positions in {selectedField.includes('ALL') || selectedField.length === 0 ? 'All Fields' : selectedField.join(', ')} ({filteredProfessors.length})
               </h2>
             </div>
@@ -1605,7 +1605,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                     />
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-bold text-[#101828] truncate group-hover:text-[#7150E7] transition-colors">
+                        <span className="text-sm font-semibold text-[#101828] truncate group-hover:text-[#7150E7] transition-colors">
                           {prof.name}
                         </span>
                         <span className="text-xs text-[#667085] font-medium truncate">
@@ -1630,7 +1630,7 @@ export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
                     <button
                       type="button"
                       onClick={() => onOpenColdEmail?.(prof)}
-                      className="px-4 py-1.5 rounded-full bg-[#7150E7] hover:bg-[#5E3CD4] text-white text-xs font-bold inline-flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                      className="px-4 py-1.5 rounded-full bg-[#7150E7] hover:bg-[#5E3CD4] text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
                     >
                       <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                       <span>Draft Cold Email</span>
