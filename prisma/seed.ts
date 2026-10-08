@@ -1,5 +1,5 @@
 // Seeds the real catalogue: scholarships, faculty (+ universities and NSF grants), research papers and
-// Opportunity Feed posts. Source files live in prisma/data (see scripts/data/* for how they're built).
+// Opportunity Feed posts. Source files live in prisma/data (see prisma/import/* for how they're built).
 // Safe to re-run: rows are upserted, and rows that are no longer in the data (old demo rows) are removed.
 // Run: npm run db:seed
 import { readFile } from 'node:fs/promises';

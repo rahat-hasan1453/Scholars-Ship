@@ -55,5 +55,5 @@ graphify-out/
 /playwright-report/
 /blob-report/
 
-# raw downloads used by scripts/data importers
+# raw downloads used by the prisma/import importers
 .data-cache/

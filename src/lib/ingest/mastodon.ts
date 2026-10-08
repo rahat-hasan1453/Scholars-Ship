@@ -1,5 +1,5 @@
 // Turns public Mastodon posts tagged #PhDPosition, #PhDJobs, … into Opportunity Feed listings.
-// Used by scripts/data/import-opportunities.ts (snapshot for the seed) and /api/cron/opportunities (live refresh).
+// Used by prisma/import/import-opportunities.ts (snapshot for the seed) and /api/cron/opportunities (live refresh).
 //
 // Only what the post says is kept. Anything the post doesn't state (rank, acceptance rate, living cost,
 // deadline, …) stays undefined so the UI hides it instead of showing a guess.
