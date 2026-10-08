@@ -50,8 +50,8 @@ interface AppContextType {
   isPaperSaved: (paperId: string) => boolean;
   globalSearchQuery: string;
   setGlobalSearchQuery: (q: string) => void;
-  activeNavTab: 'opportunities' | 'scholarships' | 'professors' | 'research' | 'tracker' | 'profile';
-  setActiveNavTab: (tab: 'opportunities' | 'scholarships' | 'professors' | 'research' | 'tracker' | 'profile') => void;
+  activeNavTab: 'opportunities' | 'scholarships' | 'professors' | 'research' | 'tracker' | 'saved' | 'profile';
+  setActiveNavTab: (tab: 'opportunities' | 'scholarships' | 'professors' | 'research' | 'tracker' | 'saved' | 'profile') => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -85,7 +85,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isSyncingOpportunities, setIsSyncingOpportunities] = useState(false);
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
   const [globalSearchQuery, setGlobalSearchQuery] = useState('');
-  const [activeNavTab, setActiveNavTab] = useState<'opportunities' | 'scholarships' | 'professors' | 'research' | 'tracker' | 'profile'>('opportunities');
+  const [activeNavTab, setActiveNavTab] = useState<'opportunities' | 'scholarships' | 'professors' | 'research' | 'tracker' | 'saved' | 'profile'>('opportunities');
 
   // Hydrate from localStorage on client mount with automatic schema migration
   useEffect(() => {

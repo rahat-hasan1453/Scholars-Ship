@@ -11,15 +11,22 @@ import { HeaderGlobalSearch } from './HeaderGlobalSearch';
 import { useDesignScale } from '@/hooks/useDesignScale';
 import { UserAvatar } from '@/components/UserAvatar';
 
-export type AppTab = 'scholarships' | 'opportunities' | 'professors' | 'research' | 'tracker' | 'profile';
+export type AppTab = 'scholarships' | 'opportunities' | 'professors' | 'research' | 'tracker' | 'saved' | 'profile';
 
 // Figma sidebar icons (273:3998): a stroke icon for the default state, a duotone filled icon when selected
-const SIDEBAR_ITEMS: { tab: AppTab; label: string; icon: string }[] = [
+type SidebarItem = { tab: AppTab; label: string; icon: string };
+const SIDEBAR_ITEMS: SidebarItem[] = [
   { tab: 'opportunities', label: 'Opportunity Feed', icon: 'dashboard' },
   { tab: 'scholarships', label: 'Scholarship Radar', icon: 'radar' },
   { tab: 'professors', label: 'Faculty & Research Labs', icon: 'user-group' },
   { tab: 'research', label: 'Research Paper', icon: 'license-draft' },
 ];
+// "Others" group (Figma Sidebar 295:6105). Pipeline is the application tracker ('tracker' tab).
+const OTHER_ITEMS: SidebarItem[] = [
+  { tab: 'tracker', label: 'Pipeline', icon: 'pipeline' },
+  { tab: 'saved', label: 'Saved Feed', icon: 'saved' },
+];
+const COLLAPSED_KEY = 'sidebar:collapsed';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -47,6 +54,20 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
     setIsOnboardingOpen,
   } = useApp();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  // Desktop only: icon-only sidebar (Figma Sidebar "Close" 295:6104), remembered across visits
+  const [collapsed, setCollapsed] = useState(false);
+  useEffect(() => {
+    try {
+      setCollapsed(localStorage.getItem(COLLAPSED_KEY) === '1');
+    } catch {}
+  }, []);
+  const toggleCollapsed = () =>
+    setCollapsed((c) => {
+      try {
+        localStorage.setItem(COLLAPSED_KEY, c ? '0' : '1');
+      } catch {}
+      return !c;
+    });
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
   useDesignScale();
@@ -91,11 +112,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         />
       )}
 
-      {/* Sidebar (Figma 183:4894) */}
+      {/* Sidebar (Figma 183:4894, open/closed states 295:6105) */}
       <aside
-        className={`fixed lg:sticky top-0 z-50 h-scaled-screen w-[260px] shrink-0 flex flex-col gap-4 px-4 pb-5 bg-surface-bg transition-transform duration-200 ease-in-out ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        }`}
+        className={`fixed lg:sticky top-0 z-50 h-scaled-screen w-[260px] shrink-0 flex flex-col gap-4 pb-5 bg-surface-bg transition-[transform,width] duration-200 ease-in-out ${
+          collapsed ? 'px-4 lg:w-[100px]' : 'px-4'
+        } ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
       >
         {/* Brand row */}
         <div className="flex h-[76px] items-center shrink-0">
@@ -106,13 +127,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                 setActiveTab('opportunities');
                 setIsSidebarOpen(false);
               }}
+              aria-label="Scholars’ ship home"
               className="flex flex-1 min-w-0 items-center gap-2 cursor-pointer text-left"
             >
               <span aria-hidden className="relative h-9 w-[45.68px] shrink-0">
                 <img src="/sidebar/logo-back.svg" alt="" width={29.1005} height={35.6341} className="absolute left-[16.58px] top-0" />
                 <img src="/sidebar/logo-front.svg" alt="" width={17.7703} height={34.3125} className="absolute left-0 top-[1.69px]" />
               </span>
-              <span className="flex flex-col min-w-0">
+              <span className={`flex flex-col min-w-0 ${collapsed ? 'lg:hidden' : ''}`}>
                 <span className="flex items-center gap-1.5">
                   <span className="text-[14px] leading-5 font-bold tracking-[-0.5004px] text-text-primary whitespace-nowrap">
                     Scholars’ ship
@@ -136,50 +158,40 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             </button>
             <button
               type="button"
-              aria-label="Collapse sidebar"
-              title="Collapse sidebar"
-              className="hidden lg:flex items-center justify-center size-4 shrink-0 cursor-pointer"
+              onClick={toggleCollapsed}
+              aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              aria-expanded={!collapsed}
+              title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              className="hidden lg:flex items-center justify-center size-6 shrink-0 rounded-md hover:bg-[#f4f2fd] cursor-pointer"
             >
-              <img src="/sidebar/collapse.svg" alt="" width={16} height={16} />
+              <img src="/sidebar/collapse.svg" alt="" width={16} height={16} className={collapsed ? 'rotate-180' : ''} />
             </button>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex flex-1 min-h-0 flex-col gap-2 overflow-y-auto" aria-label="Discover & Opportunities">
-          <p className="font-figtree text-[12px] leading-[18px] font-medium text-text-tertiary">
-            Discover &amp; Opportunities
-          </p>
-          <div className="flex flex-col gap-1">
-            {SIDEBAR_ITEMS.map((item) => {
-              const active = activeTab === item.tab;
-              return (
-                <Button
-                  key={item.tab}
-                  variant="ghost"
-                  onClick={() => {
-                    setActiveTab(item.tab);
-                    setIsSidebarOpen(false);
-                  }}
-                  aria-current={active ? 'page' : undefined}
-                  className={`h-auto w-full justify-start gap-4 py-2 pl-3 pr-2 font-figtree text-[15px] font-medium cursor-pointer ${
-                    active
-                      ? 'rounded-lg border-l-3 border-[#7050e6] bg-[#f4f2fd] leading-[18px] text-[#08261f] hover:bg-[#f4f2fd] hover:text-[#08261f]'
-                      : 'rounded-none rounded-r-2xl leading-5 text-text-secondary hover:bg-[#f4f2fd]/60 hover:text-text-primary'
-                  }`}
-                >
-                  <img
-                    src={`/sidebar/${item.icon}-${active ? 'selected' : 'default'}.svg`}
-                    alt=""
-                    width={20}
-                    height={20}
-                    className="size-5 shrink-0"
-                  />
-                  {item.label}
-                </Button>
-              );
-            })}
-          </div>
+        <nav className="flex flex-1 min-h-0 flex-col gap-4 overflow-y-auto" aria-label="Main">
+          <SidebarGroup
+            title="Discover & Opportunities"
+            items={SIDEBAR_ITEMS}
+            collapsed={collapsed}
+            activeTab={activeTab}
+            onSelect={(tab) => {
+              setActiveTab(tab);
+              setIsSidebarOpen(false);
+            }}
+          />
+          <div aria-hidden className={`h-px shrink-0 bg-[#e1e8f0] ${collapsed ? 'lg:mx-auto lg:w-[50px]' : ''}`} />
+          <SidebarGroup
+            title="Others"
+            items={OTHER_ITEMS}
+            collapsed={collapsed}
+            activeTab={activeTab}
+            onSelect={(tab) => {
+              setActiveTab(tab);
+              setIsSidebarOpen(false);
+            }}
+          />
         </nav>
       </aside>
 
@@ -248,3 +260,55 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
     </div>
   );
 };
+
+/* One labelled group of sidebar links; icon-only (with tooltip) when the desktop sidebar is collapsed */
+function SidebarGroup({
+  title,
+  items,
+  collapsed,
+  activeTab,
+  onSelect,
+}: {
+  title: string;
+  items: SidebarItem[];
+  collapsed: boolean;
+  activeTab: AppTab;
+  onSelect: (tab: AppTab) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <p className={`font-figtree text-[12px] leading-[18px] font-medium text-text-tertiary ${collapsed ? 'lg:sr-only' : ''}`}>{title}</p>
+      <div className={`flex flex-col gap-1 ${collapsed ? 'lg:items-center lg:gap-3' : ''}`}>
+        {items.map((item) => {
+          const active = activeTab === item.tab;
+          return (
+            <Button
+              key={item.tab}
+              variant="ghost"
+              onClick={() => onSelect(item.tab)}
+              aria-current={active ? 'page' : undefined}
+              aria-label={collapsed ? item.label : undefined}
+              title={collapsed ? item.label : undefined}
+              className={`h-auto w-full justify-start gap-4 py-2 pl-3 pr-2 font-figtree text-[15px] font-medium cursor-pointer ${
+                collapsed ? 'lg:h-9 lg:w-11 lg:justify-center lg:px-0 lg:py-0' : ''
+              } ${
+                active
+                  ? 'rounded-lg border-l-3 border-[#7050e6] bg-[#f4f2fd] leading-[18px] text-[#08261f] hover:bg-[#f4f2fd] hover:text-[#08261f]'
+                  : `${collapsed ? 'lg:rounded-lg' : ''} rounded-none rounded-r-2xl leading-5 text-text-secondary hover:bg-[#f4f2fd]/60 hover:text-text-primary`
+              }`}
+            >
+              <img
+                src={`/sidebar/${item.icon}-${active ? 'selected' : 'default'}.svg`}
+                alt=""
+                width={20}
+                height={20}
+                className="size-5 shrink-0"
+              />
+              <span className={collapsed ? 'lg:hidden' : ''}>{item.label}</span>
+            </Button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

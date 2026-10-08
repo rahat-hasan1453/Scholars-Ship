@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { useAuthGuard } from '@/hooks/useAuthGuard';
 import { Professor } from '@/types';
 import { useApp } from '@/context/AppContext';
+import { SavedFeedView } from '@/components/SavedFeedView';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ScholarshipCard } from '@/components/ScholarshipCard';
 import { ProfessorCard } from '@/components/ProfessorCard';
@@ -82,7 +83,7 @@ export default function HomePage() {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get('tab') as any;
-      if (tabParam && ['opportunities', 'scholarships', 'professors', 'research', 'tracker', 'profile'].includes(tabParam)) {
+      if (tabParam && ['opportunities', 'scholarships', 'professors', 'research', 'tracker', 'saved', 'profile'].includes(tabParam)) {
         setActiveNavTab(tabParam);
       }
     }
@@ -797,6 +798,9 @@ export default function HomePage() {
           {trackerMode === 'outreach' ? <OutreachKanban /> : <KanbanBoard />}
         </div>
       )}
+
+      {/* Saved Feed (sidebar → Others) */}
+      {activeTab === 'saved' && <SavedFeedView />}
 
       {/* TAB 4: MY SCHOLAR PROFILE & CREDENTIALS */}
       {activeTab === 'profile' && (
