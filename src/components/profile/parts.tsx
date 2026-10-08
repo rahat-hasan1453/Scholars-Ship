@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from 'react';
 import { Check, Eye, Trash2, Upload } from 'lucide-react';
-import { upload as uploadToBlob } from '@vercel/blob/client';
+import { uploadPresigned as uploadToBlob } from '@vercel/blob/client';
 import { useApp } from '@/context/AppContext';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/shadcn/checkbox';
@@ -370,10 +370,10 @@ const UploadDocumentsDialog: React.FC<{
   );
 };
 
-/** Pathname inside the user's own folder; the server adds a random suffix so names never clash */
+/** Pathname inside the user's own folder. The random part keeps names unique (the presigned flow cannot add a suffix). */
 const blobPathFor = (prefix: string, fileName: string) => {
   const base = fileName.replace(/\.pdf$/i, '').replace(/[^a-zA-Z0-9._-]+/g, '_').slice(0, 80) || 'document';
-  return `${prefix}${base}.pdf`;
+  return `${prefix}${crypto.randomUUID().slice(0, 8)}-${base}.pdf`;
 };
 
 async function readError(res: Response, fallback: string) {
