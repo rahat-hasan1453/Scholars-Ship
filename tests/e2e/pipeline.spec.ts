@@ -1,4 +1,4 @@
-import { expect, installFakeBackend, signedInUser, test } from './fixtures';
+import { demoApplications, expect, installFakeBackend, signedInUser, test } from './fixtures';
 import type { Page } from '@playwright/test';
 
 const column = (page: Page, status: string) => page.locator(`[data-testid="pipeline-column"][data-column="${status}"]`);
@@ -6,7 +6,8 @@ const card = (page: Page, id: string) => page.locator(`[data-card-id="${id}"]`);
 
 test.describe('Pipeline (Kanban)', () => {
   test.beforeEach(async ({ page }) => {
-    await installFakeBackend(page, { user: signedInUser() });
+    // The board is served by the fake user-data API (the old demo cards as this user's data)
+    await installFakeBackend(page, { user: signedInUser(), applications: demoApplications() });
     await page.goto('/?tab=tracker');
     await expect(page.getByRole('heading', { name: 'Pipeline', level: 1 })).toBeVisible();
   });
@@ -89,5 +90,71 @@ test.describe('Pipeline (Kanban)', () => {
     await page.getByLabel('Deadline').selectOption('7');
     await page.keyboard.press('Escape');
     await expect(page.getByRole('button', { name: /Filter/ })).toContainText('1');
+  });
+});
+
+test.describe('Pipeline saved on the server', () => {
+  test('a new user starts with an empty board with drop zones', async ({ page }) => {
+    await installFakeBackend(page, { user: signedInUser() });
+    await page.goto('/?tab=tracker');
+    await expect(page.getByRole('heading', { name: 'Pipeline', level: 1 })).toBeVisible();
+    await expect(page.getByTestId('pipeline-card')).toHaveCount(0);
+    await expect(page.getByTestId('summary-Active')).toHaveText('0');
+    for (const s of ['Wishlist', 'Preparing', 'Submitted', 'Under Review', 'Decided']) {
+      await expect(column(page, s).getByText('Drop a card here')).toBeVisible();
+    }
+  });
+
+  test('save a scholarship, move it on the board, reload: it is still there', async ({ page }) => {
+    const backend = await installFakeBackend(page, { user: signedInUser() });
+    await page.goto('/scholarships/sch_daad_design_02');
+    await page.getByRole('button', { name: '🔖 Save' }).click();
+    await expect(page.getByRole('button', { name: '🔖 Saved' })).toBeVisible();
+    await expect.poll(() => backend.applications.map((a) => a.scholarshipId)).toEqual(['sch_daad_design_02']);
+    const id = backend.applications[0].id;
+
+    await page.goto('/?tab=tracker');
+    await expect(column(page, 'Wishlist').locator(`[data-card-id="${id}"]`)).toBeVisible();
+    await card(page, id).hover();
+    await card(page, id).getByRole('button', { name: /^Actions for/ }).click();
+    await page.getByRole('menuitemradio', { name: 'Submitted' }).click();
+    await expect(column(page, 'Submitted').locator(`[data-card-id="${id}"]`)).toBeVisible();
+    await expect.poll(() => backend.applications[0]?.status).toBe('Submitted');
+
+    await page.reload();
+    await expect(column(page, 'Submitted').locator(`[data-card-id="${id}"]`)).toBeVisible();
+    await expect(column(page, 'Wishlist').getByTestId('pipeline-card')).toHaveCount(0);
+  });
+
+  test('imports the old browser-only data once, then clears it', async ({ page }) => {
+    const backend = await installFakeBackend(page, { user: signedInUser() });
+    await page.addInitScript(() => {
+      if (sessionStorage.getItem('seeded')) return;
+      sessionStorage.setItem('seeded', '1');
+      localStorage.setItem('highscholar_bookmarked_programs', JSON.stringify(['opp_bremen_ux_03']));
+      localStorage.setItem('highscholar_applications_v2', JSON.stringify([{ id: 'app_01', scholarshipId: 'sch_chevening_uk_01', status: 'Preparing' }]));
+    });
+    await page.goto('/?tab=tracker');
+    await expect.poll(() => backend.importCalls.length).toBe(1);
+    // demo cards are not sent; real bookmarks are
+    expect(backend.importCalls[0]).toMatchObject({ applications: [], opportunities: ['opp_bremen_ux_03'] });
+    await expect.poll(() => page.evaluate(() => localStorage.getItem('highscholar_bookmarked_programs'))).toBeNull();
+    await page.reload();
+    await expect(page.getByRole('heading', { name: 'Pipeline', level: 1 })).toBeVisible();
+    await page.waitForTimeout(500);
+    expect(backend.importCalls).toHaveLength(1);
+  });
+
+  test('a failed move is rolled back with a message', async ({ page }) => {
+    await installFakeBackend(page, { user: signedInUser(), applications: demoApplications() });
+    await page.route('**/api/applications/app_02', (route) =>
+      route.request().method() === 'PATCH' ? route.fulfill({ status: 500, contentType: 'application/json', body: '{"success":false}' }) : route.fallback(),
+    );
+    await page.goto('/?tab=tracker');
+    await card(page, 'app_02').hover();
+    await card(page, 'app_02').getByRole('button', { name: /^Actions for/ }).click();
+    await page.getByRole('menuitemradio', { name: 'Submitted' }).click();
+    await expect(page.getByTestId('sync-error')).toContainText('couldn’t move this card');
+    await expect(column(page, 'Wishlist').locator('[data-card-id="app_02"]')).toBeVisible();
   });
 });

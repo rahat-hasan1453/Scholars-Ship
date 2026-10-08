@@ -31,6 +31,16 @@ enum DecisionResult {
   WAITLISTED
 }
 
+// Professor Outreach pipeline columns (UI: 'Prospect' | 'Drafting' | 'Email Sent' | 'Follow-up Due' | 'Interview' | 'Funded Offer')
+enum OutreachStatus {
+  PROSPECT
+  DRAFTING
+  EMAIL_SENT
+  FOLLOW_UP_DUE
+  INTERVIEW
+  FUNDED_OFFER
+}
+
 model User {
   id                  String       @id @default(uuid())
   email               String       @unique
@@ -63,19 +73,25 @@ model RateLimit {
 }
 
 model UserProfile {
-  id              String        @id @default(uuid())
-  userId          String        @unique
-  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  degreeLevel     DegreeLevel
-  specializations String[]
-  targetCountries String[]
-  cgpa            Decimal?
-  testScores      Json?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  applications    Application[]
-  followedProfs   ProfFollow[]
-  savedPapers     SavedPaper[]
+  id                 String             @id @default(uuid())
+  userId             String             @unique
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  degreeLevel        DegreeLevel
+  specializations    String[]
+  targetCountries    String[]
+  cgpa               Decimal?
+  testScores         Json?
+  /// Photo the user uploaded on the profile page (data URL). Kept here, not in User.avatar, so it never goes into the session cookie.
+  photo              String?
+  /// Profile page fields with no column of their own: { bio, field, gradYear, intake }
+  details            Json?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  applications       Application[]
+  followedProfs      ProfFollow[]
+  savedPapers        SavedPaper[]
+  outreach           OutreachRecord[]
+  savedOpportunities SavedOpportunity[]
 }
 
 model Scholarship {
@@ -168,7 +184,7 @@ model Grant {
 }
 
 model Professor {
-  id               String        @id @default(uuid())
+  id               String           @id @default(uuid())
   name             String
   title            String
   // Plain-text copies stay until the data pipeline links every row to University / ResearchLab
@@ -176,12 +192,12 @@ model Professor {
   department       String
   country          String
   universityId     String?
-  universityRef    University?   @relation(fields: [universityId], references: [id], onDelete: SetNull)
+  universityRef    University?      @relation(fields: [universityId], references: [id], onDelete: SetNull)
   labId            String?
-  lab              ResearchLab?  @relation(fields: [labId], references: [id], onDelete: SetNull)
+  lab              ResearchLab?     @relation(fields: [labId], references: [id], onDelete: SetNull)
   labName          String?
   researchTags     String[]
-  openPositions    Boolean       @default(true)
+  openPositions    Boolean          @default(true)
   recentGrants     String?
   email            String?
   linkedInUrl      String?
@@ -197,26 +213,27 @@ model Professor {
   hIndex           Int?
   /// { degree, minCgpa?, minIelts?, minToefl?, experience?, publications } for "What They Look For"
   lookingFor       Json?
-  contactSteps     String[]      @default([])
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  contactSteps     String[]         @default([])
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
   followers        ProfFollow[]
   grants           Grant[]
   papers           PaperAuthor[]
   opportunities    Opportunity[]
+  outreach         OutreachRecord[]
 }
 
 // Opportunity Feed: a funded position posted by a professor or lab.
 // List card: Figma 212:6186 · Details page: Figma 258:3269
 model Opportunity {
-  id              String        @id
+  id              String             @id
   title           String
   authorName      String
   authorTitle     String
   authorAvatar    String?
   /// Set when the author matches a seeded Professor row by name
   professorId     String?
-  professor       Professor?    @relation(fields: [professorId], references: [id], onDelete: SetNull)
+  professor       Professor?         @relation(fields: [professorId], references: [id], onDelete: SetNull)
   institution     String
   labName         String?
   country         String
@@ -236,7 +253,7 @@ model Opportunity {
   minCgpa         Float?
   minIelts        Float?
   /// "none" | "preferred" | "required"
-  publications    String        @default("none")
+  publications    String             @default("none")
   // List card lines
   admission       String
   livingCost      String
@@ -249,13 +266,26 @@ model Opportunity {
   /// [{ label, value }] rows for the Position Details section
   positionDetails Json
   aboutLab        String
-  applySteps      String[]      @default([])
+  applySteps      String[]           @default([])
   contactEmail    String?
   officialUrl     String?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  savedBy         SavedOpportunity[]
 
   @@index([country])
+}
+
+// Opportunity Feed bookmark (the "Save" button on cards and the details page)
+model SavedOpportunity {
+  id            String      @id @default(uuid())
+  profileId     String
+  opportunityId String
+  profile       UserProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+
+  @@unique([profileId, opportunityId])
 }
 
 model ProfFollow {
@@ -349,4 +379,32 @@ model ApplicationTask {
   dueDate       DateTime?
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+}
+
+// Professor Outreach card on the Pipeline board. Name / lab / institution are copied in, because an outreach
+// can start from a live-feed post whose author is not a Professor row (then professorId is null).
+model OutreachRecord {
+  id               String         @id @default(uuid())
+  profileId        String
+  profile          UserProfile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  professorId      String?
+  professor        Professor?     @relation(fields: [professorId], references: [id], onDelete: SetNull)
+  /// Feed post the outreach started from (live-feed ids are not in the Opportunity table, so no foreign key)
+  opportunityId    String?
+  professorName    String
+  labName          String?
+  institution      String
+  country          String?
+  sourceUrl        String?
+  status           OutreachStatus @default(PROSPECT)
+  notes            String         @default("")
+  lastContactDate  DateTime?
+  nextFollowUpDate DateTime?
+  coldEmailDraft   String?
+  emailSubject     String?
+  orderIndex       Int            @default(0)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@index([profileId])
 }

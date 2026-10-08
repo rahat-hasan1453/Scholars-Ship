@@ -1,4 +1,6 @@
 import { test as base, type Page, type Route } from '@playwright/test';
+import type { Application, OutreachRecord } from '../../src/types';
+import { mockScholarships, initialApplications, initialUserProfile } from '../../src/data/mockData';
 
 /* Browser-level fake backend: every /api call is answered here, so no database, email, Google or OpenAlex is touched. */
 export const VALID_CODE = '12345';
@@ -12,7 +14,17 @@ export type FakeBackend = {
   sendCodeCalls: string[];
   onboardingPayload: Record<string, unknown> | null;
   failCompleteOnboarding: boolean;
+  /** In-memory user data served by /api/profile, /api/applications, /api/outreach, /api/bookmarks */
+  profile: Record<string, unknown>;
+  applications: Application[];
+  outreach: OutreachRecord[];
+  bookmarks: { opportunities: string[]; professors: string[]; papers: string[] };
+  /** Bodies posted to /api/import */
+  importCalls: unknown[];
 };
+
+/** The old demo board (4 cards) as the fake server's data, for specs that need cards to drag */
+export const demoApplications = (): Application[] => structuredClone(initialApplications);
 
 const json = (route: Route, body: unknown, status = 200) =>
   route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(body) });
@@ -24,13 +36,22 @@ const opportunity = {
 };
 
 export async function installFakeBackend(page: Page, init: Partial<FakeBackend> = {}): Promise<FakeBackend> {
-  const state: FakeBackend = { user: null, existing: null, sendCodeCalls: [], onboardingPayload: null, failCompleteOnboarding: false, ...init };
+  const state: FakeBackend = {
+    user: null, existing: null, sendCodeCalls: [], onboardingPayload: null, failCompleteOnboarding: false,
+    profile: {}, applications: [], outreach: [], bookmarks: { opportunities: [], professors: [], papers: [] }, importCalls: [],
+    ...init,
+  };
   let lastSend = 0;
 
   await page.route('**/api/**', async (route) => {
     const req = route.request();
     const path = new URL(req.url()).pathname;
     const body = req.postDataJSON?.() ?? {};
+
+    if (/^\/api\/(profile|applications|outreach|bookmarks|import)(\/|$)/.test(path)) {
+      if (!state.user) return json(route, { success: false, error: 'Unauthorized. Please sign in.' }, 401);
+      return userData(route, state, req.method(), path, body);
+    }
 
     switch (path) {
       case '/api/auth/me':
@@ -69,6 +90,91 @@ export async function installFakeBackend(page: Page, init: Partial<FakeBackend> 
     }
   });
   return state;
+}
+
+const ts = () => new Date().toISOString();
+
+/* Minimal in-memory version of the user-data API (src/app/api/{profile,applications,outreach,bookmarks,import}) */
+function userData(route: Route, state: FakeBackend, method: string, path: string, body: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+  const seg = path.split('/').slice(2); // e.g. ['applications', '<id>', 'tasks', '<taskId>']
+  const [resource, id, sub, subId] = seg;
+  const user = state.user!;
+
+  if (resource === 'profile') {
+    if (method === 'PATCH') state.profile = { ...state.profile, ...body };
+    // An onboarded Masters student (same answers as the app's default profile), plus anything PATCHed
+    const { degreeLevel, specializations, targetCountries, cgpa, testScores } = initialUserProfile;
+    return json(route, {
+      success: true,
+      profile: { id: user.id, name: user.name, email: user.email, onboardingCompleted: user.onboardingCompleted, degreeLevel, specializations, targetCountries, cgpa, testScores, ...state.profile },
+    });
+  }
+
+  if (resource === 'bookmarks') {
+    if (!id) return json(route, { success: true, data: state.bookmarks });
+    const kind = id as keyof FakeBackend['bookmarks'];
+    const list = state.bookmarks[kind].filter((x) => x !== sub);
+    state.bookmarks[kind] = method === 'PUT' ? [...list, sub] : list;
+    return json(route, { success: true });
+  }
+
+  if (resource === 'import') {
+    state.importCalls.push(body);
+    return json(route, { success: true, imported: {}, skipped: 0, data: { applications: state.applications, outreach: state.outreach, bookmarks: state.bookmarks } });
+  }
+
+  if (resource === 'applications') {
+    if (!id) {
+      if (method === 'GET') return json(route, { success: true, data: state.applications });
+      const existing = state.applications.find((a) => a.scholarshipId === body.scholarshipId);
+      if (existing) return json(route, { success: true, data: existing });
+      const scholarship = mockScholarships.find((s) => s.id === body.scholarshipId);
+      if (!scholarship) return json(route, { success: false, error: 'Scholarship not found.' }, 404);
+      const app: Application = {
+        id: body.id, scholarshipId: scholarship.id, scholarship, status: body.status ?? 'Wishlist', decision: body.decision ?? 'Pending',
+        notes: body.notes ?? '', deadline: body.deadline ?? scholarship.deadline, updatedAt: ts(),
+        tasks: (body.tasks ?? []).map((t: { id: string; title: string; isCompleted?: boolean }) => ({ id: t.id, title: t.title, isCompleted: !!t.isCompleted })),
+      };
+      state.applications = [app, ...state.applications];
+      return json(route, { success: true, data: app }, 201);
+    }
+    if (id === 'order') {
+      const rank = new Map<string, number>(body.ids.map((x: string, i: number) => [x, i]));
+      state.applications = [...state.applications].sort((a, b) => (rank.get(a.id) ?? 1e9) - (rank.get(b.id) ?? 1e9));
+      return json(route, { success: true });
+    }
+    const app = state.applications.find((a) => a.id === id);
+    if (!app) return json(route, { success: false, error: 'Application not found.' }, 404);
+    if (sub === 'tasks') {
+      if (method === 'POST') app.tasks.push({ id: body.id, title: body.title, isCompleted: false });
+      else if (method === 'PATCH') app.tasks = app.tasks.map((t) => (t.id === subId ? { ...t, ...body } : t));
+      else app.tasks = app.tasks.filter((t) => t.id !== subId);
+      return json(route, { success: true });
+    }
+    if (method === 'DELETE') state.applications = state.applications.filter((a) => a.id !== id);
+    else Object.assign(app, body, { updatedAt: ts() });
+    return json(route, { success: true, data: app });
+  }
+
+  if (resource === 'outreach') {
+    if (!id) {
+      if (method === 'GET') return json(route, { success: true, data: state.outreach });
+      const rec: OutreachRecord = { coldEmailDraft: '', status: 'Prospect', notes: '', ...body, updatedAt: ts() };
+      state.outreach = [rec, ...state.outreach];
+      return json(route, { success: true, data: rec }, 201);
+    }
+    if (id === 'order') {
+      const rank = new Map<string, number>(body.ids.map((x: string, i: number) => [x, i]));
+      state.outreach = [...state.outreach].sort((a, b) => (rank.get(a.id) ?? 1e9) - (rank.get(b.id) ?? 1e9));
+      return json(route, { success: true });
+    }
+    const rec = state.outreach.find((r) => r.id === id);
+    if (!rec) return json(route, { success: false, error: 'Outreach record not found.' }, 404);
+    if (method === 'DELETE') state.outreach = state.outreach.filter((r) => r.id !== id);
+    else Object.assign(rec, body, { updatedAt: ts() });
+    return json(route, { success: true, data: rec });
+  }
+  return json(route, { success: false, error: 'Not found' }, 404);
 }
 
 export const signedInUser = (over: Partial<User> = {}): User => ({ id: 'u-qa', email: TEST_EMAIL, name: 'QA Student', onboardingCompleted: true, ...over });

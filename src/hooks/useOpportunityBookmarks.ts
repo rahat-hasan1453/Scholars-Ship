@@ -1,59 +1,19 @@
 'use client';
 
-import { useCallback, useMemo, useSyncExternalStore } from 'react';
+import { useCallback, useMemo } from 'react';
+import { useApp, type BookmarkKind } from '@/context/AppContext';
 
-// Bookmarks live in localStorage until a saved-items table exists.
-// Shared by the feed cards and the details pages so both show the same state.
-const OPPORTUNITY_KEY = 'highscholar_bookmarked_programs';
-const PROFESSOR_KEY = 'highscholar_bookmarked_professors';
-const BOOKMARKS_EVENT = 'highscholar-bookmarks-change';
+// Bookmarks are saved to the signed-in user's account (/api/bookmarks); the state lives in AppContext,
+// so the feed cards and the details pages always show the same thing.
+function useBookmarks(kind: Exclude<BookmarkKind, 'papers'>) {
+  const { savedOpportunityIds, savedProfessorIds, setBookmark } = useApp();
+  const ids = kind === 'opportunities' ? savedOpportunityIds : savedProfessorIds;
+  const bookmarks = useMemo(() => new Set(ids), [ids]);
 
-function readBookmarksRaw(key: string): string {
-  try {
-    return localStorage.getItem(key) ?? '[]';
-  } catch {
-    return '[]';
-  }
-}
-
-function subscribeBookmarks(onChange: () => void) {
-  window.addEventListener('storage', onChange);
-  window.addEventListener(BOOKMARKS_EVENT, onChange);
-  return () => {
-    window.removeEventListener('storage', onChange);
-    window.removeEventListener(BOOKMARKS_EVENT, onChange);
-  };
-}
-
-function parseBookmarks(raw: string): Set<string> {
-  try {
-    const ids: unknown = JSON.parse(raw);
-    return new Set(Array.isArray(ids) ? ids.filter((x): x is string => typeof x === 'string') : []);
-  } catch {
-    return new Set();
-  }
-}
-
-function useBookmarks(key: string) {
-  const read = useCallback(() => readBookmarksRaw(key), [key]);
-  const raw = useSyncExternalStore(subscribeBookmarks, read, () => '[]');
-  const bookmarks = useMemo(() => parseBookmarks(raw), [raw]);
-
-  const toggleBookmark = useCallback(
-    (id: string) => {
-      const next = parseBookmarks(readBookmarksRaw(key));
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      try {
-        localStorage.setItem(key, JSON.stringify([...next]));
-      } catch {}
-      window.dispatchEvent(new Event(BOOKMARKS_EVENT));
-    },
-    [key],
-  );
+  const toggleBookmark = useCallback((id: string) => setBookmark(kind, id, !bookmarks.has(id)), [bookmarks, kind, setBookmark]);
 
   return { bookmarks, toggleBookmark };
 }
 
-export const useOpportunityBookmarks = () => useBookmarks(OPPORTUNITY_KEY);
-export const useProfessorBookmarks = () => useBookmarks(PROFESSOR_KEY);
+export const useOpportunityBookmarks = () => useBookmarks('opportunities');
+export const useProfessorBookmarks = () => useBookmarks('professors');
