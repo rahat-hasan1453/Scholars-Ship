@@ -7,6 +7,7 @@ import { useApp } from '@/context/AppContext';
 import { UnifiedDiscoveryHeader } from '@/components/layout/UnifiedDiscoveryHeader';
 import { ScholarshipRadarCard } from '@/components/ScholarshipRadarCard';
 import { FeedShell } from '@/components/opportunity-feed/FeedShell';
+import { ScholarshipTable } from '@/components/feed/FeedTables';
 import { FeedGrid } from '@/components/opportunity-feed/FeedGrid';
 import { OpportunityListBar, MatchMode, ViewMode } from '@/components/opportunity-feed/OpportunityListBar';
 import { isScholarshipEligible } from '@/lib/eligibility';
@@ -152,11 +153,15 @@ export const ScholarshipRadarFeed: React.FC = () => {
           </button>
         </div>
       ) : (
-        <FeedGrid viewMode={viewMode}>
-          {filteredScholarships.map((s) => (
-            <ScholarshipRadarCard key={s.id} scholarship={s} />
-          ))}
-        </FeedGrid>
+        viewMode === 'list' ? (
+          <ScholarshipTable rows={filteredScholarships} />
+        ) : (
+          <FeedGrid viewMode={viewMode}>
+            {filteredScholarships.map((s) => (
+              <ScholarshipRadarCard key={s.id} scholarship={s} />
+            ))}
+          </FeedGrid>
+        )
       )}
     </FeedShell>
   );

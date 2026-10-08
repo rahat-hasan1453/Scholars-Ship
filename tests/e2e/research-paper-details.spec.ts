@@ -12,9 +12,10 @@ test.describe('Research Paper details modal', () => {
     await page.getByRole('button', { name: 'List view' }).click();
     await expect(page.getByRole('button', { name: 'List view' })).toHaveAttribute('aria-pressed', 'true');
 
-    const card = page.locator('article').first();
-    const title = (await card.locator('h3').innerText()).trim();
-    await card.getByRole('button', { name: 'Read full abstract' }).click();
+    // List view is a table: open the first paper with its "See more" button
+    const row = page.getByRole('table').getByRole('row').filter({ has: page.getByRole('button', { name: /^See more about / }) }).first();
+    const title = (await row.getAttribute('aria-label'))!.trim();
+    await row.getByRole('button', { name: /^See more about / }).click();
 
     const dialog = page.getByRole('dialog', { name: title });
     await expect(dialog).toBeVisible();
