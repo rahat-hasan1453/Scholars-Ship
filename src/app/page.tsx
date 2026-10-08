@@ -8,7 +8,7 @@ import { SavedFeedView } from '@/components/SavedFeedView';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ScholarshipCard } from '@/components/ScholarshipCard';
 import { ProfessorCard } from '@/components/ProfessorCard';
-import { KanbanBoard } from '@/components/KanbanBoard';
+import { PipelineBoard } from '@/components/pipeline/PipelineBoard';
 import { ProfileView } from '@/components/ProfileView';
 import { OnboardingModal } from '@/components/OnboardingModal';
 import { ScholarshipDetailModal } from '@/components/ScholarshipDetailModal';
@@ -16,7 +16,6 @@ import { ChromeExtensionDrawer } from '@/components/ChromeExtensionDrawer';
 import { OpportunitiesFeed } from '@/components/OpportunitiesFeed';
 import { ColdEmailModal } from '@/components/ColdEmailModal';
 import { ProfessorDetailModal } from '@/components/ProfessorDetailModal';
-import { OutreachKanban } from '@/components/OutreachKanban';
 import { AdvancedFilterModal, FilterState, initialFilterState } from '@/components/AdvancedFilterModal';
 import { SmartProfileMatcherModal } from '@/components/SmartProfileMatcherModal';
 import { UnifiedHubView } from '@/components/UnifiedHubView';
@@ -44,8 +43,6 @@ import {
   X,
   User,
   Zap,
-  KanbanSquare,
-  Mail,
   Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -60,8 +57,6 @@ export default function HomePage() {
     profile, 
     scholarships, 
     professors, 
-    applications, 
-    outreachRecords,
     setIsOnboardingOpen, 
     selectedScholarship, 
     setSelectedScholarship,
@@ -89,7 +84,6 @@ export default function HomePage() {
     }
   }, [setActiveNavTab]);
   const [viewMode, setViewMode] = useState<'classic' | 'unified'>('unified');
-  const [trackerMode, setTrackerMode] = useState<'outreach' | 'scholarships'>('outreach');
   const [isExtensionDrawerOpen, setIsExtensionDrawerOpen] = useState(false);
 
   // Scholarship filters
@@ -279,35 +273,6 @@ export default function HomePage() {
       viewMode={viewMode}
       onToggleViewMode={() => setViewMode(prev => prev === 'classic' ? 'unified' : 'classic')}
     >
-      {/* Dynamic View Header for tracker */}
-      {activeTab === 'tracker' && (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-1">
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-extrabold text-[#101828] tracking-tight">
-                Applications & Outreach Pipelines
-              </h1>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#eef2ff] text-[#4f46e5] border border-[#c7d2fe]">
-                {applications.length + outreachRecords.length} Active
-              </span>
-            </div>
-          </div>
-
-          {/* Quick Context Pill */}
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsOnboardingOpen(true)}
-              className="text-xs"
-            >
-              <SlidersHorizontal className="w-3.5 h-3.5 text-indigo-700" />
-              <span>Profile: {profile.degreeLevel} (GPA {profile.cgpa})</span>
-            </Button>
-          </div>
-        </div>
-      )}
-
       {/* 1. OPPORTUNITY FEED: Figma Node 116:1841 */}
       {activeTab === 'opportunities' && (
         <OpportunitiesFeed />
@@ -759,45 +724,8 @@ export default function HomePage() {
         <ResearchPapersView />
       )}
 
-      {/* TAB 3: DUAL-MODE APPLICATION & OUTREACH TRACKER */}
-      {activeTab === 'tracker' && (
-        <div className="space-y-5">
-          {/* Uxcel Mode Switcher */}
-          <div className="flex items-center gap-2 p-1.5 bg-white border border-[#eaecf0] rounded-2xl w-fit shadow-xs">
-            <button
-              onClick={() => setTrackerMode('outreach')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                trackerMode === 'outreach'
-                  ? 'bg-[#4f46e5] text-white shadow-xs'
-                  : 'text-[#475467] hover:bg-slate-50'
-              }`}
-            >
-              <Mail className="w-4 h-4" />
-              <span>Professor Outreach Pipeline</span>
-              <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${trackerMode === 'outreach' ? 'bg-white/25 text-white' : 'bg-slate-100 text-[#344054]'}`}>
-                {outreachRecords.length}
-              </span>
-            </button>
-
-            <button
-              onClick={() => setTrackerMode('scholarships')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                trackerMode === 'scholarships'
-                  ? 'bg-[#4f46e5] text-white shadow-xs'
-                  : 'text-[#475467] hover:bg-slate-50'
-              }`}
-            >
-              <KanbanSquare className="w-4 h-4" />
-              <span>Scholarship Applications</span>
-              <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${trackerMode === 'scholarships' ? 'bg-white/25 text-white' : 'bg-slate-100 text-[#344054]'}`}>
-                {applications.length}
-              </span>
-            </button>
-          </div>
-
-          {trackerMode === 'outreach' ? <OutreachKanban /> : <KanbanBoard />}
-        </div>
-      )}
+      {/* Pipeline (Figma 315:5151): scholarship applications + professor outreach Kanban */}
+      {activeTab === 'tracker' && <PipelineBoard />}
 
       {/* Saved Feed (sidebar → Others) */}
       {activeTab === 'saved' && <SavedFeedView />}

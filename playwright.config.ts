@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const PORT = 3100;
+// E2E_PORT lets parallel worktrees run their own dev server instead of reusing another checkout's
+const PORT = Number(process.env.E2E_PORT ?? 3100);
 const desktop = { viewport: { width: 1728, height: 1117 } };
 
 export default defineConfig({
