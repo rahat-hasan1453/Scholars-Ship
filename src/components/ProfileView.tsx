@@ -114,12 +114,12 @@ const TopBar: React.FC<{ label: string; showShare?: boolean }> = ({ label, showS
 
   return (
     <div className="flex w-full items-center justify-between">
-      <p className="text-[14px] leading-[20px] font-[510] text-[#95a3b6] whitespace-pre">{label}</p>
+      <p className="text-[14px] leading-[20px] font-medium text-[#95a3b6] whitespace-pre">{label}</p>
       {showShare ? (
         <button
           type="button"
           onClick={share}
-          className="flex items-start gap-[4px] rounded-[6px] border border-[#e1e8f0] px-[12px] py-[6px] text-[12px] leading-[16px] font-[510] text-[#95a3b6] transition-colors hover:bg-[#fafafa]"
+          className="flex items-start gap-[4px] rounded-[6px] border border-[#e1e8f0] px-[12px] py-[6px] text-[12px] leading-[16px] font-medium text-[#95a3b6] transition-colors hover:bg-[#fafafa]"
         >
           {copied ? 'Link copied' : 'Share'}
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -152,7 +152,7 @@ const ProfileBanner: React.FC<{
     <div className="relative flex min-w-0 flex-1 items-center gap-[20px]">
       <UserAvatar src={avatar} name={name} email={contact} alt={name} className="size-[72px] md:size-[96px]" />
       <div className="flex min-w-0 flex-1 flex-col items-start gap-[4px]">
-        <h1 className="w-full truncate text-[24px] leading-[32px] font-[590] text-[#101828]">{name}</h1>
+        <h1 className="w-full truncate text-[24px] leading-[32px] font-semibold text-[#101828]">{name}</h1>
         <div className="flex min-w-0 flex-col items-start gap-[2px]">
           <p className="text-[16px] leading-[20px] text-[#101828]">{subtitle}</p>
           <p className="max-w-full truncate text-[12px] leading-[18px] italic text-[#627181]">{contact}</p>
@@ -212,7 +212,7 @@ const ChipList: React.FC<{ items: string[] }> = ({ items }) => (
 const Fact: React.FC<{ label: string; value: string }> = ({ label, value }) => (
   <div className="flex min-w-0 flex-1 flex-col items-start gap-[2px]">
     <p className="text-[12px] leading-[18px] text-[#627181]">{label}</p>
-    <p className="text-[14px] leading-[20px] font-[510] text-[#101828]">{value}</p>
+    <p className="text-[14px] leading-[20px] font-medium text-[#101828]">{value}</p>
   </div>
 );
 
@@ -282,7 +282,7 @@ const OverviewTab: React.FC<{
           {UPCOMING_DEADLINES.map((d) => (
             <div key={d.title} className="flex w-full items-center justify-between gap-[8px] border-t border-[#fafafa] pt-[8px]">
               <div className="flex min-w-0 flex-col items-start gap-[2px]">
-                <p className="text-[14px] leading-[20px] font-[510] text-[#101828]">{d.title}</p>
+                <p className="text-[14px] leading-[20px] font-medium text-[#101828]">{d.title}</p>
                 <p className="text-[12px] leading-[18px] italic text-[#627181]">{d.meta}</p>
               </div>
               <Chip tone="success" compact>
@@ -296,7 +296,7 @@ const OverviewTab: React.FC<{
           {ASK_AI_PROMPTS.map((q) => (
             <div
               key={q}
-              className="flex w-full items-start rounded-[6px] bg-[#eef2ff] px-[10px] py-[6px] text-[13px] leading-[18px] font-[510] text-[#101828]"
+              className="flex w-full items-start rounded-[6px] bg-[#eef2ff] px-[10px] py-[6px] text-[13px] leading-[18px] font-medium text-[#101828]"
             >
               ✦ {q}
             </div>
@@ -510,7 +510,7 @@ const SettingsView: React.FC<{
                   <TextField id="settings-grad" label="Graduation year" inputMode="numeric" {...input('gradYear')} />
                 </div>
                 <div className="flex w-full flex-col items-start gap-[8px]">
-                  <p className="text-[14px] leading-[20px] font-[510] text-[#101828]">Fields of interest</p>
+                  <p className="text-[14px] leading-[20px] font-medium text-[#101828]">Fields of interest</p>
                   <ChipList items={interests} />
                 </div>
               </Card>
@@ -556,11 +556,11 @@ const SettingsView: React.FC<{
                 />
               </div>
               <div className="flex w-full flex-col items-start gap-[8px]">
-                <p className="text-[14px] leading-[20px] font-[510] text-[#101828]">Target countries</p>
+                <p className="text-[14px] leading-[20px] font-medium text-[#101828]">Target countries</p>
                 <ChipList items={countries.map((c) => `${flagFor(c)} ${c}`)} />
               </div>
               <div className="flex w-full flex-col items-start gap-[8px]">
-                <p className="text-[14px] leading-[20px] font-[510] text-[#101828]">Open to</p>
+                <p className="text-[14px] leading-[20px] font-medium text-[#101828]">Open to</p>
                 <ChipList items={['Scholarships', 'Research assistantships', 'Teaching assistantships', 'Fully funded PhD']} />
               </div>
               <div className="flex w-full flex-col gap-[16px] md:flex-row">

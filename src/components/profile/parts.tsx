@@ -5,7 +5,7 @@ import { Check, Eye, Trash2, Upload } from 'lucide-react';
 import { uploadPresigned as uploadToBlob } from '@vercel/blob/client';
 import { useApp } from '@/context/AppContext';
 import { cn } from '@/lib/utils';
-import { Checkbox } from '@/components/shadcn/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/components/shadcn/radio-group';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/shadcn/dialog';
 import {
   DropdownMenu,
@@ -36,7 +36,7 @@ export const Chip: React.FC<{
 }> = ({ tone = 'neutral', compact = false, className, children }) => (
   <span
     className={cn(
-      'inline-flex shrink-0 items-start rounded-[999px] text-[12px] italic font-[508] whitespace-pre',
+      'inline-flex shrink-0 items-start rounded-[999px] text-[12px] italic font-medium whitespace-pre',
       compact ? 'px-[8px] py-[2px] leading-[16px]' : 'px-[10px] py-[3px] leading-[18px]',
       CHIP_TONES[tone],
       className,
@@ -64,7 +64,7 @@ export const Card: React.FC<{ className?: string; children: React.ReactNode; dan
 );
 
 export const CardTitle: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => (
-  <h3 className={cn('text-[16px] leading-[22px] font-[590] text-[#101828]', className)}>{children}</h3>
+  <h3 className={cn('text-[16px] leading-[22px] font-semibold text-[#101828]', className)}>{children}</h3>
 );
 
 export const CardHead: React.FC<{ title: React.ReactNode; description: React.ReactNode }> = ({
@@ -118,7 +118,7 @@ export const OutlineButton: React.FC<React.ButtonHTMLAttributes<HTMLButtonElemen
 
 /** Form label: Body/2 M (SF Pro Medium 14/20) */
 export const FieldLabel: React.FC<{ htmlFor?: string; children: React.ReactNode }> = ({ htmlFor, children }) => (
-  <label htmlFor={htmlFor} className="text-[14px] leading-[20px] font-[510] text-[#101828] whitespace-nowrap">
+  <label htmlFor={htmlFor} className="text-[14px] leading-[20px] font-medium text-[#101828] whitespace-nowrap">
     {children}
   </label>
 );
@@ -251,7 +251,7 @@ const DropZone: React.FC<{
         // eslint-disable-next-line @next/next/no-img-element
         <img src="/profile/upload-cloud.svg" alt="" width={20} height={20} />
       )}
-      <span className="text-[14px] leading-[20px] font-[510] text-[#101828] whitespace-pre-wrap">
+      <span className="text-[14px] leading-[20px] font-medium text-[#101828] whitespace-pre-wrap">
         {withIcon ? 'Drag & drop a PDF here, or browse files' : '⬆  Drag & drop a PDF here, or browse files'}
       </span>
       <span className="text-[12px] leading-[18px] italic text-[#627181]">
@@ -264,14 +264,14 @@ const DropZone: React.FC<{
 
 const UploadDocumentsDialog: React.FC<{
   initialFile: File | null;
-  initialKinds: DocKind[];
+  initialKind: DocKind;
   onClose: () => void;
   /** Resolves to an error message, or null when the upload worked */
-  onUpload: (file: File, kinds: DocKind[]) => Promise<string | null>;
-}> = ({ initialFile, initialKinds, onClose, onUpload }) => {
+  onUpload: (file: File, kind: DocKind) => Promise<string | null>;
+}> = ({ initialFile, initialKind, onClose, onUpload }) => {
   // Mounted fresh for every open, so state starts from the props
   const [file, setFile] = useState<File | null>(() => (initialFile && !checkPdf(initialFile) ? initialFile : null));
-  const [kinds, setKinds] = useState<DocKind[]>(initialKinds);
+  const [kind, setKind] = useState<DocKind>(initialKind);
   const [error, setError] = useState(() => (initialFile ? (checkPdf(initialFile) ?? '') : ''));
   const [busy, setBusy] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -282,12 +282,12 @@ const UploadDocumentsDialog: React.FC<{
     setFile(problem ? null : f);
   };
 
-  const canUpload = !!file && !error && kinds.length > 0 && !busy;
+  const canUpload = !!file && !error && !busy;
 
   const submit = async () => {
     if (!file || !canUpload) return;
     setBusy(true);
-    const problem = await onUpload(file, kinds);
+    const problem = await onUpload(file, kind);
     setBusy(false);
     if (problem) setError(problem);
     else onClose();
@@ -301,22 +301,25 @@ const UploadDocumentsDialog: React.FC<{
       >
         <div className="flex w-full flex-col gap-[40px] px-[16px] pt-[16px] pb-[40px]">
           <div className="flex w-full flex-col gap-[16px]">
-            <DialogTitle className="text-[16px] leading-[22px] font-[590] text-[#101828]">Upload Documents</DialogTitle>
+            <DialogTitle className="text-[16px] leading-[22px] font-semibold text-[#101828]">Upload Documents</DialogTitle>
             <DialogDescription className="sr-only">Choose what this PDF is, then add the file.</DialogDescription>
-            <div className="grid w-full grid-cols-2 gap-[8px] sm:grid-cols-4">
+            {/* One document type per upload, so a single choice */}
+            <RadioGroup
+              value={kind}
+              onValueChange={(v) => setKind(v as DocKind)}
+              aria-label="Document type"
+              className="grid w-full grid-cols-2 gap-[8px] sm:grid-cols-4"
+            >
               {DOC_KINDS.map((k) => {
-                const checked = kinds.includes(k.key);
+                const checked = kind === k.key;
                 return (
                   <label
                     key={k.key}
                     className="flex min-w-0 cursor-pointer items-center gap-[8px] rounded-[10px] border border-[#e1e8f0] px-[8px] py-[6px] hover:bg-[#fafafa]"
                   >
-                    <Checkbox
-                      checked={checked}
-                      onCheckedChange={(v) =>
-                        setKinds((prev) => (v ? [...prev, k.key] : prev.filter((x) => x !== k.key)))
-                      }
-                      className="border-[#d0d5dd] bg-[rgba(229,229,229,0.3)] data-[state=checked]:border-[#7150e7] data-[state=checked]:bg-[#7150e7]"
+                    <RadioGroupItem
+                      value={k.key}
+                      className="border-[#d0d5dd] bg-[rgba(229,229,229,0.3)] data-[state=checked]:border-[#7150e7] data-[state=checked]:bg-white"
                     />
                     <span
                       className={cn(
@@ -329,7 +332,7 @@ const UploadDocumentsDialog: React.FC<{
                   </label>
                 );
               })}
-            </div>
+            </RadioGroup>
           </div>
           <input
             ref={inputRef}
@@ -345,7 +348,7 @@ const UploadDocumentsDialog: React.FC<{
           <div className="flex w-full flex-col gap-[8px]">
             <DropZone withIcon onFile={pick} onBrowse={() => inputRef.current?.click()}>
               {file && (
-                <span className="mt-[6px] max-w-full truncate rounded-[999px] bg-white px-[10px] py-[3px] text-[12px] leading-[18px] font-[510] text-[#7150e7]">
+                <span className="mt-[6px] max-w-full truncate rounded-[999px] bg-white px-[10px] py-[3px] text-[12px] leading-[18px] font-medium text-[#7150e7]">
                   {file.name} · {formatSize(file.size)}
                 </span>
               )}
@@ -392,7 +395,7 @@ export const DocumentsCard: React.FC = () => {
   const [storageReady, setStorageReady] = useState(true);
   const [loaded, setLoaded] = useState(false);
   const [notice, setNotice] = useState('');
-  const [dialog, setDialog] = useState<{ file: File | null; kinds: DocKind[] } | null>(null);
+  const [dialog, setDialog] = useState<{ file: File | null; kind: DocKind } | null>(null);
 
   React.useEffect(() => {
     let alive = true;
@@ -411,12 +414,12 @@ export const DocumentsCard: React.FC = () => {
     };
   }, []);
 
-  const openDialog = (file: File | null, kinds: DocKind[] = ['cv']) => {
+  const openDialog = (file: File | null, kind: DocKind = 'cv') => {
     setNotice('');
-    setDialog({ file, kinds });
+    setDialog({ file, kind });
   };
 
-  const upload = async (file: File, kinds: DocKind[]): Promise<string | null> => {
+  const upload = async (file: File, kind: DocKind): Promise<string | null> => {
     if (!prefix) return 'Please sign in to upload documents.';
     if (!storageReady) return 'File storage is not set up yet. Please try again later.';
     try {
@@ -428,7 +431,7 @@ export const DocumentsCard: React.FC = () => {
       const res = await fetch('/api/documents', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ pathname: blob.pathname, name: file.name, kinds }),
+        body: JSON.stringify({ pathname: blob.pathname, name: file.name, kinds: [kind] }),
       });
       if (!res.ok) return await readError(res, 'We could not save that file. Please try again.');
       setDocs((await res.json()).documents);
@@ -488,7 +491,7 @@ export const DocumentsCard: React.FC = () => {
             <li key={k.key} className="flex w-full items-center gap-[16px] border-t border-[#f1f1f1] py-[14px]">
               <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-[16px] gap-y-[4px]">
                 <div className="flex min-w-0 flex-col items-start gap-[2px]">
-                  <p className="text-[14px] leading-[20px] font-[510] text-[#101828] whitespace-pre">{`📄  ${k.title}`}</p>
+                  <p className="text-[14px] leading-[20px] font-medium text-[#101828] whitespace-pre">{`📄  ${k.title}`}</p>
                   <p className="max-w-full truncate text-[12px] leading-[18px] italic text-[#627181]">{meta}</p>
                 </div>
                 {loaded && <Chip tone={chip.tone}>{chip.label}</Chip>}
@@ -498,7 +501,7 @@ export const DocumentsCard: React.FC = () => {
                   type="button"
                   disabled={!latest}
                   onClick={() => latest && window.open(`/api/documents/${latest.id}/file`, '_blank', 'noopener')}
-                  className="inline-flex h-[36px] w-[88px] items-center justify-center gap-[4px] rounded-[6px] border border-[#7150e7] px-[8px] text-[14px] leading-[20px] font-[510] text-[#7150e7] transition-colors hover:bg-[#f4f2fd] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+                  className="inline-flex h-[36px] w-[88px] items-center justify-center gap-[4px] rounded-[6px] border border-[#7150e7] px-[8px] text-[14px] leading-[20px] font-medium text-[#7150e7] transition-colors hover:bg-[#f4f2fd] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
                 >
                   View
                   <Eye size={12} strokeWidth={1.5} aria-hidden />
@@ -512,7 +515,7 @@ export const DocumentsCard: React.FC = () => {
                     <img src="/profile/doc-more.svg" alt="" width={24} height={24} />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-40">
-                    <DropdownMenuItem onSelect={() => openDialog(null, [k.key])}>
+                    <DropdownMenuItem onSelect={() => openDialog(null, k.key)}>
                       <Upload strokeWidth={1.5} aria-hidden />
                       Upload
                     </DropdownMenuItem>
@@ -530,7 +533,7 @@ export const DocumentsCard: React.FC = () => {
       {dialog && (
         <UploadDocumentsDialog
           initialFile={dialog.file}
-          initialKinds={dialog.kinds}
+          initialKind={dialog.kind}
           onClose={() => setDialog(null)}
           onUpload={upload}
         />
@@ -600,7 +603,7 @@ export const AccountCards: React.FC = () => {
           description="Manage how you sign in, what we send you, and who can see your profile."
         />
         <div className="flex w-full flex-col items-start gap-[6px]">
-          <p className="text-[14px] leading-[20px] font-[510] text-[#627181]">Sign-in method</p>
+          <p className="text-[14px] leading-[20px] font-medium text-[#627181]">Sign-in method</p>
           <div className="flex flex-wrap items-start gap-[20px]">
             <SignInMethod icon="/profile/signin-google.svg" label="Google" checked={usesGoogle === true} width="w-[200px]" />
             <SignInMethod
@@ -626,7 +629,7 @@ export const AccountCards: React.FC = () => {
                   className="flex min-w-0 items-center gap-[16px] rounded-[8px] border border-[#e1e8f0] p-[16px] text-left transition-colors hover:bg-[#fafafa]"
                 >
                   <span className="flex min-w-0 flex-1 flex-col items-start gap-[2px]">
-                    <span className="text-[14px] leading-[20px] font-[510] text-[#101828]">{n.title}</span>
+                    <span className="text-[14px] leading-[20px] font-medium text-[#101828]">{n.title}</span>
                     <span className="max-w-full truncate text-[12px] leading-[18px] italic text-[#627181]">
                       {n.description}
                     </span>
