@@ -15,6 +15,7 @@ import { UniversityOpportunityCard } from '@/components/opportunity-feed/Univers
 import { FacultyLabCard } from '@/components/FacultyLabCard';
 import { ResearchPaperCard } from '@/components/ResearchPaperCard';
 import { PROFILE_VIEW_EVENT, consumeProfileViewRequest, type ProfileViewRequest } from '@/components/layout/ProfileMenuDropdown';
+import { PipelineBoard } from '@/components/pipeline/PipelineBoard';
 import { ResearchPaperDetailsModal } from '@/components/research-paper-details/ResearchPaperDetailsModal';
 import {
   AccountCards,
@@ -58,20 +59,6 @@ const ASK_AI_PROMPTS = [
   'Improve my Statement of Purpose',
   'Which score would raise my chances?',
   'Find professors in my field',
-];
-
-const PIPELINE_COLUMNS: { title: string; cards: { title: string; sub: string; chip: string; match: string }[] }[] = [
-  { title: 'Wishlist', cards: [{ title: 'Erasmus Mundus HCI', sub: 'European Commission', chip: '⏰ Due 10 Jan 2027', match: '92%' }] },
-  { title: 'Preparing', cards: [{ title: 'Chevening Scholarship', sub: 'FCDO · UK', chip: '⏰ Due 5 Nov 2026', match: '78%' }] },
-  {
-    title: 'Applying',
-    cards: [
-      { title: 'DAAD Study Scholarship', sub: 'DAAD · Germany', chip: '⏰ Due 15 Oct 2026', match: '85%' },
-      { title: 'PhD — Accessible Interaction Lab', sub: 'KTH · Sweden', chip: '⏰ Email sent 2 days ago', match: '90%' },
-    ],
-  },
-  { title: 'Submitted', cards: [{ title: 'Knight-Hennessy Scholars', sub: 'Stanford · USA', chip: '⏰ Submitted 28 Sep', match: '74%' }] },
-  { title: 'Decision', cards: [] },
 ];
 
 const SETTINGS_NAV: { key: SettingsSection; label: string; icon: LucideIcon }[] = [
@@ -381,35 +368,6 @@ const SavedTab: React.FC = () => {
   );
 };
 
-const PipelineTab: React.FC = () => (
-  <div className="flex w-full gap-[16px] overflow-x-auto pb-[4px]">
-    {PIPELINE_COLUMNS.map((col) => (
-      <div key={col.title} className="flex min-w-[220px] flex-1 flex-col items-start gap-[12px] self-stretch rounded-[12px] bg-[#fafafa] p-[12px]">
-        <div className="flex items-center gap-[8px]">
-          <p className="text-[16px] leading-[22px] font-[590] text-[#101828]">{col.title}</p>
-          <Chip>{String(col.cards.length)}</Chip>
-        </div>
-        {col.cards.length === 0 ? (
-          <p className="text-[12px] leading-[18px] italic text-[#627181]">
-            Nothing here yet — move a card here when you hear back.
-          </p>
-        ) : (
-          col.cards.map((c) => (
-            <div key={c.title} className="flex w-full flex-col items-start gap-[6px] rounded-[10px] border border-[#f1f1f1] bg-white p-[12px]">
-              <p className="text-[14px] leading-[20px] font-[510] text-[#101828]">{c.title}</p>
-              <p className="text-[12px] leading-[18px] italic text-[#627181]">{c.sub}</p>
-              <div className="flex w-full flex-wrap gap-[6px]">
-                <Chip tone="warning">{c.chip}</Chip>
-                <Chip tone="success">{c.match}</Chip>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-    ))}
-  </div>
-);
-
 // ---------------------------------------------------------------------------
 // Edit Profile (Settings)
 
@@ -613,7 +571,7 @@ const SettingsView: React.FC<{
           )}
 
           {section === 'documents' && <DocumentsCard />}
-          {section === 'account' && <AccountCards email={email} />}
+          {section === 'account' && <AccountCards />}
         </div>
 
         <div className="flex w-full justify-end gap-[12px]">
@@ -632,7 +590,7 @@ const SettingsView: React.FC<{
 // ---------------------------------------------------------------------------
 
 export const ProfileView: React.FC<{ onNavigateToTracker?: () => void }> = () => {
-  const { profile, saveProfile } = useApp();
+  const { profile, saveProfile, applications } = useApp();
 
   // A header menu request (Settings / My Applications) picks the first view
   const [initialRequest] = useState<ProfileViewRequest | null>(consumeProfileViewRequest);
@@ -743,7 +701,7 @@ export const ProfileView: React.FC<{ onNavigateToTracker?: () => void }> = () =>
   const tabs: { key: ProfileTab; label: string }[] = [
     { key: 'overview', label: 'Overview' },
     { key: 'saved', label: 'Saved (12)' },
-    { key: 'pipeline', label: 'Pipeline (4)' },
+    { key: 'pipeline', label: `Pipeline (${applications.length})` },
     { key: 'documents', label: 'Documents' },
     { key: 'account', label: 'Account' },
   ];
@@ -797,9 +755,9 @@ export const ProfileView: React.FC<{ onNavigateToTracker?: () => void }> = () =>
             />
           )}
           {tab === 'saved' && <SavedTab />}
-          {tab === 'pipeline' && <PipelineTab />}
+          {tab === 'pipeline' && <PipelineBoard embedded />}
           {tab === 'documents' && <DocumentsCard />}
-          {tab === 'account' && <AccountCards email={profile.email} />}
+          {tab === 'account' && <AccountCards />}
         </>
       )}
       {saved && (
