@@ -95,7 +95,8 @@ export interface Professor {
   country: string;
   labName?: string;
   researchTags: string[];
-  openPositions: boolean;
+  /** true = hiring, false = not hiring, undefined = no source says (most imported faculty) */
+  openPositions?: boolean;
   recentGrants?: string;
   email?: string;
   linkedInUrl?: string;

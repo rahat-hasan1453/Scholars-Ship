@@ -130,12 +130,20 @@ export function glanceRows(p: Professor): GlanceRow[] {
     rows.push({ label: 'Recent grant', value: p.recentGrant.year ? `${p.recentGrant.amount} (${p.recentGrant.year})` : p.recentGrant.amount });
   }
 
-  const level = degreesOffered(p)[0] ?? 'PhD';
-  rows.push({
-    label: 'Open positions',
-    value: !p.openPositions ? 'None right now' : p.openPositionCount ? `${p.openPositionCount} ${level}` : degreesOffered(p).join(' & '),
-  });
+  // Unknown hiring status is left out rather than shown as "none"
+  if (p.openPositions !== undefined) {
+    const level = degreesOffered(p)[0] ?? 'PhD';
+    rows.push({
+      label: 'Open positions',
+      value: !p.openPositions ? 'None right now' : p.openPositionCount ? `${p.openPositionCount} ${level}` : degreesOffered(p).join(' & '),
+    });
+  }
   return rows;
+}
+
+/** A public grant that started in the last three years: labs often hire students after one */
+export function isRecentlyFunded(p: Pick<Professor, 'recentGrant'>, now = new Date()): boolean {
+  return !!p.recentGrant?.year && p.recentGrant.year >= now.getFullYear() - 3;
 }
 
 /* ---------- Matching against the student's profile ---------- */

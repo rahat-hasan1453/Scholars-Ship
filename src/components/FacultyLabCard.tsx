@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Professor } from '@/types';
 import { FEED_CARD_HEIGHT } from '@/components/opportunity-feed/FeedGrid';
 import { initialsAvatar } from '@/lib/initialsAvatar';
+import { isRecentlyFunded } from '@/lib/professorDetails';
 
 interface FacultyLabCardProps {
   professor: Professor;
@@ -27,7 +28,7 @@ export const FacultyLabCard: React.FC<FacultyLabCardProps> = ({ professor }) => 
       ? 'Partial Funding'
       : 'Fully Funded'
     : null;
-  const recentlyFunded = !!professor.recentGrant?.year && professor.recentGrant.year >= new Date().getFullYear() - 3;
+  const recentlyFunded = isRecentlyFunded(professor);
   const terms = professor.acceptingTerms?.length ? professor.acceptingTerms.join(', ') : 'Not specified';
 
   const chipClass =

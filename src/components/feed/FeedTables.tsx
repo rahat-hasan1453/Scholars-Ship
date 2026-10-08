@@ -8,7 +8,7 @@ import { useApp } from '@/context/AppContext';
 import { useOpportunityBookmarks, useProfessorBookmarks } from '@/hooks/useOpportunityBookmarks';
 import { calculateMatchScore } from '@/lib/utils';
 import { INSTITUTION_NOT_STATED, countryFlagSrc, countryShortLabel, matchScore as opportunityMatch } from '@/lib/opportunityDetails';
-import { matchScore as professorMatch } from '@/lib/professorDetails';
+import { isRecentlyFunded, matchScore as professorMatch } from '@/lib/professorDetails';
 import { relevance } from '@/lib/researchPapers';
 import { initialsAvatar } from '@/lib/initialsAvatar';
 import {
@@ -153,7 +153,17 @@ export function FacultyTable({ rows }: { rows: Professor[] }) {
     { key: 'country', header: 'Country', cell: (p) => <CountryCell flagSrc={countryFlagSrc(p.country)} label={countryShortLabel(p.country)} />, hideBelow: 'md' },
     { key: 'lab', header: 'Lab', cell: (p) => <span className="block max-w-[220px] truncate" title={p.labName || p.department}>{p.labName || p.department}</span>, hideBelow: 'xl' },
     { key: 'funding', header: 'Funding', cell: (p) => <Pill tone={p.fundingType === 'PARTIAL' ? 'warning' : 'success'}>{p.fundingType === 'PARTIAL' ? 'Partial' : 'Fully Funded'}</Pill>, hideBelow: 'lg' },
-    { key: 'open', header: 'Positions', cell: (p) => (p.openPositions ? <Pill tone="success">Open</Pill> : <span className="text-[#627181]">Closed</span>), sortValue: (p) => (p.openPositions ? 1 : 0), hideBelow: 'md' },
+    { key: 'open', header: 'Positions', cell: (p) =>
+        p.openPositions ? (
+          <Pill tone="success">Open</Pill>
+        ) : p.openPositions === false ? (
+          <span className="text-[#627181]">Closed</span>
+        ) : isRecentlyFunded(p) ? (
+          <Pill tone="success">Recently funded</Pill>
+        ) : (
+          <span className="text-[#627181]">—</span>
+        ),
+      sortValue: (p) => (p.openPositions ? 2 : isRecentlyFunded(p) ? 1 : 0), hideBelow: 'md' },
     { key: 'match', header: 'Match', cell: (p) => <MatchPill value={professorMatch(p, profile)} />, sortValue: (p) => professorMatch(p, profile) },
     {
       key: 'actions', header: '', className: actionsCol, cell: (p) => (

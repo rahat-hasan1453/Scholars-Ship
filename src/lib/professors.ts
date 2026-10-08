@@ -32,7 +32,8 @@ export function toProfessor(row: ProfessorRow): Professor {
     country: row.country,
     labName: lab?.name ?? row.labName ?? undefined,
     researchTags: row.researchTags,
-    openPositions: lab?.openPositions ?? row.openPositions,
+    // Without a lab row nobody has told us about hiring: `false` in the column means unknown, not "closed"
+    openPositions: lab ? lab.openPositions : row.openPositions || undefined,
     recentGrants: row.recentGrants ?? undefined,
     email: row.email ?? undefined,
     linkedInUrl: row.linkedInUrl ?? undefined,

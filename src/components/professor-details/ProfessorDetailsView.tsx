@@ -8,6 +8,7 @@ import { useProfessorBookmarks } from '@/hooks/useOpportunityBookmarks';
 import { countryFlagEmoji } from '@/lib/scholarshipDetails';
 import {
   degreesOffered,
+  isRecentlyFunded,
   glanceRows,
   locationLine,
   lookingForRows,
@@ -63,9 +64,10 @@ export const ProfessorDetailsView: React.FC<Props> = ({ professor: p, others }) 
   const chips: { label: string; tone?: ChipTone }[] = [
     { label: `${match}% Match`, tone: 'success' },
     { label: degrees.join(' · ') },
-    { label: p.fundingType === 'PARTIAL' ? '$ Partially Funded' : '$ Funded Positions' },
   ];
+  if (p.fundingType) chips.push({ label: p.fundingType === 'PARTIAL' ? '$ Partially Funded' : '$ Funded Positions' });
   if (p.openPositions) chips.push({ label: '● Accepting Students', tone: 'live' });
+  else if (isRecentlyFunded(p)) chips.push({ label: '$ Recently Funded', tone: 'success' });
 
   const website = p.labWebsite;
   const papers = p.recentPapers ?? [];
@@ -139,9 +141,13 @@ export const ProfessorDetailsView: React.FC<Props> = ({ professor: p, others }) 
         note={
           p.openPositions
             ? `● Accepting ${degrees[0] ?? 'PhD'} students${nextIntake ? ` for ${nextIntake}` : ''}`
-            : 'Not taking new students right now'
+            : p.openPositions === false
+              ? 'Not taking new students right now'
+              : isRecentlyFunded(p)
+                ? `New ${p.recentGrant!.year} grant: a good time to ask about openings`
+                : 'Hiring status not published: ask about openings in your email'
         }
-        noteTone={p.openPositions ? 'success' : 'warning'}
+        noteTone={p.openPositions || (p.openPositions === undefined && isRecentlyFunded(p)) ? 'success' : 'warning'}
         primary={{ label: p.email ? 'Email Professor' : 'Visit Lab Website', href: contactHref }}
         secondary={[
           { label: saved ? '🔖 Saved' : '🔖 Save', onClick: () => toggleBookmark(p.id), pressed: saved },
