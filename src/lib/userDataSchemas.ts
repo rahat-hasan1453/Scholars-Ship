@@ -20,7 +20,13 @@ export const testScoresSchema = z
   .strict();
 
 export const profileDetailsSchema = z
-  .object({ bio: text(2000).optional(), field: text(200).optional(), gradYear: text(10).optional(), intake: text(50).optional() })
+  .object({
+    bio: text(2000).optional(),
+    field: text(200).optional(),
+    gradYear: text(10).optional(),
+    intake: text(50).optional(),
+    notifications: z.object({ deadlines: z.boolean(), digest: z.boolean() }).strict().optional(),
+  })
   .strict();
 
 // Uploaded photos arrive as data URLs from a <canvas> resize; ~375 KB of base64 is plenty for an avatar.

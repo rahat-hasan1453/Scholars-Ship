@@ -156,7 +156,7 @@ export function createFakeTables() {
 
   const names = [
     'userProfile', 'application', 'applicationTask', 'outreachRecord', 'savedOpportunity', 'profFollow', 'savedPaper',
-    'scholarship', 'professor', 'opportunity', 'researchPaper',
+    'scholarship', 'professor', 'opportunity', 'researchPaper', 'userDocument',
   ] as const;
   const models = Object.fromEntries(names.map((n) => [n, model(n)])) as Record<(typeof names)[number], ReturnType<typeof model>>;
   return { _tables: tables, table, ...models };

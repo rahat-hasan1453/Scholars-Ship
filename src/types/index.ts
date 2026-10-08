@@ -38,6 +38,8 @@ export interface ProfileDetails {
   field?: string;
   gradYear?: string;
   intake?: string;
+  /** Email notification choices on My Profile → Account (default: both on) */
+  notifications?: { deadlines: boolean; digest: boolean };
 }
 
 export interface Scholarship {

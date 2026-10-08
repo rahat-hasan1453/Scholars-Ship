@@ -128,6 +128,15 @@ describe('profile', () => {
     const again = await json(await profileRoute.GET());
     expect(again.body.profile.degreeLevel).toBe('PhD');
   });
+  it('PATCH merges details: saving one key keeps the others (notifications survive a bio save)', async () => {
+    await profileRoute.PATCH(req('/api/profile', 'PATCH', { details: { notifications: { deadlines: false, digest: true } } }));
+    const { body } = await json(await profileRoute.PATCH(req('/api/profile', 'PATCH', { details: { bio: 'New bio' } })));
+    expect(body.profile.details).toMatchObject({ bio: 'New bio', notifications: { deadlines: false, digest: true } });
+  });
+  it('PATCH rejects malformed notification settings (400)', async () => {
+    expect((await profileRoute.PATCH(req('/api/profile', 'PATCH', { details: { notifications: { deadlines: 'yes' } } }))).status).toBe(400);
+    expect((await profileRoute.PATCH(req('/api/profile', 'PATCH', { details: { notifications: { deadlines: true, digest: true, sms: true } } }))).status).toBe(400);
+  });
   it('PATCH stores an uploaded photo outside User.avatar (never in the session cookie)', async () => {
     const photo = 'data:image/jpeg;base64,' + 'A'.repeat(1000);
     const { body } = await json(await profileRoute.PATCH(req('/api/profile', 'PATCH', { avatar: photo })));
