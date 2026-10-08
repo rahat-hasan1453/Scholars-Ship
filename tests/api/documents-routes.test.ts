@@ -23,11 +23,12 @@ vi.mock('@vercel/blob', () => ({
   },
   get: async (pathname: string) =>
     h.blobs.has(pathname) ? { statusCode: 200, stream: new Response('%PDF-1.4 hello').body, blob: {} } : null,
+  issueSignedToken: async (opts: any) => ({ delegationToken: 'd', clientSigningToken: 'c', validUntil: opts.validUntil, opts }),
 }));
 vi.mock('@vercel/blob/client', () => ({
-  handleUpload: async ({ body, onBeforeGenerateToken }: any) => {
-    const config = await onBeforeGenerateToken(body.payload.pathname, null, false);
-    return { type: 'blob.generate-client-token', clientToken: 'tok', config };
+  handleUploadPresigned: async ({ body, getSignedToken }: any) => {
+    const { token, urlOptions } = await getSignedToken(body.payload.pathname, null, false);
+    return { type: 'blob.generate-presigned-url', presignedUrlPayload: { token, urlOptions } };
   },
 }));
 
@@ -76,17 +77,30 @@ describe('documents: auth', () => {
 });
 
 describe('documents: upload token', () => {
-  const tokenFor = (pathname: string) => uploadRoute.POST(req('/api/documents/upload', 'POST', { type: 'blob.generate-client-token', payload: { pathname } })).then(json);
+  const tokenFor = (pathname: string) => uploadRoute.POST(req('/api/documents/upload', 'POST', { type: 'blob.generate-presigned-url', payload: { pathname } })).then(json);
 
-  it('allows a PDF path in the user’s own folder, limited to PDFs ≤ 10 MB', async () => {
+  it('signs a put for ONE PDF path in the user’s own folder, limited to PDFs ≤ 10 MB', async () => {
     const { status, body } = await tokenFor('documents/user-alice/cv.pdf');
     expect(status).toBe(200);
-    expect(body.config).toMatchObject({ allowedContentTypes: ['application/pdf'], maximumSizeInBytes: 10 * 1024 * 1024, addRandomSuffix: true });
+    expect(body.presignedUrlPayload.token.opts).toMatchObject({
+      pathname: 'documents/user-alice/cv.pdf',
+      operations: ['put'],
+      allowedContentTypes: ['application/pdf'],
+      maximumSizeInBytes: 10 * 1024 * 1024,
+    });
+    expect(body.presignedUrlPayload.urlOptions).toMatchObject({ allowedContentTypes: ['application/pdf'], maximumSizeInBytes: 10 * 1024 * 1024 });
   });
   it('rejects another user’s folder and non-PDF names (400)', async () => {
     expect((await tokenFor('documents/user-bob/cv.pdf')).status).toBe(400);
     expect((await tokenFor('documents/user-alice/cv.exe')).status).toBe(400);
     expect((await tokenFor('../escape.pdf')).status).toBe(400);
+    expect((await tokenFor('documents/user-alice/../user-bob/x.pdf')).status).toBe(400);
+  });
+  it('works with Vercel’s OIDC setup (BLOB_STORE_ID only, no read-write token)', async () => {
+    delete process.env.BLOB_READ_WRITE_TOKEN;
+    process.env.BLOB_STORE_ID = 'store_test';
+    expect((await tokenFor('documents/user-alice/cv.pdf')).status).toBe(200);
+    delete process.env.BLOB_STORE_ID;
   });
   it('503 when file storage is not configured', async () => {
     delete process.env.BLOB_READ_WRITE_TOKEN;
