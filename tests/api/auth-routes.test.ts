@@ -167,19 +167,32 @@ describe('POST /api/auth/complete-onboarding', () => {
   });
   it('saves profile for the session email and ignores email/onboardingCompleted from the body', async () => {
     await signIn();
-    const res = await completeOnboarding(post('/api/auth/complete-onboarding', { name: '  Rahim  ', email: 'attacker@example.test', onboardingCompleted: false, degree: 'Masters' }));
+    const res = await completeOnboarding(post('/api/auth/complete-onboarding', { name: '  Rahim  ', email: 'attacker@example.test', onboardingCompleted: false, degreeLevel: 'Masters', specializations: ['HCI'] }));
     expect(res.status).toBe(200);
     const row = h.db._users.get(EMAIL);
     expect(row).toMatchObject({ onboardingCompleted: true, name: 'Rahim' });
-    expect(row.profileData).toEqual({ name: '  Rahim  ', degree: 'Masters' });
+    expect(row.profileData).toEqual({ name: 'Rahim', degreeLevel: 'Masters', specializations: ['HCI'] });
     expect(h.db._users.has('attacker@example.test')).toBe(false);
     expect(sessionUser()).toMatchObject({ onboardingCompleted: true });
+    // also written to the UserProfile table
+    const profile = await h.db.userProfile.findUnique({ where: { userId: row.id } });
+    expect(profile).toMatchObject({ degreeLevel: 'MASTERS', specializations: ['HCI'] });
   });
-  // BUG-09: the body is stored as-is with no schema or size limit (any keys, any length).
-  it.fails('rejects an oversized / unexpected profile payload', async () => {
+  // BUG-09 (fixed): the body is validated with a schema and a size limit
+  it('rejects an oversized / unexpected profile payload', async () => {
     await signIn();
     const res = await completeOnboarding(post('/api/auth/complete-onboarding', { name: 'x'.repeat(100_000), junk: 'y'.repeat(500_000) }));
     expect(res.status).toBe(400);
+  });
+  it.each([
+    { degreeLevel: 'Masters', junk: 1 },
+    { degreeLevel: 'Wizard' },
+    { degreeLevel: 'Masters', cgpa: 99 },
+    { degreeLevel: 'Masters', specializations: 'HCI' },
+  ])('400 for invalid onboarding body %j', async (body) => {
+    await signIn();
+    expect((await completeOnboarding(post('/api/auth/complete-onboarding', body))).status).toBe(400);
+    expect(h.db._users.get(EMAIL).onboardingCompleted).toBe(false);
   });
 });
 

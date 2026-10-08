@@ -115,7 +115,7 @@ Each known bug has a test that is expected to fail while the bug exists, so `npm
 - **File:** `src/lib/semanticSearch.ts:117` (`/ms/` matches "systems", "programs", "algorithms") and `:122` (`/pi|lab/` matches "topic", "available").
 - **Expected:** Word boundaries, e.g. `\bms\b`, `\bpi\b`.
 
-### BUG-09 · Low · Onboarding payload not validated
+### BUG-09 · Low · Onboarding payload not validated · **fixed** (feat/user-data-db: zod schema + 64 KB limit, 400 on invalid input)
 - **File:** `src/app/api/auth/complete-onboarding/route.ts:13`. Any keys of any size are saved to `profileData`, and `name` has no length limit.
 - **Repro:** `tests/api/auth-routes.test.ts` → "rejects an oversized / unexpected profile payload" (600 KB is accepted).
 - **Expected:** A whitelist of fields (zod schema) and a size limit.

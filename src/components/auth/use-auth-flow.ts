@@ -42,7 +42,7 @@ export async function postJson(url: string, body: unknown): Promise<JsonResult> 
 /* After any successful sign-in: sync the app profile, then go to onboarding or home. */
 export function useFinishSignIn() {
   const router = useRouter();
-  const { updateProfile } = useApp();
+  const { updateProfile, reloadUserData } = useApp();
   return (data: Record<string, any>) => { // eslint-disable-line @typescript-eslint/no-explicit-any
     const user = data.user;
     updateProfile({
@@ -57,6 +57,7 @@ export function useFinishSignIn() {
     } else {
       localStorage.removeItem(`highscholar_onboarded_${user.email}`);
     }
+    void reloadUserData(); // profile, Pipeline and bookmarks of the account that just signed in
     router.push(user.onboardingCompleted ? '/' : '/onboarding');
   };
 }

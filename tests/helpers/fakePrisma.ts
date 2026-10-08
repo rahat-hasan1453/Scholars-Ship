@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- loose typing for test doubles */
 import { Prisma } from '@prisma/client';
+import { createFakeTables } from './fakeTables';
 
 /* In-memory stand-in for the Prisma client: only the calls src/lib uses. No database needed. */
 type Row = Record<string, any>;
@@ -13,7 +14,11 @@ export function createFakePrisma() {
     !f || ((f.gt === undefined || row.windowStart > f.gt) && (f.lte === undefined || row.windowStart <= f.lte) && (f.lt === undefined || row.windowStart < f.lt));
   let nextId = 1;
 
-  return {
+  const byWhere = (where: any) => (where.email ? users.get(where.email) : [...users.values()].find((u) => u.id === where.id));
+
+  const db: any = {
+    ...createFakeTables(),
+    $transaction: async (arg: any) => (typeof arg === 'function' ? arg(db) : Promise.all(arg)),
     _loginCodes: loginCodes,
     _users: users,
     _rateLimits: rateLimits,
@@ -65,18 +70,19 @@ export function createFakePrisma() {
       },
     },
     user: {
-      findUnique: async ({ where }: any) => (users.has(where.email) ? { ...users.get(where.email) } : null),
+      findUnique: async ({ where }: any) => (byWhere(where) ? { ...byWhere(where) } : null),
       create: async ({ data }: any) => {
         const row = { id: `user-${nextId++}`, onboardingCompleted: false, avatar: null, googleId: null, profileData: null, emailVerifiedAt: null, ...data };
         users.set(row.email, row);
         return row;
       },
       update: async ({ where, data }: any) => {
-        const row = users.get(where.email);
+        const row = byWhere(where);
         if (!row) throw new Error('Record to update not found.');
         Object.assign(row, data);
         return row;
       },
     },
   };
+  return db;
 }

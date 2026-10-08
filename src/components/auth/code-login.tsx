@@ -28,7 +28,7 @@ const GOOGLE_ERRORS: Record<string, string> = {
 
 export function CodeLogin() {
   const router = useRouter();
-  const { updateProfile } = useApp();
+  const { updateProfile, reloadUserData } = useApp();
 
   const [step, setStep] = useState<'email' | 'code'>('email');
   const [email, setEmail] = useState('');
@@ -124,7 +124,8 @@ export function CodeLogin() {
       } else {
         localStorage.removeItem(`highscholar_onboarded_${user.email}`);
       }
-      router.push(user.onboardingCompleted ? '/' : '/onboarding');
+      void reloadUserData(); // profile, Pipeline and bookmarks of the account that just signed in
+    router.push(user.onboardingCompleted ? '/' : '/onboarding');
     } catch {
       setError('Network error. Please try again.');
       setIsVerifying(false);

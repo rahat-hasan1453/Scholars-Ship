@@ -29,6 +29,15 @@ export interface UserProfile {
   testScores: TestScores;
   onboardingCompleted: boolean;
   avatar?: string;
+  /** Profile page fields without a column of their own (saved in UserProfile.details) */
+  details?: ProfileDetails;
+}
+
+export interface ProfileDetails {
+  bio?: string;
+  field?: string;
+  gradYear?: string;
+  intake?: string;
 }
 
 export interface Scholarship {

@@ -81,6 +81,28 @@ const SETTINGS_NAV: { key: SettingsSection; label: string; icon: LucideIcon }[] 
   { key: 'documents', label: 'Documents', icon: FileText },
   { key: 'account', label: 'Account & sign-in', icon: Lock },
 ];
+/** Shrinks an uploaded photo to a 256px JPEG data URL, small enough to save with the profile */
+function resizePhoto(file: File, size = 256): Promise<string | null> {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, size / Math.max(img.width, img.height));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(img.width * scale));
+      canvas.height = Math.max(1, Math.round(img.height * scale));
+      canvas.getContext('2d')?.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/jpeg', 0.85));
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(null);
+    };
+    img.src = url;
+  });
+}
+
 const DEFAULT_BIO =
   'UX designer with 3 years of industry experience, looking for a funded Master’s in HCI. Interested in accessible interfaces and in how AI tools change the way designers prototype and test.';
 
@@ -478,9 +500,7 @@ const SettingsView: React.FC<{
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = () => typeof reader.result === 'string' && onChangePhoto(reader.result);
-                    reader.readAsDataURL(file);
+                    void resizePhoto(file).then((dataUrl) => dataUrl && onChangePhoto(dataUrl));
                     e.target.value = '';
                   }}
                 />
@@ -612,7 +632,7 @@ const SettingsView: React.FC<{
 // ---------------------------------------------------------------------------
 
 export const ProfileView: React.FC<{ onNavigateToTracker?: () => void }> = () => {
-  const { profile, updateProfile } = useApp();
+  const { profile, saveProfile } = useApp();
 
   // A header menu request (Settings / My Applications) picks the first view
   const [initialRequest] = useState<ProfileViewRequest | null>(consumeProfileViewRequest);
@@ -646,8 +666,13 @@ export const ProfileView: React.FC<{ onNavigateToTracker?: () => void }> = () =>
     rank: 'Top 200 (QS)',
   });
 
-  // Fields the profile model does not store yet stay in local state
-  const [extra, setExtra] = useState({ bio: DEFAULT_BIO, field: 'UX Design & HCI', gradYear: '2023', intake: 'Fall 2027' });
+  // Bio / field / graduation year / intake are saved in the profile's `details` (defaults until the user edits them)
+  const extra = {
+    bio: profile.details?.bio ?? DEFAULT_BIO,
+    field: profile.details?.field ?? 'UX Design & HCI',
+    gradYear: profile.details?.gradYear ?? '2023',
+    intake: profile.details?.intake ?? 'Fall 2027',
+  };
   const [form, setForm] = useState<SettingsForm>(initialForm);
 
   // Header menu request while this page is already open
@@ -677,15 +702,16 @@ export const ProfileView: React.FC<{ onNavigateToTracker?: () => void }> = () =>
     return v.trim() && Number.isFinite(n) ? n : undefined;
   };
 
-  const save = () => {
-    updateProfile({
+  const save = async () => {
+    setMode('view');
+    const ok = await saveProfile({
       name: form.name.trim() || profile.name,
       degreeLevel: form.degree,
       cgpa: num(form.cgpa) ?? profile.cgpa,
       testScores: { ielts: num(form.ielts), toefl: num(form.toefl), gre: num(form.gre), gmat: num(form.gmat) },
+      details: { bio: form.bio, field: form.field, gradYear: form.gradYear, intake: form.intake },
     });
-    setExtra({ bio: form.bio, field: form.field, gradYear: form.gradYear, intake: form.intake });
-    setMode('view');
+    if (!ok) return; // rolled back; AppContext shows the error message
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };
@@ -705,7 +731,8 @@ export const ProfileView: React.FC<{ onNavigateToTracker?: () => void }> = () =>
       extra.intake,
     ];
     return Math.round((checks.filter(Boolean).length / checks.length) * 100);
-  }, [profile, extra]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- extra is derived from profile
+  }, [profile]);
 
   const english = profile.testScores?.ielts
     ? `IELTS ${profile.testScores.ielts.toFixed(1)}`
@@ -735,8 +762,8 @@ export const ProfileView: React.FC<{ onNavigateToTracker?: () => void }> = () =>
             avatar={avatar}
             interests={interests}
             countries={countries}
-            onChangePhoto={(dataUrl) => updateProfile({ avatar: dataUrl })}
-            onRemovePhoto={() => updateProfile({ avatar: '' })}
+            onChangePhoto={(dataUrl) => void saveProfile({ avatar: dataUrl })}
+            onRemovePhoto={() => void saveProfile({ avatar: '' })}
             onCancel={() => setMode('view')}
             onSave={save}
           />

@@ -1,13 +1,20 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { UserProfile, Scholarship, Professor, Application, ApplicationStatus, DecisionResult, HiringOpportunity, OutreachRecord, OutreachStatus } from '@/types';
-import { initialUserProfile, mockScholarships, mockProfessors, initialApplications } from '@/data/mockData';
-import { mockOpportunities, initialOutreachRecords } from '@/data/mockOpportunities';
+import { initialUserProfile, mockScholarships, mockProfessors } from '@/data/mockData';
+import { mockOpportunities } from '@/data/mockOpportunities';
+import { apiFetch, ApiError, newId } from '@/lib/apiClient';
+import { DEMO_RECORD_IDS, IMPORT_DONE_KEY, LEGACY_EXTRA_KEYS, LEGACY_STORAGE_KEYS } from '@/lib/legacyStorage';
 import confetti from 'canvas-confetti';
+
+export type BookmarkKind = 'opportunities' | 'professors' | 'papers';
 
 interface AppContextType {
   profile: UserProfile;
   setProfile: React.Dispatch<React.SetStateAction<UserProfile>>;
+  /** Changes the profile in memory only (sign-in flows copy server data in with this) */
   updateProfile: (updates: Partial<UserProfile>) => void;
+  /** Changes the profile and saves it to the server; rolls back (and resolves false) when the save fails */
+  saveProfile: (updates: Partial<UserProfile>) => Promise<boolean>;
   scholarships: Scholarship[];
   professors: Professor[];
   applications: Application[];
@@ -19,6 +26,7 @@ interface AppContextType {
   updateApplicationStatus: (appId: string, status: ApplicationStatus, decision?: DecisionResult) => void;
   toggleTaskCompletion: (appId: string, taskId: string) => void;
   addTaskToApplication: (appId: string, title: string) => void;
+  removeTaskFromApplication: (appId: string, taskId: string) => void;
   updateApplicationNotes: (appId: string, notes: string) => void;
   removeApplication: (appId: string) => void;
   saveOpportunityToOutreach: (opp: HiringOpportunity, status?: OutreachStatus) => void;
@@ -44,6 +52,10 @@ interface AppContextType {
   toggleTheme: () => void;
   setTheme: (t: 'dark' | 'light') => void;
   isMounted: boolean;
+  /** True once the signed-in user's saved data has loaded from the server */
+  isUserDataLoaded: boolean;
+  /** Re-reads the signed-in user's data (after a sign-in without a page reload) */
+  reloadUserData: () => Promise<void>;
   isSyncingOpportunities: boolean;
   lastSyncedAt: string | null;
   syncLiveOpportunities: (tag?: string) => Promise<{ count: number; newFound: number }>;
@@ -51,6 +63,10 @@ interface AppContextType {
   savedPaperIds: string[];
   toggleSavePaper: (paperId: string) => void;
   isPaperSaved: (paperId: string) => boolean;
+  /** Opportunity Feed / Faculty bookmarks (read through useOpportunityBookmarks / useProfessorBookmarks) */
+  savedOpportunityIds: string[];
+  savedProfessorIds: string[];
+  setBookmark: (kind: BookmarkKind, id: string, saved: boolean) => void;
   globalSearchQuery: string;
   setGlobalSearchQuery: (q: string) => void;
   activeNavTab: 'opportunities' | 'scholarships' | 'professors' | 'research' | 'tracker' | 'saved' | 'profile';
@@ -68,25 +84,79 @@ function reorderById<T extends { id: string }>(list: T[], orderedIds: string[]):
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+// Browser-only settings. Pipeline, bookmarks and the profile live in the database (see /api/applications etc.).
 const STORAGE_KEYS = {
-  PROFILE: 'highscholar_profile_v2',
   SCHOLARSHIPS: 'highscholar_scholarships_v5',
   PROFESSORS: 'highscholar_professors_v5',
-  APPLICATIONS: 'highscholar_applications_v2',
-  OUTREACH: 'highscholar_outreach_v2',
   OPPORTUNITIES: 'highscholar_opportunities_v4',
   THEME: 'highscholar_theme_v2',
-  RESEARCH_PAPERS: 'highscholar_saved_papers_v1',
 };
+
+type Updater<T> = (prev: T) => T;
+type ListKey = 'applications' | 'outreach' | 'opportunities' | 'professors' | 'papers';
+type Bookmarks = { opportunities: string[]; professors: string[]; papers: string[] };
+
+const now = () => new Date().toISOString();
+const replaceById = <T extends { id: string }>(id: string, fn: (item: T) => T): Updater<T[]> => (prev) => prev.map((x) => (x.id === id ? fn(x) : x));
+const setMembership = (id: string, saved: boolean): Updater<string[]> => (prev) =>
+  saved ? (prev.includes(id) ? prev : [...prev, id]) : prev.filter((x) => x !== id);
+
+function readLegacyList(key: string): unknown[] {
+  try {
+    const parsed: unknown = JSON.parse(localStorage.getItem(key) ?? '[]');
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Old localStorage data worth importing (the old demo cards are left out here and on the server) */
+function readLegacyData() {
+  const notDemo = (x: unknown) => !(x && typeof x === 'object' && DEMO_RECORD_IDS.has(String((x as { id?: unknown }).id)));
+  // Old cards carry the full scholarship object; the server only needs the id
+  const applications = readLegacyList(LEGACY_STORAGE_KEYS.applications)
+    .filter(notDemo)
+    .map((a) => {
+      if (!a || typeof a !== 'object') return a;
+      const { scholarship: _s, updatedAt: _u, ...rest } = a as Record<string, unknown>;
+      void _s;
+      void _u;
+      return rest;
+    });
+  return {
+    applications,
+    outreach: readLegacyList(LEGACY_STORAGE_KEYS.outreach).filter(notDemo),
+    opportunities: readLegacyList(LEGACY_STORAGE_KEYS.opportunities),
+    professors: readLegacyList(LEGACY_STORAGE_KEYS.professors),
+    papers: readLegacyList(LEGACY_STORAGE_KEYS.papers),
+  };
+}
+
+function clearLegacyData() {
+  try {
+    for (const key of [...Object.values(LEGACY_STORAGE_KEYS), ...LEGACY_EXTRA_KEYS]) localStorage.removeItem(key);
+    localStorage.setItem(IMPORT_DONE_KEY, new Date().toISOString());
+  } catch {}
+}
+
+const errorMessage = (err: unknown, fallback: string) =>
+  err instanceof ApiError && err.status === 401
+    ? 'Your session has expired. Please sign in again.'
+    : err instanceof ApiError && err.status === 404
+      ? 'This item can’t be saved yet.'
+      : fallback;
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [profile, setProfile] = useState<UserProfile>(initialUserProfile);
   const [scholarships, setScholarships] = useState<Scholarship[]>(mockScholarships);
   const [professors, setProfessors] = useState<Professor[]>(mockProfessors);
-  const [applications, setApplications] = useState<Application[]>(initialApplications);
+  // Signed-in users' Pipeline and bookmarks come from the server; everyone starts empty (no demo cards)
+  const [applications, setApplications] = useState<Application[]>([]);
   const [opportunities, setOpportunities] = useState<HiringOpportunity[]>(mockOpportunities);
-  const [outreachRecords, setOutreachRecords] = useState<OutreachRecord[]>(initialOutreachRecords);
+  const [outreachRecords, setOutreachRecords] = useState<OutreachRecord[]>([]);
   const [savedPaperIds, setSavedPaperIds] = useState<string[]>([]);
+  const [savedOpportunityIds, setSavedOpportunityIds] = useState<string[]>([]);
+  const [savedProfessorIds, setSavedProfessorIds] = useState<string[]>([]);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [selectedScholarship, setSelectedScholarship] = useState<Scholarship | null>(null);
   const [selectedProfessor, setSelectedProfessor] = useState<Professor | null>(null);
@@ -94,27 +164,139 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isColdEmailModalOpen, setIsColdEmailModalOpen] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [isMounted, setIsMounted] = useState(false);
+  const [isUserDataLoaded, setIsUserDataLoaded] = useState(false);
   const [isSyncingOpportunities, setIsSyncingOpportunities] = useState(false);
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
   const [globalSearchQuery, setGlobalSearchQuery] = useState('');
   const [activeNavTab, setActiveNavTab] = useState<'opportunities' | 'scholarships' | 'professors' | 'research' | 'tracker' | 'saved' | 'profile'>('opportunities');
+  const [syncError, setSyncError] = useState<string | null>(null);
 
-  // Hydrate from localStorage on client mount with automatic schema migration
+  // ---------------------------------------------------------------------------
+  // Server sync plumbing
+
+  /** Latest state for building rollbacks inside event handlers */
+  const latest = useRef({ applications, outreachRecords, profile, savedPaperIds, savedOpportunityIds, savedProfessorIds });
   useEffect(() => {
+    latest.current = { applications, outreachRecords, profile, savedPaperIds, savedOpportunityIds, savedProfessorIds };
+  }, [applications, outreachRecords, profile, savedPaperIds, savedOpportunityIds, savedProfessorIds]);
+
+  const signedIn = useRef(false);
+  /** While the first load is in flight, local changes are recorded and re-applied on top of the loaded data */
+  const loading = useRef(false);
+  const pending = useRef<Record<ListKey, Updater<unknown[]>[]>>({ applications: [], outreach: [], opportunities: [], professors: [], papers: [] });
+  /** Requests for the same item run one after another, so a quick move + move arrive in order */
+  const chains = useRef(new Map<string, Promise<unknown>>());
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const setters: Record<ListKey, (fn: Updater<unknown[]>) => void> = {
+    applications: (fn) => setApplications(fn as unknown as Updater<Application[]>),
+    outreach: (fn) => setOutreachRecords(fn as unknown as Updater<OutreachRecord[]>),
+    opportunities: (fn) => setSavedOpportunityIds(fn as unknown as Updater<string[]>),
+    professors: (fn) => setSavedProfessorIds(fn as unknown as Updater<string[]>),
+    papers: (fn) => setSavedPaperIds(fn as unknown as Updater<string[]>),
+  };
+
+  const showError = useCallback((message: string) => {
+    setSyncError(message);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setSyncError(null), 4000);
+  }, []);
+
+  /** Optimistic local change. Every updater is idempotent, so re-applying it after the load is safe. */
+  const local = <T,>(key: ListKey, fn: Updater<T[]>) => {
+    setters[key](fn as unknown as Updater<unknown[]>);
+    if (loading.current) pending.current[key].push(fn as unknown as Updater<unknown[]>);
+  };
+
+  /** Sends a change for signed-in users; on failure undoes it and shows a short message */
+  const sync = (chainKey: string, request: () => Promise<unknown>, rollback: () => void, failMessage: string) => {
+    if (!signedIn.current) return;
+    const prev = chains.current.get(chainKey) ?? Promise.resolve();
+    const next = prev
+      .catch(() => {})
+      .then(request)
+      .catch((err) => {
+        rollback();
+        showError(errorMessage(err, failMessage));
+      });
+    chains.current.set(chainKey, next);
+    void next.finally(() => {
+      if (chains.current.get(chainKey) === next) chains.current.delete(chainKey);
+    });
+  };
+
+  const applyLoaded = (data: { applications: Application[]; outreach: OutreachRecord[]; bookmarks: Bookmarks }) => {
+    const replay = <T,>(key: ListKey, value: T[]) => pending.current[key].reduce<unknown[]>((acc, fn) => fn(acc), value) as T[];
+    setApplications(replay('applications', data.applications));
+    setOutreachRecords(replay('outreach', data.outreach));
+    setSavedOpportunityIds(replay('opportunities', data.bookmarks.opportunities));
+    setSavedProfessorIds(replay('professors', data.bookmarks.professors));
+    setSavedPaperIds(replay('papers', data.bookmarks.papers));
+  };
+
+  const fetchUserData = useCallback(async () => {
+    signedIn.current = true;
+    loading.current = true;
+    pending.current = { applications: [], outreach: [], opportunities: [], professors: [], papers: [] };
     try {
-      let currentProfile = initialUserProfile;
-      const savedProfile = localStorage.getItem(STORAGE_KEYS.PROFILE);
-      if (savedProfile) {
-        const parsed = JSON.parse(savedProfile);
-        if (parsed.specializations && !parsed.specializations.includes('UX Design')) {
-          setProfile(initialUserProfile);
-          currentProfile = initialUserProfile;
+      const [p, a, o, b] = await Promise.all([
+        apiFetch<{ profile: UserProfile }>('/api/profile'),
+        apiFetch<{ data: Application[] }>('/api/applications'),
+        apiFetch<{ data: OutreachRecord[] }>('/api/outreach'),
+        apiFetch<{ data: Bookmarks }>('/api/bookmarks'),
+      ]);
+      setProfile((prev) => ({ ...prev, ...p.profile }));
+      let data = { applications: a.data, outreach: o.data, bookmarks: b.data };
+
+      // One-time move of the old browser-only data into the account
+      let alreadyImported = false;
+      try {
+        alreadyImported = !!localStorage.getItem(IMPORT_DONE_KEY);
+      } catch {}
+      if (!alreadyImported) {
+        const serverEmpty =
+          data.applications.length === 0 &&
+          data.outreach.length === 0 &&
+          data.bookmarks.opportunities.length + data.bookmarks.professors.length + data.bookmarks.papers.length === 0;
+        const legacy = readLegacyData();
+        const hasLegacy = Object.values(legacy).some((list) => list.length > 0);
+        if (serverEmpty && hasLegacy) {
+          try {
+            const res = await apiFetch<{ data: typeof data }>('/api/import', 'POST', legacy);
+            data = res.data;
+            clearLegacyData();
+          } catch (err) {
+            // Kept for the next load; the board just shows what the server has
+            console.error('[user-data] import failed', err);
+          }
         } else {
-          setProfile(parsed);
-          currentProfile = parsed;
+          clearLegacyData();
         }
       }
 
+      applyLoaded(data);
+      setIsUserDataLoaded(true);
+    } catch (err) {
+      console.error('[user-data] load failed', err);
+      showError('We couldn’t load your saved items. Please refresh the page.');
+    } finally {
+      loading.current = false;
+      pending.current = { applications: [], outreach: [], opportunities: [], professors: [], papers: [] };
+    }
+  }, [showError]);
+
+  /** One load at a time (React dev mounts effects twice; two loads would import the old data twice) */
+  const inFlight = useRef<Promise<void> | null>(null);
+  const loadUserData = useCallback(() => {
+    inFlight.current ??= fetchUserData().finally(() => {
+      inFlight.current = null;
+    });
+    return inFlight.current;
+  }, [fetchUserData]);
+
+  // Mount: theme + catalogue caches from localStorage, then the session and the user's data from the server
+  useEffect(() => {
+    try {
       // Check URL parameters if redirected from Google OAuth callback or signup
       if (typeof window !== 'undefined') {
         const urlParams = new URLSearchParams(window.location.search);
@@ -130,19 +312,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           const googleEmail = rawEmail ? decodeURIComponent(rawEmail) : undefined;
           const googleAvatar = rawAvatar ? decodeURIComponent(rawAvatar) : undefined;
 
-          const targetEmail = googleEmail || currentProfile.email;
+          const targetEmail = googleEmail || initialUserProfile.email;
           const isUserOnboarded = localStorage.getItem(`highscholar_onboarded_${targetEmail}`) === 'true';
 
-          const updatedProfile = {
-            ...currentProfile,
+          setProfile((prev) => ({
+            ...prev,
             ...(googleName ? { name: googleName } : {}),
             ...(googleEmail ? { email: googleEmail } : {}),
             ...(googleAvatar ? { avatar: googleAvatar } : {}),
             onboardingCompleted: isUserOnboarded,
-          };
-
-          setProfile(updatedProfile);
-          localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(updatedProfile));
+          }));
 
           // First time Google sign in or explicitly triggered -> open onboarding modal
           if (!isUserOnboarded || shouldTriggerOnboarding) {
@@ -158,7 +337,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           window.history.replaceState({}, document.title, cleanUrl);
         }
 
-        // Also sync from backend session cookie
+        // Session from the backend cookie, then the user's own data (profile, Pipeline, bookmarks)
         fetch('/api/auth/me')
           .then((res) => (res.ok ? res.json() : null))
           .then((data) => {
@@ -168,31 +347,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                 data.user.onboardingCompleted === true ||
                 localStorage.getItem(`highscholar_onboarded_${uEmail}`) === 'true';
 
-              const profileData = data.user.profileData || {};
-
-              setProfile((prev) => {
-                const synced = {
-                  ...prev,
-                  name: data.user.name || prev.name,
-                  email: data.user.email || prev.email,
-                  avatar: data.user.avatar || prev.avatar,
-                  degreeLevel: profileData.degreeLevel || prev.degreeLevel,
-                  specializations: profileData.specializations || prev.specializations,
-                  targetCountries: profileData.targetCountries || prev.targetCountries,
-                  cgpa: profileData.cgpa || prev.cgpa,
-                  testScores: profileData.testScores || prev.testScores,
-                  onboardingCompleted: isAlreadyOnboarded,
-                };
-                localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(synced));
-                if (isAlreadyOnboarded) {
-                  localStorage.setItem(`highscholar_onboarded_${uEmail}`, 'true');
-                }
-                return synced;
-              });
+              setProfile((prev) => ({
+                ...prev,
+                name: data.user.name || prev.name,
+                email: data.user.email || prev.email,
+                avatar: data.user.avatar || prev.avatar,
+                onboardingCompleted: isAlreadyOnboarded,
+              }));
+              if (isAlreadyOnboarded) {
+                localStorage.setItem(`highscholar_onboarded_${uEmail}`, 'true');
+              }
 
               if (!isAlreadyOnboarded && uEmail && !uEmail.includes('alex.mercer')) {
                 setIsOnboardingOpen(true);
               }
+              void loadUserData();
             }
           })
           .catch(() => {});
@@ -222,30 +391,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setProfessors(mockProfessors);
       }
 
-      const savedApplications = localStorage.getItem(STORAGE_KEYS.APPLICATIONS);
-      if (savedApplications) {
-        const parsed = JSON.parse(savedApplications);
-        if (!Array.isArray(parsed) || parsed.length === 0 || !parsed.some((a: any) => a.id === 'app_01')) {
-          setApplications(initialApplications);
-        } else {
-          setApplications(parsed);
-        }
-      } else {
-        setApplications(initialApplications);
-      }
-
-      const savedOutreach = localStorage.getItem(STORAGE_KEYS.OUTREACH);
-      if (savedOutreach) {
-        const parsed = JSON.parse(savedOutreach);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setOutreachRecords(parsed);
-        } else {
-          setOutreachRecords(initialOutreachRecords);
-        }
-      } else {
-        setOutreachRecords(initialOutreachRecords);
-      }
-
       const savedOpportunities = localStorage.getItem(STORAGE_KEYS.OPPORTUNITIES);
       if (savedOpportunities) {
         const parsed = JSON.parse(savedOpportunities);
@@ -271,12 +416,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       console.error('Failed reading from localStorage, loading defaults', e);
       setScholarships(mockScholarships);
       setProfessors(mockProfessors);
-      setApplications(initialApplications);
-      setOutreachRecords(initialOutreachRecords);
     } finally {
       setIsMounted(true);
     }
-  }, []);
+  }, [loadUserData]);
 
   const toggleTheme = () => {
     setTheme((prev) => {
@@ -291,26 +434,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return next;
     });
   };
-
-  // Save changes
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(profile));
-    } catch (e) {
-      console.error(e);
-    }
-  }, [profile]);
-
-  // Pipeline data is only written after hydration; otherwise the first (default) render overwrites the saved
-  // board before it is read again (React dev re-runs mount effects), and moves are lost on reload.
-  useEffect(() => {
-    if (!isMounted) return;
-    try {
-      localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(applications));
-    } catch (e) {
-      console.error(e);
-    }
-  }, [applications, isMounted]);
 
   useEffect(() => {
     try {
@@ -328,44 +451,95 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [professors]);
 
-  useEffect(() => {
-    if (!isMounted) return;
-    try {
-      localStorage.setItem(STORAGE_KEYS.OUTREACH, JSON.stringify(outreachRecords));
-    } catch (e) {
-      console.error(e);
-    }
-  }, [outreachRecords, isMounted]);
+  // ---------------------------------------------------------------------------
+  // Profile
 
   const updateProfile = (updates: Partial<UserProfile>) => {
     setProfile((prev) => ({ ...prev, ...updates }));
   };
 
-  const saveScholarshipToTracker = (scholarship: Scholarship, initialStatus: ApplicationStatus = 'Wishlist') => {
-    // Check if already in applications
-    const exists = applications.find((a) => a.scholarshipId === scholarship.id);
-    if (exists) {
-      return;
+  const saveProfile = async (updates: Partial<UserProfile>): Promise<boolean> => {
+    const before = latest.current.profile;
+    setProfile((prev) => ({ ...prev, ...updates }));
+    if (!signedIn.current) return true;
+    const body: Record<string, unknown> = {};
+    for (const key of ['name', 'degreeLevel', 'specializations', 'targetCountries', 'cgpa', 'testScores', 'avatar', 'details'] as const) {
+      if (updates[key] !== undefined) body[key] = updates[key];
     }
+    if (Object.keys(body).length === 0) return true;
+    try {
+      const res = await apiFetch<{ profile: UserProfile }>('/api/profile', 'PATCH', body);
+      setProfile((prev) => ({ ...prev, ...res.profile }));
+      return true;
+    } catch (err) {
+      const restore = Object.fromEntries(Object.keys(updates).map((k) => [k, before[k as keyof UserProfile]]));
+      setProfile((prev) => ({ ...prev, ...restore }));
+      showError(err instanceof ApiError && err.status === 400 ? 'Some profile values are out of range. Please check and try again.' : errorMessage(err, 'We couldn’t save your profile. Please try again.'));
+      return false;
+    }
+  };
+
+  // ---------------------------------------------------------------------------
+  // Pipeline: scholarship applications
+
+  /** Rollback helper: put a card back exactly as it was (or drop it if it didn't exist) */
+  const restoreApplication = (id: string) => {
+    const snapshot = latest.current.applications.find((a) => a.id === id);
+    const index = latest.current.applications.findIndex((a) => a.id === id);
+    return () =>
+      setApplications((prev) => {
+        if (!snapshot) return prev.filter((a) => a.id !== id);
+        if (prev.some((a) => a.id === id)) return prev.map((a) => (a.id === id ? snapshot : a));
+        const next = [...prev];
+        next.splice(Math.min(index, next.length), 0, snapshot);
+        return next;
+      });
+  };
+
+  const saveScholarshipToTracker = (scholarship: Scholarship, initialStatus: ApplicationStatus = 'Wishlist') => {
+    if (latest.current.applications.some((a) => a.scholarshipId === scholarship.id)) return;
 
     const newApp: Application = {
-      id: `app_${Date.now()}`,
+      id: newId(),
       scholarshipId: scholarship.id,
       scholarship,
       status: initialStatus,
       decision: 'Pending',
       notes: `Targeting deadline: ${new Date(scholarship.deadline).toLocaleDateString()}`,
       deadline: scholarship.deadline,
-      updatedAt: new Date().toISOString(),
+      updatedAt: now(),
       tasks: [
-        { id: `t_${Date.now()}_1`, title: 'Review eligibility & prerequisites', isCompleted: true },
-        { id: `t_${Date.now()}_2`, title: 'Draft Statement of Purpose / Essay', isCompleted: false },
-        { id: `t_${Date.now()}_3`, title: 'Request Academic Letters of Recommendation', isCompleted: false },
-        { id: `t_${Date.now()}_4`, title: 'Prepare Transcripts & Test Scores', isCompleted: false },
+        { id: newId(), title: 'Review eligibility & prerequisites', isCompleted: true },
+        { id: newId(), title: 'Draft Statement of Purpose / Essay', isCompleted: false },
+        { id: newId(), title: 'Request Academic Letters of Recommendation', isCompleted: false },
+        { id: newId(), title: 'Prepare Transcripts & Test Scores', isCompleted: false },
       ],
     };
+    const rollback = restoreApplication(newApp.id);
+    local<Application>('applications', (prev) => (prev.some((a) => a.scholarshipId === scholarship.id) ? prev : [newApp, ...prev]));
+    sync(
+      `app:${newApp.id}`,
+      async () => {
+        const res = await apiFetch<{ data: Application }>('/api/applications', 'POST', {
+          id: newApp.id,
+          scholarshipId: scholarship.id,
+          status: newApp.status,
+          notes: newApp.notes,
+          deadline: newApp.deadline,
+          tasks: newApp.tasks.map((t) => ({ id: t.id, title: t.title, isCompleted: t.isCompleted })),
+        });
+        // Already tracked on another device: show the server's card instead of the new one
+        if (res.data.id !== newApp.id) setApplications((prev) => prev.map((a) => (a.id === newApp.id ? res.data : a)));
+      },
+      rollback,
+      'We couldn’t save this scholarship. Please try again.',
+    );
+  };
 
-    setApplications((prev) => [newApp, ...prev]);
+  const patchApplication = (appId: string, fn: (app: Application) => Application, body: Record<string, unknown>, failMessage: string) => {
+    const rollback = restoreApplication(appId);
+    local<Application>('applications', replaceById<Application>(appId, fn));
+    sync(`app:${appId}`, () => apiFetch(`/api/applications/${encodeURIComponent(appId)}`, 'PATCH', body), rollback, failMessage);
   };
 
   const updateApplicationStatus = (appId: string, status: ApplicationStatus, decision?: DecisionResult) => {
@@ -382,66 +556,117 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         console.error(err);
       }
     }
-
-    setApplications((prev) =>
-      prev.map((app) => {
-        if (app.id === appId) {
-          return {
-            ...app,
-            status,
-            decision: decision || app.decision,
-            updatedAt: new Date().toISOString(),
-          };
-        }
-        return app;
-      })
+    const updatedAt = now();
+    patchApplication(
+      appId,
+      (app) => ({ ...app, status, decision: decision || app.decision, updatedAt }),
+      { status, ...(decision ? { decision } : {}) },
+      'We couldn’t move this card. Please try again.',
     );
   };
 
   const toggleTaskCompletion = (appId: string, taskId: string) => {
-    setApplications((prev) =>
-      prev.map((app) => {
-        if (app.id === appId) {
-          return {
-            ...app,
-            tasks: app.tasks.map((t) => (t.id === taskId ? { ...t, isCompleted: !t.isCompleted } : t)),
-            updatedAt: new Date().toISOString(),
-          };
-        }
-        return app;
-      })
+    const task = latest.current.applications.find((a) => a.id === appId)?.tasks.find((t) => t.id === taskId);
+    if (!task) return;
+    const isCompleted = !task.isCompleted;
+    const updatedAt = now();
+    const rollback = restoreApplication(appId);
+    local<Application>(
+      'applications',
+      replaceById<Application>(appId, (app) => ({ ...app, tasks: app.tasks.map((t) => (t.id === taskId ? { ...t, isCompleted } : t)), updatedAt })),
+    );
+    sync(
+      `app:${appId}`,
+      () => apiFetch(`/api/applications/${encodeURIComponent(appId)}/tasks/${encodeURIComponent(taskId)}`, 'PATCH', { isCompleted }),
+      rollback,
+      'We couldn’t update this task. Please try again.',
     );
   };
 
   const addTaskToApplication = (appId: string, title: string) => {
     if (!title.trim()) return;
-    setApplications((prev) =>
-      prev.map((app) => {
-        if (app.id === appId) {
-          return {
-            ...app,
-            tasks: [...app.tasks, { id: `task_${Date.now()}`, title: title.trim(), isCompleted: false }],
-            updatedAt: new Date().toISOString(),
-          };
-        }
-        return app;
-      })
+    const task = { id: newId(), title: title.trim(), isCompleted: false };
+    const updatedAt = now();
+    const rollback = restoreApplication(appId);
+    local<Application>(
+      'applications',
+      replaceById<Application>(appId, (app) => (app.tasks.some((t) => t.id === task.id) ? app : { ...app, tasks: [...app.tasks, task], updatedAt })),
+    );
+    sync(`app:${appId}`, () => apiFetch(`/api/applications/${encodeURIComponent(appId)}/tasks`, 'POST', task), rollback, 'We couldn’t add this task. Please try again.');
+  };
+
+  const removeTaskFromApplication = (appId: string, taskId: string) => {
+    const updatedAt = now();
+    const rollback = restoreApplication(appId);
+    local<Application>('applications', replaceById<Application>(appId, (app) => ({ ...app, tasks: app.tasks.filter((t) => t.id !== taskId), updatedAt })));
+    sync(
+      `app:${appId}`,
+      () => apiFetch(`/api/applications/${encodeURIComponent(appId)}/tasks/${encodeURIComponent(taskId)}`, 'DELETE'),
+      rollback,
+      'We couldn’t remove this task. Please try again.',
     );
   };
 
   const updateApplicationNotes = (appId: string, notes: string) => {
-    setApplications((prev) =>
-      prev.map((app) => {
-        if (app.id === appId) {
-          return { ...app, notes, updatedAt: new Date().toISOString() };
-        }
-        return app;
-      })
-    );
+    const updatedAt = now();
+    patchApplication(appId, (app) => ({ ...app, notes, updatedAt }), { notes }, 'We couldn’t save your notes. Please try again.');
   };
 
   const removeApplication = (appId: string) => {
-    setApplications((prev) => prev.filter((a) => a.id !== appId));
+    const rollback = restoreApplication(appId);
+    local<Application>('applications', (prev) => prev.filter((a) => a.id !== appId));
+    sync(`app:${appId}`, () => apiFetch(`/api/applications/${encodeURIComponent(appId)}`, 'DELETE'), rollback, 'We couldn’t remove this card. Please try again.');
+  };
+
+  const reorderApplications = (orderedIds: string[]) => {
+    const before = latest.current.applications.map((a) => a.id);
+    const after = reorderById(latest.current.applications, orderedIds).map((a) => a.id);
+    local<Application>('applications', (prev) => reorderById(prev, orderedIds));
+    sync('order:applications', () => apiFetch('/api/applications/order', 'PUT', { ids: after }), () => setApplications((prev) => reorderById(prev, before)), 'We couldn’t save the new order. Please try again.');
+  };
+
+  // ---------------------------------------------------------------------------
+  // Pipeline: professor outreach
+
+  const restoreOutreach = (id: string) => {
+    const snapshot = latest.current.outreachRecords.find((r) => r.id === id);
+    const index = latest.current.outreachRecords.findIndex((r) => r.id === id);
+    return () =>
+      setOutreachRecords((prev) => {
+        if (!snapshot) return prev.filter((r) => r.id !== id);
+        if (prev.some((r) => r.id === id)) return prev.map((r) => (r.id === id ? snapshot : r));
+        const next = [...prev];
+        next.splice(Math.min(index, next.length), 0, snapshot);
+        return next;
+      });
+  };
+
+  const createOutreach = (record: OutreachRecord, isDuplicate: (r: OutreachRecord) => boolean) => {
+    if (latest.current.outreachRecords.some(isDuplicate)) return false;
+    const rollback = restoreOutreach(record.id);
+    local<OutreachRecord>('outreach', (prev) => (prev.some(isDuplicate) ? prev : [record, ...prev]));
+    sync(
+      `outreach:${record.id}`,
+      async () => {
+        const res = await apiFetch<{ data: OutreachRecord }>('/api/outreach', 'POST', {
+          id: record.id,
+          ...(record.professorId ? { professorId: record.professorId } : {}),
+          ...(record.opportunityId ? { opportunityId: record.opportunityId } : {}),
+          professorName: record.professorName,
+          ...(record.labName ? { labName: record.labName } : {}),
+          institution: record.institution,
+          ...(record.country ? { country: record.country } : {}),
+          ...(record.sourceUrl ? { sourceUrl: record.sourceUrl } : {}),
+          status: record.status,
+          notes: record.notes,
+          ...(record.emailSubject ? { emailSubject: record.emailSubject } : {}),
+        });
+        if (res.data.id !== record.id) setOutreachRecords((prev) => prev.map((r) => (r.id === record.id ? res.data : r)));
+      },
+      rollback,
+      'We couldn’t add this to Professor Outreach. Please try again.',
+    );
+    return true;
   };
 
   const openColdEmailModal = (opp: HiringOpportunity) => {
@@ -450,27 +675,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const saveOpportunityToOutreach = (opp: HiringOpportunity, status: OutreachStatus = 'Prospect') => {
-    setOutreachRecords((prev) => {
-      const exists = prev.find((r) => r.opportunityId === opp.id);
-      if (exists) return prev;
-      return [
-        {
-          id: `outreach_${Date.now()}`,
-          opportunityId: opp.id,
-          professorName: opp.authorName,
-          labName: opp.labName,
-          institution: opp.institution,
-          status,
-          notes: `Target: ${opp.title}`,
-          coldEmailDraft: '',
-          emailSubject: `Inquiry: Research Assistantship in ${opp.fieldTags[0] || 'HCI'}`,
-          updatedAt: new Date().toISOString(),
-          country: opp.country,
-          sourceUrl: opp.sourceUrl,
-        },
-        ...prev,
-      ];
-    });
+    createOutreach(
+      {
+        id: newId(),
+        opportunityId: opp.id,
+        professorName: opp.authorName,
+        labName: opp.labName,
+        institution: opp.institution,
+        status,
+        notes: `Target: ${opp.title}`,
+        coldEmailDraft: '',
+        emailSubject: `Inquiry: Research Assistantship in ${opp.fieldTags[0] || 'HCI'}`,
+        updatedAt: now(),
+        country: opp.country,
+        sourceUrl: opp.sourceUrl,
+      },
+      (r) => r.opportunityId === opp.id,
+    );
     confetti({
       particleCount: 35,
       spread: 60,
@@ -480,32 +701,34 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const saveProfessorToOutreach = (prof: Professor, status: OutreachStatus = 'Prospect') => {
-    setOutreachRecords((prev) => {
-      if (prev.some((r) => r.professorId === prof.id)) return prev;
-      return [
-        {
-          id: `outreach_${Date.now()}`,
-          professorId: prof.id,
-          professorName: prof.name,
-          labName: prof.labName,
-          institution: prof.university,
-          status,
-          notes: `Target: ${prof.labName ?? prof.department}`,
-          coldEmailDraft: '',
-          emailSubject: `Prospective student: ${prof.researchTags[0] || 'research'} in your lab`,
-          updatedAt: new Date().toISOString(),
-          country: prof.country,
-          sourceUrl: prof.labWebsite,
-        },
-        ...prev,
-      ];
-    });
+    createOutreach(
+      {
+        id: newId(),
+        professorId: prof.id,
+        professorName: prof.name,
+        labName: prof.labName,
+        institution: prof.university,
+        status,
+        notes: `Target: ${prof.labName ?? prof.department}`,
+        coldEmailDraft: '',
+        emailSubject: `Prospective student: ${prof.researchTags[0] || 'research'} in your lab`,
+        updatedAt: now(),
+        country: prof.country,
+        sourceUrl: prof.labWebsite,
+      },
+      (r) => r.professorId === prof.id,
+    );
+  };
+
+  const patchOutreach = (recordId: string, fn: (r: OutreachRecord) => OutreachRecord, body: Record<string, unknown>, failMessage: string) => {
+    const rollback = restoreOutreach(recordId);
+    local<OutreachRecord>('outreach', replaceById<OutreachRecord>(recordId, fn));
+    sync(`outreach:${recordId}`, () => apiFetch(`/api/outreach/${encodeURIComponent(recordId)}`, 'PATCH', body), rollback, failMessage);
   };
 
   const updateOutreachStatus = (recordId: string, status: OutreachStatus) => {
-    setOutreachRecords((prev) =>
-      prev.map((r) => (r.id === recordId ? { ...r, status, updatedAt: new Date().toISOString() } : r))
-    );
+    const updatedAt = now();
+    patchOutreach(recordId, (r) => ({ ...r, status, updatedAt }), { status }, 'We couldn’t move this card. Please try again.');
     if (status === 'Funded Offer' || status === 'Interview') {
       confetti({
         particleCount: 65,
@@ -517,22 +740,42 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const updateOutreachNotes = (recordId: string, notes: string) => {
-    setOutreachRecords((prev) =>
-      prev.map((r) => (r.id === recordId ? { ...r, notes, updatedAt: new Date().toISOString() } : r))
-    );
+    const updatedAt = now();
+    patchOutreach(recordId, (r) => ({ ...r, notes, updatedAt }), { notes }, 'We couldn’t save your notes. Please try again.');
   };
 
   const removeOutreachRecord = (recordId: string) => {
-    setOutreachRecords((prev) => prev.filter((r) => r.id !== recordId));
-  };
-
-  const reorderApplications = (orderedIds: string[]) => {
-    setApplications((prev) => reorderById(prev, orderedIds));
+    const rollback = restoreOutreach(recordId);
+    local<OutreachRecord>('outreach', (prev) => prev.filter((r) => r.id !== recordId));
+    sync(`outreach:${recordId}`, () => apiFetch(`/api/outreach/${encodeURIComponent(recordId)}`, 'DELETE'), rollback, 'We couldn’t remove this card. Please try again.');
   };
 
   const reorderOutreachRecords = (orderedIds: string[]) => {
-    setOutreachRecords((prev) => reorderById(prev, orderedIds));
+    const before = latest.current.outreachRecords.map((r) => r.id);
+    const after = reorderById(latest.current.outreachRecords, orderedIds).map((r) => r.id);
+    local<OutreachRecord>('outreach', (prev) => reorderById(prev, orderedIds));
+    sync('order:outreach', () => apiFetch('/api/outreach/order', 'PUT', { ids: after }), () => setOutreachRecords((prev) => reorderById(prev, before)), 'We couldn’t save the new order. Please try again.');
   };
+
+  // ---------------------------------------------------------------------------
+  // Bookmarks (opportunities, professors, papers; scholarships are saved by tracking them)
+
+  const setBookmark = (kind: BookmarkKind, id: string, saved: boolean) => {
+    local<string>(kind, setMembership(id, saved));
+    sync(
+      `bookmark:${kind}:${id}`,
+      () => apiFetch(`/api/bookmarks/${kind}/${encodeURIComponent(id)}`, saved ? 'PUT' : 'DELETE'),
+      () => setters[kind](setMembership(id, !saved) as unknown as Updater<unknown[]>),
+      saved ? 'We couldn’t save this item. Please try again.' : 'We couldn’t remove this bookmark. Please try again.',
+    );
+  };
+
+  const toggleSavePaper = (paperId: string) => setBookmark('papers', paperId, !latest.current.savedPaperIds.includes(paperId));
+
+  const isPaperSaved = (paperId: string) => savedPaperIds.includes(paperId);
+
+  // ---------------------------------------------------------------------------
+  // Catalogue (not user data)
 
   const addScholarship = (newSch: Scholarship) => {
     setScholarships((prev) => [newSch, ...prev]);
@@ -600,26 +843,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     throw new Error(json.error || 'Failed to import opportunity');
   };
 
-  const toggleSavePaper = (paperId: string) => {
-    setSavedPaperIds((prev) => {
-      const next = prev.includes(paperId) ? prev.filter((id) => id !== paperId) : [...prev, paperId];
-      try {
-        localStorage.setItem(STORAGE_KEYS.RESEARCH_PAPERS, JSON.stringify(next));
-      } catch (e) {
-        console.error(e);
-      }
-      return next;
-    });
-  };
-
-  const isPaperSaved = (paperId: string) => savedPaperIds.includes(paperId);
-
   return (
     <AppContext.Provider
       value={{
         profile,
         setProfile,
         updateProfile,
+        saveProfile,
         scholarships,
         professors,
         applications,
@@ -628,12 +858,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         savedPaperIds,
         toggleSavePaper,
         isPaperSaved,
+        savedOpportunityIds,
+        savedProfessorIds,
+        setBookmark,
         isOnboardingOpen,
         setIsOnboardingOpen,
         saveScholarshipToTracker,
         updateApplicationStatus,
         toggleTaskCompletion,
         addTaskToApplication,
+        removeTaskFromApplication,
         updateApplicationNotes,
         removeApplication,
         saveOpportunityToOutreach,
@@ -658,6 +892,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         toggleTheme,
         setTheme,
         isMounted,
+        isUserDataLoaded,
+        reloadUserData: loadUserData,
         isSyncingOpportunities,
         lastSyncedAt,
         syncLiveOpportunities,
@@ -669,6 +905,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }}
     >
       {children}
+      {syncError && (
+        <div
+          role="status"
+          aria-live="polite"
+          data-testid="sync-error"
+          className="fixed bottom-6 left-1/2 z-[1000] max-w-[calc(100vw-32px)] -translate-x-1/2 rounded-[10px] bg-[#101828] px-4 py-3 text-[14px] leading-5 font-medium text-white shadow-lg"
+        >
+          {syncError}
+        </div>
+      )}
     </AppContext.Provider>
   );
 };
