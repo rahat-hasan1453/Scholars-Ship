@@ -46,7 +46,7 @@ interface UnifiedHubViewProps {
   onOpenColdEmail?: (prof: Professor) => void;
   onOpenScholarshipDetail: (sch: Scholarship) => void;
   activeTab?: string;
-  setActiveTab?: (tab: 'scholarships' | 'opportunities' | 'professors' | 'research' | 'tracker' | 'profile') => void;
+  setActiveTab?: (tab: 'scholarships' | 'opportunities' | 'professors' | 'research' | 'tracker' | 'saved' | 'profile') => void;
 }
 
 export const UnifiedHubView: React.FC<UnifiedHubViewProps> = ({
