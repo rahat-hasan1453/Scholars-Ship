@@ -18,7 +18,6 @@ import { ColdEmailModal } from '@/components/ColdEmailModal';
 import { ProfessorDetailModal } from '@/components/ProfessorDetailModal';
 import { AdvancedFilterModal, FilterState, initialFilterState } from '@/components/AdvancedFilterModal';
 import { SmartProfileMatcherModal } from '@/components/SmartProfileMatcherModal';
-import { UnifiedHubView } from '@/components/UnifiedHubView';
 import { ResearchPapersView } from '@/components/ResearchPapersView';
 import { ScholarshipRadarFeed } from '@/components/ScholarshipRadarFeed';
 import { FacultyLabsFeed } from '@/components/FacultyLabsFeed';

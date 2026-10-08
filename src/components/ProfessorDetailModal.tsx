@@ -1,5 +1,6 @@
 'use client';
 
+import { initialsAvatar } from '@/lib/initialsAvatar';
 import React from 'react';
 import { Professor, HiringOpportunity } from '@/types';
 import { useApp } from '@/context/AppContext';
@@ -61,7 +62,7 @@ export const ProfessorDetailModal: React.FC<ProfessorDetailModalProps> = ({ prof
         <div className="px-6 py-5 border-b border-slate-100 flex items-start justify-between bg-slate-50/70">
           <div className="flex items-start gap-4 min-w-0">
             <img
-              src={professor.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
+              src={professor.avatarUrl || initialsAvatar(professor.name)}
               alt={professor.name}
               className="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-sm shrink-0"
             />

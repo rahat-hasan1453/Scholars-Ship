@@ -87,3 +87,19 @@ export async function getProfessor(id: string): Promise<Professor | null> {
     return null;
   }
 }
+
+/** Candidates for "Similar faculty": same country or a shared research tag (the page only shows 3, so a few dozen is plenty). */
+export async function getSimilarCandidates(p: Pick<Professor, 'id' | 'country' | 'researchTags'>, limit = 60): Promise<Professor[]> {
+  try {
+    const rows = await prisma.professor.findMany({
+      where: { id: { not: p.id }, OR: [{ researchTags: { hasSome: p.researchTags } }, { country: p.country }] },
+      include: INCLUDE,
+      orderBy: [{ hIndex: { sort: 'desc', nulls: 'last' } }, { id: 'asc' }],
+      take: limit,
+    });
+    return rows.map(toProfessor);
+  } catch (error) {
+    console.error('[professors] database read failed', error);
+    return [];
+  }
+}

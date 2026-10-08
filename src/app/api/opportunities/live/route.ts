@@ -91,7 +91,7 @@ function parseAcademicPost(post: any): HiringOpportunity | null {
       author = `Prof. ${piMatch[1].trim()}`;
     }
 
-    const avatar = post.account?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80';
+    const avatar = post.account?.avatar || undefined;
     const sourceUrl = post.url || 'https://academiccloud.social';
     const postDate = post.created_at ? post.created_at.slice(0, 10) : new Date().toISOString().slice(0, 10);
 
@@ -114,18 +114,14 @@ function parseAcademicPost(post: any): HiringOpportunity | null {
       }
     }
 
-    if (detectedFields.size === 0) {
-      detectedFields.add('Interdisciplinary Research');
-    }
 
     // Extract degrees
     const degrees: DegreeLevel[] = [];
     if (/phd|doctoral|ph\.d/i.test(text)) degrees.push('PhD');
     if (/master|masc|msc|graduate assistant|grad student/i.test(text)) degrees.push('Masters');
-    if (degrees.length === 0) degrees.push('PhD');
 
     // Extract Institution
-    let institution = 'Academic Research Institution';
+    let institution = 'Institution not stated';
     const instPatterns = [
       /(?:at|with|join|at\s+the|at\s+our\s+partner\s+university)\s+([A-Z][A-Za-z\s0-9&-]+(?:University|Institute|School|Academy|College|TU\s+[A-Za-z]+|Center|Centre|Laboratory|Lab))/i,
       /(TU\s+[A-Z][a-z]+|Max\s+Planck\s+Institute(?:\s+for\s+[A-Za-z\s]+)?|IMPRS(?:\s+for\s+[A-Za-z\s]+)?|Bulgarian\s+Academy\s+of\s+Sciences)/i,
@@ -141,7 +137,7 @@ function parseAcademicPost(post: any): HiringOpportunity | null {
     }
 
     // Extract Country
-    let country = 'International';
+    let country = 'Location not stated';
     for (const [keyword, cName] of Object.entries(COUNTRY_MAP)) {
       if (lowerText.includes(keyword)) {
         country = cName;
@@ -150,7 +146,7 @@ function parseAcademicPost(post: any): HiringOpportunity | null {
     }
 
     // Extract Funding
-    let funding = 'Fully Funded / University Fellowship';
+    let funding = 'Funding not stated in the post';
     const fundingPatterns = [
       /(TV-L\s*E\d+(?:\s*\d+%)?)/i,
       /((?:\$|€|£)\s*[\d,]+(?:\s*\/\s*(?:year|yr|month|mo))?)/i,
@@ -161,7 +157,7 @@ function parseAcademicPost(post: any): HiringOpportunity | null {
     for (const fPattern of fundingPatterns) {
       const fMatch = text.match(fPattern);
       if (fMatch) {
-        funding = `${fMatch[1]} (Standard Academic Scale)`;
+        funding = fMatch[1];
         break;
       }
     }
@@ -294,7 +290,7 @@ export async function POST(request: Request) {
       account: {
         display_name: authorName || 'Academic Faculty / PI',
         username: (authorName || 'professor').toLowerCase().replace(/\s+/g, '_'),
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+        avatar: '',
       },
     };
 

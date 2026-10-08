@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getProfessor, getProfessors } from '@/lib/professors';
+import { getProfessor, getSimilarCandidates } from '@/lib/professors';
 import { ProfessorDetailsView } from '@/components/professor-details/ProfessorDetailsView';
 
 type Params = { params: Promise<{ id: string }> };
@@ -14,7 +14,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 // Details page for one Faculty & Research Labs card: /professors/<id>
 export default async function ProfessorDetailsPage({ params }: Params) {
   const { id } = await params;
-  const [professor, all] = await Promise.all([getProfessor(id), getProfessors()]);
+  const professor = await getProfessor(id);
   if (!professor) notFound();
-  return <ProfessorDetailsView professor={professor} others={all} />;
+  const others = await getSimilarCandidates(professor);
+  return <ProfessorDetailsView professor={professor} others={others} />;
 }

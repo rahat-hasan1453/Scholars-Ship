@@ -59,6 +59,7 @@ export const ProfessorDetailsView: React.FC<Props> = ({ professor: p, others }) 
   const nextIntake = p.acceptingTerms[0];
   const person = shortName(p.name);
   const similar = useMemo(() => similarFaculty(p, others, profile), [p, others, profile]);
+  const glance = glanceRows(p);
 
   const meta = [`${countryFlagEmoji(p.country)} ${p.country}`.trim(), updatedLine(p.updatedAt)].filter(Boolean).join(' · ');
   const chips: { label: string; tone?: ChipTone }[] = [
@@ -107,9 +108,11 @@ export const ProfessorDetailsView: React.FC<Props> = ({ professor: p, others }) 
           <ExpandableText text={p.bio} />
         </DetailSection>
       )}
-      <DetailSection label="Lab at a Glance">
-        <ValueRows rows={glanceRows(p)} />
-      </DetailSection>
+      {glance.length > 0 && (
+        <DetailSection label="Lab at a Glance">
+          <ValueRows rows={glance} />
+        </DetailSection>
+      )}
       <DetailSection label="What They Look For">
         <CheckList rows={lookingForRows(p, profile)} />
       </DetailSection>
