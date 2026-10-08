@@ -77,7 +77,8 @@ const selectCls =
   'h-9 w-full rounded-[8px] border border-[#d0d5dd] bg-white px-2 text-[14px] font-normal text-[#101828] focus-visible:outline-2 focus-visible:outline-[#7150e7]';
 
 // Pipeline page (Figma 315:5151): scholarship applications or professor outreach as a drag-and-drop Kanban board.
-export function PipelineBoard() {
+/** `embedded`: board only (no header / toolbar), scholarships mode, used inside My Profile → Pipeline (Figma 327:5400) */
+export function PipelineBoard({ embedded = false }: { embedded?: boolean } = {}) {
   const router = useRouter();
   const {
     profile,
@@ -92,7 +93,8 @@ export function PipelineBoard() {
     reorderOutreachRecords,
   } = useApp();
 
-  const [mode, setMode] = useSessionState<PipelineMode>('pipeline:mode', 'scholarships');
+  const [sessionMode, setMode] = useSessionState<PipelineMode>('pipeline:mode', 'scholarships');
+  const mode: PipelineMode = embedded ? 'scholarships' : sessionMode;
   const [filters, setFilters] = useSessionState<PipelineFilters>('pipeline:filters', DEFAULT_FILTERS);
   const [sort, setSort] = useSessionState<PipelineSort>('pipeline:sort', 'manual');
   const [columnSort, setColumnSort] = useSessionState<Record<string, PipelineSort>>('pipeline:columnSort', {});
@@ -231,7 +233,9 @@ export function PipelineBoard() {
   ];
 
   return (
-    <div className="flex w-full flex-col gap-6 rounded-[16px] bg-white px-4 py-5 sm:px-8 sm:py-6">
+    <div className={embedded ? 'flex w-full flex-col' : 'flex w-full flex-col gap-6 rounded-[16px] bg-white px-4 py-5 sm:px-8 sm:py-6'}>
+      {!embedded && (
+      <>
       {/* Header (Figma 315:5250) */}
       <div className="flex flex-wrap items-center gap-4">
         <div className="flex min-w-[240px] flex-1 flex-col gap-1">
@@ -348,6 +352,8 @@ export function PipelineBoard() {
           {mode === 'scholarships' ? 'Add application' : 'Add professor'}
         </button>
       </div>
+      </>
+      )}
 
       {/* Board (Figma 316:5228) */}
       <DndContext
