@@ -49,11 +49,11 @@ export function AddApplicationDialog({ mode, status, onClose }: AddApplicationDi
     <Dialog open={status !== null} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="grid-cols-[minmax(0,1fr)] gap-0 overflow-hidden rounded-[16px] p-0 sm:max-w-[520px]">
         <DialogHeader className="gap-1 px-5 pt-5 pb-4 text-left">
-          <DialogTitle className="text-[18px] leading-7 font-[590] text-[#101828]">
+          <DialogTitle className="text-[18px] leading-7 font-medium text-[#101828]">
             {mode === 'scholarships' ? 'Add application' : 'Add professor'}
           </DialogTitle>
           <DialogDescription className="text-[14px] leading-5 text-[#627181]">
-            Pick a {noun} to add to <span className="font-[510] text-[#344054]">{status}</span>.
+            Pick a {noun} to add to <span className="font-medium text-[#344054]">{status}</span>.
           </DialogDescription>
         </DialogHeader>
         <Command className="rounded-none border-t border-[#e4e7ec]">
@@ -65,7 +65,7 @@ export function AddApplicationDialog({ mode, status, onClose }: AddApplicationDi
             <CommandGroup>
               {options.map((o) => (
                 <CommandItem key={o.id} value={`${o.title} ${o.id}`} keywords={o.keywords} onSelect={() => add(o.id)} className="flex min-w-0 cursor-pointer flex-col items-stretch gap-0 rounded-[8px] px-3 py-2">
-                  <span className="truncate text-[14px] leading-5 font-[510] text-[#101828]">{o.title}</span>
+                  <span className="truncate text-[14px] leading-5 font-medium text-[#101828]">{o.title}</span>
                   <span className="truncate text-[12px] leading-4 text-[#627181]">{o.sub}</span>
                 </CommandItem>
               ))}
