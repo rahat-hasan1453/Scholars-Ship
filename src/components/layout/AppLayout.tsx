@@ -136,10 +136,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
               </span>
               <span className={`flex flex-col min-w-0 ${collapsed ? 'lg:hidden' : ''}`}>
                 <span className="flex items-center gap-1.5">
-                  <span className="text-[14px] leading-5 font-bold tracking-[-0.5004px] text-text-primary whitespace-nowrap">
+                  <span className="text-[14px] leading-5 font-semibold tracking-[-0.5004px] text-text-primary whitespace-nowrap">
                     Scholars’ ship
                   </span>
-                  <span className="px-1.5 rounded-xl bg-brand-soft text-[10px] leading-[15px] font-bold tracking-[-0.0748px] text-[#4f46e5]">
+                  <span className="px-1.5 rounded-xl bg-brand-soft text-[10px] leading-[15px] font-semibold tracking-[-0.0748px] text-[#4f46e5]">
                     PRO
                   </span>
                 </span>
@@ -241,7 +241,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
 
                 {/* User Name & Degree Subtitle matching Figma 122:3181 */}
                 <div className="hidden sm:flex flex-col text-left">
-                  <span className="text-xs font-bold text-[#101828] leading-tight">
+                  <span className="text-xs font-semibold text-[#101828] leading-tight">
                     {profile.name || profile.email}
                   </span>
                   <span className="text-xs italic text-[#64748B] leading-tight mt-0.5">

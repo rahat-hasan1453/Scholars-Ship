@@ -239,7 +239,7 @@ export function PipelineBoard({ embedded = false }: { embedded?: boolean } = {})
       {/* Header (Figma 315:5250) */}
       <div className="flex flex-wrap items-center gap-4">
         <div className="flex min-w-[240px] flex-1 flex-col gap-1">
-          <h1 className="text-[24px] leading-8 font-[590] text-[#101828]">Pipeline</h1>
+          <h1 className="text-[24px] leading-8 font-semibold text-[#101828]">Pipeline</h1>
           <p className="text-[14px] leading-5 text-[#627181]">
             {mode === 'scholarships'
               ? 'Track every application from wishlist to decision. Drag a card to move it.'
@@ -250,7 +250,7 @@ export function PipelineBoard({ embedded = false }: { embedded?: boolean } = {})
           {summaryStats.map((s) => (
             <div key={s.label} className="flex flex-col-reverse items-end">
               <dt className="text-[12px] leading-4 text-[#627181]">{s.label}</dt>
-              <dd className="text-[20px] leading-7 font-[590]" style={{ color: s.color }} data-testid={`summary-${s.label}`}>
+              <dd className="text-[20px] leading-7 font-semibold" style={{ color: s.color }} data-testid={`summary-${s.label}`}>
                 {s.value}
               </dd>
             </div>

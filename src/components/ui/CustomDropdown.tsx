@@ -193,7 +193,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
         <span className="truncate font-semibold text-[#101828]">
           {first?.label || selectedValues[0]}
         </span>
-        <span className="shrink-0 bg-[#EDE9FC] text-[#7150E7] text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+        <span className="shrink-0 bg-[#EDE9FC] text-[#7150E7] text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
           +{selectedValues.length - 1}
         </span>
       </span>
@@ -317,7 +317,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
               return (
                 <React.Fragment key={opt.value}>
                   {isNewCategory && (
-                    <div className="px-2.5 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-[#7150E7] bg-[#EDE9FC]/50 rounded-lg my-1 select-none flex items-center justify-between border-l-2 border-[#7150E7]">
+                    <div className="px-2.5 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-[#7150E7] bg-[#EDE9FC]/50 rounded-lg my-1 select-none flex items-center justify-between border-l-2 border-[#7150E7]">
                       <span>{opt.category}</span>
                     </div>
                   )}

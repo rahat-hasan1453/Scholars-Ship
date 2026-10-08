@@ -159,7 +159,7 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({ opportunity })
         {/* Top Header Row: University Name, Subtitle, Crisp SVG Flag */}
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <h3 className="font-bold text-sm sm:text-base text-[#101828] leading-tight truncate group-hover:text-[#7050E6] transition-colors">
+            <h3 className="font-semibold text-sm sm:text-base text-[#101828] leading-tight truncate group-hover:text-[#7050E6] transition-colors">
               {universityName}
             </h3>
             <p className="text-xs text-text-secondary font-normal leading-tight mt-1 truncate">
@@ -182,12 +182,12 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({ opportunity })
           <div className="leading-snug flex items-start gap-1.5">
             <span className="shrink-0 text-xs select-none">💰</span>
             <div className="min-w-0">
-              <span className="font-bold text-[#101828]">Financial: </span>
+              <span className="font-semibold text-[#101828]">Financial: </span>
               <span className="text-[#101828]">{financialText.split('+').map((part, i) => {
                 const trimmed = part.trim();
                 // Dollar amounts and key figures in bold italic
                 if (trimmed.match(/\$[\d,]+/) || trimmed.match(/€[\d,]+/)) {
-                  return <span key={i}>{i > 0 ? '+ ' : ''}<strong className="font-bold italic">{trimmed}</strong> </span>;
+                  return <span key={i}>{i > 0 ? '+ ' : ''}<strong className="font-semibold italic">{trimmed}</strong> </span>;
                 }
                 return <span key={i}>{i > 0 ? '+ ' : ''}{trimmed} </span>;
               })}</span>
@@ -250,7 +250,7 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({ opportunity })
             <button
               type="button"
               onClick={handleOfficialLink}
-              className="flex-1 h-10 px-3 rounded-[20px] bg-[#F8FAFC] border border-[#7050E6] hover:bg-[#EDE9FE] text-[#7050E6] text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer whitespace-nowrap"
+              className="flex-1 h-10 px-3 rounded-[20px] bg-[#F8FAFC] border border-[#7050E6] hover:bg-[#EDE9FE] text-[#7050E6] text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer whitespace-nowrap"
               title="Open official university link"
             >
               <span>Official Link</span>
@@ -261,7 +261,7 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({ opportunity })
             <button
               type="button"
               onClick={handleSeeDetails}
-              className="flex-1 h-10 px-3 rounded-[20px] bg-[#7050E6] hover:bg-[#5D3FD3] text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer whitespace-nowrap"
+              className="flex-1 h-10 px-3 rounded-[20px] bg-[#7050E6] hover:bg-[#5D3FD3] text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer whitespace-nowrap"
               title="See details & outreach"
             >
               <span>See Details</span>

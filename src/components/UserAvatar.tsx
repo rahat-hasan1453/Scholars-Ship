@@ -46,7 +46,7 @@ export function UserAvatar({
       aria-label={alt || undefined}
       aria-hidden={alt ? undefined : true}
       className={cn(
-        'flex shrink-0 select-none items-center justify-center rounded-full bg-brand-soft font-[590] text-brand-primary [container-type:size]',
+        'flex shrink-0 select-none items-center justify-center rounded-full bg-brand-soft font-semibold text-brand-primary [container-type:size]',
         className
       )}
     >

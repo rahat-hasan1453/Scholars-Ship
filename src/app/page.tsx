@@ -305,7 +305,7 @@ export default function HomePage() {
                 <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#ECE9FE] text-[#6941C6] mb-2.5">
                   {filteredScholarships.length} Available
                 </span>
-                <h1 className="text-2xl sm:text-3xl font-bold text-[#101828] tracking-tight">
+                <h1 className="text-2xl sm:text-3xl font-semibold text-[#101828] tracking-tight">
                   Personalized Scholarship Radar
                 </h1>
               </div>
@@ -358,7 +358,7 @@ export default function HomePage() {
                   <span>Filter</span>
                   <SlidersHorizontal className="w-4 h-4" />
                   {advancedActiveCount > 0 && (
-                    <span className="w-5 h-5 rounded-full bg-white text-[#7150E7] text-[11px] font-bold flex items-center justify-center">
+                    <span className="w-5 h-5 rounded-full bg-white text-[#7150E7] text-[11px] font-semibold flex items-center justify-center">
                       {advancedActiveCount}
                     </span>
                   )}
@@ -475,7 +475,7 @@ export default function HomePage() {
               <div className="w-12 h-12 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center mx-auto">
                 <Search className="w-6 h-6" />
               </div>
-              <h3 className="text-base font-bold text-slate-800">No scholarships matched these criteria</h3>
+              <h3 className="text-base font-semibold text-slate-800">No scholarships matched these criteria</h3>
               <p className="text-xs text-slate-500 max-w-md mx-auto">
                 Try resetting your search query or expanding your degree and country filters to view more global opportunities.
               </p>
@@ -518,7 +518,7 @@ export default function HomePage() {
                 </div>
 
                 {/* Title */}
-                <h1 className="text-2xl sm:text-[28px] font-bold text-[#101828] tracking-tight">
+                <h1 className="text-2xl sm:text-[28px] font-semibold text-[#101828] tracking-tight">
                   Graduate Faculty & Research Labs
                 </h1>
               </div>
@@ -571,7 +571,7 @@ export default function HomePage() {
                   <span>Filter</span>
                   <SlidersHorizontal className="w-4 h-4" />
                   {advancedActiveCount > 0 && (
-                    <span className="w-5 h-5 rounded-full bg-white text-[#7150E7] text-[11px] font-bold flex items-center justify-center">
+                    <span className="w-5 h-5 rounded-full bg-white text-[#7150E7] text-[11px] font-semibold flex items-center justify-center">
                       {advancedActiveCount}
                     </span>
                   )}
@@ -621,7 +621,7 @@ export default function HomePage() {
                 >
                   <span>Open Positions</span>
                   <span
-                    className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${
+                    className={`text-[11px] px-2 py-0.5 rounded-full font-semibold ${
                       openPositionsOnly
                         ? 'bg-[#5925DC] text-white'
                         : 'bg-[#EAECF0] text-[#475467]'
@@ -697,7 +697,7 @@ export default function HomePage() {
               {liveSearchResults.length > 0 && (
                 <div className="flex items-center justify-between text-xs bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl px-4 py-2 mt-2">
                   <span>✓ Added <strong>{liveSearchResults.length} live international faculty & labs</strong> from OpenAlex global database.</span>
-                  <button onClick={() => setLiveSearchResults([])} className="text-emerald-700 hover:underline font-bold">Clear Live Data</button>
+                  <button onClick={() => setLiveSearchResults([])} className="text-emerald-700 hover:underline font-semibold">Clear Live Data</button>
                 </div>
               )}
 

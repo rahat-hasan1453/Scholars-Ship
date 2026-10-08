@@ -116,8 +116,8 @@ ${studentName}`;
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base font-extrabold text-[#101828]">AI Academic Cold Email Drafter</h3>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <h3 className="text-base font-semibold text-[#101828]">AI Academic Cold Email Drafter</h3>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                   Ready to send
                 </span>
               </div>
@@ -140,7 +140,7 @@ ${studentName}`;
           <div className="flex items-center gap-2">
             <button
               onClick={() => setActiveTab('initial')}
-              className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`px-4 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === 'initial'
                   ? 'bg-white text-[#4f46e5] shadow-xs border border-[#eaecf0]'
                   : 'text-[#667085] hover:text-[#101828]'
@@ -150,7 +150,7 @@ ${studentName}`;
             </button>
             <button
               onClick={() => setActiveTab('followup')}
-              className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`px-4 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === 'followup'
                   ? 'bg-white text-[#4f46e5] shadow-xs border border-[#eaecf0]'
                   : 'text-[#667085] hover:text-[#101828]'
@@ -160,7 +160,7 @@ ${studentName}`;
             </button>
           </div>
 
-          <div className="text-xs text-[#065f46] bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full font-bold">
+          <div className="text-xs text-[#065f46] bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full font-semibold">
             98% High Precision
           </div>
         </div>
@@ -170,12 +170,12 @@ ${studentName}`;
           {/* Subject Line */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-xs font-bold text-[#344054] uppercase tracking-wider">
+              <span className="text-xs font-semibold text-[#344054] uppercase tracking-wider">
                 Subject Line
               </span>
               <button
                 onClick={handleCopySubject}
-                className="inline-flex items-center gap-1 text-xs text-[#4f46e5] hover:text-[#4338ca] font-bold cursor-pointer"
+                className="inline-flex items-center gap-1 text-xs text-[#4f46e5] hover:text-[#4338ca] font-semibold cursor-pointer"
               >
                 {copiedSubject ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copiedSubject ? 'Copied!' : 'Copy Subject'}</span>
@@ -189,12 +189,12 @@ ${studentName}`;
           {/* Email Body */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-xs font-bold text-[#344054] uppercase tracking-wider">
+              <span className="text-xs font-semibold text-[#344054] uppercase tracking-wider">
                 Email Body
               </span>
               <button
                 onClick={handleCopyBody}
-                className="inline-flex items-center gap-1 text-xs text-[#4f46e5] hover:text-[#4338ca] font-bold cursor-pointer"
+                className="inline-flex items-center gap-1 text-xs text-[#4f46e5] hover:text-[#4338ca] font-semibold cursor-pointer"
               >
                 {copiedBody ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copiedBody ? 'Copied Full Body!' : 'Copy Body'}</span>
@@ -209,7 +209,7 @@ ${studentName}`;
           <div className="p-3.5 rounded-xl bg-[#eef2ff] border border-[#c7d2fe] text-[#344054] text-xs flex items-start gap-2.5">
             <Bot className="w-4 h-4 text-[#4f46e5] shrink-0 mt-0.5" />
             <div>
-              <span className="font-bold text-[#4338ca]">Why this converts:</span> Mentions Dr. {opp.authorName.split(' ').slice(-1)[0]}'s lab methodology in "{opp.recentPaperTopic || opp.title}" and highlights your background in {opp.fieldTags[0] || 'HCI'} while maintaining ideal academic brevity (&lt;200 words).
+              <span className="font-semibold text-[#4338ca]">Why this converts:</span> Mentions Dr. {opp.authorName.split(' ').slice(-1)[0]}'s lab methodology in "{opp.recentPaperTopic || opp.title}" and highlights your background in {opp.fieldTags[0] || 'HCI'} while maintaining ideal academic brevity (&lt;200 words).
             </div>
           </div>
         </div>
@@ -218,7 +218,7 @@ ${studentName}`;
         <div className="p-5 border-t border-[#f2f4f7] bg-white flex flex-wrap items-center justify-between gap-3">
           <button
             onClick={handleSaveOutreach}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
               isSaved
                 ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
                 : 'bg-white hover:bg-slate-50 text-[#344054] border-[#d0d5dd]'
@@ -231,7 +231,7 @@ ${studentName}`;
           <div className="flex items-center gap-2.5">
             <button
               onClick={handleCopyBody}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-[#344054] transition-colors border border-[#d0d5dd] cursor-pointer shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-semibold bg-white hover:bg-slate-50 text-[#344054] transition-colors border border-[#d0d5dd] cursor-pointer shadow-2xs"
             >
               {copiedBody ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
               <span>Copy All</span>
@@ -239,7 +239,7 @@ ${studentName}`;
 
             <a
               href={mailtoHref}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-[#4f46e5] hover:bg-[#4338ca] transition-all shadow-sm shadow-indigo-500/25 cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-[#4f46e5] hover:bg-[#4338ca] transition-all shadow-sm shadow-indigo-500/25 cursor-pointer"
             >
               <Mail className="w-4 h-4" />
               <span>Open in Mail</span>

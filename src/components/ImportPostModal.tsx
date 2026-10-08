@@ -97,7 +97,7 @@ export const ImportPostModal: React.FC<ImportPostModalProps> = ({ isOpen, onClos
             <Share2 className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-xl font-extrabold text-[#101828]">
+            <h3 className="text-xl font-semibold text-[#101828]">
               Import Opportunity from Social Media
             </h3>
             <p className="text-xs text-[#667085] mt-0.5">
@@ -118,7 +118,7 @@ export const ImportPostModal: React.FC<ImportPostModalProps> = ({ isOpen, onClos
             <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-3 animate-bounce">
               <CheckCircle2 className="w-8 h-8" />
             </div>
-            <h4 className="text-lg font-extrabold text-[#101828]">Opportunity Imported!</h4>
+            <h4 className="text-lg font-semibold text-[#101828]">Opportunity Imported!</h4>
             <p className="text-xs text-[#667085] mt-1">
               Parsed and added to your live feed with AI cold email capability.
             </p>
@@ -139,7 +139,7 @@ export const ImportPostModal: React.FC<ImportPostModalProps> = ({ isOpen, onClos
 
             {/* Post Content / Announcement Text */}
             <div>
-              <label className="block text-xs font-bold text-[#344054] mb-1.5 flex items-center gap-1.5">
+              <label className="block text-xs font-semibold text-[#344054] mb-1.5 flex items-center gap-1.5">
                 <FileText className="w-3.5 h-3.5 text-[#4f46e5]" />
                 Post Announcement Text <span className="text-red-500">*</span>
               </label>
@@ -154,7 +154,7 @@ export const ImportPostModal: React.FC<ImportPostModalProps> = ({ isOpen, onClos
 
             {/* Source URL */}
             <div>
-              <label className="block text-xs font-bold text-[#344054] mb-1.5 flex items-center gap-1.5">
+              <label className="block text-xs font-semibold text-[#344054] mb-1.5 flex items-center gap-1.5">
                 <LinkIcon className="w-3.5 h-3.5 text-[#4f46e5]" />
                 Post URL (Optional)
               </label>
@@ -170,7 +170,7 @@ export const ImportPostModal: React.FC<ImportPostModalProps> = ({ isOpen, onClos
             {/* Quick Details (Optional Helper) */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="block text-[11px] font-bold text-[#344054] mb-1">
+                <label className="block text-[11px] font-semibold text-[#344054] mb-1">
                   Professor Name
                 </label>
                 <input
@@ -183,7 +183,7 @@ export const ImportPostModal: React.FC<ImportPostModalProps> = ({ isOpen, onClos
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-[#344054] mb-1">
+                <label className="block text-[11px] font-semibold text-[#344054] mb-1">
                   University / Lab
                 </label>
                 <input
@@ -196,7 +196,7 @@ export const ImportPostModal: React.FC<ImportPostModalProps> = ({ isOpen, onClos
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-[#344054] mb-1">
+                <label className="block text-[11px] font-semibold text-[#344054] mb-1">
                   Country
                 </label>
                 <CustomDropdown
@@ -233,7 +233,7 @@ export const ImportPostModal: React.FC<ImportPostModalProps> = ({ isOpen, onClos
                 variant="primary"
                 size="sm"
                 disabled={isLoading}
-                className="rounded-xl bg-[#4f46e5] hover:bg-[#4338ca] text-white font-bold flex items-center gap-1.5 px-4 shadow-sm"
+                className="rounded-xl bg-[#4f46e5] hover:bg-[#4338ca] text-white font-semibold flex items-center gap-1.5 px-4 shadow-sm"
               >
                 {isLoading ? (
                   <>

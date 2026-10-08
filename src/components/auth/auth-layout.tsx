@@ -102,7 +102,7 @@ export function CodeStepActions({
 
 /* Button 185:6449 — 36px, radius-sm 6, Brand/Primary, Body/2 M */
 export function AuthSubmitButton({ className, ...props }: ComponentProps<typeof Button>) {
-  return <Button type="submit" className={cn('h-9 w-full rounded-[6px] px-2 font-[510] leading-5', className)} {...props} />;
+  return <Button type="submit" className={cn('h-9 w-full rounded-[6px] px-2 font-medium leading-5', className)} {...props} />;
 }
 
 export function AuthMessage({ error, success }: { error?: string; success?: string }) {
@@ -139,7 +139,7 @@ export function BrandLogo() {
 export function AuthHeading({ title, subtitle, children }: { title: string; subtitle: string; children?: ReactNode }) {
   return (
     <div className="flex flex-col gap-1">
-      <h1 className="text-2xl font-[510] leading-8 text-text-primary">{title}</h1>
+      <h1 className="text-2xl font-medium leading-8 text-text-primary">{title}</h1>
       <p className="text-sm leading-[18px] text-text-secondary">{subtitle}</p>
       {children}
     </div>
@@ -180,7 +180,7 @@ export function AuthFooterLink({ prompt, href, label }: { prompt: string; href: 
   return (
     <div className="flex items-center text-xs italic leading-[18px]">
       <span className="flex w-[158px] justify-center whitespace-nowrap font-normal text-text-secondary">{prompt}&nbsp;</span>
-      <Link href={href} className="font-[508] text-text-primary hover:text-brand-primary">
+      <Link href={href} className="font-medium text-text-primary hover:text-brand-primary">
         {label}
       </Link>
     </div>

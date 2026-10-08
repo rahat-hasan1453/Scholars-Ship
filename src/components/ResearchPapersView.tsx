@@ -161,7 +161,7 @@ export const ResearchPapersView: React.FC = () => {
         {/* Top White Section matching Figma Node 102:266 */}
         <div className="p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
-            <h1 className="text-xl sm:text-2xl lg:text-[26px] font-bold text-[#101828] tracking-tight">
+            <h1 className="text-xl sm:text-2xl lg:text-[26px] font-semibold text-[#101828] tracking-tight">
               Global Research Papers &amp; AI Assistant Hub
             </h1>
             <p className="text-xs sm:text-sm text-[#475467] font-normal">
@@ -224,7 +224,7 @@ export const ResearchPapersView: React.FC = () => {
                   }}
                   className={`h-9 px-3.5 rounded-l-full text-xs transition-all cursor-pointer shrink-0 flex items-center justify-center border ${
                     selectedDiscipline === 'ALL' && activeTab === 'all'
-                      ? 'bg-[#6941C6] text-white border-[#6941C6] font-bold'
+                      ? 'bg-[#6941C6] text-white border-[#6941C6] font-semibold'
                       : 'bg-white text-[#344054] hover:bg-slate-50 border-[#D0D5DD] font-medium'
                   }`}
                 >
@@ -362,7 +362,7 @@ export const ResearchPapersView: React.FC = () => {
           <div className="w-12 h-12 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center mx-auto">
             <BookOpen className="w-6 h-6" />
           </div>
-          <h3 className="text-base font-bold text-slate-900">No research papers matched your search</h3>
+          <h3 className="text-base font-semibold text-slate-900">No research papers matched your search</h3>
           <p className="text-xs text-slate-500 max-w-md mx-auto">
             {activeTab === 'saved'
               ? 'You have not saved any research papers to your library yet. Click the bookmark icon on any paper to save it.'
@@ -370,7 +370,7 @@ export const ResearchPapersView: React.FC = () => {
           </p>
           <button
             onClick={resetFilters}
-            className="px-4 py-2 rounded-xl bg-[#7150E7] text-white text-xs font-bold shadow-xs hover:bg-[#5e3cd4] transition-all cursor-pointer inline-flex items-center gap-2"
+            className="px-4 py-2 rounded-xl bg-[#7150E7] text-white text-xs font-semibold shadow-xs hover:bg-[#5e3cd4] transition-all cursor-pointer inline-flex items-center gap-2"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Reset All Filters</span>
@@ -394,7 +394,7 @@ export const ResearchPapersView: React.FC = () => {
                       {paper.venue} ({paper.year})
                     </span>
                     {paper.isOpenAccess && (
-                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1 shrink-0">
+                      <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1 shrink-0">
                         <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                         <span>Open Access PDF</span>
                       </span>
@@ -415,7 +415,7 @@ export const ResearchPapersView: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => toggleAbstractExpand(paper.id)}
-                        className="text-[11px] font-bold text-[#7150E7] hover:underline mt-1 inline-flex items-center gap-1 cursor-pointer"
+                        className="text-[11px] font-semibold text-[#7150E7] hover:underline mt-1 inline-flex items-center gap-1 cursor-pointer"
                       >
                         <span>{isExpanded ? 'Show less' : 'Read full abstract'}</span>
                         {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
@@ -461,7 +461,7 @@ export const ResearchPapersView: React.FC = () => {
                     </div>
 
                     {/* Right Citations Badge matching Figma 102:715 */}
-                    <span className="text-[11px] font-bold text-[#B54708] bg-[#FFFBEB] px-2.5 py-1 rounded-xl border border-[#FDE047]/60 shrink-0">
+                    <span className="text-[11px] font-semibold text-[#B54708] bg-[#FFFBEB] px-2.5 py-1 rounded-xl border border-[#FDE047]/60 shrink-0">
                       📊 {paper.citationCount.toLocaleString()} Citations
                     </span>
                   </div>
@@ -522,7 +522,7 @@ export const ResearchPapersView: React.FC = () => {
                           href={paper.pdfUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="flex-1 h-8 px-2 sm:px-3 rounded-full bg-[#7150E7] hover:bg-[#5e3cd4] text-white font-bold text-xs shadow-xs inline-flex items-center justify-center gap-1.5 transition-all cursor-pointer truncate"
+                          className="flex-1 h-8 px-2 sm:px-3 rounded-full bg-[#7150E7] hover:bg-[#5e3cd4] text-white font-semibold text-xs shadow-xs inline-flex items-center justify-center gap-1.5 transition-all cursor-pointer truncate"
                         >
                           <Download className="w-3.5 h-3.5 shrink-0" />
                           <span className="truncate">Download PDF</span>
@@ -557,11 +557,11 @@ export const ResearchPapersView: React.FC = () => {
               >
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#EDE9FC] text-[#7150E7]">
+                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#EDE9FC] text-[#7150E7]">
                       {paper.venue} ({paper.year})
                     </span>
                     {paper.isOpenAccess && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
                         <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                         <span>Open Access</span>
                       </span>
@@ -571,7 +571,7 @@ export const ResearchPapersView: React.FC = () => {
                     </span>
                   </div>
 
-                  <h3 className="text-sm sm:text-base font-bold text-slate-900 group-hover:text-[#7150E7] transition-colors leading-snug">
+                  <h3 className="text-sm sm:text-base font-semibold text-slate-900 group-hover:text-[#7150E7] transition-colors leading-snug">
                     {paper.title}
                   </h3>
 

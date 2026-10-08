@@ -70,7 +70,7 @@ export const ScholarshipCard: React.FC<ScholarshipCardProps> = ({ scholarship, o
         <div className="mt-3">
           <h3 
             onClick={() => onSelect(scholarship)}
-            className="text-base font-bold text-[#101828] hover:text-[#6941C6] transition-colors cursor-pointer line-clamp-1 leading-snug"
+            className="text-base font-semibold text-[#101828] hover:text-[#6941C6] transition-colors cursor-pointer line-clamp-1 leading-snug"
             title={scholarship.title}
           >
             {scholarship.title}
@@ -88,7 +88,7 @@ export const ScholarshipCard: React.FC<ScholarshipCardProps> = ({ scholarship, o
           <div className="text-[10px] text-[#667085] font-semibold leading-none mb-1.5">
             Funding Value
           </div>
-          <div className="text-xs font-bold text-[#101828] leading-snug line-clamp-2">
+          <div className="text-xs font-semibold text-[#101828] leading-snug line-clamp-2">
             {scholarship.fundingAmount}
           </div>
         </div>

@@ -131,8 +131,8 @@ export const ResearchBotModal: React.FC<ResearchBotModalProps> = ({ isOpen, onCl
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-bold leading-tight">Research AI Assistant</h2>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-400 text-slate-900 uppercase">Live Bot</span>
+                <h2 className="text-base font-semibold leading-tight">Research AI Assistant</h2>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-400 text-slate-900 uppercase">Live Bot</span>
               </div>
               <p className="text-xs text-indigo-100 mt-0.5 truncate max-w-sm font-medium">
                 Target: {paper.title}
@@ -151,7 +151,7 @@ export const ResearchBotModal: React.FC<ResearchBotModalProps> = ({ isOpen, onCl
         {/* Paper Banner Snippet */}
         <div className="bg-[#F4F3FE] px-6 py-3 border-b border-[#DDD7FA] flex items-center justify-between gap-3 text-xs">
           <div className="min-w-0">
-            <div className="font-bold text-[#101828] truncate">{paper.title}</div>
+            <div className="font-semibold text-[#101828] truncate">{paper.title}</div>
             <div className="text-[#64748B] text-[11px] truncate">
               {paper.venue} • {paper.year} • {paper.citationCount} Citations
             </div>

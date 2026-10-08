@@ -193,7 +193,7 @@ export const ResearchPapersFeed: React.FC = () => {
             <div className="w-12 h-12 rounded-full bg-[#EDE9FE] text-[#7150E7] flex items-center justify-center">
               <FilterIcon size={24} />
             </div>
-            <h3 className="text-base font-bold text-[#101828]">No matching research papers found</h3>
+            <h3 className="text-base font-semibold text-[#101828]">No matching research papers found</h3>
             <p className="text-xs text-[#667085] max-w-md">
               {matchMode === 'eligible'
                 ? 'None of these match your current interests. Switch to "All" to see every paper.'

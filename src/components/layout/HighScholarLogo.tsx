@@ -30,10 +30,10 @@ export const HighScholarLogo: React.FC<HighScholarLogoProps> = ({
 
       <div>
         <div className="flex items-center gap-1.5 leading-none">
-          <span className="font-bold text-sm tracking-tight text-[#101828]">
+          <span className="font-semibold text-sm tracking-tight text-[#101828]">
             HighScholar
           </span>
-          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-[#EDE9FE] text-[#5B3FD1]">
+          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-[#EDE9FE] text-[#5B3FD1]">
             PRO
           </span>
         </div>
