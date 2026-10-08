@@ -7,6 +7,7 @@ import { useApp } from '@/context/AppContext';
 import { UnifiedDiscoveryHeader } from '@/components/layout/UnifiedDiscoveryHeader';
 import { FacultyLabCard } from '@/components/FacultyLabCard';
 import { FeedShell } from '@/components/opportunity-feed/FeedShell';
+import { FacultyTable } from '@/components/feed/FeedTables';
 import { FeedGrid } from '@/components/opportunity-feed/FeedGrid';
 import { OpportunityListBar, MatchMode, ViewMode } from '@/components/opportunity-feed/OpportunityListBar';
 import { isProfessorEligible } from '@/lib/eligibility';
@@ -150,11 +151,15 @@ export const FacultyLabsFeed: React.FC = () => {
           </button>
         </div>
       ) : (
-        <FeedGrid viewMode={viewMode}>
-          {filteredProfessors.map((p) => (
-            <FacultyLabCard key={p.id} professor={p} />
-          ))}
-        </FeedGrid>
+        viewMode === 'list' ? (
+          <FacultyTable rows={filteredProfessors} />
+        ) : (
+          <FeedGrid viewMode={viewMode}>
+            {filteredProfessors.map((p) => (
+              <FacultyLabCard key={p.id} professor={p} />
+            ))}
+          </FeedGrid>
+        )
       )}
     </FeedShell>
   );

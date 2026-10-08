@@ -10,6 +10,7 @@ import { UnifiedDiscoveryHeader } from '@/components/layout/UnifiedDiscoveryHead
 import { ResearchPaperCard } from '@/components/ResearchPaperCard';
 import { ResearchPaperDetailsModal } from '@/components/research-paper-details/ResearchPaperDetailsModal';
 import { FeedShell } from '@/components/opportunity-feed/FeedShell';
+import { ResearchPaperTable } from '@/components/feed/FeedTables';
 import { FeedGrid, FeedSkeleton } from '@/components/opportunity-feed/FeedGrid';
 import { OpportunityListBar, MatchMode, ViewMode } from '@/components/opportunity-feed/OpportunityListBar';
 import { isPaperEligible } from '@/lib/eligibility';
@@ -207,11 +208,15 @@ export const ResearchPapersFeed: React.FC = () => {
             </button>
           </div>
         ) : (
-          <FeedGrid viewMode={viewMode}>
-            {filteredPapers.map((p) => (
-              <ResearchPaperCard key={p.id} paper={p} onOpen={openPaper} />
-            ))}
-          </FeedGrid>
+          viewMode === 'list' ? (
+            <ResearchPaperTable rows={filteredPapers} onOpen={openPaper} />
+          ) : (
+            <FeedGrid viewMode={viewMode}>
+              {filteredPapers.map((p) => (
+                <ResearchPaperCard key={p.id} paper={p} onOpen={openPaper} />
+              ))}
+            </FeedGrid>
+          )
         )}
       </FeedShell>
 

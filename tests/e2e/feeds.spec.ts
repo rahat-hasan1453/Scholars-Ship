@@ -12,7 +12,8 @@ const FEEDS = [
 const openFeed = async (page: Page, tab: string) => {
   await page.goto(`/?tab=${tab}`);
   await page.waitForLoadState('networkidle');
-  await expect(page.locator('article').first()).toBeVisible();
+  // Grid shows cards, list view shows a table (the view mode is remembered per session)
+  await expect(page.locator('article, table').first()).toBeVisible();
 };
 
 const count = async (page: Page) => {
@@ -103,13 +104,22 @@ test.describe('Natural scroll', () => {
     await expect.poll(() => scroll.evaluate((el) => el.scrollTop)).toBe(0);
   });
 
-  test('list view is a single column', async ({ page, isMobile }) => {
-    test.skip(isMobile, 'layout is already one column on phones');
-    await page.setViewportSize({ width: 1728, height: 900 });
+  test('list view is a sortable table on every feed; a row opens its details', async ({ page }) => {
     await installFakeBackend(page, { user: signedInUser() });
-    await openFeed(page, 'opportunities');
+    for (const { tab } of FEEDS) {
+      await openFeed(page, tab);
+      await page.getByRole('button', { name: 'List view' }).click();
+      const table = page.getByRole('table');
+      await expect(table).toBeVisible();
+      const header = table.getByRole('columnheader', { name: /Match/ });
+      await header.getByRole('button').click();
+      await expect(header).toHaveAttribute('aria-sort', /ascending|descending/);
+    }
+    // Clicking a row (not a button inside it) opens the details page
+    await openFeed(page, 'scholarships');
     await page.getByRole('button', { name: 'List view' }).click();
-    const boxes = await page.locator('article').evaluateAll((els) => els.slice(0, 3).map((e) => Math.round(e.getBoundingClientRect().left)));
-    expect(new Set(boxes).size).toBe(1);
+    const row = page.getByRole('table').getByRole('row').filter({ has: page.getByRole('link', { name: /^Explore / }) }).first();
+    await row.getByRole('cell').first().click();
+    await expect(page).toHaveURL(/\/scholarships\/[^/?]+$/);
   });
 });

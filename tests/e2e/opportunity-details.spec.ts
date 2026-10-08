@@ -10,9 +10,10 @@ test.describe('Opportunity details', () => {
     await page.getByRole('button', { name: 'List view' }).click();
     await expect(page.getByRole('button', { name: 'List view' })).toHaveAttribute('aria-pressed', 'true');
 
-    const card = page.locator('article').first();
-    const institution = (await card.locator('h3').innerText()).trim();
-    await card.getByRole('link', { name: 'Explore More' }).click();
+    // List view is a table: open the first row with its Explore link
+    const row = page.getByRole('table').getByRole('row').filter({ has: page.getByRole('link', { name: /^Explore / }) }).first();
+    const institution = (await row.getAttribute('aria-label'))!.trim();
+    await row.getByRole('link', { name: /^Explore / }).click();
 
     await expect(page).toHaveURL(/\/opportunities\/[^/?]+$/);
     await expect(page.getByText(`· ${institution}`, { exact: false }).first()).toBeVisible();
@@ -25,7 +26,7 @@ test.describe('Opportunity details', () => {
 
     await page.getByRole('link', { name: /Back to Opportunity Feed/ }).click();
     await expect(page).toHaveURL(/tab=opportunities/);
-    await expect(page.locator('article').first()).toBeVisible();
+    await expect(page.getByRole('table')).toBeVisible();
     await expect(page.getByRole('button', { name: 'List view' })).toHaveAttribute('aria-pressed', 'true');
     expect(consoleErrors, consoleErrors.join('\n')).toEqual([]);
   });

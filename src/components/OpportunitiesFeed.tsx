@@ -7,6 +7,7 @@ import { useApp } from '@/context/AppContext';
 import { UnifiedDiscoveryHeader } from '@/components/layout/UnifiedDiscoveryHeader';
 import { UniversityOpportunityCard } from '@/components/opportunity-feed/UniversityOpportunityCard';
 import { FeedShell } from '@/components/opportunity-feed/FeedShell';
+import { OpportunityTable } from '@/components/feed/FeedTables';
 import { FeedGrid, FeedSkeleton } from '@/components/opportunity-feed/FeedGrid';
 import { OpportunityListBar, MatchMode, ViewMode } from '@/components/opportunity-feed/OpportunityListBar';
 import type { Opportunity } from '@/types';
@@ -141,16 +142,20 @@ export const OpportunitiesFeed: React.FC = () => {
               </button>
             </div>
       ) : (
-        <FeedGrid viewMode={viewMode}>
-          {filteredListings.map((p) => (
-            <UniversityOpportunityCard
-              key={p.id}
-              opportunity={p}
-              isBookmarked={bookmarks.has(p.id)}
-              onToggleBookmark={toggleBookmark}
-            />
-          ))}
-        </FeedGrid>
+        viewMode === 'list' ? (
+          <OpportunityTable rows={filteredListings} />
+        ) : (
+          <FeedGrid viewMode={viewMode}>
+            {filteredListings.map((p) => (
+              <UniversityOpportunityCard
+                key={p.id}
+                opportunity={p}
+                isBookmarked={bookmarks.has(p.id)}
+                onToggleBookmark={toggleBookmark}
+              />
+            ))}
+          </FeedGrid>
+        )
       )}
     </FeedShell>
   );
