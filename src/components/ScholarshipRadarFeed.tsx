@@ -69,7 +69,9 @@ export const ScholarshipRadarFeed: React.FC = () => {
       // 4. Subject filter
       if (selectedSubjects.length > 0) {
         const allTags = [...(sch.specializations || []), ...(sch.tags || [])];
-        const matchesSubject = allTags.some(tag =>
+        // "All fields" scholarships fit every subject
+        const openToAll = allTags.some((t) => t.toLowerCase() === 'all fields');
+        const matchesSubject = openToAll || allTags.some(tag =>
           selectedSubjects.some(sub => {
             const t = tag.toLowerCase().trim();
             const s = sub.toLowerCase().trim();

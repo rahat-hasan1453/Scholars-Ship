@@ -1,139 +1,67 @@
-// Seeds the mock faculty, research papers, scholarships and opportunity listings. Safe to re-run: rows are upserted.
+// Seeds the real catalogue: scholarships, faculty (+ universities and NSF grants), research papers and
+// Opportunity Feed posts. Source files live in prisma/data (see scripts/data/* for how they're built).
+// Safe to re-run: rows are upserted, and rows that are no longer in the data (old demo rows) are removed.
 // Run: npm run db:seed
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 import { Prisma, PrismaClient } from '@prisma/client';
-import { initialResearchPapers } from '../src/data/researchPapers';
-import { mockProfessors, mockScholarships } from '../src/data/mockData';
-import { withFacultyDefaults } from '../src/lib/professorDetails';
+import type { Opportunity } from '../src/types';
 import { degreeToDb } from '../src/lib/scholarships';
-import { leadInstitution, semanticScholarIdFromUrl } from '../src/lib/researchPapers';
-import { OPPORTUNITY_LISTINGS } from '../src/data/opportunityPosts';
+import { toOpportunityData } from '../src/lib/opportunities';
+import { SCHOLARSHIPS } from './data/scholarships';
 
 const prisma = new PrismaClient();
+const DATA = path.join(__dirname, 'data');
+const VERIFIED_AT = new Date('2026-10-09T00:00:00Z');
 
-// Upserts University → ResearchLab → Professor (+ latest Grant) from the mock faculty list.
-// Professor ids match the list cards, so /professors/<id> works for both DB and mock data.
-// Runs first so papers and opportunities can link their authors to these rows.
-async function seedFaculty() {
-  for (const mock of mockProfessors) {
-    const p = withFacultyDefaults(mock);
-    const university = await prisma.university.upsert({
-      where: { name_country: { name: p.university, country: p.country } },
-      create: { name: p.university, country: p.country, city: p.city ?? null },
-      update: { city: p.city ?? null },
-    });
+const readJson = async <T>(file: string): Promise<T> => JSON.parse(await readFile(path.join(DATA, file), 'utf8')) as T;
 
-    const labData = {
-      department: p.department,
-      website: p.labWebsite ?? null,
-      researchTags: p.researchTags,
-      openPositions: p.openPositions,
-      fundingSummary: p.fundingSummary ?? null,
-      fundingType: p.fundingType ?? 'FULL',
-      fundingSource: p.fundingSource ?? null,
-      degreeLevels: (p.degreeLevels ?? []).map(degreeToDb),
-      acceptingTerms: p.acceptingTerms,
-    };
-    const lab = p.labName
-      ? await prisma.researchLab.upsert({
-          where: { universityId_name: { universityId: university.id, name: p.labName } },
-          create: { name: p.labName, universityId: university.id, ...labData },
-          update: labData,
-        })
-      : null;
+type ProfessorSeed = {
+  id: string;
+  name: string;
+  university: string;
+  universityWebsite: string | null;
+  country: string;
+  department: string;
+  researchTags: string[];
+  homepage: string | null;
+  googleScholar: string | null;
+  orcid: string | null;
+  openAlexId: string | null;
+  hIndex: number | null;
+  publicationCount: number | null;
+  email: string | null;
+  grant: { title: string; amount: string; year: number; funder: string; url: string } | null;
+};
 
-    const data = {
-      name: p.name,
-      title: p.title,
-      university: p.university,
-      department: p.department,
-      country: p.country,
-      universityId: university.id,
-      labId: lab?.id ?? null,
-      labName: p.labName ?? null,
-      researchTags: p.researchTags,
-      openPositions: p.openPositions,
-      recentGrants: p.recentGrants ?? null,
-      email: p.email ?? null,
-      linkedInUrl: p.linkedInUrl ?? null,
-      googleScholar: p.googleScholar ?? null,
-      labWebsite: p.labWebsite ?? null,
-      avatarUrl: p.avatarUrl,
-      acceptingTerms: p.acceptingTerms,
-      school: p.school ?? null,
-      bio: p.bio ?? null,
-      lookingFor: p.lookingFor,
-      contactSteps: p.contactSteps ?? [],
-    };
-    await prisma.professor.upsert({ where: { id: p.id }, create: { id: p.id, ...data }, update: data });
+type PaperSeed = {
+  id: string;
+  title: string;
+  abstract: string;
+  year: number | null;
+  publishedAt: string | null;
+  venue: string | null;
+  citationCount: number;
+  doi: string | null;
+  pdfUrl: string | null;
+  isOpenAccess: boolean;
+  paperType: string | null;
+  fieldsOfStudy: string[];
+  tags: string[];
+  funding: string | null;
+  institution: string | null;
+  authors: { position: number; name: string; institution: string | null; professorId: string | null }[];
+};
 
-    if (p.recentGrant) {
-      const grant = {
-        title: p.recentGrant.title,
-        amount: p.recentGrant.amount,
-        year: p.recentGrant.year ?? null,
-        labId: lab?.id ?? null,
-        professorId: p.id,
-      };
-      await prisma.grant.upsert({ where: { id: `grant_${p.id}` }, create: { id: `grant_${p.id}`, ...grant }, update: grant });
-    }
-  }
-  console.log(`Seeded ${mockProfessors.length} professors with their universities, labs and grants.`);
-}
-
-async function seedResearchPapers() {
-  const professors = await prisma.professor.findMany({ select: { id: true, name: true } });
-  const professorIdByName = new Map(professors.map((p) => [p.name.toLowerCase(), p.id]));
-  let linked = 0;
-
-  for (const paper of initialResearchPapers) {
-    const data = {
-      title: paper.title,
-      abstract: paper.abstract,
-      year: paper.year,
-      publishedAt: paper.publicationDate ? new Date(paper.publicationDate) : null,
-      venue: paper.venue,
-      citationCount: paper.citationCount,
-      semanticScholarId: semanticScholarIdFromUrl(paper.semanticScholarUrl),
-      pdfUrl: paper.pdfUrl ?? null,
-      googleScholarUrl: paper.googleScholarUrl,
-      fieldsOfStudy: paper.fieldsOfStudy,
-      tags: paper.tags,
-      isOpenAccess: paper.isOpenAccess,
-      venueShort: paper.venueShort ?? null,
-      paperType: paper.paperType ?? null,
-      peerReviewed: paper.peerReviewed ?? null,
-      institution: leadInstitution(paper) ?? null,
-      funding: paper.funding ?? null,
-      keyFindings: paper.keyFindings ? (paper.keyFindings as unknown as Prisma.InputJsonValue) : Prisma.DbNull,
-    };
-    const authors = paper.authors.map((a, position) => {
-      const professorId = professorIdByName.get(a.name.toLowerCase()) ?? null;
-      if (professorId) linked++;
-      return { position, name: a.name, institution: a.institution ?? null, professorId };
-    });
-
-    await prisma.$transaction(async (tx) => {
-      // By id, so /?tab=research&paper=<id> links stay the same for DB and mock data
-      const row = await tx.researchPaper.upsert({
-        where: { id: paper.id },
-        create: { id: paper.id, doi: paper.doi ?? null, ...data },
-        update: { doi: paper.doi ?? null, ...data },
-      });
-      await tx.paperAuthor.deleteMany({ where: { paperId: row.id } });
-      await tx.paperAuthor.createMany({ data: authors.map((a) => ({ ...a, paperId: row.id })) });
-    });
-  }
-
-  console.log(`Seeded ${initialResearchPapers.length} research papers (${linked} authors linked to professors).`);
-}
-
-// Upserts the mock scholarships by id, so the details page URLs stay the same as the list's.
 async function seedScholarships() {
-  for (const s of mockScholarships) {
+  for (const s of SCHOLARSHIPS) {
     const data = {
       title: s.title,
       provider: s.provider,
+      providerShort: s.providerShort ?? null,
       deadline: new Date(s.deadline),
+      deadlineEstimated: s.deadlineEstimated,
+      deadlineNote: s.deadlineNote ?? null,
       fundingAmount: s.fundingAmount,
       fundingType: s.fundingType,
       degreeLevels: s.degreeLevels.map(degreeToDb),
@@ -141,74 +69,148 @@ async function seedScholarships() {
       specializations: s.specializations,
       requirementsJson: s.requirements,
       admissionSummary: s.admissionSummary ?? null,
-      livingCost: s.livingCost ?? null,
-      providerShort: s.providerShort ?? null,
-      fieldOfStudy: s.fieldOfStudy ?? null,
-      fundingBreakdown: s.fundingBreakdown ?? [],
+      livingCost: null,
+      fieldOfStudy: null,
+      fundingBreakdown: Prisma.DbNull,
       applySteps: s.applySteps ?? [],
       tags: s.tags,
       officialUrl: s.officialUrl,
+      sourceUrl: s.sourceUrl,
+      verifiedAt: VERIFIED_AT,
       description: s.description,
       featured: s.featured ?? false,
     };
     await prisma.scholarship.upsert({ where: { id: s.id }, create: { id: s.id, ...data }, update: data });
   }
-  console.log(`Seeded ${mockScholarships.length} scholarships.`);
+  const removed = await prisma.scholarship.deleteMany({ where: { id: { notIn: SCHOLARSHIPS.map((s) => s.id) } } });
+  console.log(`Seeded ${SCHOLARSHIPS.length} scholarships (removed ${removed.count} old rows).`);
 }
 
-// Upserts the Opportunity Feed listings by id, so list and details URLs match.
-// Authors are linked to Professor rows by exact name when one exists.
-async function seedOpportunities() {
-  const professors = await prisma.professor.findMany({ select: { id: true, name: true } });
-  const professorIdByName = new Map(professors.map((p) => [p.name.toLowerCase(), p.id]));
-  let linked = 0;
+async function seedFaculty() {
+  const { professors } = await readJson<{ professors: ProfessorSeed[] }>('professors.json');
 
-  for (const o of OPPORTUNITY_LISTINGS) {
-    const professorId = professorIdByName.get(o.authorName.toLowerCase()) ?? null;
-    if (professorId) linked++;
+  // Universities first, one row per (name, country)
+  const uniIds = new Map<string, string>();
+  for (const p of professors) {
+    const key = `${p.university}|${p.country}`;
+    if (uniIds.has(key)) continue;
+    const u = await prisma.university.upsert({
+      where: { name_country: { name: p.university, country: p.country } },
+      create: { name: p.university, country: p.country, website: p.universityWebsite },
+      update: { website: p.universityWebsite },
+    });
+    uniIds.set(key, u.id);
+  }
+
+  let grants = 0;
+  for (const p of professors) {
+    const recentGrants = p.grant ? `${p.grant.amount} NSF award (${p.grant.year}): ${p.grant.title}` : null;
     const data = {
-      title: o.title,
-      authorName: o.authorName,
-      authorTitle: o.authorTitle,
-      authorAvatar: o.authorAvatar ?? null,
-      professorId,
-      institution: o.institution,
-      labName: o.labName ?? null,
-      country: o.country,
-      city: o.city ?? null,
-      source: o.source,
-      sourceUrl: o.sourceUrl,
-      postedAt: new Date(o.postedAt),
-      content: o.content,
-      funding: o.funding,
-      fundingTags: o.fundingTags,
-      degreeLevels: o.degreeLevels.map(degreeToDb),
-      fieldTags: o.fieldTags,
-      subjectTags: o.subjectTags,
-      minCgpa: o.minCgpa ?? null,
-      minIelts: o.minIelts ?? null,
-      publications: o.publications,
-      admission: o.admission,
-      livingCost: o.livingCost,
-      rankRange: o.rankRange,
-      acceptanceRate: o.acceptanceRate,
-      positionType: o.positionType,
-      startDate: o.startDate,
-      deadline: new Date(o.deadline),
-      positionDetails: o.positionDetails,
-      aboutLab: o.aboutLab,
-      applySteps: o.applySteps,
-      contactEmail: o.contactEmail ?? null,
-      officialUrl: o.officialUrl ?? null,
+      name: p.name,
+      title: `Faculty · ${p.department}`,
+      university: p.university,
+      department: p.department,
+      country: p.country,
+      universityId: uniIds.get(`${p.university}|${p.country}`)!,
+      labId: null,
+      labName: null,
+      researchTags: p.researchTags,
+      // No source says whether they are hiring; the "Recently Funded" signal comes from the grant instead
+      openPositions: false,
+      recentGrants,
+      email: p.email,
+      googleScholar: p.googleScholar,
+      orcid: p.orcid,
+      openAlexId: p.openAlexId,
+      dataSource: ['CSRankings', p.openAlexId && 'OpenAlex', (p.grant || p.email) && 'NSF'].filter(Boolean).join(' + '),
+      labWebsite: p.homepage,
+      avatarUrl: null,
+      acceptingTerms: [],
+      hIndex: p.hIndex,
+      publicationCount: p.publicationCount,
     };
+    await prisma.professor.upsert({ where: { id: p.id }, create: { id: p.id, ...data }, update: data });
+    if (p.grant) {
+      const id = `nsf_${p.grant.url.split('AWD_ID=').pop()}_${p.id}`.slice(0, 120);
+      const grant = { title: p.grant.title, funder: p.grant.funder, amount: p.grant.amount, year: p.grant.year, url: p.grant.url, professorId: p.id };
+      await prisma.grant.upsert({ where: { id }, create: { id, ...grant }, update: grant });
+      grants++;
+    }
+  }
+
+  const keep = professors.map((p) => p.id);
+  const removedProfs = await prisma.professor.deleteMany({ where: { id: { notIn: keep } } });
+  // Demo labs and grants had no real source
+  const removedGrants = await prisma.grant.deleteMany({ where: { OR: [{ professorId: null }, { url: null }] } });
+  const removedLabs = await prisma.researchLab.deleteMany({});
+  const removedUnis = await prisma.university.deleteMany({ where: { professors: { none: {} } } });
+  console.log(
+    `Seeded ${professors.length} faculty at ${uniIds.size} universities, ${grants} NSF grants ` +
+      `(removed ${removedProfs.count} old faculty, ${removedLabs.count} labs, ${removedGrants.count} grants, ${removedUnis.count} universities).`,
+  );
+}
+
+async function seedResearchPapers() {
+  const { papers } = await readJson<{ papers: PaperSeed[] }>('papers.json');
+  const known = new Set((await prisma.professor.findMany({ select: { id: true } })).map((p) => p.id));
+  for (const p of papers) {
+    const data = {
+      title: p.title,
+      abstract: p.abstract,
+      year: p.year,
+      publishedAt: p.publishedAt ? new Date(`${p.publishedAt}T00:00:00Z`) : null,
+      venue: p.venue,
+      citationCount: p.citationCount,
+      doi: p.doi,
+      semanticScholarId: null,
+      pdfUrl: p.pdfUrl,
+      googleScholarUrl: null,
+      fieldsOfStudy: p.fieldsOfStudy,
+      tags: p.tags,
+      isOpenAccess: p.isOpenAccess,
+      venueShort: null,
+      paperType: p.paperType,
+      peerReviewed: p.paperType === 'Preprint' ? false : null,
+      institution: p.institution,
+      funding: p.funding,
+      keyFindings: Prisma.DbNull,
+    };
+    // A DOI can only belong to one row: drop it from any old row first
+    if (p.doi) await prisma.researchPaper.updateMany({ where: { doi: p.doi, id: { not: p.id } }, data: { doi: null } });
+    await prisma.$transaction(async (tx) => {
+      await tx.researchPaper.upsert({ where: { id: p.id }, create: { id: p.id, ...data }, update: data });
+      await tx.paperAuthor.deleteMany({ where: { paperId: p.id } });
+      await tx.paperAuthor.createMany({
+        data: p.authors.map((a) => ({
+          paperId: p.id,
+          position: a.position,
+          name: a.name,
+          institution: a.institution,
+          professorId: a.professorId && known.has(a.professorId) ? a.professorId : null,
+        })),
+      });
+    });
+  }
+  const removed = await prisma.researchPaper.deleteMany({ where: { id: { notIn: papers.map((p) => p.id) } } });
+  console.log(`Seeded ${papers.length} research papers (removed ${removed.count} old rows).`);
+}
+
+async function seedOpportunities() {
+  const { opportunities } = await readJson<{ opportunities: Opportunity[] }>('opportunities.json');
+  for (const o of opportunities) {
+    const data = toOpportunityData(o);
     await prisma.opportunity.upsert({ where: { id: o.id }, create: { id: o.id, ...data }, update: data });
   }
-  console.log(`Seeded ${OPPORTUNITY_LISTINGS.length} opportunities (${linked} linked to professors).`);
+  // Posts added later by /api/cron/opportunities are kept; only the old demo listings go
+  const removed = await prisma.opportunity.deleteMany({
+    where: { id: { notIn: opportunities.map((o) => o.id) }, source: { not: 'mastodon' } },
+  });
+  console.log(`Seeded ${opportunities.length} opportunities (removed ${removed.count} old rows).`);
 }
 
-seedFaculty()
+seedScholarships()
+  .then(seedFaculty)
   .then(seedResearchPapers)
-  .then(seedScholarships)
   .then(seedOpportunities)
   .catch((e) => {
     console.error(e);

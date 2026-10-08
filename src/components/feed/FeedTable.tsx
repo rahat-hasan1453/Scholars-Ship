@@ -227,21 +227,26 @@ export function daysUntil(iso: string): number {
   return Math.ceil((new Date(iso).getTime() - Date.now()) / 86_400_000);
 }
 
-export function DeadlineCell({ iso }: { iso: string }) {
+/** Date + days left. `estimated` = the provider hasn't announced it yet ("Expected"); no date = not stated. */
+export function DeadlineCell({ iso, estimated }: { iso?: string; estimated?: boolean }) {
+  if (!iso) return <span className="whitespace-nowrap text-[#627181]">Not stated</span>;
   const d = daysUntil(iso);
   const date = new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   return (
-    <span className={cn('whitespace-nowrap', d < 0 ? 'text-[#627181]' : d <= 7 ? 'font-medium text-[#b42318]' : '')}>
+    <span className={cn('whitespace-nowrap', d < 0 ? 'text-[#627181]' : d <= 7 && !estimated ? 'font-medium text-[#b42318]' : '')}>
+      {estimated && <span className="text-[12px] text-[#627181]">Expected </span>}
       {date}
-      {d >= 0 && <span className="text-[12px] text-[#627181]"> · {d}d</span>}
+      {d >= 0 && !estimated && <span className="text-[12px] text-[#627181]"> · {d}d</span>}
     </span>
   );
 }
 
-/** Closing soon (≤ 14 days) / Open / Closed */
-export function deadlineGroup(iso: string): FeedGroup {
+/** Closing soon (≤ 14 days) / Open / Expected (call not announced) / Closed */
+export function deadlineGroup(iso?: string, estimated?: boolean): FeedGroup {
+  if (!iso) return { id: 'open', label: 'Open', order: 1, tone: 'success' };
   const d = daysUntil(iso);
-  if (d < 0) return { id: 'closed', label: 'Closed', order: 2, tone: 'muted' };
+  if (d < 0) return { id: 'closed', label: 'Closed', order: 3, tone: 'muted' };
+  if (estimated) return { id: 'expected', label: 'Next round expected', order: 2, tone: 'muted' };
   if (d <= 14) return { id: 'soon', label: 'Closing soon', order: 0, tone: 'danger' };
   return { id: 'open', label: 'Open', order: 1, tone: 'success' };
 }

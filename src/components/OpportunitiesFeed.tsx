@@ -11,16 +11,17 @@ import { OpportunityTable } from '@/components/feed/FeedTables';
 import { FeedGrid, FeedSkeleton } from '@/components/opportunity-feed/FeedGrid';
 import { OpportunityListBar, MatchMode, ViewMode } from '@/components/opportunity-feed/OpportunityListBar';
 import type { Opportunity } from '@/types';
-import { OPPORTUNITY_LISTINGS } from '@/data/opportunityPosts';
 import { useSessionState } from '@/hooks/useSessionState';
 import { useOpportunityBookmarks } from '@/hooks/useOpportunityBookmarks';
 import { isOpportunityEligible } from '@/lib/eligibility';
 
-// Figma defaults (Opportunity Feed, node 183:4449)
-const DEFAULT_SUBJECTS = ['UX & Product Design', 'HCI', 'Computer Science', 'Artificial Intelligence'];
+// Defaults: degree preset as in Figma (node 183:4449). Subject and country start open, because real posts
+// cover every field and many don't name a country; a preset would hide most of them.
+const DEFAULT_SUBJECTS: string[] = [];
 const DEFAULT_DEGREES = ['Masters', 'PhD'];
-const DEFAULT_COUNTRIES = ['USA', 'Germany', 'Norway', 'United Kingdom', 'Canada'];
-const DEFAULT_FUNDING = ['Safe Regional'];
+const DEFAULT_COUNTRIES: string[] = [];
+// Real posts carry no acceptance-rate data, so no funding filter is preset
+const DEFAULT_FUNDING: string[] = [];
 
 // Empty selection = no restriction. Inside one filter: OR. Across filters: AND.
 const matchesAny = (selected: string[], values: string[]) =>
@@ -44,8 +45,8 @@ export const OpportunitiesFeed: React.FC = () => {
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error(`HTTP ${res.status}`))))
       .then((body) => !cancelled && setListings(body.data))
       .catch((error) => {
-        console.error('Failed to load opportunities, using bundled list', error);
-        if (!cancelled) setListings(OPPORTUNITY_LISTINGS);
+        console.error('Failed to load opportunities', error);
+        if (!cancelled) setListings([]);
       });
     return () => {
       cancelled = true;
@@ -73,7 +74,7 @@ export const OpportunitiesFeed: React.FC = () => {
   }, [listings, globalSearchQuery, matchMode, profile, selectedSubjects, selectedDegrees, selectedCountries, selectedFunding]);
 
   const acceptanceRange = useMemo(() => {
-    return formatPercentRange(filteredListings.map((p) => p.acceptanceRate));
+    return formatPercentRange(filteredListings.flatMap((p) => (p.acceptanceRate === undefined ? [] : [p.acceptanceRate])));
   }, [filteredListings]);
 
   // Any filter, search or mode change scrolls the cards back to the top

@@ -103,12 +103,12 @@ describe('getScholarship', () => {
     expect(await getScholarship('nope')).toBeNull();
   });
 
-  it('falls back to mock data while the table is empty or the DB is down', async () => {
-    expect((await getScholarship('sch_daad_design_02'))?.providerShort).toBe('DAAD');
+  it('returns null while the table is empty or the DB is down (no demo fallback)', async () => {
+    expect(await getScholarship('sch_daad_design_02')).toBeNull();
     h.findUnique = async () => {
       throw new Error('down');
     };
     vi.spyOn(console, 'error').mockImplementation(() => {});
-    expect((await getScholarship('sch_daad_design_02'))?.id).toBe('sch_daad_design_02');
+    expect(await getScholarship('sch_daad_design_02')).toBeNull();
   });
 });

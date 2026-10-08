@@ -2,7 +2,6 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { ResearchPaper } from '@/types';
-import { initialResearchPapers } from '@/data/researchPapers';
 import { useApp } from '@/context/AppContext';
 import { ResearchBotModal } from '@/components/ResearchBotModal';
 import { 
@@ -32,7 +31,7 @@ import {
 export const ResearchPapersView: React.FC = () => {
   const { savedPaperIds, toggleSavePaper, isPaperSaved } = useApp();
 
-  const [papers, setPapers] = useState<ResearchPaper[]>(initialResearchPapers);
+  const [papers, setPapers] = useState<ResearchPaper[]>([]);
   const [viewLayout, setViewLayout] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDiscipline, setSelectedDiscipline] = useState<'ALL' | 'UX' | 'AI' | 'Biotech' | 'Robotics' | 'Economics'>('ALL');

@@ -4,13 +4,13 @@ import React from 'react';
 import Link from 'next/link';
 import { Professor } from '@/types';
 import { FEED_CARD_HEIGHT } from '@/components/opportunity-feed/FeedGrid';
+import { initialsAvatar } from '@/lib/initialsAvatar';
 
 interface FacultyLabCardProps {
   professor: Professor;
 }
 
-const FALLBACK_AVATAR =
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80';
+
 
 // Figma: "Faculty or Researchlab" card (node 251:22151)
 export const FacultyLabCard: React.FC<FacultyLabCardProps> = ({ professor }) => {
@@ -21,7 +21,13 @@ export const FacultyLabCard: React.FC<FacultyLabCardProps> = ({ professor }) => 
   const officialUrl = professor.labWebsite || professor.googleScholar || `https://www.google.com/search?q=${searchName}`;
 
   const degree = professor.degreeLevels?.[0] || 'Masters';
-  const fundingLabel = professor.fundingType === 'PARTIAL' ? 'Partial Funding' : 'Fully Funded';
+  // Only say "funded" when a source does: the lab's own funding type, or a recent public grant
+  const fundingLabel = professor.fundingType
+    ? professor.fundingType === 'PARTIAL'
+      ? 'Partial Funding'
+      : 'Fully Funded'
+    : null;
+  const recentlyFunded = !!professor.recentGrant?.year && professor.recentGrant.year >= new Date().getFullYear() - 3;
   const terms = professor.acceptingTerms?.length ? professor.acceptingTerms.join(', ') : 'Not specified';
 
   const chipClass =
@@ -44,7 +50,7 @@ export const FacultyLabCard: React.FC<FacultyLabCardProps> = ({ professor }) => 
         <div className="relative flex flex-1 min-w-0 items-start gap-3">
           <div className="flex flex-1 min-w-0 items-start gap-3">
             <img
-              src={professor.avatarUrl || FALLBACK_AVATAR}
+              src={professor.avatarUrl || initialsAvatar(professor.name)}
               alt=""
               width={40}
               height={40}
@@ -60,10 +66,19 @@ export const FacultyLabCard: React.FC<FacultyLabCardProps> = ({ professor }) => 
               </div>
             </div>
           </div>
-          {professor.openPositions && (
+          {professor.openPositions ? (
             <span className="flex items-center h-6 px-2 shrink-0 rounded-full bg-[#e7fdeb] font-[family-name:var(--font-figtree)] text-[12px] leading-[18px] font-medium text-[#36b37e] whitespace-nowrap">
               Open Positions
             </span>
+          ) : (
+            recentlyFunded && (
+              <span
+                title="New research grant in the last 3 years: labs often hire students after one"
+                className="flex items-center h-6 px-2 shrink-0 rounded-full bg-[#e7fdeb] font-[family-name:var(--font-figtree)] text-[12px] leading-[18px] font-medium text-[#36b37e] whitespace-nowrap"
+              >
+                Recently Funded
+              </span>
+            )
           )}
         </div>
       </div>
@@ -96,7 +111,8 @@ export const FacultyLabCard: React.FC<FacultyLabCardProps> = ({ professor }) => 
 
         <div className="flex flex-wrap items-center gap-2 w-full">
           <span className={chipClass}>{degree}</span>
-          <span className={chipClass}>$ {fundingLabel}</span>
+          {fundingLabel && <span className={chipClass}>$ {fundingLabel}</span>}
+          {professor.hIndex !== undefined && <span className={chipClass}>h-index {professor.hIndex}</span>}
           {professor.fundingSource && (
             <span className={chipClass} title={professor.fundingSource}>
               <span className="block w-[79px] truncate">#{professor.fundingSource}</span>

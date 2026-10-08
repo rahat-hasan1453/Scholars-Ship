@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- loose typing for test doubles */
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { initialResearchPapers } from '@/data/researchPapers';
 
 const h = vi.hoisted(() => ({ findMany: (async () => []) as (args: any) => Promise<any[]> }));
 vi.mock('@/lib/prisma', () => ({ prisma: { researchPaper: { findMany: (args: any) => h.findMany(args) } } }));
@@ -50,19 +49,18 @@ describe('GET /api/research/papers', () => {
     expect(p.googleScholarUrl).toBe('https://scholar.google.com/scholar?q=A%20Paper');
   });
 
-  it('serves mock papers while the table is empty', async () => {
+  it('returns an empty list while the table is empty (no demo fallback)', async () => {
     const body = await (await GET()).json();
-    expect(body.source).toBe('mock');
-    expect(body.count).toBe(initialResearchPapers.length);
+    expect(body).toMatchObject({ source: 'database', count: 0, data: [] });
   });
 
-  it('serves mock papers when the database read fails', async () => {
+  it('answers 503 with an empty list when the database read fails', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     h.findMany = async () => {
       throw new Error('db down');
     };
     const res = await GET();
-    expect(res.status).toBe(200);
-    expect((await res.json()).source).toBe('mock');
+    expect(res.status).toBe(503);
+    expect((await res.json()).data).toEqual([]);
   });
 });

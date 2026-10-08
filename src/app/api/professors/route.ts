@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { mockProfessors } from '@/data/mockData';
+import { getProfessors } from '@/lib/professors';
+import { initialsAvatar } from '@/lib/initialsAvatar';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -7,7 +8,7 @@ export async function GET(request: Request) {
   const university = searchParams.get('university');
   const query = searchParams.get('q');
 
-  let results = [...mockProfessors];
+  let results = await getProfessors();
 
   if (tag) {
     results = results.filter((p) => p.researchTags.some((t) => t.toLowerCase().includes(tag.toLowerCase())));
@@ -70,7 +71,7 @@ export async function POST(request: Request) {
       linkedInUrl: body.linkedInUrl || null,
       googleScholar: body.googleScholar || null,
       labWebsite: body.labWebsite || null,
-      avatarUrl: body.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
+      avatarUrl: body.avatarUrl || initialsAvatar(body.name),
       acceptingTerms: body.acceptingTerms || ['Fall 2026'],
       bio: body.bio || 'Ingested via HighScholar Chrome Extension Scraper',
       createdAt: new Date().toISOString(),

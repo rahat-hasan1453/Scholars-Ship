@@ -1,4 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { mockScholarships } from '../fixtures/mockData';
+
+// The route reads the database through getScholarships; feed it the fixture list
+vi.mock('@/lib/scholarships', () => ({ getScholarships: async () => mockScholarships }));
 import { GET as scholarships, POST as scholarshipsPost } from '@/app/api/scholarships/route';
 import { GET as researchSearch } from '@/app/api/research/search/route';
 import { GET as professorSearch } from '@/app/api/professors/search/route';
@@ -7,7 +11,7 @@ import { GET as liveOpps } from '@/app/api/opportunities/live/route';
 const get = (url: string) => new Request(`http://localhost:3000${url}`);
 afterEach(() => vi.restoreAllMocks());
 
-describe('GET /api/scholarships (mock data)', () => {
+describe('GET /api/scholarships (database mocked)', () => {
   it('returns all with count', async () => {
     const body = await (await scholarships(get('/api/scholarships'))).json();
     expect(body.success).toBe(true);

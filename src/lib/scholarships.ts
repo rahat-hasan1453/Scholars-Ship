@@ -1,7 +1,6 @@
 import type { Scholarship as ScholarshipRow, DegreeLevel as DbDegreeLevel } from '@prisma/client';
 import type { DegreeLevel, FundingType, Scholarship } from '@/types';
 import { prisma } from '@/lib/prisma';
-import { mockScholarships } from '@/data/mockData';
 import { withDetailDefaults, type FundingRow } from '@/lib/scholarshipDetails';
 
 const DEGREE_TO_DB: Record<DegreeLevel, DbDegreeLevel> = { Bachelors: 'BACHELORS', Masters: 'MASTERS', PhD: 'PHD' };
@@ -31,31 +30,34 @@ export function toScholarship(row: ScholarshipRow): Scholarship {
     applySteps: row.applySteps,
     createdAt: row.createdAt.toISOString(),
     officialUrl: row.officialUrl,
+    deadlineEstimated: row.deadlineEstimated,
+    deadlineNote: row.deadlineNote ?? undefined,
+    sourceUrl: row.sourceUrl ?? undefined,
+    verifiedAt: row.verifiedAt?.toISOString(),
     description: row.description,
     featured: row.featured,
     tags: row.tags,
   });
 }
 
-/** All scholarships from the database, or the mock list while the table is empty or the DB is down. */
+/** All scholarships from the database, soonest deadline first. Empty when the DB is down (the UI shows its empty state). */
 export async function getScholarships(): Promise<Scholarship[]> {
   try {
     const rows = await prisma.scholarship.findMany({ orderBy: [{ deadline: 'asc' }, { id: 'asc' }] });
-    if (rows.length > 0) return rows.map(toScholarship);
+    return rows.map(toScholarship);
   } catch (error) {
-    console.error('[scholarships] database read failed, serving mock data', error);
+    console.error('[scholarships] database read failed', error);
+    return [];
   }
-  return mockScholarships;
 }
 
-/** One scholarship by id, with the same mock fallback. */
+/** One scholarship by id. */
 export async function getScholarship(id: string): Promise<Scholarship | null> {
   try {
     const row = await prisma.scholarship.findUnique({ where: { id } });
-    if (row) return toScholarship(row);
-    if ((await prisma.scholarship.count()) > 0) return null;
+    return row ? toScholarship(row) : null;
   } catch (error) {
-    console.error('[scholarships] database read failed, serving mock data', error);
+    console.error('[scholarships] database read failed', error);
+    return null;
   }
-  return mockScholarships.find((s) => s.id === id) ?? null;
 }

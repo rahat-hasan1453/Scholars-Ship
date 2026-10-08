@@ -3,6 +3,10 @@ import { formatDeadline } from '@/lib/scholarshipDetails';
 
 // Pure helpers for the Opportunity Feed card and details page (no React, no database).
 
+/** Shown when an imported post doesn't name an institution or a place */
+export const INSTITUTION_NOT_STATED = 'Institution not stated';
+export const LOCATION_NOT_STATED = 'Location not stated';
+
 /** Mock data writes "UK"; the Country filter uses "United Kingdom". */
 export function normalizeCountry(country: string): string {
   return country === 'UK' ? 'United Kingdom' : country;
@@ -49,16 +53,16 @@ export const SAFE_REGIONAL_MIN_ACCEPTANCE = 20;
 export const HIGH_ACCEPTANCE_MIN = 85;
 
 /** Acceptance & Funding filter values that describe this listing */
-export function fundingTagsFor(funding: string, acceptanceRate: number): string[] {
+export function fundingTagsFor(funding: string, acceptanceRate?: number): string[] {
   const tags: string[] = [];
   const tuition = /tuition|fees? (covered|remission)|remission|€0|0 chf/i.test(funding);
   const living = /stipend|salary|fellowship|living|allowance|gsr|assistantship|scholarship/i.test(funding);
-  if (acceptanceRate >= SAFE_REGIONAL_MIN_ACCEPTANCE) tags.push('Safe Regional');
+  if (acceptanceRate !== undefined && acceptanceRate >= SAFE_REGIONAL_MIN_ACCEPTANCE) tags.push('Safe Regional');
   if (tuition) tags.push('Tuition Waiver');
-  if ((tuition && living) || /salary/i.test(funding)) tags.push('Full Funding');
+  if ((tuition && living) || /salary|fully[- ]funded|full(?:y)? funding|TV-L/i.test(funding)) tags.push('Full Funding');
   if (/assistantship|\bRA\b|\bTA\b|gsr/i.test(funding)) tags.push('Graduate Assistantship (TA/RA)');
   if (/stipend|living|allowance|salary/i.test(funding)) tags.push('Stipend / Living Allowance');
-  if (acceptanceRate >= HIGH_ACCEPTANCE_MIN) tags.push('High Acceptance (85%+)');
+  if (acceptanceRate !== undefined && acceptanceRate >= HIGH_ACCEPTANCE_MIN) tags.push('High Acceptance (85%+)');
   if (/fellowship|fellow|scholarship/i.test(funding)) tags.push('University Fellowship');
   return tags;
 }
@@ -96,7 +100,7 @@ export function applicationCode(o: Pick<Opportunity, 'subjectTags' | 'fieldTags'
   const field =
     (o.subjectTags[0] && SUBJECT_CODES[o.subjectTags[0]]) ||
     (o.fieldTags[0] ?? 'Research').split(/\s+/)[0].replace(/[^A-Za-z]/g, '').toUpperCase();
-  const year = o.startDate.match(/\d{4}/)?.[0] ?? '';
+  const year = o.startDate?.match(/\d{4}/)?.[0] ?? '';
   return [field, primaryDegree(o.degreeLevels), year].filter(Boolean).join('-');
 }
 
@@ -114,7 +118,9 @@ export function defaultApplySteps(
   return [
     `Email your CV and a 1-page research statement to ${to}`,
     `Use “${applicationCode(o)}” as the email subject line`,
-    `Apply before ${formatDeadline(o.deadline)}; shortlisted candidates are invited to an interview`,
+    o.deadline
+      ? `Apply before ${formatDeadline(o.deadline)}; shortlisted candidates are invited to an interview`
+      : 'Check the original post for the deadline and how to apply',
   ];
 }
 
@@ -124,6 +130,7 @@ const SOURCE_LABEL: Record<OpportunitySource, string> = {
   lab_website: 'the lab website',
   web: 'the web',
   reddit: 'Reddit',
+  mastodon: 'Mastodon',
 };
 
 export const sourceLabel = (source: OpportunitySource) => SOURCE_LABEL[source] ?? 'the web';

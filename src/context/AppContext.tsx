@@ -1,7 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { UserProfile, Scholarship, Professor, Application, ApplicationStatus, DecisionResult, HiringOpportunity, OutreachRecord, OutreachStatus } from '@/types';
-import { initialUserProfile, mockScholarships, mockProfessors } from '@/data/mockData';
-import { mockOpportunities } from '@/data/mockOpportunities';
+import { GUEST_PROFILE } from '@/lib/guestProfile';
 import { apiFetch, ApiError, newId } from '@/lib/apiClient';
 import { DEMO_RECORD_IDS, IMPORT_DONE_KEY, LEGACY_EXTRA_KEYS, LEGACY_STORAGE_KEYS } from '@/lib/legacyStorage';
 import confetti from 'canvas-confetti';
@@ -147,12 +146,12 @@ const errorMessage = (err: unknown, fallback: string) =>
       : fallback;
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [profile, setProfile] = useState<UserProfile>(initialUserProfile);
-  const [scholarships, setScholarships] = useState<Scholarship[]>(mockScholarships);
-  const [professors, setProfessors] = useState<Professor[]>(mockProfessors);
+  const [profile, setProfile] = useState<UserProfile>(GUEST_PROFILE);
+  const [scholarships, setScholarships] = useState<Scholarship[]>([]);
+  const [professors, setProfessors] = useState<Professor[]>([]);
   // Signed-in users' Pipeline and bookmarks come from the server; everyone starts empty (no demo cards)
   const [applications, setApplications] = useState<Application[]>([]);
-  const [opportunities, setOpportunities] = useState<HiringOpportunity[]>(mockOpportunities);
+  const [opportunities, setOpportunities] = useState<HiringOpportunity[]>([]);
   const [outreachRecords, setOutreachRecords] = useState<OutreachRecord[]>([]);
   const [savedPaperIds, setSavedPaperIds] = useState<string[]>([]);
   const [savedOpportunityIds, setSavedOpportunityIds] = useState<string[]>([]);
@@ -294,6 +293,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return inFlight.current;
   }, [fetchUserData]);
 
+  /** Scholarships and faculty from the database (no bundled fallback: an outage shows the empty state) */
+  const loadCatalogue = useCallback(async () => {
+    const get = async <T,>(url: string): Promise<T[] | null> => {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const body = (await res.json()) as { data?: T[] };
+        return Array.isArray(body.data) ? body.data : null;
+      } catch (err) {
+        console.error(`[catalogue] ${url} failed`, err);
+        return null;
+      }
+    };
+    const [sch, prof] = await Promise.all([get<Scholarship>('/api/scholarships'), get<Professor>('/api/professors')]);
+    if (sch) setScholarships(sch);
+    if (prof) setProfessors(prof);
+  }, []);
+
   // Mount: theme + catalogue caches from localStorage, then the session and the user's data from the server
   useEffect(() => {
     try {
@@ -312,7 +329,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           const googleEmail = rawEmail ? decodeURIComponent(rawEmail) : undefined;
           const googleAvatar = rawAvatar ? decodeURIComponent(rawAvatar) : undefined;
 
-          const targetEmail = googleEmail || initialUserProfile.email;
+          const targetEmail = googleEmail || '';
           const isUserOnboarded = localStorage.getItem(`highscholar_onboarded_${targetEmail}`) === 'true';
 
           setProfile((prev) => ({
@@ -358,7 +375,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                 localStorage.setItem(`highscholar_onboarded_${uEmail}`, 'true');
               }
 
-              if (!isAlreadyOnboarded && uEmail && !uEmail.includes('alex.mercer')) {
+              if (!isAlreadyOnboarded && uEmail) {
                 setIsOnboardingOpen(true);
               }
               void loadUserData();
@@ -367,41 +384,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           .catch(() => {});
       }
 
-      const savedScholarships = localStorage.getItem(STORAGE_KEYS.SCHOLARSHIPS);
-      if (savedScholarships) {
-        const parsed = JSON.parse(savedScholarships);
-        if (!Array.isArray(parsed) || parsed.length < 15 || !parsed.some((s: any) => s.id === 'sch_chevening_uk_01')) {
-          setScholarships(mockScholarships);
-        } else {
-          setScholarships(parsed);
-        }
-      } else {
-        setScholarships(mockScholarships);
-      }
-
-      const savedProfessors = localStorage.getItem(STORAGE_KEYS.PROFESSORS);
-      if (savedProfessors) {
-        const parsed = JSON.parse(savedProfessors);
-        if (!Array.isArray(parsed) || parsed.length < 20 || !parsed.some((p: any) => p.id === 'prof_rosalind_picard_13')) {
-          setProfessors(mockProfessors);
-        } else {
-          setProfessors(parsed);
-        }
-      } else {
-        setProfessors(mockProfessors);
-      }
-
-      const savedOpportunities = localStorage.getItem(STORAGE_KEYS.OPPORTUNITIES);
-      if (savedOpportunities) {
-        const parsed = JSON.parse(savedOpportunities);
-        if (Array.isArray(parsed) && parsed.length >= 25 && parsed.some((o: any) => o.id === 'opp_mit_affective_13')) {
-          setOpportunities(parsed);
-        } else {
-          setOpportunities(mockOpportunities);
-        }
-      } else {
-        setOpportunities(mockOpportunities);
-      }
+      // Catalogue (scholarships, faculty) always comes from the database; old localStorage copies held demo data
+      localStorage.removeItem(STORAGE_KEYS.SCHOLARSHIPS);
+      localStorage.removeItem(STORAGE_KEYS.PROFESSORS);
+      localStorage.removeItem(STORAGE_KEYS.OPPORTUNITIES);
+      void loadCatalogue();
 
       const savedTheme = localStorage.getItem(STORAGE_KEYS.THEME) as 'dark' | 'light' | null;
       if (savedTheme === 'light' || savedTheme === 'dark') {
@@ -414,12 +401,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     } catch (e) {
       console.error('Failed reading from localStorage, loading defaults', e);
-      setScholarships(mockScholarships);
-      setProfessors(mockProfessors);
     } finally {
       setIsMounted(true);
     }
-  }, [loadUserData]);
+  }, [loadUserData, loadCatalogue]);
 
   const toggleTheme = () => {
     setTheme((prev) => {
@@ -434,22 +419,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return next;
     });
   };
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEYS.SCHOLARSHIPS, JSON.stringify(scholarships));
-    } catch (e) {
-      console.error(e);
-    }
-  }, [scholarships]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEYS.PROFESSORS, JSON.stringify(professors));
-    } catch (e) {
-      console.error(e);
-    }
-  }, [professors]);
 
   // ---------------------------------------------------------------------------
   // Profile

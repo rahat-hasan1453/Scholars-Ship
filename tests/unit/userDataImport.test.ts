@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { planImport, referencedIds, type ImportContext, type ImportPayload } from '@/lib/userDataImport';
 import { DEMO_RECORD_IDS } from '@/lib/legacyStorage';
-import { initialApplications } from '@/data/mockData';
-import { initialOutreachRecords } from '@/data/mockOpportunities';
+import { initialApplications } from '../fixtures/mockData';
+import { initialOutreachRecords } from '../fixtures/mockOpportunities';
 
 const empty = (): ImportPayload => ({ applications: [], outreach: [], opportunities: [], professors: [], papers: [] });
 const ctx = (over: Partial<ImportContext['existing']> = {}): ImportContext => ({

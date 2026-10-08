@@ -5,7 +5,6 @@ import { FilterIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { useSessionState } from '@/hooks/useSessionState';
 import { ResearchPaper } from '@/types';
-import { initialResearchPapers } from '@/data/researchPapers';
 import { UnifiedDiscoveryHeader } from '@/components/layout/UnifiedDiscoveryHeader';
 import { ResearchPaperCard } from '@/components/ResearchPaperCard';
 import { ResearchPaperDetailsModal } from '@/components/research-paper-details/ResearchPaperDetailsModal';
@@ -83,8 +82,8 @@ export const ResearchPapersFeed: React.FC = () => {
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error(`HTTP ${res.status}`))))
       .then((body) => !cancelled && setPapers(body.data))
       .catch((error) => {
-        console.error('Failed to load research papers, using bundled list', error);
-        if (!cancelled) setPapers(initialResearchPapers);
+        console.error('Failed to load research papers', error);
+        if (!cancelled) setPapers([]);
       });
     return () => {
       cancelled = true;

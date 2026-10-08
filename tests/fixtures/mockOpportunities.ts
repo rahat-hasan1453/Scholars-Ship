@@ -1,3 +1,4 @@
+// Demo data kept only as TEST FIXTURES (it is not real). The app reads the real catalogue from the database.
 import { HiringOpportunity } from '@/types';
 
 export const mockOpportunities: HiringOpportunity[] = [

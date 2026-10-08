@@ -1,8 +1,9 @@
+// Demo data kept only as TEST FIXTURES (it is not real). The app reads the real catalogue from the database.
 // Opportunity Feed listings: the mock hiring posts plus the fields the card (Figma 212:6186) and the
 // details page (Figma 258:3269) need. Example data — ranks, acceptance rates and living costs are rough
 // estimates for layout, not verified figures. Seeded into the Opportunity table by `npm run db:seed`.
 import type { HiringOpportunity, Opportunity } from '@/types';
-import { mockOpportunities } from '@/data/mockOpportunities';
+import { mockOpportunities } from './mockOpportunities';
 import {
   aboutLabFor,
   admissionLine,
