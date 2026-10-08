@@ -88,7 +88,7 @@ export const ProfileMenuDropdown: React.FC<{ onClose: () => void }> = ({ onClose
           className="size-[36px] border border-[#f4f6f8]"
         />
         <div className="flex min-w-0 flex-1 flex-col justify-center">
-          <p className="-mb-[2px] truncate text-[16px] leading-[24px] font-[590] text-[#101828]">
+          <p className="-mb-[2px] truncate text-[16px] leading-[24px] font-semibold text-[#101828]">
             {profile.name || 'Your name'}
           </p>
           <p className="h-[20px] truncate text-[12px] leading-[16px] text-[#627181]">{profile.email}</p>
