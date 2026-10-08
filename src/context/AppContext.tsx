@@ -26,6 +26,9 @@ interface AppContextType {
   updateOutreachStatus: (recordId: string, status: OutreachStatus) => void;
   updateOutreachNotes: (recordId: string, notes: string) => void;
   removeOutreachRecord: (recordId: string) => void;
+  /** Pipeline drag & drop: put applications / outreach records in this order (unknown ids keep their place at the end) */
+  reorderApplications: (orderedIds: string[]) => void;
+  reorderOutreachRecords: (orderedIds: string[]) => void;
   addScholarship: (scholarship: Scholarship) => void;
   addProfessor: (professor: Professor) => void;
   selectedScholarship: Scholarship | null;
@@ -52,6 +55,15 @@ interface AppContextType {
   setGlobalSearchQuery: (q: string) => void;
   activeNavTab: 'opportunities' | 'scholarships' | 'professors' | 'research' | 'tracker' | 'saved' | 'profile';
   setActiveNavTab: (tab: 'opportunities' | 'scholarships' | 'professors' | 'research' | 'tracker' | 'saved' | 'profile') => void;
+}
+
+function reorderById<T extends { id: string }>(list: T[], orderedIds: string[]): T[] {
+  const rank = new Map(orderedIds.map((id, i) => [id, i]));
+  const key = (item: T, i: number) => rank.get(item.id) ?? orderedIds.length + i;
+  return list
+    .map((item, i) => ({ item, k: key(item, i) }))
+    .sort((a, b) => a.k - b.k)
+    .map((x) => x.item);
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -289,13 +301,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [profile]);
 
+  // Pipeline data is only written after hydration; otherwise the first (default) render overwrites the saved
+  // board before it is read again (React dev re-runs mount effects), and moves are lost on reload.
   useEffect(() => {
+    if (!isMounted) return;
     try {
       localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(applications));
     } catch (e) {
       console.error(e);
     }
-  }, [applications]);
+  }, [applications, isMounted]);
 
   useEffect(() => {
     try {
@@ -314,12 +329,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [professors]);
 
   useEffect(() => {
+    if (!isMounted) return;
     try {
       localStorage.setItem(STORAGE_KEYS.OUTREACH, JSON.stringify(outreachRecords));
     } catch (e) {
       console.error(e);
     }
-  }, [outreachRecords]);
+  }, [outreachRecords, isMounted]);
 
   const updateProfile = (updates: Partial<UserProfile>) => {
     setProfile((prev) => ({ ...prev, ...updates }));
@@ -510,6 +526,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setOutreachRecords((prev) => prev.filter((r) => r.id !== recordId));
   };
 
+  const reorderApplications = (orderedIds: string[]) => {
+    setApplications((prev) => reorderById(prev, orderedIds));
+  };
+
+  const reorderOutreachRecords = (orderedIds: string[]) => {
+    setOutreachRecords((prev) => reorderById(prev, orderedIds));
+  };
+
   const addScholarship = (newSch: Scholarship) => {
     setScholarships((prev) => [newSch, ...prev]);
   };
@@ -617,6 +641,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateOutreachStatus,
         updateOutreachNotes,
         removeOutreachRecord,
+        reorderApplications,
+        reorderOutreachRecords,
         addScholarship,
         addProfessor,
         selectedScholarship,
