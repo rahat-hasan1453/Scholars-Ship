@@ -54,6 +54,7 @@ model User {
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
   profile             UserProfile?
+  documents           UserDocument[]
 }
 
 // One pending email sign-in code per address; only the SHA-256 hash is stored.
@@ -407,4 +408,20 @@ model OutreachRecord {
   updatedAt        DateTime       @updatedAt
 
   @@index([profileId])
+}
+
+// A PDF the user uploaded on My Profile → Documents. The file itself is a private Vercel Blob;
+// only its pathname is stored here, and it is only served through /api/documents/[id]/file after an ownership check.
+model UserDocument {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// cv | sop | transcripts | letters
+  kind      String
+  name      String
+  size      Int
+  pathname  String
+  createdAt DateTime @default(now())
+
+  @@index([userId, kind])
 }

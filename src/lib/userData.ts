@@ -130,6 +130,11 @@ export async function updateProfile(userId: string, patch: ProfilePatch): Promis
   const { name, ...rest } = patch;
   if (name) await prisma.user.update({ where: { id: userId }, data: { name } });
   const data = profileColumns(rest);
+  if (rest.details) {
+    // details is one JSON column shared by several screens, so a save only changes the keys it sends
+    const existing = await prisma.userProfile.findUnique({ where: { userId }, select: { details: true } });
+    data.details = { ...((existing?.details as Record<string, unknown> | null) ?? {}), ...rest.details } as Prisma.InputJsonValue;
+  }
   if (Object.keys(data).length > 0) await prisma.userProfile.update({ where: { userId }, data });
   return getProfile(userId);
 }

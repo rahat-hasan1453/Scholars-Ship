@@ -2,6 +2,8 @@
 
 import React, { useRef, useState } from 'react';
 import { Check, Eye, Trash2, Upload } from 'lucide-react';
+import { upload as uploadToBlob } from '@vercel/blob/client';
+import { useApp } from '@/context/AppContext';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/shadcn/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/shadcn/dialog';
@@ -201,10 +203,10 @@ const LETTERS_NEEDED = 3;
 const MAX_DOC_BYTES = 10 * 1024 * 1024;
 
 interface StoredDoc {
+  id: string;
+  kind: DocKind;
   name: string;
   size: number;
-  url: string;
-  addedAt: number;
 }
 
 function formatSize(bytes: number) {
@@ -264,12 +266,14 @@ const UploadDocumentsDialog: React.FC<{
   initialFile: File | null;
   initialKinds: DocKind[];
   onClose: () => void;
-  onUpload: (file: File, kinds: DocKind[]) => void;
+  /** Resolves to an error message, or null when the upload worked */
+  onUpload: (file: File, kinds: DocKind[]) => Promise<string | null>;
 }> = ({ initialFile, initialKinds, onClose, onUpload }) => {
   // Mounted fresh for every open, so state starts from the props
   const [file, setFile] = useState<File | null>(() => (initialFile && !checkPdf(initialFile) ? initialFile : null));
   const [kinds, setKinds] = useState<DocKind[]>(initialKinds);
   const [error, setError] = useState(() => (initialFile ? (checkPdf(initialFile) ?? '') : ''));
+  const [busy, setBusy] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const pick = (f: File) => {
@@ -278,10 +282,19 @@ const UploadDocumentsDialog: React.FC<{
     setFile(problem ? null : f);
   };
 
-  const canUpload = !!file && !error && kinds.length > 0;
+  const canUpload = !!file && !error && kinds.length > 0 && !busy;
+
+  const submit = async () => {
+    if (!file || !canUpload) return;
+    setBusy(true);
+    const problem = await onUpload(file, kinds);
+    setBusy(false);
+    if (problem) setError(problem);
+    else onClose();
+  };
 
   return (
-    <Dialog open onOpenChange={(o) => !o && onClose()}>
+    <Dialog open onOpenChange={(o) => !o && !busy && onClose()}>
       <DialogContent
         showCloseButton={false}
         className="w-[465px] max-w-[calc(100%-2rem)] gap-0 overflow-hidden rounded-[20px] border-[#e1e8f0] p-0 shadow-xl sm:max-w-[465px]"
@@ -345,19 +358,11 @@ const UploadDocumentsDialog: React.FC<{
           </div>
         </div>
         <div className="flex w-full items-center gap-[12px] border-t border-[#e1e8f0] p-[16px]">
-          <OutlineButton className="flex-1" onClick={onClose}>
+          <OutlineButton className="flex-1" onClick={onClose} disabled={busy}>
             Cancel
           </OutlineButton>
-          <PrimaryButton
-            className="flex-1"
-            disabled={!canUpload}
-            onClick={() => {
-              if (!file || !canUpload) return;
-              onUpload(file, kinds);
-              onClose();
-            }}
-          >
-            Upload
+          <PrimaryButton className="flex-1" disabled={!canUpload} onClick={submit}>
+            {busy ? 'Uploading…' : 'Upload'}
           </PrimaryButton>
         </div>
       </DialogContent>
@@ -365,30 +370,88 @@ const UploadDocumentsDialog: React.FC<{
   );
 };
 
+/** Pathname inside the user's own folder; the server adds a random suffix so names never clash */
+const blobPathFor = (prefix: string, fileName: string) => {
+  const base = fileName.replace(/\.pdf$/i, '').replace(/[^a-zA-Z0-9._-]+/g, '_').slice(0, 80) || 'document';
+  return `${prefix}${base}.pdf`;
+};
+
+async function readError(res: Response, fallback: string) {
+  try {
+    const data = await res.json();
+    if (res.status === 503) return 'File storage is not set up yet. Please try again later.';
+    return typeof data?.error === 'string' ? data.error : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 export const DocumentsCard: React.FC = () => {
-  const [docs, setDocs] = useState<Record<DocKind, StoredDoc[]>>({ cv: [], sop: [], transcripts: [], letters: [] });
+  const [docs, setDocs] = useState<StoredDoc[]>([]);
+  const [prefix, setPrefix] = useState<string | null>(null);
+  const [storageReady, setStorageReady] = useState(true);
+  const [loaded, setLoaded] = useState(false);
+  const [notice, setNotice] = useState('');
   const [dialog, setDialog] = useState<{ file: File | null; kinds: DocKind[] } | null>(null);
 
-  const openDialog = (file: File | null, kinds: DocKind[] = ['cv']) => setDialog({ file, kinds });
+  React.useEffect(() => {
+    let alive = true;
+    fetch('/api/documents')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!alive) return;
+        if (d?.documents) setDocs(d.documents);
+        if (d?.uploadPrefix) setPrefix(d.uploadPrefix);
+        if (d && d.storageReady === false) setStorageReady(false);
+        setLoaded(true);
+      })
+      .catch(() => alive && setLoaded(true));
+    return () => {
+      alive = false;
+    };
+  }, []);
 
-  const upload = (file: File, kinds: DocKind[]) => {
-    setDocs((prev) => {
-      const next = { ...prev };
-      for (const k of kinds) {
-        const entry: StoredDoc = { name: file.name, size: file.size, url: URL.createObjectURL(file), addedAt: Date.now() };
-        // Letters stack up; every other kind holds one file
-        if (k !== 'letters') prev[k].forEach((d) => URL.revokeObjectURL(d.url));
-        next[k] = k === 'letters' ? [...prev[k], entry] : [entry];
-      }
-      return next;
-    });
+  const openDialog = (file: File | null, kinds: DocKind[] = ['cv']) => {
+    setNotice('');
+    setDialog({ file, kinds });
   };
 
-  const remove = (kind: DocKind) =>
-    setDocs((prev) => {
-      prev[kind].forEach((d) => URL.revokeObjectURL(d.url));
-      return { ...prev, [kind]: [] };
-    });
+  const upload = async (file: File, kinds: DocKind[]): Promise<string | null> => {
+    if (!prefix) return 'Please sign in to upload documents.';
+    if (!storageReady) return 'File storage is not set up yet. Please try again later.';
+    try {
+      const blob = await uploadToBlob(blobPathFor(prefix, file.name), file, {
+        access: 'private',
+        handleUploadUrl: '/api/documents/upload',
+        contentType: 'application/pdf',
+      });
+      const res = await fetch('/api/documents', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ pathname: blob.pathname, name: file.name, kinds }),
+      });
+      if (!res.ok) return await readError(res, 'We could not save that file. Please try again.');
+      setDocs((await res.json()).documents);
+      return null;
+    } catch (err) {
+      console.error('[documents] upload failed:', err);
+      return 'The upload did not finish. Check your connection and try again.';
+    }
+  };
+
+  const remove = async (kind: DocKind) => {
+    setNotice('');
+    const before = docs;
+    setDocs((prev) => prev.filter((d) => d.kind !== kind));
+    try {
+      const res = await fetch(`/api/documents?kind=${kind}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('delete failed');
+      setDocs((await res.json()).documents);
+    } catch {
+      setDocs(before);
+      setNotice('We could not delete that file. Please try again.');
+    }
+  };
 
   return (
     <Card className="gap-[16px] p-[24px]">
@@ -398,17 +461,24 @@ export const DocumentsCard: React.FC = () => {
       />
       {/* Click or drop: both open the Upload Documents popup */}
       <DropZone onFile={(f) => openDialog(f)} onBrowse={() => openDialog(null)} />
-      <ul className="flex w-full flex-col">
+      {notice && (
+        <p role="alert" className="text-[12px] leading-[18px] text-[#f62752]">
+          {notice}
+        </p>
+      )}
+      <ul className="flex w-full flex-col" aria-busy={!loaded}>
         {DOC_KINDS.map((k) => {
-          const files = docs[k.key];
+          const files = docs.filter((d) => d.kind === k.key);
           const latest = files[files.length - 1];
           const isLetters = k.key === 'letters';
           const ready = isLetters ? files.length >= LETTERS_NEEDED : files.length > 0;
-          const meta = !latest
-            ? 'Not uploaded'
-            : isLetters
-              ? `${files.length} of ${LETTERS_NEEDED} letters uploaded`
-              : `${latest.name} · ${formatSize(latest.size)}`;
+          const meta = !loaded
+            ? 'Loading…'
+            : !latest
+              ? 'Not uploaded'
+              : isLetters
+                ? `${files.length} of ${LETTERS_NEEDED} letters uploaded`
+                : `${latest.name} · ${formatSize(latest.size)}`;
           const chip = ready
             ? { tone: 'success' as const, label: '✓ Ready' }
             : isLetters && files.length > 0
@@ -421,13 +491,13 @@ export const DocumentsCard: React.FC = () => {
                   <p className="text-[14px] leading-[20px] font-[510] text-[#101828] whitespace-pre">{`📄  ${k.title}`}</p>
                   <p className="max-w-full truncate text-[12px] leading-[18px] italic text-[#627181]">{meta}</p>
                 </div>
-                <Chip tone={chip.tone}>{chip.label}</Chip>
+                {loaded && <Chip tone={chip.tone}>{chip.label}</Chip>}
               </div>
               <div className="flex shrink-0 items-center gap-[16px]">
                 <button
                   type="button"
                   disabled={!latest}
-                  onClick={() => latest && window.open(latest.url, '_blank', 'noopener')}
+                  onClick={() => latest && window.open(`/api/documents/${latest.id}/file`, '_blank', 'noopener')}
                   className="inline-flex h-[36px] w-[88px] items-center justify-center gap-[4px] rounded-[6px] border border-[#7150e7] px-[8px] text-[14px] leading-[20px] font-[510] text-[#7150e7] transition-colors hover:bg-[#f4f2fd] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
                 >
                   View
@@ -473,9 +543,9 @@ export const DocumentsCard: React.FC = () => {
 // Account & sign-in card (Figma 281:5574) + Delete account card
 
 const NOTIFICATIONS = [
-  { key: 'deadlines', title: 'Deadline reminders', description: '7 days and 2 days before each saved deadline', on: true },
-  { key: 'digest', title: 'New matches digest', description: 'Weekly summary of new scholarships and positions', on: true },
-];
+  { key: 'deadlines', title: 'Deadline reminders', description: '7 days and 2 days before each saved deadline' },
+  { key: 'digest', title: 'New matches digest', description: 'Weekly summary of new scholarships and positions' },
+] as const;
 
 const SignInMethod: React.FC<{ icon: string; label: string; checked: boolean; width: string }> = ({
   icon,
@@ -503,9 +573,11 @@ const SignInMethod: React.FC<{ icon: string; label: string; checked: boolean; wi
 );
 
 export const AccountCards: React.FC = () => {
-  const [notifs, setNotifs] = useState<Record<string, boolean>>(
-    Object.fromEntries(NOTIFICATIONS.map((n) => [n.key, n.on])),
-  );
+  const { profile, saveProfile } = useApp();
+  // Both reminders are on until the user turns one off (saved in the profile's details)
+  const notifs = profile.details?.notifications ?? { deadlines: true, digest: true };
+  const toggle = (key: 'deadlines' | 'digest') =>
+    void saveProfile({ details: { ...profile.details, notifications: { ...notifs, [key]: !notifs[key] } } });
   // Google is connected when the account has a Google id; otherwise the user signs in with an email code
   const [usesGoogle, setUsesGoogle] = useState<boolean | null>(null);
 
@@ -550,7 +622,7 @@ export const AccountCards: React.FC = () => {
                   type="button"
                   role="switch"
                   aria-checked={on}
-                  onClick={() => setNotifs((prev) => ({ ...prev, [n.key]: !prev[n.key] }))}
+                  onClick={() => toggle(n.key)}
                   className="flex min-w-0 items-center gap-[16px] rounded-[8px] border border-[#e1e8f0] p-[16px] text-left transition-colors hover:bg-[#fafafa]"
                 >
                   <span className="flex min-w-0 flex-1 flex-col items-start gap-[2px]">

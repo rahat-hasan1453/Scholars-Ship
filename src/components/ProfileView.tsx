@@ -667,7 +667,7 @@ export const ProfileView: React.FC<{ onNavigateToTracker?: () => void }> = () =>
       degreeLevel: form.degree,
       cgpa: num(form.cgpa) ?? profile.cgpa,
       testScores: { ielts: num(form.ielts), toefl: num(form.toefl), gre: num(form.gre), gmat: num(form.gmat) },
-      details: { bio: form.bio, field: form.field, gradYear: form.gradYear, intake: form.intake },
+      details: { ...profile.details, bio: form.bio, field: form.field, gradYear: form.gradYear, intake: form.intake },
     });
     if (!ok) return; // rolled back; AppContext shows the error message
     setSaved(true);
