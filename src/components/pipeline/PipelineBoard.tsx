@@ -71,10 +71,10 @@ const FUNDING_LABELS: Record<string, string> = {
 };
 
 const neutralButton =
-  'flex items-center gap-[6px] rounded-[10px] bg-[#f8fafc] px-3 py-[6px] text-[14px] leading-5 font-[510] text-[#344054] hover:bg-[#eef2f6] focus-visible:outline-2 focus-visible:outline-[#7150e7] cursor-pointer data-[state=open]:bg-[#eef2f6]';
+  'flex items-center gap-[6px] rounded-[10px] bg-[#f8fafc] px-3 py-[6px] text-[14px] leading-5 font-medium text-[#344054] hover:bg-[#eef2f6] focus-visible:outline-2 focus-visible:outline-[#7150e7] cursor-pointer data-[state=open]:bg-[#eef2f6]';
 
 const selectCls =
-  'h-9 w-full rounded-[8px] border border-[#d0d5dd] bg-white px-2 text-[14px] text-[#101828] focus-visible:outline-2 focus-visible:outline-[#7150e7]';
+  'h-9 w-full rounded-[8px] border border-[#d0d5dd] bg-white px-2 text-[14px] font-normal text-[#101828] focus-visible:outline-2 focus-visible:outline-[#7150e7]';
 
 // Pipeline page (Figma 315:5151): scholarship applications or professor outreach as a drag-and-drop Kanban board.
 export function PipelineBoard() {
@@ -263,7 +263,7 @@ export function PipelineBoard() {
             finish();
             setMode(m);
           }}
-          segmentClassName="gap-[6px] px-3 font-sans font-[510]"
+          segmentClassName="gap-[6px] px-3 font-sans font-medium"
           options={[
             { value: 'scholarships', label: 'Scholarships', count: applications.length },
             { value: 'outreach', label: 'Professor Outreach', count: outreachRecords.length },
@@ -277,8 +277,8 @@ export function PipelineBoard() {
             {filterCount > 0 && <span className="rounded-[6px] bg-[#ede9fc] px-[6px] text-[12px] leading-[18px] text-[#5b3fd1]">{filterCount}</span>}
           </PopoverTrigger>
           <PopoverContent align="start" className="flex w-72 flex-col gap-3 rounded-[12px] p-4">
-            <p className="text-[14px] leading-5 font-[590] text-[#101828]">Filter cards</p>
-            <label className="flex flex-col gap-1 text-[12px] leading-4 font-[510] text-[#344054]">
+            <p className="text-[14px] leading-5 font-medium text-[#101828]">Filter cards</p>
+            <label className="flex flex-col gap-1 text-[12px] leading-4 font-medium text-[#344054]">
               Country
               <select className={selectCls} value={filters.country} onChange={(e) => setFilters((f) => ({ ...f, country: e.target.value }))}>
                 <option value="ALL">All countries</option>
@@ -289,7 +289,7 @@ export function PipelineBoard() {
                 ))}
               </select>
             </label>
-            <label className="flex flex-col gap-1 text-[12px] leading-4 font-[510] text-[#344054]">
+            <label className="flex flex-col gap-1 text-[12px] leading-4 font-medium text-[#344054]">
               Funding type
               <select className={selectCls} value={filters.funding} onChange={(e) => setFilters((f) => ({ ...f, funding: e.target.value as PipelineFilters['funding'] }))}>
                 <option value="ALL">Any funding</option>
@@ -300,7 +300,7 @@ export function PipelineBoard() {
                 ))}
               </select>
             </label>
-            <label className="flex flex-col gap-1 text-[12px] leading-4 font-[510] text-[#344054]">
+            <label className="flex flex-col gap-1 text-[12px] leading-4 font-medium text-[#344054]">
               {mode === 'scholarships' ? 'Deadline' : 'Follow-up date'}
               <select className={selectCls} value={filters.deadline} onChange={(e) => setFilters((f) => ({ ...f, deadline: e.target.value as PipelineFilters['deadline'] }))}>
                 <option value="any">Any time</option>
@@ -313,7 +313,7 @@ export function PipelineBoard() {
               type="button"
               disabled={filterCount === 0}
               onClick={() => setFilters(DEFAULT_FILTERS)}
-              className="self-start rounded-[8px] px-2 py-1 text-[13px] leading-[18px] font-[510] text-[#5b3fd1] hover:bg-[#f4f2fd] disabled:text-[#627181] disabled:hover:bg-transparent cursor-pointer disabled:cursor-default"
+              className="self-start rounded-[8px] px-2 py-1 text-[13px] leading-[18px] font-medium text-[#5b3fd1] hover:bg-[#f4f2fd] disabled:text-[#627181] disabled:hover:bg-transparent cursor-pointer disabled:cursor-default"
             >
               Clear filters
             </button>
@@ -342,7 +342,7 @@ export function PipelineBoard() {
         <button
           type="button"
           onClick={() => setAddTo(columns[0].id)}
-          className="flex items-center gap-[6px] rounded-[8px] bg-[#7150e7] px-4 py-2 text-[14px] leading-5 font-[510] text-white hover:bg-[#5f3fdc] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7150e7] cursor-pointer"
+          className="flex items-center gap-[6px] rounded-[8px] bg-[#7150e7] px-4 py-2 text-[14px] leading-5 font-medium text-white hover:bg-[#5f3fdc] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7150e7] cursor-pointer"
         >
           <Plus {...ICON} className="size-4" aria-hidden />
           {mode === 'scholarships' ? 'Add application' : 'Add professor'}

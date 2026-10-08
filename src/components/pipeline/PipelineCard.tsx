@@ -19,7 +19,7 @@ import {
 } from '@/components/shadcn/dropdown-menu';
 
 const ICON = { strokeWidth: 1.5 } as const;
-const menuLabel = 'px-2 pt-1 pb-0.5 text-[12px] leading-4 font-[510] text-[#627181]';
+const menuLabel = 'px-2 pt-1 pb-0.5 text-[12px] leading-4 font-medium text-[#627181]';
 
 /** 14px progress ring (Figma 316:5248) */
 function ProgressRing({ pct }: { pct: number }) {
@@ -42,7 +42,7 @@ const DECISION_PILL: Record<DecisionResult, { label: string; cls: string }> = {
   Pending: { label: 'Awaiting decision', cls: 'bg-[#eef2f6] text-[#344054]' },
 };
 
-const pill = 'shrink-0 rounded-[999px] px-[8px] py-px text-[12px] leading-[18px] font-[508] italic whitespace-nowrap';
+const pill = 'shrink-0 rounded-[999px] px-[8px] py-px text-[12px] leading-[18px] font-medium italic whitespace-nowrap';
 
 /** The card's visual body (Figma 316:5242). Used in the column and in the drag overlay. */
 export function PipelineCardBody({ item }: { item: PipelineItem }) {
@@ -50,9 +50,9 @@ export function PipelineCardBody({ item }: { item: PipelineItem }) {
     <>
       <div className="flex w-full gap-1 border-b border-[#f1f1f1] pb-[10px] pr-6 text-[12px] leading-4 whitespace-nowrap">
         <span className="shrink-0 text-[#627181]">{item.providerLabel}:</span>
-        <span className="min-w-0 flex-1 truncate font-[510] text-[#344054]">{item.provider}</span>
+        <span className="min-w-0 flex-1 truncate font-medium text-[#344054]">{item.provider}</span>
       </div>
-      <p className="w-full truncate text-[16px] leading-[22px] font-[510] text-[#101828]">{item.title}</p>
+      <p className="w-full truncate text-[16px] leading-[22px] font-medium text-[#101828]">{item.title}</p>
       {item.decision ? (
         <span className={cn(pill, DECISION_PILL[item.decision].cls)}>{DECISION_PILL[item.decision].label}</span>
       ) : item.progress !== null ? (
@@ -61,7 +61,7 @@ export function PipelineCardBody({ item }: { item: PipelineItem }) {
           <span className="text-[14px] leading-5 text-[#344054]">{item.progress}%</span>
         </div>
       ) : null}
-      <div className={cn('flex items-center gap-[6px] text-[14px] leading-5', item.dateUrgent ? 'font-[510] text-[#b42318]' : 'text-[#344054]')}>
+      <div className={cn('flex items-center gap-[6px] text-[14px] leading-5', item.dateUrgent ? 'font-medium text-[#b42318]' : 'text-[#344054]')}>
         <Clock {...ICON} className="size-[15px] shrink-0" aria-hidden />
         <span className="truncate">{item.dateLabel}</span>
       </div>

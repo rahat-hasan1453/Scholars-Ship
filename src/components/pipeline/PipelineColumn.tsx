@@ -69,10 +69,10 @@ export function PipelineColumnView(props: PipelineColumnProps) {
           <ChevronsLeftRight {...ICON} className="size-[18px]" aria-hidden />
         </button>
         <span aria-hidden className="size-[10px] shrink-0 rounded-full" style={{ background: column.dot }} />
-        <h2 id={headingId} className="text-[14px] leading-5 font-[510] whitespace-nowrap text-[#101828] [writing-mode:vertical-rl]">
+        <h2 id={headingId} className="text-[14px] leading-5 font-medium whitespace-nowrap text-[#101828] [writing-mode:vertical-rl]">
           {column.label}
         </h2>
-        <span className="rounded-[6px] bg-[#eef2f6] px-[5px] text-[13px] leading-5 font-[510] text-[#344054]">{items.length}</span>
+        <span className="rounded-[6px] bg-[#eef2f6] px-[5px] text-[13px] leading-5 font-medium text-[#344054]">{items.length}</span>
       </section>
     );
   }
@@ -90,10 +90,10 @@ export function PipelineColumnView(props: PipelineColumnProps) {
     >
       <div className="flex h-[60px] w-full items-center gap-2 px-2 py-[6px]">
         <span aria-hidden className="size-[10px] shrink-0 rounded-full" style={{ background: column.dot }} />
-        <h2 id={headingId} className="truncate text-[16px] leading-[22px] font-[510] text-[#101828]">
+        <h2 id={headingId} className="truncate text-[16px] leading-[22px] font-medium text-[#101828]">
           {column.label}
         </h2>
-        <span className="shrink-0 rounded-[6px] bg-[#eef2f6] px-[7px] text-[13px] leading-5 font-[510] text-[#344054]">
+        <span className="shrink-0 rounded-[6px] bg-[#eef2f6] px-[7px] text-[13px] leading-5 font-medium text-[#344054]">
           <span className="sr-only">Cards: </span>
           {items.length}
         </span>
@@ -106,7 +106,7 @@ export function PipelineColumnView(props: PipelineColumnProps) {
             <MoreVertical {...ICON} className="size-[18px]" aria-hidden />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-52">
-            <DropdownMenuLabel className="px-2 pt-1 pb-0.5 text-[12px] leading-4 font-[510] text-[#627181]">Sort this column</DropdownMenuLabel>
+            <DropdownMenuLabel className="px-2 pt-1 pb-0.5 text-[12px] leading-4 font-medium text-[#627181]">Sort this column</DropdownMenuLabel>
             <DropdownMenuRadioGroup aria-label="Sort this column" value={sort ?? 'board'} onValueChange={(v) => onSort(v === 'board' ? null : (v as PipelineSort))}>
               <DropdownMenuRadioItem value="board">Same as board</DropdownMenuRadioItem>
               {(Object.keys(SORT_LABELS) as PipelineSort[]).map((s) => (
@@ -151,7 +151,7 @@ export function PipelineColumnView(props: PipelineColumnProps) {
       <button
         type="button"
         onClick={onAdd}
-        className="flex w-full items-center gap-2 rounded-[8px] p-[10px] text-[14px] leading-5 font-[510] text-[#627181] hover:bg-[#eef2f6] focus-visible:outline-2 focus-visible:outline-[#7150e7] cursor-pointer"
+        className="flex w-full items-center gap-2 rounded-[8px] p-[10px] text-[14px] leading-5 font-medium text-[#627181] hover:bg-[#eef2f6] focus-visible:outline-2 focus-visible:outline-[#7150e7] cursor-pointer"
       >
         <Plus {...ICON} className="size-4" aria-hidden />
         Add new
