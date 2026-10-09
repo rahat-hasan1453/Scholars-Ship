@@ -438,3 +438,19 @@ model UserDocument {
 
   @@index([userId, kind])
 }
+
+/// A feed search that showed no results while the catalogue had data. Anonymous; drives which sources to add next.
+model SearchMiss {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  page      String
+  query     String   @default("")
+  subjects  String[]
+  degrees   String[]
+  countries String[]
+  funding   String[]
+  matchMode String   @default("all")
+
+  @@index([createdAt])
+  @@index([page, createdAt])
+}

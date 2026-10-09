@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react'
 import { FilterIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { useSessionState } from '@/hooks/useSessionState';
+import { useSearchMissLog } from '@/hooks/useSearchMissLog';
 import { matchesSubjects } from '@/data/subjectCatalog';
 import { profileFilterDefaults, useProfileFilterDefaults } from '@/hooks/useProfileFilterDefaults';
 import { ResearchPaper } from '@/types';
@@ -120,6 +121,20 @@ export const ResearchPapersFeed: React.FC = () => {
 
   // Any filter, search or mode change scrolls the cards back to the top
   const scrollResetKey = JSON.stringify([globalSearchQuery, selectedSubjects, matchMode, viewMode]);
+
+  useSearchMissLog(
+    {
+      page: 'research',
+      query: globalSearchQuery,
+      subjects: selectedSubjects,
+      degrees: selectedDegrees,
+      countries: selectedCountries,
+      funding: selectedFunding,
+      matchMode,
+    },
+    papers?.length ?? 0,
+    filteredPapers.length,
+  );
 
   const resetFilters = () => {
     const d = profileFilterDefaults(profile);
