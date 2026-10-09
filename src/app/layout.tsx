@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'sw
 const figtree = Figtree({ subsets: ['latin'], variable: '--font-figtree-loaded', display: 'swap' });
 
 export const metadata: Metadata = {
-  title: 'HighScholar | Global Scholarship & Professor Finder Portal',
+  title: "Scholars' Ship | Global Scholarship & Professor Finder Portal",
   description: 'Personalized higher-education discovery engine for global scholarships, graduate research labs, and application tracking.',
 };
 
