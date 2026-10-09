@@ -8,6 +8,7 @@
     "vercel-build": "node prisma/vercel-build.mjs",
     "postinstall": "prisma generate",
     "db:seed": "tsx --env-file=.env.local prisma/seed.ts",
+    "data:misses": "tsx --env-file=.env.local prisma/report/search-misses.ts",
     "data:import": "tsx prisma/import/import-professors.ts && tsx prisma/import/import-papers.ts && tsx prisma/import/import-opportunities.ts",
     "start": "next start",
     "lint": "eslint",

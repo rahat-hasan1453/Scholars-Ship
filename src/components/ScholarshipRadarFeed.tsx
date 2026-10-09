@@ -2,6 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { useSessionState } from '@/hooks/useSessionState';
+import { useSearchMissLog } from '@/hooks/useSearchMissLog';
 import { matchesSubjects } from '@/data/subjectCatalog';
 import { profileFilterDefaults, useProfileFilterDefaults } from '@/hooks/useProfileFilterDefaults';
 import { FilterIcon } from 'lucide-react';
@@ -86,6 +87,20 @@ export const ScholarshipRadarFeed: React.FC = () => {
     matchMode,
     viewMode,
   ]);
+
+  useSearchMissLog(
+    {
+      page: 'scholarships',
+      query: globalSearchQuery,
+      subjects: selectedSubjects,
+      degrees: selectedDegrees,
+      countries: selectedCountries,
+      funding: selectedFunding,
+      matchMode,
+    },
+    scholarships.length,
+    filteredScholarships.length,
+  );
 
   const resetFilters = () => {
     const d = profileFilterDefaults(profile);

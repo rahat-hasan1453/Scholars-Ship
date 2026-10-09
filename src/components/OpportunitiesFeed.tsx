@@ -12,6 +12,7 @@ import { FeedGrid, FeedSkeleton } from '@/components/opportunity-feed/FeedGrid';
 import { OpportunityListBar, MatchMode, ViewMode } from '@/components/opportunity-feed/OpportunityListBar';
 import type { Opportunity } from '@/types';
 import { useSessionState } from '@/hooks/useSessionState';
+import { useSearchMissLog } from '@/hooks/useSearchMissLog';
 import { profileFilterDefaults, useProfileFilterDefaults } from '@/hooks/useProfileFilterDefaults';
 import { useOpportunityBookmarks } from '@/hooks/useOpportunityBookmarks';
 import { isOpportunityEligible } from '@/lib/eligibility';
@@ -89,6 +90,20 @@ export const OpportunitiesFeed: React.FC = () => {
     matchMode,
     viewMode,
   ]);
+
+  useSearchMissLog(
+    {
+      page: 'opportunities',
+      query: globalSearchQuery,
+      subjects: selectedSubjects,
+      degrees: selectedDegrees,
+      countries: selectedCountries,
+      funding: selectedFunding,
+      matchMode,
+    },
+    listings?.length ?? 0,
+    filteredListings.length,
+  );
 
   const resetFilters = () => {
     const d = profileFilterDefaults(profile);
