@@ -42,17 +42,17 @@ enum OutreachStatus {
 }
 
 model User {
-  id                  String       @id @default(uuid())
-  email               String       @unique
+  id                  String         @id @default(uuid())
+  email               String         @unique
   name                String
   avatar              String?
-  googleId            String?      @unique
-  onboardingCompleted Boolean      @default(false)
+  googleId            String?        @unique
+  onboardingCompleted Boolean        @default(false)
   profileData         Json?
   emailVerifiedAt     DateTime?
   passwordHash        String? // scrypt; null for Google-only or code-only accounts
-  createdAt           DateTime     @default(now())
-  updatedAt           DateTime     @updatedAt
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
   profile             UserProfile?
   documents           UserDocument[]
 }
@@ -96,32 +96,39 @@ model UserProfile {
 }
 
 model Scholarship {
-  id               String        @id @default(uuid())
-  title            String
-  provider         String
-  deadline         DateTime
-  fundingAmount    String
-  fundingType      String        @default("FULL")
-  degreeLevels     DegreeLevel[]
-  countries        String[]
-  specializations  String[]
-  requirementsJson Json?
-  admissionSummary String?
-  livingCost       String?
+  id                String        @id @default(uuid())
+  title             String
+  provider          String
+  deadline          DateTime
+  fundingAmount     String
+  fundingType       String        @default("FULL")
+  degreeLevels      DegreeLevel[]
+  countries         String[]
+  specializations   String[]
+  requirementsJson  Json?
+  admissionSummary  String?
+  livingCost        String?
   /// Short provider name for the facts grid, e.g. "DAAD"
-  providerShort    String?
+  providerShort     String?
   /// Field of study line for the facts grid
-  fieldOfStudy     String?
+  fieldOfStudy      String?
   /// [{ label, value }] rows for the Funding section
-  fundingBreakdown Json?
-  applySteps       String[]      @default([])
-  tags             String[]      @default([])
-  officialUrl      String
-  description      String
-  featured         Boolean       @default(false)
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-  applications     Application[]
+  fundingBreakdown  Json?
+  applySteps        String[]      @default([])
+  tags              String[]      @default([])
+  officialUrl       String
+  /// true while the provider hasn't published the new call: the date follows last cycle and the UI says "Expected"
+  deadlineEstimated Boolean       @default(false)
+  /// Short note on how the deadline works, e.g. "Each country has its own deadline"
+  deadlineNote      String?
+  /// Page the facts were checked against, and when
+  sourceUrl         String?
+  verifiedAt        DateTime?
+  description       String
+  featured          Boolean       @default(false)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  applications      Application[]
 }
 
 model University {
@@ -178,6 +185,8 @@ model Grant {
   lab         ResearchLab? @relation(fields: [labId], references: [id], onDelete: SetNull)
   professorId String?
   professor   Professor?   @relation(fields: [professorId], references: [id], onDelete: Cascade)
+  /// Public award page, e.g. nsf.gov/awardsearch/showAward?AWD_ID=…
+  url         String?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
@@ -203,6 +212,10 @@ model Professor {
   email            String?
   linkedInUrl      String?
   googleScholar    String?
+  orcid            String?
+  openAlexId       String?
+  /// Where this row came from, e.g. "CSRankings + OpenAlex + NSF"
+  dataSource       String?
   labWebsite       String?
   avatarUrl        String?
   acceptingTerms   String[]
@@ -255,18 +268,18 @@ model Opportunity {
   minIelts        Float?
   /// "none" | "preferred" | "required"
   publications    String             @default("none")
-  // List card lines
-  admission       String
-  livingCost      String
-  rankRange       String
-  acceptanceRate  Int
+  // List card lines. Real posts rarely state these, so null = not stated and the row is hidden.
+  admission       String?
+  livingCost      String?
+  rankRange       String?
+  acceptanceRate  Int?
   // Details page
-  positionType    String
-  startDate       String
-  deadline        DateTime
+  positionType    String?
+  startDate       String?
+  deadline        DateTime?
   /// [{ label, value }] rows for the Position Details section
-  positionDetails Json
-  aboutLab        String
+  positionDetails Json               @default("[]")
+  aboutLab        String?
   applySteps      String[]           @default([])
   contactEmail    String?
   officialUrl     String?

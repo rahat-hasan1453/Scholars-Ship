@@ -82,12 +82,16 @@ export const OpportunityDetailsView: React.FC<Props> = ({ opportunity: o, others
   const tracked = outreachRecords.some((r) => r.opportunityId === o.id);
 
   const match = matchScore(o, profile);
-  const left = daysUntil(o.deadline);
-  const deadline = formatDeadline(o.deadline);
+  const left = o.deadline ? daysUntil(o.deadline) : null;
+  const deadline = o.deadline ? formatDeadline(o.deadline) : null;
   const similar = useMemo(() => similarOpportunities(o, others, profile), [o, others, profile]);
 
-  const deadlineChip: { label: string; tone: ChipTone } =
-    left > 0 ? { label: `⏰ Apply by ${deadline}`, tone: 'warning' } : { label: 'Applications closed', tone: 'warning' };
+  const deadlineChip: { label: string; tone: ChipTone } | null =
+    left === null
+      ? null
+      : left > 0
+        ? { label: `⏰ Apply by ${deadline}`, tone: 'warning' }
+        : { label: 'Applications closed', tone: 'warning' };
   const meta = [`${countryFlagEmoji(o.country)} ${o.country}`.trim(), postedLine(o)].join(' · ');
   const location = [o.city, o.country].filter(Boolean).join(', ');
   const contactHref = o.contactEmail ? `mailto:${o.contactEmail}` : o.sourceUrl;
@@ -102,16 +106,16 @@ export const OpportunityDetailsView: React.FC<Props> = ({ opportunity: o, others
         chips={[
           { label: `${match}% Match`, tone: 'success' },
           { label: primaryDegree(o.degreeLevels) },
-          { label: isFullyFunded(o) ? '$ Fully Funded' : '$ Funded' },
-          deadlineChip,
+          ...(o.fundingTags.length ? [{ label: isFullyFunded(o) ? '$ Fully Funded' : '$ Funded' }] : []),
+          ...(deadlineChip ? [deadlineChip] : []),
         ]}
       />
       <FactsGrid
         facts={[
-          { icon: '💼', label: 'Position Type', value: o.positionType },
-          { icon: '📚', label: 'Research Area', value: o.fieldTags.slice(0, 2).join(' & ') },
-          { icon: '💰', label: 'Funding', value: fundingKind(o.funding) },
-          { icon: '🗓', label: 'Start Date', value: o.startDate },
+          { icon: '💼', label: 'Position Type', value: o.positionType ?? o.degreeLevels.map((d) => (d === 'PhD' ? 'PhD position' : `${d} position`)).join(' / ') },
+          { icon: '📚', label: 'Research Area', value: o.fieldTags.slice(0, 2).join(' & ') || 'Not stated' },
+          { icon: '💰', label: 'Funding', value: o.fundingTags.length ? fundingKind(o.funding) : 'Not stated' },
+          { icon: '🗓', label: 'Start Date', value: o.startDate ?? 'Not stated' },
           { icon: '📍', label: 'Location', value: location },
           { icon: '🔬', label: 'Lab', value: o.labName ?? '—' },
         ]}
@@ -135,9 +139,11 @@ export const OpportunityDetailsView: React.FC<Props> = ({ opportunity: o, others
       <DetailSection label="Eligibility">
         <CheckList rows={eligibilityRows(o, profile)} />
       </DetailSection>
-      <DetailSection label="About the Lab">
-        <DetailText>{o.aboutLab}</DetailText>
-      </DetailSection>
+      {o.aboutLab && (
+        <DetailSection label="About the Lab">
+          <DetailText>{o.aboutLab}</DetailText>
+        </DetailSection>
+      )}
       {o.applySteps.length > 0 && (
         <DetailSection label="How to Apply">
           <StepList steps={o.applySteps} />
@@ -150,7 +156,13 @@ export const OpportunityDetailsView: React.FC<Props> = ({ opportunity: o, others
     <>
       <ActionCard
         title="Apply for this position"
-        note={left > 0 ? `⏰ Closes ${deadline}  ·  ${left} day${left === 1 ? '' : 's'} left` : `⏰ Closed on ${deadline}`}
+        note={
+          left === null
+            ? 'The post gives no deadline; check the original post before applying'
+            : left > 0
+              ? `⏰ Closes ${deadline}  ·  ${left} day${left === 1 ? '' : 's'} left`
+              : `⏰ Closed on ${deadline}`
+        }
         primary={{ label: 'Contact Professor', href: contactHref }}
         secondary={[
           { label: saved ? '🔖 Saved' : '🔖 Save', onClick: () => toggleBookmark(o.id), pressed: saved },

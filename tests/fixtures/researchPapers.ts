@@ -1,3 +1,4 @@
+// Demo data kept only as TEST FIXTURES (it is not real). The app reads the real catalogue from the database.
 import { ResearchPaper } from '@/types';
 
 export const initialResearchPapers: ResearchPaper[] = [

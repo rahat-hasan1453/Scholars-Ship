@@ -73,6 +73,14 @@ export interface Scholarship {
   /** ISO date the listing was added (database rows only) */
   createdAt?: string;
   officialUrl: string;
+  /** The new call isn't published yet: `deadline` follows last cycle and is shown as "Expected" */
+  deadlineEstimated?: boolean;
+  /** How the deadline works, e.g. "Each country has its own deadline" */
+  deadlineNote?: string;
+  /** Page the listing was checked against */
+  sourceUrl?: string;
+  /** ISO date the listing was last checked */
+  verifiedAt?: string;
   description: string;
   featured?: boolean;
   tags: string[];
@@ -87,7 +95,8 @@ export interface Professor {
   country: string;
   labName?: string;
   researchTags: string[];
-  openPositions: boolean;
+  /** true = hiring, false = not hiring, undefined = no source says (most imported faculty) */
+  openPositions?: boolean;
   recentGrants?: string;
   email?: string;
   linkedInUrl?: string;
@@ -178,7 +187,7 @@ export interface HiringOpportunity {
   authorAvatar?: string;
   institution: string;
   labName?: string;
-  source: 'linkedin' | 'twitter' | 'lab_website' | 'web' | 'reddit';
+  source: 'linkedin' | 'twitter' | 'lab_website' | 'web' | 'reddit' | 'mastodon';
   sourceUrl: string;
   postedAgo: string;
   postedDate: string;
@@ -222,15 +231,16 @@ export interface Opportunity {
   minCgpa?: number;
   minIelts?: number;
   publications: 'none' | 'preferred' | 'required';
-  admission: string;
-  livingCost: string;
-  rankRange: string;
-  acceptanceRate: number;
-  positionType: string;
-  startDate: string;
-  deadline: string; // ISO date
+  // Real posts rarely state these; undefined = not stated, and the UI hides the row
+  admission?: string;
+  livingCost?: string;
+  rankRange?: string;
+  acceptanceRate?: number;
+  positionType?: string;
+  startDate?: string;
+  deadline?: string; // ISO date
   positionDetails: { label: string; value: string }[];
-  aboutLab: string;
+  aboutLab?: string;
   applySteps: string[];
   contactEmail?: string;
   officialUrl?: string;

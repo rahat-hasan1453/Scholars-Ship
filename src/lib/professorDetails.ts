@@ -48,19 +48,15 @@ export function parseGrant(text: string | undefined): ProfessorGrant | undefined
 
 const DEGREE_NOUN: Record<DegreeLevel, string> = { Bachelors: "Bachelor's", Masters: "Master's", PhD: 'PhD' };
 
-/** Typical entry requirements, used until a professor's own requirements are recorded */
+/**
+ * Requirements when the professor hasn't published their own: only the prior degree, which every
+ * graduate admission needs. No test scores or experience are made up; those rows stay hidden.
+ */
 export function defaultLookingFor(p: Pick<Professor, 'degreeLevels' | 'researchTags' | 'country'>): LookingFor {
   const levels = p.degreeLevels?.length ? p.degreeLevels : (['Masters', 'PhD'] as DegreeLevel[]);
   // PhD applicants need the degree below it
-  const prior = levels.includes('PhD') ? "Master's" : "Bachelor's";
-  const fields = p.researchTags.slice(0, 2).join(' or ');
-  return {
-    degree: fields ? `${prior} in ${fields}` : `${prior} degree`,
-    minIelts: p.country === 'USA' ? 7 : 6.5,
-    minToefl: p.country === 'USA' ? 100 : 90,
-    experience: 'Prior research or project experience',
-    publications: levels.includes('PhD') ? 'preferred' : 'none',
-  };
+  const prior = levels.includes('PhD') ? "Bachelor's or Master's" : "Bachelor's";
+  return { degree: `${prior} degree in a related field`, publications: 'none' };
 }
 
 /** Last name with academic titles kept: "Dr. Scott Klemmer" → "Dr. Klemmer" */
@@ -86,7 +82,6 @@ export function withFacultyDefaults(p: Professor): Professor {
     degreeLevels: p.degreeLevels?.length ? p.degreeLevels : ['Masters', 'PhD'],
     city: p.city ?? cityFor(p.university),
     recentGrant: p.recentGrant ?? parseGrant(p.recentGrants),
-    lookingFor: p.lookingFor ?? defaultLookingFor(p),
     contactSteps: p.contactSteps?.length ? p.contactSteps : defaultContactSteps(p),
   };
 }
@@ -135,12 +130,20 @@ export function glanceRows(p: Professor): GlanceRow[] {
     rows.push({ label: 'Recent grant', value: p.recentGrant.year ? `${p.recentGrant.amount} (${p.recentGrant.year})` : p.recentGrant.amount });
   }
 
-  const level = degreesOffered(p)[0] ?? 'PhD';
-  rows.push({
-    label: 'Open positions',
-    value: !p.openPositions ? 'None right now' : p.openPositionCount ? `${p.openPositionCount} ${level}` : degreesOffered(p).join(' & '),
-  });
+  // Unknown hiring status is left out rather than shown as "none"
+  if (p.openPositions !== undefined) {
+    const level = degreesOffered(p)[0] ?? 'PhD';
+    rows.push({
+      label: 'Open positions',
+      value: !p.openPositions ? 'None right now' : p.openPositionCount ? `${p.openPositionCount} ${level}` : degreesOffered(p).join(' & '),
+    });
+  }
   return rows;
+}
+
+/** A public grant that started in the last three years: labs often hire students after one */
+export function isRecentlyFunded(p: Pick<Professor, 'recentGrant'>, now = new Date()): boolean {
+  return !!p.recentGrant?.year && p.recentGrant.year >= now.getFullYear() - 3;
 }
 
 /* ---------- Matching against the student's profile ---------- */

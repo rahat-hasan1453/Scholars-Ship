@@ -3,8 +3,7 @@ import type { LookingFor, Professor, ProfessorPaper } from '@/types';
 import { prisma } from '@/lib/prisma';
 import { degreeFromDb } from '@/lib/scholarships';
 import { withFacultyDefaults } from '@/lib/professorDetails';
-import { mockProfessors } from '@/data/mockData';
-import { initialResearchPapers } from '@/data/researchPapers';
+import { initialsAvatar } from '@/lib/initialsAvatar';
 
 const INCLUDE = {
   universityRef: true,
@@ -20,9 +19,6 @@ const INCLUDE = {
 
 type ProfessorRow = Prisma.ProfessorGetPayload<{ include: typeof INCLUDE }>;
 
-const FALLBACK_AVATAR =
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80';
-
 /** Maps a database row (with its university, lab, latest grant and papers) to the `Professor` shape the UI uses. */
 export function toProfessor(row: ProfessorRow): Professor {
   const lab = row.lab;
@@ -36,13 +32,14 @@ export function toProfessor(row: ProfessorRow): Professor {
     country: row.country,
     labName: lab?.name ?? row.labName ?? undefined,
     researchTags: row.researchTags,
-    openPositions: lab?.openPositions ?? row.openPositions,
+    // Without a lab row nobody has told us about hiring: `false` in the column means unknown, not "closed"
+    openPositions: lab ? lab.openPositions : row.openPositions || undefined,
     recentGrants: row.recentGrants ?? undefined,
     email: row.email ?? undefined,
     linkedInUrl: row.linkedInUrl ?? undefined,
     googleScholar: row.googleScholar ?? undefined,
     labWebsite: lab?.website ?? row.labWebsite ?? undefined,
-    avatarUrl: row.avatarUrl ?? FALLBACK_AVATAR,
+    avatarUrl: row.avatarUrl ?? initialsAvatar(row.name),
     acceptingTerms: lab?.acceptingTerms.length ? lab.acceptingTerms : row.acceptingTerms,
     bio: row.bio ?? undefined,
     fundingSummary: lab?.fundingSummary ?? undefined,
@@ -69,46 +66,40 @@ export function toProfessor(row: ProfessorRow): Professor {
   });
 }
 
-/** "Dr. Sarah Jenkins" and "Sarah Jenkins" are the same author */
-const plainName = (name: string) =>
-  name
-    .split(' ')
-    .filter((x) => !x.endsWith('.'))
-    .join(' ')
-    .toLowerCase();
-
-/** Mock papers this professor co-authored, newest first */
-function mockPapersFor(name: string): ProfessorPaper[] {
-  const me = plainName(name);
-  return initialResearchPapers
-    .filter((p) => p.authors.some((a) => plainName(a.name) === me))
-    .sort((a, b) => (b.year ?? 0) - (a.year ?? 0))
-    .slice(0, 3)
-    .map((p) => ({ id: p.id, title: p.title, venue: p.venue, year: p.year }));
-}
-
-const fromMock = (p: Professor): Professor => withFacultyDefaults({ ...p, recentPapers: mockPapersFor(p.name) });
-
-/** All faculty from the database, or the mock list while the table is empty or the DB is down. */
+/** All faculty from the database. Empty when the DB is down (the UI shows its empty state). */
 export async function getProfessors(): Promise<Professor[]> {
   try {
-    const rows = await prisma.professor.findMany({ include: INCLUDE, orderBy: { id: 'asc' } });
-    if (rows.length > 0) return rows.map(toProfessor);
+    const rows = await prisma.professor.findMany({ include: INCLUDE, orderBy: [{ hIndex: { sort: 'desc', nulls: 'last' } }, { id: 'asc' }] });
+    return rows.map(toProfessor);
   } catch (error) {
-    console.error('[professors] database read failed, serving mock data', error);
+    console.error('[professors] database read failed', error);
+    return [];
   }
-  return mockProfessors.map(fromMock);
 }
 
-/** One professor by id, with the same mock fallback. */
+/** One professor by id. */
 export async function getProfessor(id: string): Promise<Professor | null> {
   try {
     const row = await prisma.professor.findUnique({ where: { id }, include: INCLUDE });
-    if (row) return toProfessor(row);
-    if ((await prisma.professor.count()) > 0) return null;
+    return row ? toProfessor(row) : null;
   } catch (error) {
-    console.error('[professors] database read failed, serving mock data', error);
+    console.error('[professors] database read failed', error);
+    return null;
   }
-  const mock = mockProfessors.find((p) => p.id === id);
-  return mock ? fromMock(mock) : null;
+}
+
+/** Candidates for "Similar faculty": same country or a shared research tag (the page only shows 3, so a few dozen is plenty). */
+export async function getSimilarCandidates(p: Pick<Professor, 'id' | 'country' | 'researchTags'>, limit = 60): Promise<Professor[]> {
+  try {
+    const rows = await prisma.professor.findMany({
+      where: { id: { not: p.id }, OR: [{ researchTags: { hasSome: p.researchTags } }, { country: p.country }] },
+      include: INCLUDE,
+      orderBy: [{ hIndex: { sort: 'desc', nulls: 'last' } }, { id: 'asc' }],
+      take: limit,
+    });
+    return rows.map(toProfessor);
+  } catch (error) {
+    console.error('[professors] database read failed', error);
+    return [];
+  }
 }

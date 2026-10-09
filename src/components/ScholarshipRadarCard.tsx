@@ -6,6 +6,7 @@ import { CardHeader } from '@/components/opportunity-feed/CardHeader';
 import { Scholarship } from '@/types';
 import { useApp } from '@/context/AppContext';
 import { calculateMatchScore } from '@/lib/utils';
+import { formatDeadline } from '@/lib/scholarshipDetails';
 import { COUNTRY_FLAGS } from '@/components/layout/UnifiedDiscoveryHeader';
 import { FEED_CARD_HEIGHT } from '@/components/opportunity-feed/FeedGrid';
 
@@ -20,7 +21,7 @@ export const ScholarshipRadarCard: React.FC<ScholarshipRadarCardProps> = ({
   const { profile, saveScholarshipToTracker, applications } = useApp();
 
   const isTracked = applications.some((app) => app.scholarshipId === scholarship.id);
-  const matchScore = calculateMatchScore(scholarship, profile) || 85;
+  const matchScore = calculateMatchScore(scholarship, profile);
   const country = scholarship.countries?.[0] || 'Global';
   const flagSrc = COUNTRY_FLAGS[country];
   const countryLabel = country === 'United Kingdom' ? 'UK' : country;
@@ -58,12 +59,19 @@ export const ScholarshipRadarCard: React.FC<ScholarshipRadarCardProps> = ({
                 {scholarship.admissionSummary || 'See official requirements'}
               </dd>
             </div>
-            <div className="flex items-start gap-[6px]">
-              <dt className="w-[100px] shrink-0 leading-[20px] font-medium text-[#627181]">🏡 Living:</dt>
-              <dd className="flex-1 min-w-0 truncate leading-[18px] text-[#101828]">
-                {scholarship.livingCost || 'Not specified'}
-              </dd>
-            </div>
+            {scholarship.livingCost ? (
+              <div className="flex items-start gap-[6px]">
+                <dt className="w-[100px] shrink-0 leading-[20px] font-medium text-[#627181]">🏡 Living:</dt>
+                <dd className="flex-1 min-w-0 truncate leading-[18px] text-[#101828]">{scholarship.livingCost}</dd>
+              </div>
+            ) : (
+              <div className="flex items-start gap-[6px]">
+                <dt className="w-[100px] shrink-0 leading-[20px] font-medium text-[#627181]">🗓 Deadline:</dt>
+                <dd className="flex-1 min-w-0 truncate leading-[18px] text-[#101828]">
+                  {scholarship.deadlineEstimated ? `Expected ${formatDeadline(scholarship.deadline)}` : formatDeadline(scholarship.deadline)}
+                </dd>
+              </div>
+            )}
           </dl>
         </div>
 

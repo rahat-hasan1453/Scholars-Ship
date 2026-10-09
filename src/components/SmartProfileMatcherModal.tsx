@@ -8,7 +8,6 @@ import {
   CheckCircle2, 
   AlertCircle, 
   Award, 
-  Building2, 
   ArrowRight, 
   ExternalLink, 
   Globe2, 
@@ -18,8 +17,7 @@ import {
   Compass
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { mockScholarships, mockProfessors } from '@/data/mockData';
-import { mockOpportunities } from '@/data/mockOpportunities';
+import { useApp } from '@/context/AppContext';
 import { WORLD_COUNTRIES, getCountryOptions } from '@/data/countries';
 import { CustomDropdown } from './ui/CustomDropdown';
 
@@ -34,6 +32,7 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
   onClose,
   onSelectScholarship,
 }) => {
+  const { scholarships, professors } = useApp();
   // Step: 'FORM' | 'RESULTS'
   const [step, setStep] = useState<'FORM' | 'RESULTS'>('FORM');
 
@@ -51,59 +50,19 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
   if (!isOpen) return null;
 
   // Compute Personalized Recommendations
-  const matchingScholarships = mockScholarships.filter((s) => {
+  const matchingScholarships = scholarships.filter((s) => {
     const text = (s.title + ' ' + s.specializations.join(' ') + ' ' + s.tags.join(' ')).toLowerCase();
-    const matchesField = text.includes(field.toLowerCase()) || text.includes('design') || text.includes('tech') || text.includes('inclusive');
+    const matchesField = text.includes('all fields') || text.includes(field.toLowerCase()) || text.includes('design') || text.includes('tech') || text.includes('inclusive');
     const matchesCountry = preferredCountry === 'ALL' || s.countries.includes(preferredCountry);
     return matchesField && matchesCountry;
   }).slice(0, 4);
 
-  const matchingProfessors = mockProfessors.filter((p) => {
+  const matchingProfessors = professors.filter((p) => {
     const text = (p.researchTags.join(' ') + ' ' + p.department + ' ' + (p.bio || '')).toLowerCase();
     const matchesField = text.includes(field.toLowerCase()) || text.includes('design') || text.includes('interaction') || text.includes('computing');
     const matchesCountry = preferredCountry === 'ALL' || p.country === preferredCountry;
     return matchesField && matchesCountry;
   }).slice(0, 3);
-
-  // Safe Bet Regional Universities tailored for the User's Strategy (Rank 1,000 - 5,000+)
-  const safeUniversities = [
-    {
-      name: 'Arkansas State University / Lamar University',
-      country: 'USA 🇺🇸',
-      rankBadge: 'Rank 1,200 – 1,800 • High Acceptance (88%)',
-      cost: 'Low Cost College Town ($650/mo)',
-      fundingBenefit: 'Automatic In-State Tuition Waiver + $1,400/mo Graduate Assistantship (TA/RA)',
-      requirements: 'Accepts CGPA 2.65+, No GRE required, 4+ Years Study Gap Accepted',
-      link: 'https://www.astate.edu/graduate-school',
-    },
-    {
-      name: 'Memorial University of Newfoundland',
-      country: 'Canada 🇨🇦',
-      rankBadge: 'Rank 700 – 900 • Canadian Atlantic PNP PR Bonus',
-      cost: 'Lowest Tuition in Canada ($3,500/yr or 100% Free with Faculty Fellowship)',
-      fundingBenefit: 'Dean’s Doctoral & Masters Award + Atlantic Immigration Program (AIP) fast PR pathway',
-      requirements: 'No GRE, Accepts Duolingo, Flexible CGPA assessment',
-      link: 'https://www.mun.ca/sgs',
-    },
-    {
-      name: 'University of Bremen & HfK Bremen',
-      country: 'Germany 🇩🇪',
-      rankBadge: 'Public University • 100% Tuition Free (€0)',
-      cost: 'Affordable Living (€750 - €850/mo) • Semesterticket Free Transit',
-      fundingBenefit: 'Zero Tuition Fees + High Demand for English Digital Media / UX / CS Students',
-      requirements: 'No Tuition, 18 Months Stay-Back Job Visa, Accepts English MOI',
-      link: 'https://www.uni-bremen.de/en/studies/international',
-    },
-    {
-      name: 'University of Southern Mississippi / South Dakota Mines',
-      country: 'USA 🇺🇸',
-      rankBadge: 'Rank 1,500+ • 92% Graduate Admission Rate',
-      cost: 'Super Low Living Cost ($550/mo)',
-      fundingBenefit: '100% Tuition Remission with Departmental Teaching Assistantship',
-      requirements: 'Low CGPA friendly (2.50+), GRE waived upon inquiry, Fast I-20 Issuance',
-      link: 'https://www.usm.edu/graduate-admissions',
-    },
-  ];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-xs animate-in fade-in duration-200">
@@ -358,57 +317,6 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
                 <p className="text-xs text-emerald-50 mt-1 leading-relaxed">
                   Tailored for <strong>{degree} in {field}</strong> with CGPA {cgpa}, {englishTest}, and {greStatus}.
                 </p>
-              </div>
-
-              {/* Section 1: Safe Bet & 100% Free Tuition Universities (Rank 1,000 - 5,000+) */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-700">
-                    <Building2 className="w-4 h-4 text-emerald-600" />
-                    <span>🟢 Safe Bet Universities with 100% Free Tuition / TA-RA (Rank 1,000 – 5,000+)</span>
-                  </div>
-                  <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                    High Acceptance (85%+)
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  {safeUniversities.map((uni, idx) => (
-                    <div 
-                      key={idx} 
-                      className="p-4 rounded-2xl border border-emerald-100 bg-emerald-50/20 hover:bg-emerald-50/40 transition-all flex flex-col justify-between space-y-2.5"
-                    >
-                      <div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-semibold text-slate-900">{uni.name}</span>
-                          <span className="text-xs">{uni.country}</span>
-                        </div>
-                        <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full inline-block mt-1">
-                          {uni.rankBadge}
-                        </span>
-                        <div className="text-[11px] text-slate-600 font-medium mt-2">
-                          💰 <strong>Financial:</strong> {uni.fundingBenefit}
-                        </div>
-                        <div className="text-[11px] text-slate-500 mt-1">
-                          🏡 <strong>Living:</strong> {uni.cost}
-                        </div>
-                        <div className="text-[11px] text-slate-500 mt-1">
-                          🎓 <strong>Admission:</strong> {uni.requirements}
-                        </div>
-                      </div>
-
-                      <a
-                        href={uni.link}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-emerald-700 hover:text-emerald-800 bg-emerald-100/60 hover:bg-emerald-100 py-2 rounded-xl transition-all"
-                      >
-                        <span>Official Admissions & Funding Page</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
-                    </div>
-                  ))}
-                </div>
               </div>
 
               {/* Section 2: Top Matched Scholarships with 100% Free Tuition */}

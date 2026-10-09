@@ -16,7 +16,7 @@ import {
   websiteLabel,
   withFacultyDefaults,
 } from '@/lib/professorDetails';
-import { mockProfessors } from '@/data/mockData';
+import { mockProfessors } from '../fixtures/mockData';
 
 const h = vi.hoisted(() => ({
   findUnique: (async () => null) as (args: any) => Promise<any>,
@@ -41,7 +41,7 @@ afterEach(() => {
   h.count = async () => 0;
 });
 
-describe('faculty mock data', () => {
+describe('faculty fixture data', () => {
   it('has unique ids, so list and details URLs match', () => {
     const ids = mockProfessors.map((p) => p.id);
     expect(new Set(ids).size).toBe(ids.length);
@@ -49,7 +49,7 @@ describe('faculty mock data', () => {
 
   it('fills every field the details page needs', () => {
     for (const p of mockProfessors.map(withFacultyDefaults)) {
-      expect(p.lookingFor, p.id).toBeDefined();
+      // No made-up entry requirements: lookingFor stays unset unless a source gives it
       expect(p.contactSteps, p.id).toHaveLength(3);
       expect(p.recentGrant?.amount, p.id).toBeTruthy();
       expect(p.city, p.id).toBeTruthy();
@@ -91,12 +91,11 @@ describe('faculty helpers', () => {
     expect(degreesOffered({ degreeLevels: ['Masters', 'PhD'] })).toEqual(['PhD', 'Masters']);
   });
 
-  it('asks for the degree below PhD and stricter English in the USA', () => {
+  it('only asks for the prior degree when the professor states no requirements (no guessed test scores)', () => {
     const us = defaultLookingFor({ degreeLevels: ['PhD'], researchTags: ['HCI', 'Haptics', 'AR'], country: 'USA' });
-    expect(us).toMatchObject({ degree: "Master's in HCI or Haptics", minIelts: 7, minToefl: 100, publications: 'preferred' });
-    expect(defaultLookingFor({ degreeLevels: ['Masters'], researchTags: [], country: 'Germany' })).toMatchObject({
-      degree: "Bachelor's degree",
-      minIelts: 6.5,
+    expect(us).toEqual({ degree: "Bachelor's or Master's degree in a related field", publications: 'none' });
+    expect(defaultLookingFor({ degreeLevels: ['Masters'], researchTags: [], country: 'Germany' })).toEqual({
+      degree: "Bachelor's degree in a related field",
       publications: 'none',
     });
   });
@@ -120,15 +119,21 @@ describe('faculty matching', () => {
       { label: 'Research fit', percent: 100 },
       { label: 'Academic (CGPA)', percent: 100 },
       { label: 'Language (IELTS)', percent: 100 },
-      { label: 'Experience', percent: 50 },
+      { label: 'Experience', percent: 100 },
     ]);
-    expect(matchScore(prof(), profile)).toBe(88);
+    expect(matchScore(prof(), profile)).toBe(100);
     // Lab doesn't take Masters students → 20 points off
-    expect(matchScore(prof({ degreeLevels: ['PhD'] }), profile)).toBe(68);
+    expect(matchScore(prof({ degreeLevels: ['PhD'] }), profile)).toBe(80);
+    // A stated experience requirement counts half
+    expect(matchScore(prof({ lookingFor: { degree: 'x', experience: 'User studies', publications: 'none' } }), profile)).toBe(88);
   });
 
   it('builds the What They Look For checklist with the student values', () => {
-    const rows = lookingForRows(prof(), profile);
+    expect(lookingForRows(prof(), profile).map((r) => [r.label, r.met])).toEqual([['Degree', true]]);
+    const rows = lookingForRows(
+      prof({ lookingFor: { degree: "Master's", minIelts: 6.5, minToefl: 90, experience: 'User studies', publications: 'preferred' } }),
+      profile,
+    );
     expect(rows.map((r) => [r.label, r.met])).toEqual([
       ['Degree', true],
       ['English', true],
@@ -151,15 +156,7 @@ describe('faculty matching', () => {
 });
 
 describe('getProfessor', () => {
-  it('falls back to mock data while the table is empty', async () => {
-    const p = await getProfessor('prof_baudisch_hpi_06');
-    expect(p?.name).toBe('Dr. Patrick Baudisch');
-    expect(p?.lookingFor).toBeDefined();
-    expect(await getProfessor('missing')).toBeNull();
-  });
-
-  it('returns null for an unknown id once the table has rows', async () => {
-    h.count = async () => 3;
+  it('returns null for an unknown id (no demo fallback)', async () => {
     expect(await getProfessor('prof_baudisch_hpi_06')).toBeNull();
   });
 

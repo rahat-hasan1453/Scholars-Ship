@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Professor } from '@/types';
+import { initialsAvatar } from '@/lib/initialsAvatar';
 
 // Map country code to readable name
 const countryMap: Record<string, string> = {
@@ -61,26 +62,25 @@ export async function GET(request: Request) {
           .map((t: any) => t.display_name)
           .filter(Boolean);
 
-        const primaryTopic = topics[0] || 'Human-Centered Computing';
-        const citationCount = author.cited_by_count?.toLocaleString() || '1,200+';
+        const primaryTopic = topics[0] || '';
 
         return {
           id: `openalex_${author.id?.split('/').pop() || index}`,
           name: author.display_name,
-          title: `Principal Investigator & Research Faculty (${author.works_count} publications, ${citationCount} citations)`,
+          title: 'Researcher',
           university: institutionName,
           department: primaryTopic,
           country: country,
-          labName: `${author.display_name.split(' ').pop()} Research Laboratory`,
-          researchTags: topics.length > 0 ? topics : ['UX Design', 'Human-Computer Interaction', 'Applied Computing'],
-          openPositions: true, // Candidate labs actively publishing
-          recentGrants: `${citationCount} Total Citations • Leading Active Research Projects`,
+          researchTags: topics,
+          // OpenAlex says nothing about hiring or intakes, so these stay empty instead of guessed
+          openPositions: false,
           googleScholar: `https://scholar.google.com/scholar?q=${encodeURIComponent(author.display_name)}`,
           linkedInUrl: `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(author.display_name + ' ' + institutionName)}`,
           labWebsite: author.id || `https://openalex.org/${author.id?.split('/').pop()}`,
-          avatarUrl: `https://images.unsplash.com/photo-${1534528741775 + (index * 137) % 50000}?auto=format&fit=crop&w=250&q=80`,
-          acceptingTerms: ['Fall 2026', 'Spring 2027'],
-          bio: `Active academic researcher at ${institutionName} specializing in ${topics.join(', ') || 'interdisciplinary computational research'}. Indexed with ${author.works_count} scientific papers and ${citationCount} citations on OpenAlex.`,
+          avatarUrl: initialsAvatar(author.display_name),
+          acceptingTerms: [],
+          publicationCount: author.works_count ?? undefined,
+          hIndex: author.summary_stats?.h_index ?? undefined,
         };
       });
 

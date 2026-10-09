@@ -55,8 +55,11 @@ export const ScholarshipDetailsView: React.FC<Props> = ({ scholarship: s, others
   const funded = s.fundingType === 'FULL' ? 'Fully Funded' : 'Partial Funding';
 
   const similar = useMemo(() => similarScholarships(s, others, profile), [s, others, profile]);
-  const deadlineChip: { label: string; tone: ChipTone } =
-    left > 0 ? { label: `⏰ Deadline in ${left} day${left === 1 ? '' : 's'}`, tone: 'warning' } : { label: 'Deadline passed', tone: 'warning' };
+  const deadlineChip: { label: string; tone: ChipTone } = s.deadlineEstimated
+    ? { label: `⏰ Next round expected ${deadline}`, tone: 'warning' }
+    : left > 0
+      ? { label: `⏰ Deadline in ${left} day${left === 1 ? '' : 's'}`, tone: 'warning' }
+      : { label: 'Deadline passed', tone: 'warning' };
 
   const keywords = [...new Set([...s.specializations, ...s.tags])].slice(0, 8);
   const meta = [`${countryFlagEmoji(country)} ${country}`.trim(), addedAgo(s.createdAt)].filter(Boolean).join('  ·  ');
@@ -80,7 +83,7 @@ export const ScholarshipDetailsView: React.FC<Props> = ({ scholarship: s, others
           { icon: '🎓', label: 'Degree Level', value: s.degreeLevels.join(', ') },
           { icon: '📚', label: 'Field of Study', value: s.fieldOfStudy ?? '—' },
           { icon: '💰', label: 'Funding', value: funded },
-          { icon: '🗓', label: 'Deadline', value: deadline },
+          { icon: '🗓', label: 'Deadline', value: s.deadlineEstimated ? `Expected ${deadline}` : deadline },
           { icon: '🌍', label: 'Country', value: s.countries.join(', ') },
           { icon: '🏛', label: 'Provider', value: s.providerShort ?? s.provider },
         ]}
@@ -93,6 +96,11 @@ export const ScholarshipDetailsView: React.FC<Props> = ({ scholarship: s, others
       <DetailSection label="Overview">
         <ExpandableText text={s.description} />
       </DetailSection>
+      {s.deadlineNote && (
+        <DetailSection label="About the Deadline">
+          <p className="text-[16px] leading-5 text-[#101828]">{s.deadlineNote}</p>
+        </DetailSection>
+      )}
       {s.fundingBreakdown && s.fundingBreakdown.length > 0 && (
         <DetailSection label="Funding">
           <ValueRows rows={s.fundingBreakdown} />
@@ -118,7 +126,13 @@ export const ScholarshipDetailsView: React.FC<Props> = ({ scholarship: s, others
     <>
       <ActionCard
         title="Apply for this scholarship"
-        note={left > 0 ? `⏰ Closes ${deadline}  ·  ${left} day${left === 1 ? '' : 's'} left` : `⏰ Closed on ${deadline}`}
+        note={
+          s.deadlineEstimated
+            ? `⏰ Expected around ${deadline} (not announced yet)`
+            : left > 0
+              ? `⏰ Closes ${deadline}  ·  ${left} day${left === 1 ? '' : 's'} left`
+              : `⏰ Closed on ${deadline}`
+        }
         primary={{ label: 'Official Link', href: s.officialUrl }}
         secondary={[
           { label: saved ? '🔖 Saved' : '🔖 Save', onClick: save, pressed: saved },

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { mockScholarships } from '@/data/mockData';
+import { getScholarships } from '@/lib/scholarships';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   const country = searchParams.get('country');
   const query = searchParams.get('q');
 
-  let results = [...mockScholarships];
+  let results = await getScholarships();
 
   if (degree) {
     results = results.filter((s) => s.degreeLevels.some((d) => d.toLowerCase() === degree.toLowerCase()));

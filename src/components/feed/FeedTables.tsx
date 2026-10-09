@@ -7,9 +7,10 @@ import type { Opportunity, Professor, ResearchPaper, Scholarship } from '@/types
 import { useApp } from '@/context/AppContext';
 import { useOpportunityBookmarks, useProfessorBookmarks } from '@/hooks/useOpportunityBookmarks';
 import { calculateMatchScore } from '@/lib/utils';
-import { countryFlagSrc, countryShortLabel, matchScore as opportunityMatch } from '@/lib/opportunityDetails';
-import { matchScore as professorMatch } from '@/lib/professorDetails';
+import { INSTITUTION_NOT_STATED, countryFlagSrc, countryShortLabel, matchScore as opportunityMatch } from '@/lib/opportunityDetails';
+import { isRecentlyFunded, matchScore as professorMatch } from '@/lib/professorDetails';
 import { relevance } from '@/lib/researchPapers';
+import { initialsAvatar } from '@/lib/initialsAvatar';
 import {
   CountryCell,
   DeadlineCell,
@@ -63,12 +64,12 @@ export function OpportunityTable({ rows }: { rows: Opportunity[] }) {
   const { profile } = useApp();
   const { bookmarks, toggleBookmark } = useOpportunityBookmarks();
   const columns: FeedColumn<Opportunity>[] = [
-    { key: 'name', header: 'University / Subject', cell: (o) => <TitleCell title={o.institution} subtitle={o.fieldTags.slice(0, 2).join(', ')} />, sortValue: (o) => o.institution },
+    { key: 'name', header: 'University / Subject', cell: (o) => <TitleCell title={o.institution === INSTITUTION_NOT_STATED ? o.title : o.institution} subtitle={o.fieldTags.slice(0, 2).join(', ')} />, sortValue: (o) => o.institution },
     { key: 'country', header: 'Country', cell: (o) => <CountryCell flagSrc={countryFlagSrc(o.country)} label={countryShortLabel(o.country)} />, hideBelow: 'md' },
     { key: 'funding', header: 'Funding', cell: (o) => <Pill tone={fundingTone(o.funding)}>{fundingLabel(o)}</Pill>, hideBelow: 'lg' },
-    { key: 'admission', header: 'Admission', cell: (o) => <span className="block max-w-[220px] truncate text-[#627181]" title={o.admission}>{o.admission}</span>, hideBelow: 'xl' },
-    { key: 'accept', header: 'Accept.', cell: (o) => `${o.acceptanceRate}%`, sortValue: (o) => o.acceptanceRate, hideBelow: 'lg' },
-    { key: 'deadline', header: 'Deadline', cell: (o) => <DeadlineCell iso={o.deadline} />, sortValue: (o) => new Date(o.deadline).getTime(), hideBelow: 'md' },
+    { key: 'admission', header: 'Admission', cell: (o) => <span className="block max-w-[220px] truncate text-[#627181]" title={o.admission}>{o.admission ?? '—'}</span>, hideBelow: 'xl' },
+    { key: 'accept', header: 'Accept.', cell: (o) => (o.acceptanceRate === undefined ? '—' : `${o.acceptanceRate}%`), sortValue: (o) => o.acceptanceRate ?? -1, hideBelow: 'lg' },
+    { key: 'deadline', header: 'Deadline', cell: (o) => <DeadlineCell iso={o.deadline} />, sortValue: (o) => (o.deadline ? new Date(o.deadline).getTime() : Number.MAX_SAFE_INTEGER), hideBelow: 'md' },
     { key: 'match', header: 'Match', cell: (o) => <MatchPill value={opportunityMatch(o, profile)} />, sortValue: (o) => opportunityMatch(o, profile) },
     {
       key: 'actions', header: '', className: actionsCol, cell: (o) => (
@@ -105,7 +106,7 @@ export function ScholarshipTable({ rows }: { rows: Scholarship[] }) {
     { key: 'country', header: 'Country', cell: (s) => <CountryCell flagSrc={countryFlagSrc(country(s))} label={countryShortLabel(country(s))} />, hideBelow: 'md' },
     { key: 'funding', header: 'Funding', cell: (s) => <Pill tone={s.fundingType === 'FULL' ? 'success' : 'warning'}>{s.fundingType === 'FULL' ? 'Fully Funded' : 'Partial'}</Pill>, hideBelow: 'lg' },
     { key: 'degree', header: 'Degree', cell: (s) => s.degreeLevels?.join(', ') || '—', hideBelow: 'xl' },
-    { key: 'deadline', header: 'Deadline', cell: (s) => <DeadlineCell iso={s.deadline} />, sortValue: (s) => new Date(s.deadline).getTime(), hideBelow: 'md' },
+    { key: 'deadline', header: 'Deadline', cell: (s) => <DeadlineCell iso={s.deadline} estimated={s.deadlineEstimated} />, sortValue: (s) => new Date(s.deadline).getTime(), hideBelow: 'md' },
     { key: 'match', header: 'Match', cell: (s) => <MatchPill value={calculateMatchScore(s, profile)} />, sortValue: (s) => calculateMatchScore(s, profile) },
     {
       key: 'actions', header: '', className: actionsCol, cell: (s) => (
@@ -125,7 +126,7 @@ export function ScholarshipTable({ rows }: { rows: Scholarship[] }) {
       getKey={(s) => s.id}
       getRowLabel={(s) => s.title}
       getHref={(s) => `/scholarships/${s.id}`}
-      groupBy={(s) => deadlineGroup(s.deadline)}
+      groupBy={(s) => deadlineGroup(s.deadline, s.deadlineEstimated)}
       defaultSort={{ key: 'deadline', dir: 'asc' }}
     />
   );
@@ -133,7 +134,6 @@ export function ScholarshipTable({ rows }: { rows: Scholarship[] }) {
 
 /* ---------------- Faculty & Research Labs ---------------- */
 
-const FALLBACK_AVATAR = '/profile/avatar-fallback.png';
 
 export function FacultyTable({ rows }: { rows: Professor[] }) {
   const { profile } = useApp();
@@ -146,14 +146,24 @@ export function FacultyTable({ rows }: { rows: Professor[] }) {
         <TitleCell
           title={p.name}
           subtitle={`${p.title} · ${p.university}`}
-          leading={<img src={p.avatarUrl || FALLBACK_AVATAR} alt="" width={32} height={32} className="size-8 shrink-0 rounded-full object-cover" />}
+          leading={<img src={p.avatarUrl || initialsAvatar(p.name)} alt="" width={32} height={32} className="size-8 shrink-0 rounded-full object-cover" />}
         />
       ),
     },
     { key: 'country', header: 'Country', cell: (p) => <CountryCell flagSrc={countryFlagSrc(p.country)} label={countryShortLabel(p.country)} />, hideBelow: 'md' },
     { key: 'lab', header: 'Lab', cell: (p) => <span className="block max-w-[220px] truncate" title={p.labName || p.department}>{p.labName || p.department}</span>, hideBelow: 'xl' },
     { key: 'funding', header: 'Funding', cell: (p) => <Pill tone={p.fundingType === 'PARTIAL' ? 'warning' : 'success'}>{p.fundingType === 'PARTIAL' ? 'Partial' : 'Fully Funded'}</Pill>, hideBelow: 'lg' },
-    { key: 'open', header: 'Positions', cell: (p) => (p.openPositions ? <Pill tone="success">Open</Pill> : <span className="text-[#627181]">Closed</span>), sortValue: (p) => (p.openPositions ? 1 : 0), hideBelow: 'md' },
+    { key: 'open', header: 'Positions', cell: (p) =>
+        p.openPositions ? (
+          <Pill tone="success">Open</Pill>
+        ) : p.openPositions === false ? (
+          <span className="text-[#627181]">Closed</span>
+        ) : isRecentlyFunded(p) ? (
+          <Pill tone="success">Recently funded</Pill>
+        ) : (
+          <span className="text-[#627181]">—</span>
+        ),
+      sortValue: (p) => (p.openPositions ? 2 : isRecentlyFunded(p) ? 1 : 0), hideBelow: 'md' },
     { key: 'match', header: 'Match', cell: (p) => <MatchPill value={professorMatch(p, profile)} />, sortValue: (p) => professorMatch(p, profile) },
     {
       key: 'actions', header: '', className: actionsCol, cell: (p) => (

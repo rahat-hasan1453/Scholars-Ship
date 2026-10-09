@@ -8,7 +8,7 @@ import {
   isScholarshipEligible,
   meetsMinimums,
 } from '@/lib/eligibility';
-import { OPPORTUNITY_LISTINGS } from '@/data/opportunityPosts';
+import { OPPORTUNITY_LISTINGS } from '../fixtures/opportunityPosts';
 
 const profile: UserProfile = {
   id: 'u', name: 'U', email: 'u@x.test', degreeLevel: 'Masters', specializations: ['UX Design', 'HCI'],
@@ -95,9 +95,9 @@ describe('isProfessorEligible', () => {
     expect(isProfessorEligible(p({ degreeLevels: ['PhD'] }), profile)).toBe(false);
     expect(isProfessorEligible(p({ lookingFor: { degree: 'x', minCgpa: 3.9, publications: 'none' } }), profile)).toBe(false);
   });
-  it('falls back to the default lookingFor minimums (IELTS 6.5 outside the USA)', () => {
+  it('with no stated requirements only the degree level counts (no guessed test scores)', () => {
     expect(isProfessorEligible(p(), profile)).toBe(true);
-    expect(isProfessorEligible(p(), noScores)).toBe(false);
+    expect(isProfessorEligible(p(), noScores)).toBe(true);
   });
 });
 

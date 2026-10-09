@@ -5,11 +5,10 @@ import { BookOpen, FileText, GraduationCap, Lock, User, type LucideIcon } from '
 import { useApp } from '@/context/AppContext';
 import { UserAvatar } from '@/components/UserAvatar';
 import { cn } from '@/lib/utils';
-import type { DegreeLevel, ResearchPaper } from '@/types';
+import type { DegreeLevel, Opportunity, ResearchPaper } from '@/types';
 import { WORLD_COUNTRIES } from '@/data/countries';
-import { OPPORTUNITY_LISTINGS } from '@/data/opportunityPosts';
-import { initialResearchPapers } from '@/data/researchPapers';
-import { useOpportunityBookmarks } from '@/hooks/useOpportunityBookmarks';
+import { useOpportunityBookmarks, useProfessorBookmarks } from '@/hooks/useOpportunityBookmarks';
+import { useFetchedList } from '@/hooks/useFetchedList';
 import { ScholarshipRadarCard } from '@/components/ScholarshipRadarCard';
 import { UniversityOpportunityCard } from '@/components/opportunity-feed/UniversityOpportunityCard';
 import { FacultyLabCard } from '@/components/FacultyLabCard';
@@ -310,39 +309,46 @@ const OverviewTab: React.FC<{
 type SavedFilter = 'all' | 'scholarships' | 'opportunities' | 'faculty' | 'papers';
 
 const SavedTab: React.FC = () => {
-  const { scholarships, professors } = useApp();
+  const { scholarships, professors, applications, savedPaperIds } = useApp();
   const { bookmarks, toggleBookmark } = useOpportunityBookmarks();
+  const { bookmarks: savedProfs } = useProfessorBookmarks();
+  const opportunities = useFetchedList<Opportunity>('/api/opportunities');
+  const papers = useFetchedList<ResearchPaper>('/api/research/papers');
   const [filter, setFilter] = useState<SavedFilter>('all');
   const [openPaper, setOpenPaper] = useState<ResearchPaper | null>(null);
 
+  // The student's real saved items (saving a scholarship adds it to the Pipeline)
   const items = useMemo(() => {
     const list: { key: string; type: Exclude<SavedFilter, 'all'>; node: React.ReactNode }[] = [];
-    scholarships.slice(0, 2).forEach((s) =>
-      list.push({ key: `s-${s.id}`, type: 'scholarships', node: <ScholarshipRadarCard scholarship={s} /> }),
-    );
-    OPPORTUNITY_LISTINGS.slice(0, 2).forEach((o) =>
-      list.push({
-        key: `o-${o.id}`,
-        type: 'opportunities',
-        node: <UniversityOpportunityCard opportunity={o} isBookmarked={bookmarks.has(o.id)} onToggleBookmark={toggleBookmark} />,
-      }),
-    );
-    professors.slice(0, 1).forEach((p) =>
-      list.push({ key: `f-${p.id}`, type: 'faculty', node: <FacultyLabCard professor={p} /> }),
-    );
-    initialResearchPapers.slice(0, 1).forEach((p) =>
-      list.push({ key: `p-${p.id}`, type: 'papers', node: <ResearchPaperCard paper={p} onOpen={setOpenPaper} /> }),
-    );
-    // Design order: scholarship, scholarship, opportunity / opportunity, faculty, paper
+    const tracked = new Set(applications.map((a) => a.scholarshipId));
+    scholarships
+      .filter((s) => tracked.has(s.id))
+      .forEach((s) => list.push({ key: `s-${s.id}`, type: 'scholarships', node: <ScholarshipRadarCard scholarship={s} /> }));
+    opportunities
+      .filter((o) => bookmarks.has(o.id))
+      .forEach((o) =>
+        list.push({
+          key: `o-${o.id}`,
+          type: 'opportunities',
+          node: <UniversityOpportunityCard opportunity={o} isBookmarked onToggleBookmark={toggleBookmark} />,
+        }),
+      );
+    professors
+      .filter((p) => savedProfs.has(p.id))
+      .forEach((p) => list.push({ key: `f-${p.id}`, type: 'faculty', node: <FacultyLabCard professor={p} /> }));
+    papers
+      .filter((p) => savedPaperIds.includes(p.id))
+      .forEach((p) => list.push({ key: `p-${p.id}`, type: 'papers', node: <ResearchPaperCard paper={p} onOpen={setOpenPaper} /> }));
     return list;
-  }, [scholarships, professors, bookmarks, toggleBookmark]);
+  }, [scholarships, professors, applications, opportunities, papers, bookmarks, savedProfs, savedPaperIds, toggleBookmark]);
 
+  const count = (type: Exclude<SavedFilter, 'all'>) => items.filter((i) => i.type === type).length;
   const filters: { key: SavedFilter; label: string; count: number }[] = [
-    { key: 'all', label: 'All', count: 12 },
-    { key: 'scholarships', label: 'Scholarships', count: 5 },
-    { key: 'opportunities', label: 'Opportunities', count: 3 },
-    { key: 'faculty', label: 'Faculty & Labs', count: 3 },
-    { key: 'papers', label: 'Research Papers', count: 1 },
+    { key: 'all', label: 'All', count: items.length },
+    { key: 'scholarships', label: 'Scholarships', count: count('scholarships') },
+    { key: 'opportunities', label: 'Opportunities', count: count('opportunities') },
+    { key: 'faculty', label: 'Faculty & Labs', count: count('faculty') },
+    { key: 'papers', label: 'Research Papers', count: count('papers') },
   ];
 
   const visible = filter === 'all' ? items : items.filter((i) => i.type === filter);
@@ -356,6 +362,9 @@ const SavedTab: React.FC = () => {
           </button>
         ))}
       </div>
+      {visible.length === 0 && (
+        <p className="text-[14px] leading-5 text-[#667085]">Nothing saved here yet. Use the bookmark button on any card to keep it.</p>
+      )}
       <div className="grid w-full grid-cols-1 gap-[16px] md:grid-cols-2 xl:grid-cols-3">
         {visible.map((i) => (
           <div key={i.key} className="min-w-0">

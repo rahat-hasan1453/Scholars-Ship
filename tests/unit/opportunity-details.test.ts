@@ -16,7 +16,7 @@ import {
   similarOpportunities,
   subjectTagsFor,
 } from '@/lib/opportunityDetails';
-import { OPPORTUNITY_LISTINGS } from '@/data/opportunityPosts';
+import { OPPORTUNITY_LISTINGS } from '../fixtures/opportunityPosts';
 import { ALL_COUNTRIES, ALL_FUNDING, ALL_SUBJECTS } from '@/components/layout/UnifiedDiscoveryHeader';
 
 const h = vi.hoisted(() => ({
@@ -68,7 +68,7 @@ describe('opportunity listing data', () => {
     for (const o of OPPORTUNITY_LISTINGS) {
       expect(o.positionDetails.length, o.id).toBeGreaterThan(0);
       expect(o.applySteps.length, o.id).toBe(3);
-      expect(Number.isNaN(Date.parse(o.deadline)), o.id).toBe(false);
+      expect(Number.isNaN(Date.parse(o.deadline!)), o.id).toBe(false);
     }
   });
 });
@@ -162,7 +162,7 @@ describe('opportunity data access', () => {
       ...o,
       degreeLevels: ['MASTERS', 'PHD'],
       postedAt: new Date(o.postedAt),
-      deadline: new Date(o.deadline),
+      deadline: new Date(o.deadline!),
       authorAvatar: null,
       labName: null,
       city: null,
@@ -181,17 +181,15 @@ describe('opportunity data access', () => {
     expect(mapped.deadline).toBe(o.deadline);
   });
 
-  it('falls back to mock data while the table is empty, and 404s once it has rows', async () => {
-    expect((await getOpportunity('opp_bremen_ux_03'))?.institution).toBe('University of Bremen');
-    h.count = async () => 5;
+  it('returns null for an unknown id (no demo fallback)', async () => {
     expect(await getOpportunity('opp_bremen_ux_03')).toBeNull();
   });
 
-  it('falls back to mock data when the database is down', async () => {
+  it('returns null when the database is down', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     h.findUnique = async () => {
       throw new Error('down');
     };
-    expect((await getOpportunity('opp_cmu_hcii_ux_01'))?.institution).toBe('Carnegie Mellon University');
+    expect(await getOpportunity('opp_cmu_hcii_ux_01')).toBeNull();
   });
 });

@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import type { Opportunity, ResearchPaper } from '@/types';
 import { useApp } from '@/context/AppContext';
 import { useOpportunityBookmarks, useProfessorBookmarks } from '@/hooks/useOpportunityBookmarks';
 import { useSessionState } from '@/hooks/useSessionState';
-import { OPPORTUNITY_LISTINGS } from '@/data/opportunityPosts';
-import { initialResearchPapers } from '@/data/researchPapers';
+import { useFetchedList } from '@/hooks/useFetchedList';
 import { SegmentedToggle } from '@/components/feed/SegmentedToggle';
 import { FeedGrid } from '@/components/opportunity-feed/FeedGrid';
 import { UniversityOpportunityCard } from '@/components/opportunity-feed/UniversityOpportunityCard';
@@ -20,27 +19,12 @@ import { ResearchPaperDetailsModal } from '@/components/research-paper-details/R
 
 type Kind = 'all' | 'scholarships' | 'opportunities' | 'professors' | 'papers';
 
-function useFetched<T>(url: string, fallback: T[]): T[] {
-  const [data, setData] = useState<T[]>(fallback);
-  useEffect(() => {
-    let cancelled = false;
-    fetch(url)
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((body) => !cancelled && Array.isArray(body.data) && setData(body.data))
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, [url]);
-  return data;
-}
-
 export function SavedFeedView() {
   const { scholarships, applications, professors, savedPaperIds } = useApp();
   const { bookmarks: savedOpps, toggleBookmark } = useOpportunityBookmarks();
   const { bookmarks: savedProfs } = useProfessorBookmarks();
-  const opportunities = useFetched<Opportunity>('/api/opportunities', OPPORTUNITY_LISTINGS);
-  const papers = useFetched<ResearchPaper>('/api/research/papers', initialResearchPapers);
+  const opportunities = useFetchedList<Opportunity>('/api/opportunities');
+  const papers = useFetchedList<ResearchPaper>('/api/research/papers');
   const [kind, setKind] = useSessionState<Kind>('saved:kind', 'all');
   const [openPaper, setOpenPaper] = useState<ResearchPaper | null>(null);
 

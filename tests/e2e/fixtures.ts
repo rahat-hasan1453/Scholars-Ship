@@ -1,6 +1,6 @@
 import { test as base, type Page, type Route } from '@playwright/test';
 import type { Application, OutreachRecord } from '../../src/types';
-import { mockScholarships, initialApplications, initialUserProfile } from '../../src/data/mockData';
+import { mockScholarships, initialApplications, initialUserProfile } from '../fixtures/mockData';
 
 /* Browser-level fake backend: every /api call is answered here, so no database, email, Google or OpenAlex is touched. */
 export const VALID_CODE = '12345';

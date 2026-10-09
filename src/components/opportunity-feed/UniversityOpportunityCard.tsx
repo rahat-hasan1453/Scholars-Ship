@@ -4,7 +4,8 @@ import React from 'react';
 import Link from 'next/link';
 import { CardHeader } from '@/components/opportunity-feed/CardHeader';
 import type { Opportunity } from '@/types';
-import { countryFlagSrc, countryShortLabel } from '@/lib/opportunityDetails';
+import { INSTITUTION_NOT_STATED, countryFlagSrc, countryShortLabel, sourceLabel } from '@/lib/opportunityDetails';
+import { formatDeadline } from '@/lib/scholarshipDetails';
 import { FEED_CARD_HEIGHT } from '@/components/opportunity-feed/FeedGrid';
 
 interface UniversityOpportunityCardProps {
@@ -25,8 +26,8 @@ export const UniversityOpportunityCard: React.FC<UniversityOpportunityCardProps>
       style={{ height: FEED_CARD_HEIGHT }}
     >
       <CardHeader
-        title={o.institution}
-        subtitle={o.fieldTags.slice(0, 2).join(', ')}
+        title={o.institution === INSTITUTION_NOT_STATED ? o.title : o.institution}
+        subtitle={o.fieldTags.slice(0, 2).join(', ') || o.degreeLevels.join(' & ')}
         flagSrc={countryFlagSrc(o.country) ?? undefined}
         countryLabel={countryShortLabel(o.country)}
       />
@@ -41,19 +42,32 @@ export const UniversityOpportunityCard: React.FC<UniversityOpportunityCardProps>
                 {o.funding}
               </dd>
             </div>
-            <div className="flex items-start gap-[6px] text-[14px]">
-              <dt className="w-[100px] shrink-0 leading-[20px] font-medium text-[#101828]">🎓 Admission:</dt>
-              <dd className="flex-1 min-w-0 leading-[18px] text-[#627181]">{o.admission}</dd>
-            </div>
-            <div className="flex items-start gap-[6px] text-[14px]">
-              <dt className="w-[100px] shrink-0 leading-[20px] font-medium text-[#101828]">🏡 Living:</dt>
-              <dd className="flex-1 min-w-0 leading-[18px] text-[#627181]">{o.livingCost}</dd>
-            </div>
+            {o.admission ? (
+              <div className="flex items-start gap-[6px] text-[14px]">
+                <dt className="w-[100px] shrink-0 leading-[20px] font-medium text-[#101828]">🎓 Admission:</dt>
+                <dd className="flex-1 min-w-0 leading-[18px] text-[#627181]">{o.admission}</dd>
+              </div>
+            ) : (
+              <div className="flex items-start gap-[6px] text-[14px]">
+                <dt className="w-[100px] shrink-0 leading-[20px] font-medium text-[#101828]">🎓 Position:</dt>
+                <dd className="flex-1 min-w-0 leading-[18px] text-[#627181] line-clamp-2">{o.title}</dd>
+              </div>
+            )}
+            {o.livingCost && (
+              <div className="flex items-start gap-[6px] text-[14px]">
+                <dt className="w-[100px] shrink-0 leading-[20px] font-medium text-[#101828]">🏡 Living:</dt>
+                <dd className="flex-1 min-w-0 leading-[18px] text-[#627181]">{o.livingCost}</dd>
+              </div>
+            )}
           </dl>
         </div>
         <div className="flex items-center h-6 w-full px-2 rounded-[4px] border-l-2 border-[#1b806a] bg-[#ebfdef] shrink-0">
           <p className="truncate text-[14px] leading-[18px] text-[#1b806a]">
-            Rank {o.rankRange} • Acceptance Rate ({o.acceptanceRate}%)
+            {o.rankRange && o.acceptanceRate !== undefined
+              ? `Rank ${o.rankRange} • Acceptance Rate (${o.acceptanceRate}%)`
+              : o.deadline
+                ? `Apply by ${formatDeadline(o.deadline)}`
+                : `Posted ${formatDeadline(o.postedAt)} on ${sourceLabel(o.source)}`}
           </p>
         </div>
       </div>
