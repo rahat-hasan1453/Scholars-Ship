@@ -3,6 +3,7 @@ import type { Opportunity } from '@/types';
 import { prisma } from '@/lib/prisma';
 import { degreeFromDb, degreeToDb } from '@/lib/scholarships';
 import { MAX_AGE_DAYS } from '@/lib/ingest/mastodon';
+import { normalizeSubjects, subjectTagsFor } from '@/data/subjectCatalog';
 
 /** Maps a database row to the `Opportunity` shape the UI uses. */
 export function toOpportunity(row: OpportunityRow): Opportunity {
@@ -24,7 +25,7 @@ export function toOpportunity(row: OpportunityRow): Opportunity {
     fundingTags: row.fundingTags,
     degreeLevels: row.degreeLevels.map(degreeFromDb),
     fieldTags: row.fieldTags,
-    subjectTags: row.subjectTags,
+    subjectTags: normalizeSubjects([...row.subjectTags, ...subjectTagsFor(row.fieldTags)]),
     minCgpa: row.minCgpa ?? undefined,
     minIelts: row.minIelts ?? undefined,
     publications: row.publications as Opportunity['publications'],

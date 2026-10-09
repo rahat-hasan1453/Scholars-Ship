@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, Check, Info, Mail } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { DegreeLevel } from '@/types';
 import { WORLD_COUNTRIES } from '@/data/countries';
+import { SUBJECTS, normalizeSubjects } from '@/data/subjectCatalog';
 import { BrandLogo } from '@/components/auth/auth-layout';
 import { Button } from '@/components/shadcn/button';
 import { Checkbox } from '@/components/shadcn/checkbox';
@@ -38,23 +39,7 @@ const DEGREE_OPTIONS: { id: DegreeLevel; title: string; subtitle: string }[] = [
   },
 ];
 
-const AVAILABLE_SPECIALIZATIONS = [
-  'Computer Science',
-  'Artificial Intelligence & Machine Learning',
-  'Data Science & Analytics',
-  'Biomedical Engineering',
-  'Biotechnology & Genomics',
-  'Electrical & Computer Engineering',
-  'Mechanical & Aerospace Engineering',
-  'Economics & Quantitative Finance',
-  'Public Health & Epidemiology',
-  'Public Policy & Governance',
-  'Robotics & Autonomous Systems',
-  'Materials Science & Nanotechnology',
-  'Human-Computer Interaction (HCI) & UX',
-  'Software Engineering & Distributed Systems',
-  'Neuroscience & Neurotechnology',
-];
+const AVAILABLE_SPECIALIZATIONS: string[] = [...SUBJECTS];
 
 // Country values shown in the Figma grid (161:1944); the rest sit behind "Other".
 const FIGMA_COUNTRY_VALUES = [
@@ -263,7 +248,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ isStandalonePage
   const email = emailInput ?? (account?.email || (isDemo ? '' : profile?.email) || '');
   const emailLocked = !!(account?.email || (!isDemo && profile?.email));
   const [degreeLevel, setDegreeLevel] = useState<DegreeLevel>(saved ? profile.degreeLevel : 'Masters');
-  const [specializations, setSpecializations] = useState<string[]>(saved ? profile.specializations : []);
+  const [specializations, setSpecializations] = useState<string[]>(saved ? normalizeSubjects(profile.specializations) : []);
   const [countries, setCountries] = useState<string[]>(saved ? profile.targetCountries : []);
   const [cgpa, setCgpa] = useState(saved && profile.cgpa ? String(profile.cgpa) : '');
   const [ielts, setIelts] = useState(saved && profile.testScores?.ielts ? String(profile.testScores.ielts) : '');

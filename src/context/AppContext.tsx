@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { normalizeSubjects } from '@/data/subjectCatalog';
 import { UserProfile, Scholarship, Professor, Application, ApplicationStatus, DecisionResult, HiringOpportunity, OutreachRecord, OutreachStatus } from '@/types';
 import { GUEST_PROFILE } from '@/lib/guestProfile';
 import { apiFetch, ApiError, newId } from '@/lib/apiClient';
@@ -244,7 +245,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         apiFetch<{ data: OutreachRecord[] }>('/api/outreach'),
         apiFetch<{ data: Bookmarks }>('/api/bookmarks'),
       ]);
-      setProfile((prev) => ({ ...prev, ...p.profile }));
+      setProfile((prev) => ({ ...prev, ...p.profile, specializations: normalizeSubjects(p.profile.specializations) }));
       let data = { applications: a.data, outreach: o.data, bookmarks: b.data };
 
       // One-time move of the old browser-only data into the account

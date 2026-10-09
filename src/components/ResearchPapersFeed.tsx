@@ -4,6 +4,8 @@ import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react'
 import { FilterIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { useSessionState } from '@/hooks/useSessionState';
+import { matchesSubjects } from '@/data/subjectCatalog';
+import { profileFilterDefaults, useProfileFilterDefaults } from '@/hooks/useProfileFilterDefaults';
 import { ResearchPaper } from '@/types';
 import { UnifiedDiscoveryHeader } from '@/components/layout/UnifiedDiscoveryHeader';
 import { ResearchPaperCard } from '@/components/ResearchPaperCard';
@@ -17,7 +19,7 @@ import { relevance } from '@/lib/researchPapers';
 import { formatPercentRange } from '@/lib/utils';
 
 // Figma defaults (Research Paper, node 251:27009)
-const DEFAULT_SUBJECTS = ['UX & Product Design', 'HCI', 'Computer Science', 'Artificial Intelligence'];
+const DEFAULT_SUBJECTS = ['UX & Product Design', 'Human-Computer Interaction (HCI)', 'Computer Science', 'Artificial Intelligence'];
 const DEFAULT_DEGREES = ['Masters', 'PhD'];
 const DEFAULT_COUNTRIES = ['USA', 'Germany', 'Norway', 'United Kingdom', 'Canada'];
 const DEFAULT_FUNDING = ['Safe Regional'];
@@ -30,6 +32,7 @@ export const ResearchPapersFeed: React.FC = () => {
   const [selectedSubjects, setSelectedSubjects] = useSessionState<string[]>('research:subjects', DEFAULT_SUBJECTS);
   const [selectedDegrees, setSelectedDegrees] = useSessionState<string[]>('research:degrees', DEFAULT_DEGREES);
   const [selectedCountries, setSelectedCountries] = useSessionState<string[]>('research:countries', DEFAULT_COUNTRIES);
+  useProfileFilterDefaults('research', { setSubjects: setSelectedSubjects, setDegrees: setSelectedDegrees, setCountries: setSelectedCountries });
   const [selectedFunding, setSelectedFunding] = useSessionState<string[]>('research:funding', DEFAULT_FUNDING);
   const [viewMode, setViewMode] = useSessionState<ViewMode>('research:view', 'grid');
   const [matchMode, setMatchMode] = useSessionState<MatchMode>('research:match', 'all');
@@ -109,21 +112,7 @@ export const ResearchPapersFeed: React.FC = () => {
       if (matchMode === 'eligible' && !isPaperEligible(paper, profile)) return false;
 
       // 2. Subject filter
-      if (selectedSubjects.length > 0) {
-        const paperFields = [...(paper.fieldsOfStudy || []), ...(paper.tags || [])];
-        const matchesSubject = paperFields.some(field =>
-          selectedSubjects.some(sub => {
-            const f = field.toLowerCase().trim();
-            const s = sub.toLowerCase().trim();
-            if (f.includes(s) || s.includes(f)) return true;
-            if (s.includes('ux') && (f.includes('ux') || f.includes('design') || f.includes('interaction'))) return true;
-            if (s.includes('hci') && (f.includes('hci') || f.includes('human') || f.includes('interaction'))) return true;
-            if (s.includes('computer') && (f.includes('cs') || f.includes('computer'))) return true;
-            return false;
-          })
-        );
-        if (!matchesSubject) return false;
-      }
+      if (!matchesSubjects(selectedSubjects, [...(paper.fieldsOfStudy || []), ...(paper.tags || [])])) return false;
 
       return true;
     });
@@ -133,9 +122,10 @@ export const ResearchPapersFeed: React.FC = () => {
   const scrollResetKey = JSON.stringify([globalSearchQuery, selectedSubjects, matchMode, viewMode]);
 
   const resetFilters = () => {
-    setSelectedSubjects(DEFAULT_SUBJECTS);
-    setSelectedDegrees(DEFAULT_DEGREES);
-    setSelectedCountries(DEFAULT_COUNTRIES);
+    const d = profileFilterDefaults(profile);
+    setSelectedSubjects(d.subjects.length ? d.subjects : DEFAULT_SUBJECTS);
+    setSelectedDegrees(d.degrees.length ? d.degrees : DEFAULT_DEGREES);
+    setSelectedCountries(d.countries.length ? d.countries : DEFAULT_COUNTRIES);
     setSelectedFunding(DEFAULT_FUNDING);
   };
 

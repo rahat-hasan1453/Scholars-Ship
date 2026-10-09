@@ -76,11 +76,12 @@ describe('opportunity listing data', () => {
 describe('opportunity helpers', () => {
   it('maps free-text field tags to Subject filter values', () => {
     expect(subjectTagsFor(['UX Design', 'Human-Computer Interaction (HCI)', 'Robotics'])).toEqual([
+      'Human-Computer Interaction (HCI)',
       'UX & Product Design',
-      'HCI',
-      'Robotics',
+      'Robotics & Autonomous Systems',
     ]);
-    expect(subjectTagsFor(['Economics'])).toEqual([]);
+    expect(subjectTagsFor(['Economics'])).toEqual(['Economics & Quantitative Finance']);
+    expect(subjectTagsFor(['Medieval poetry'])).toEqual([]);
   });
 
   it('derives Acceptance & Funding tags', () => {
@@ -110,7 +111,7 @@ describe('opportunity helpers', () => {
   });
 
   it('builds a short email subject code', () => {
-    expect(applicationCode({ subjectTags: ['HCI'], fieldTags: [], degreeLevels: ['PhD'], startDate: 'January 2027' })).toBe('HCI-PhD-2027');
+    expect(applicationCode({ subjectTags: ['Human-Computer Interaction (HCI)'], fieldTags: [], degreeLevels: ['PhD'], startDate: 'January 2027' })).toBe('HCI-PhD-2027');
     expect(applicationCode({ subjectTags: [], fieldTags: ['Physics'], degreeLevels: ['Masters'], startDate: 'October 2027' })).toBe(
       'PHYSICS-Masters-2027',
     );
