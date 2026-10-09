@@ -4,24 +4,35 @@ import type { Opportunity } from '@/types';
 import { postToOpportunity, type MastodonPost } from '@/lib/ingest/mastodon';
 
 const SEARCH_URL = 'https://api.bsky.app/xrpc/app.bsky.feed.searchPosts';
+// HCI / UX and related fields; each is searched as "PhD <topic>" and the shared parser keeps only position ads
+const TOPICS = [
+  // UX and design
+  'UX design', 'user experience', 'interaction design', 'product design', 'service design', 'UX research',
+  'user research', 'usability', 'design research', 'human-centered design', 'participatory design', 'co-design',
+  'information architecture',
+  // HCI fields
+  'HCI', 'human-computer interaction', 'CSCW', 'social computing', 'ubiquitous computing', 'pervasive computing',
+  'tangible interaction', 'wearable computing', 'human-AI interaction', 'human-centered AI', 'human-robot interaction',
+  'conversational agents', 'voice interfaces',
+  // visual and immersive
+  'information visualization', 'data visualization', 'visual analytics', 'virtual reality', 'augmented reality',
+  'mixed reality', 'game design', 'games user research', 'creativity support',
+  // people, behaviour, accessibility
+  'accessibility', 'inclusive design', 'assistive technology', 'cognitive science', 'human factors', 'ergonomics',
+  'behavior change', 'persuasive technology', 'digital health',
+  // interfaces and systems
+  'interactive systems', 'user interface', 'learning sciences', 'educational technology', 'usable security',
+];
 const QUERIES = [
-  'PhD position HCI',
-  'PhD human-computer interaction',
-  'PhD HCI',
-  'PhD studentship HCI',
-  'PhD position UX research',
-  'PhD position CSCW',
-  'PhD position accessibility',
-  'PhD position interaction design',
+  ...TOPICS.map((t) => `PhD ${t}`),
   'recruiting PhD students HCI',
-  'PhD students HCI lab',
   'HCI lab hiring PhD',
-  'recruiting PhD students',
-  'accepting PhD students',
   'PhD position',
   'funded PhD',
+  'recruiting PhD students',
+  'accepting PhD students',
 ];
-const DELAY_MS = 1200;
+const DELAY_MS = 1000;
 
 type Facet = { index: { byteStart: number; byteEnd: number }; features: { $type: string; uri?: string; tag?: string }[] };
 export type BlueskyPost = {

@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-10-09T05:48:20.096Z",
+ "generatedAt": "2026-10-09T06:00:40.784Z",
  "sources": [
   "Mastodon public tag timelines",
   "Bluesky public search"
@@ -206,8 +206,12 @@
    "degreeLevels": [
     "PhD"
    ],
-   "fieldTags": [],
-   "subjectTags": [],
+   "fieldTags": [
+    "Human Factors"
+   ],
+   "subjectTags": [
+    "Human Factors"
+   ],
    "publications": "none",
    "positionDetails": [],
    "applySteps": [],
@@ -681,6 +685,30 @@
    "officialUrl": "https://www.academictransfer.com/364591/"
   },
   {
+   "id": "bluesky_Bvc3QvM214ZW53b29pYnMyaw",
+   "title": "I'm hoping to recruit a new PhD student to join my lab at Brown (@browncopsy.bsky.social) this cycle.…",
+   "authorName": "David Levari",
+   "authorTitle": "@davidlevari.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:saippvjy3n4v746lje64gezg/bafkreiel6u5epgeuzalue7fiw6t7oe6f6re4fee7b5uxdpebpz366zzp24",
+   "institution": "Institution not stated",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/davidlevari.bsky.social/post/3mxenwooibs2k",
+   "postedAt": "2026-10-08T14:23:21.291Z",
+   "content": "I'm hoping to recruit a new PhD student to join my lab at Brown (@browncopsy.bsky.social) this cycle. Applications are due Nov 15. Please apply! To read about our whole deal: levarilab.com",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [],
+   "subjectTags": [],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://levarilab.com/"
+  },
+  {
    "id": "bluesky_Bvc3QvM214ZW1sYm9mZzIyMw",
    "title": "I'm recruiting PhD students this cycle! We study how the brain perceives, remembers, and predicts…",
    "authorName": "Chris Baldassano",
@@ -901,6 +929,35 @@
    "officialUrl": "https://www.academictransfer.com/364570/"
   },
   {
+   "id": "bluesky_Bvc3QvM214ZWI1cjc1ejIyZA",
+   "title": "We are launching 12 new #PhD opportunities today!",
+   "authorName": "MRC Laboratory of Medical Sciences",
+   "authorTitle": "@mrc-lms.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:lajf2h6khhwts77bj2m4jk5p/bafkreibtihjn3fmybr7fvpygxmwmuremxxlyltrpmnw4au4d7v2sfqq2qe",
+   "institution": "Institution not stated",
+   "country": "United Kingdom",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/mrc-lms.bsky.social/post/3mxeb5r75z22d",
+   "postedAt": "2026-10-08T10:34:40.171Z",
+   "content": "We are launching 12 new #PhD opportunities today! \n\nWe have studentships spanning protein design, sex differences in immunity, GLP-1 medicines and metabolism, spatial genomics and 4D cancer imaging. \n\n📆 Deadline: Thursday 18th November (9:00) \n\n✍️ Apply here: lms.mrc.ac.uk/work-and-stu...",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Bioinformatics"
+   ],
+   "subjectTags": [
+    "Computer Science",
+    "Biomedical Informatics"
+   ],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://lms.mrc.ac.uk/work-and-study/studentships/lms-4-year-phd-studentships/"
+  },
+  {
    "id": "bluesky_Bvc3QvM214ZTZsd2xiYjIyMw",
    "title": "PhD opportunity! Join us in St Andrews to study the consequences of defence against conjugative plasmids…",
    "authorName": "Tatiana Dimitriu",
@@ -989,14 +1046,18 @@
    "source": "bluesky",
    "sourceUrl": "https://bsky.app/profile/tomstafford.mastodon.online.ap.brid.gy/post/3mxe2jkww3i52",
    "postedAt": "2026-10-08T08:35:57.000Z",
-   "content": "Interesting (funded) PhD position : How do you turn an exhibition into a behaviour change intervention that can reduce pollution? […]",
+   "content": "Interesting (funded) PhD position : How do you turn an exhibition into a behaviour change intervention that can reduce pollution? [...]",
    "funding": "Funding not stated in the post",
    "fundingTags": [],
    "degreeLevels": [
     "PhD"
    ],
-   "fieldTags": [],
-   "subjectTags": [],
+   "fieldTags": [
+    "Human Factors"
+   ],
+   "subjectTags": [
+    "Human Factors"
+   ],
    "publications": "none",
    "positionDetails": [],
    "applySteps": []
@@ -1440,30 +1501,6 @@
    "positionDetails": [],
    "applySteps": [],
    "officialUrl": "https://www.academictransfer.com/364544/"
-  },
-  {
-   "id": "bluesky_Bvc3QvM214Y2wyeHR2Z2MyZA",
-   "title": "On Monday, a masters student was accepted for a PhD position, where she was one of 500 applicants",
-   "authorName": "Xenia Schmalz",
-   "authorTitle": "@xeniaschmalz.bsky.social",
-   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:oeo6de6wxdalvxz3l3wc7fbu/bafkreic7db4juwvhqo2wrywuvhcmrjdumcfax65u77476b6zdrvcrdbuiu",
-   "institution": "Institution not stated",
-   "country": "Location not stated",
-   "source": "bluesky",
-   "sourceUrl": "https://bsky.app/profile/xeniaschmalz.bsky.social/post/3mxcl2xtvgc2d",
-   "postedAt": "2026-10-07T18:26:44.421Z",
-   "content": "On Monday, a masters student was accepted for a PhD position, where she was one of 500 applicants.\nOn Tuesday, @leungyianna.bsky.social successfully defended her PhD!\nOn Wednesday, I got positive reviews for a grant (more details once I get the official notice).\nWhy can't every week be like this?",
-   "funding": "Funding not stated in the post",
-   "fundingTags": [],
-   "degreeLevels": [
-    "PhD",
-    "Masters"
-   ],
-   "fieldTags": [],
-   "subjectTags": [],
-   "publications": "none",
-   "positionDetails": [],
-   "applySteps": []
   },
   {
    "id": "bluesky_Bvc3QvM214Y2tiNjZqMmMyNA",
@@ -1930,9 +1967,11 @@
     "PhD"
    ],
    "fieldTags": [
+    "Human Factors",
     "Neuroscience"
    ],
    "subjectTags": [
+    "Human Factors",
     "Neuroscience & Neurotechnology"
    ],
    "publications": "none",
@@ -1983,44 +2022,17 @@
     "PhD"
    ],
    "fieldTags": [
+    "Human Factors",
     "Neuroscience"
    ],
    "subjectTags": [
+    "Human Factors",
     "Neuroscience & Neurotechnology"
    ],
    "publications": "none",
    "positionDetails": [],
    "applySteps": [],
    "officialUrl": "https://tenuretracker.info/l/zYOkRtHU/m-f-phd-position-in-cognitive-science-cognitive-resilience-to-misinformation-in?utm_source=bsky"
-  },
-  {
-   "id": "bluesky_Bvc3QvM214YXFicGl2M2Mydw",
-   "title": "Jason and I got married, he went on to earn a masters degree and a PHD in statistics. He taught at the…",
-   "authorName": "a.dieudonne",
-   "authorTitle": "@dieudonne.bsky.social",
-   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:mv7zcj6oglztfak3655yfgpi/bafkreighner5pxsea4ivjfqfhhrpnpexo3g7yfsc2qbexip25dpepryaqy",
-   "institution": "Institution not stated",
-   "country": "Location not stated",
-   "source": "bluesky",
-   "sourceUrl": "https://bsky.app/profile/dieudonne.bsky.social/post/3mxaqbpiv3c2w",
-   "postedAt": "2026-10-07T00:54:39.786Z",
-   "content": "\"Jason and I got married, he went on to earn a masters degree and a PHD in statistics. He taught at the university level for 15 ys, receiving tenure at his most recent position...He has been totally blind for 2 ys now. His cognitive abilities are involved also.\" www.aldalliance.org/ald-families...",
-   "funding": "Funding not stated in the post",
-   "fundingTags": [],
-   "degreeLevels": [
-    "PhD",
-    "Masters"
-   ],
-   "fieldTags": [
-    "Data Science"
-   ],
-   "subjectTags": [
-    "Data Science & Analytics"
-   ],
-   "publications": "none",
-   "positionDetails": [],
-   "applySteps": [],
-   "officialUrl": "https://www.aldalliance.org/ald-families.html"
   },
   {
    "id": "bluesky_Bvc3QvM214YWdzbXFmZjQyaw",
@@ -3337,6 +3349,32 @@
    "officialUrl": "https://www.findaphd.com/phds/program/fully-funded-4-year-cheney-scholarship-phd-programme-in-in-situ-biology/?i321p6355"
   },
   {
+   "id": "bluesky_Bvc3QvM213d29haGN5eTIycQ",
+   "title": "Extract: The Quasi-Living Materials Research Group seeks a PhD student to design super predatory vesicles…",
+   "authorName": "tenuretracker.info",
+   "authorTitle": "@tenuretracker.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:m2rhzyb4ihbylrrfy7hlsf3s/bafkreicuzqibcrs6a5x2gq25nrcuwjhexd56dprxpkmcky63aitifjfhwu",
+   "institution": "Institution not stated",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/tenuretracker.bsky.social/post/3mwwoahcyy22q",
+   "postedAt": "2026-10-03T00:51:32.591Z",
+   "content": "Extract: The Quasi-Living Materials Research Group seeks a PhD student to design super predatory vesicles for antimicrobial applications. Candidates must have a Master's in polymer or organic chemistry and hands-on experience in synthesis.",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD",
+    "Masters"
+   ],
+   "fieldTags": [
+    "Chemistry"
+   ],
+   "subjectTags": [],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": []
+  },
+  {
    "id": "bluesky_Bvc3QvM213dzVnaGZkbGsyYw",
    "title": "I am recruiting graduate students for UCI's PhD in Cognitive Sciences - www.cogsci.uci.edu/graduate/pro...…",
    "authorName": "Dr Anna Leshinskaya",
@@ -3354,11 +3392,13 @@
     "PhD"
    ],
    "fieldTags": [
+    "Human Factors",
     "Artificial Intelligence",
     "Neuroscience"
    ],
    "subjectTags": [
     "Artificial Intelligence",
+    "Human Factors",
     "Neuroscience & Neurotechnology"
    ],
    "publications": "none",
@@ -3741,17 +3781,42 @@
     "PhD"
    ],
    "fieldTags": [
+    "UX Design",
     "Artificial Intelligence",
     "Computer Science"
    ],
    "subjectTags": [
     "Computer Science",
-    "Artificial Intelligence"
+    "Artificial Intelligence",
+    "UX & Product Design"
    ],
    "publications": "none",
    "positionDetails": [],
    "applySteps": [],
    "officialUrl": "https://mlscientist.com/ai-efficiency-researchers-singapore/"
+  },
+  {
+   "id": "bluesky_Bvc3QvM213Y29nY2l2ZTYycg",
+   "title": "Extract: The Max Planck Institute for Legal History and Legal Theory seeks a Research Group Leader to…",
+   "authorName": "tenuretracker.info",
+   "authorTitle": "@tenuretracker.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:m2rhzyb4ihbylrrfy7hlsf3s/bafkreicuzqibcrs6a5x2gq25nrcuwjhexd56dprxpkmcky63aitifjfhwu",
+   "institution": "Institution not stated",
+   "country": "Germany",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/tenuretracker.bsky.social/post/3mwcogcive62r",
+   "postedAt": "2026-09-25T02:01:34.091Z",
+   "content": "Extract: The Max Planck Institute for Legal History and Legal Theory seeks a Research Group Leader to design and lead an independent research group with two PhD positions, focusing on historical regimes of normativity and dependency studies.",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [],
+   "subjectTags": [],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": []
   },
   {
    "id": "bluesky_Bvc3QvM213YzUzNWNsMzcydg",
@@ -3865,6 +3930,30 @@
    "officialUrl": "https://mlscientist.com/phd-reinforcement-learning-united-states/"
   },
   {
+   "id": "bluesky_Bvc3QvM213N2hvemc0ZmMycA",
+   "title": "Recruiting a new PhD student to start Fall 2027. Research would focus on Visual Working Memory, possibly…",
+   "authorName": "Tim Ricker",
+   "authorTitle": "@timricker.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:bgc2flrexwpsof2mi74myjh4/bafkreihzvpci5v3mpl36qdsaoyetd5ol37hcoqixyyjrtyjemljizvy5ji",
+   "institution": "Institution not stated",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/timricker.bsky.social/post/3mw7hozg4fc2p",
+   "postedAt": "2026-09-23T19:23:11.345Z",
+   "content": "Recruiting a new PhD student to start Fall 2027. Research would focus on Visual Working Memory, possibly with a developmental approach (but not necessarily). Check out my lab website where the are links to the application and contact info if you have questions.\nrickermemorylab.com",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [],
+   "subjectTags": [],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://rickermemorylab.com"
+  },
+  {
    "id": "bluesky_Bvc3QvM213N2Rld3pqdDIyag",
    "title": "I’m accepting applications for PhD students to join my lab in Fall 2027!",
    "authorName": "stephen",
@@ -3910,6 +3999,37 @@
    "publications": "none",
    "positionDetails": [],
    "applySteps": []
+  },
+  {
+   "id": "bluesky_Bvc3QvM213NnZ0eGxxdjIyMw",
+   "title": "15 PhD opportunities!⏰ Just one week left to apply",
+   "authorName": "Pablo Lamata",
+   "authorTitle": "@pablolamata.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:7qlf4xynojixms3wpqn26a3j/bafkreiewr3m4ttkzumi5uuj5vpt74rvhpuhhvy2begrmmcxgubbnu4s5be",
+   "institution": "Institution not stated",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/pablolamata.bsky.social/post/3mw6vtxlqv223",
+   "postedAt": "2026-09-23T14:03:49.849Z",
+   "content": "15 PhD opportunities!⏰ Just one week left to apply.\n\nJoin Europe's next generation of researchers and innovators at the forefront of digital health, AI, data science and healthcare engineering through CDTnet Cardiovascular Digital Twin Network.\n\nApply now: www.cdtnet.eu",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Artificial Intelligence",
+    "Data Science",
+    "Engineering"
+   ],
+   "subjectTags": [
+    "Artificial Intelligence",
+    "Data Science & Analytics"
+   ],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://www.cdtnet.eu/"
   },
   {
    "id": "bluesky_Bvc3QvM213NG9qdWpyeDIyeg",
@@ -4238,6 +4358,34 @@
    "officialUrl": "https://mlscientist.com/phd-3d-computer-vision-deep-learning-china/"
   },
   {
+   "id": "bluesky_Bvc3QvM212dmJrZmFkbGsyNg",
+   "title": "BITS Pilani–RMIT University Joint PhD Program is offering a PhD position in unlearning, abstention, and…",
+   "authorName": "ML Scientist",
+   "authorTitle": "@mlscientist.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:w2ww6zd4wkaw4zl6xf63hzmt/bafkreibmotrz6thuyzx7auatthknmo5qt3snaolqz3l3ltyuv3hqpzkxoa",
+   "institution": "RMIT University",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/mlscientist.bsky.social/post/3mvvbkfadlk26",
+   "postedAt": "2026-09-19T18:06:35.936Z",
+   "content": "BITS Pilani–RMIT University Joint PhD Program is offering a PhD position in unlearning, abstention, and ambiguity in interactive AI systems, with a focus...\n\nmlscientist.com/phd-interact...\n\n#PhD #InteractiveAISystems #LargeLanguageModels",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Artificial Intelligence"
+   ],
+   "subjectTags": [
+    "Artificial Intelligence"
+   ],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://mlscientist.com/phd-interactive-ai-systems-australia/"
+  },
+  {
    "id": "mastodon_ExNzI5MjA2MTQ0NzYyMTg4Mw",
    "title": "Open 4-year PhD position in Barcelona for research on synapes and computation with Jake Watson",
    "authorName": "Albert Cardona",
@@ -4418,6 +4566,30 @@
    "officialUrl": "https://sites.ua.edu/kiedrowskilab/"
   },
   {
+   "id": "bluesky_Bvc3QvM212a3NvZjVjZHMyNA",
+   "title": "It’s always been important to me to be involved with research that is meant to be used and have direct…",
+   "authorName": "Leslie Dan Faculty of Pharmacy",
+   "authorTitle": "@pharmacy.utoronto.ca",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:dmdtevjvyyia63fmuuni3djt/bafkreiflwovf4zlgqmp7i7lk37phhtvpolnqju4c5vubaum7qizlt4uaoi",
+   "institution": "Institution not stated",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/pharmacy.utoronto.ca/post/3mvksof5cds24",
+   "postedAt": "2026-09-15T14:13:46.739Z",
+   "content": "“It’s always been important to me to be involved with research that is meant to be used and have direct impact.”\n\nPhD candidate in pharmaceutical sciences Hannah Girdler is applying an equity lens to policies for emerging biomedical technologies.\n\nRead more: www.pharmacy.utoronto.ca/news-announc...",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [],
+   "subjectTags": [],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://www.pharmacy.utoronto.ca/news-announcements/incoming-phd-student-brings-equity-lens-emerging-biomedical-technologies"
+  },
+  {
    "id": "bluesky_Bvc3QvM212a29hZWJlNWsycQ",
    "title": "Fully Funded AI PhD – USA",
    "authorName": "Opportunities For Youth(OFY)",
@@ -4450,6 +4622,38 @@
    "positionDetails": [],
    "applySteps": [],
    "officialUrl": "https://wp.me/p23f03-nUC"
+  },
+  {
+   "id": "bluesky_Bvc3QvM212a2szdzN2Z2sybA",
+   "title": "Interested in a #PhD in machine learning & theoretical neuroscience?",
+   "authorName": "Gatsby Computational Neuroscience Unit",
+   "authorTitle": "@gatsbyucl.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:36xb6jecavbgsk2u3yblb2a2/bafkreihgvi4vwofpzdktaak7vtjdu5i5fe2i25zwdx6txdyllg75have2q",
+   "institution": "Institution not stated",
+   "country": "United Kingdom",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/gatsbyucl.bsky.social/post/3mvkk3w3vgk2l",
+   "postedAt": "2026-09-15T11:40:17.047Z",
+   "content": "Interested in a #PhD in machine learning & theoretical neuroscience? \n\nApplications for 2027 entry to the Gatsby Unit PhD programme are now open!\n\n💰 Fully-funded 4-year programme\n🤝 Close links to @sainsburywellcome.bsky.social\ni️ www.ucl.ac.uk/life-science...",
+   "funding": "Fully-funded 4-year programme",
+   "fundingTags": [
+    "Full Funding"
+   ],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Machine Learning",
+    "Neuroscience"
+   ],
+   "subjectTags": [
+    "Machine Learning",
+    "Neuroscience & Neurotechnology"
+   ],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://www.ucl.ac.uk/life-sciences/gatsby/study-and-work/gatsby-unit-phd-programme"
   },
   {
    "id": "bluesky_Bvc3QvM212a2FzZmV6amMyNg",
@@ -4557,6 +4761,35 @@
    "officialUrl": "https://ischool.uw.edu/programs/phd/recruitment"
   },
   {
+   "id": "bluesky_Bvc3QvM212YXRnM3p3Z2syYQ",
+   "title": "We have an exciting digital health PhD studentship available (starting Oct 2027) under the GW4biomed3…",
+   "authorName": "clementdong.bsky.social",
+   "authorTitle": "@clementdong.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:wojxa6nhmsosw7iklntdki6c/bafkreieqjrxzw6aojvej4sd6x7xupdq6orx5oowslsdtr7xsyz345caipu",
+   "institution": "University of Exeter",
+   "country": "United Kingdom",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/clementdong.bsky.social/post/3mvatg3zwgk2a",
+   "postedAt": "2026-09-11T15:00:25.112Z",
+   "content": "We have an exciting digital health PhD studentship available (starting Oct 2027) under the GW4biomed3 scheme, at the University of Exeter. AI scientists for understanding dementia modifiable risk factors gw4biomed.ac.uk/ai-scientist... Applications close on Wednesday 21st October 2026.",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Artificial Intelligence"
+   ],
+   "subjectTags": [
+    "Artificial Intelligence"
+   ],
+   "publications": "none",
+   "deadline": "2026-10-21T23:59:00.000Z",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://gw4biomed.ac.uk/ai-scientists-for-understanding-dementia-modifiable-risk-factors/"
+  },
+  {
    "id": "bluesky_Bvc3QvM212YXQ0dGE3b2MybQ",
    "title": "Recruiting PhD students to join the Coupled Minds Lab!**",
    "authorName": "Sebastian Speer",
@@ -4614,6 +4847,33 @@
    "positionDetails": [],
    "applySteps": [],
    "officialUrl": "https://virusdetective.eu"
+  },
+  {
+   "id": "bluesky_Bvc3QvM212N2twaHFxbnEyNg",
+   "title": "Extract: The BloodCare Centre of Research Excellence offers a PhD scholarship in supportive care for…",
+   "authorName": "tenuretracker.info",
+   "authorTitle": "@tenuretracker.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:m2rhzyb4ihbylrrfy7hlsf3s/bafkreicuzqibcrs6a5x2gq25nrcuwjhexd56dprxpkmcky63aitifjfhwu",
+   "institution": "Institution not stated",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/tenuretracker.bsky.social/post/3mv7kphqqnq26",
+   "postedAt": "2026-09-11T02:51:55.641Z",
+   "content": "Extract: The BloodCare Centre of Research Excellence offers a PhD scholarship in supportive care for patients with blood cancers, welcoming candidates from diverse backgrounds. The opportunity allows for project co-design and focuses on key areas like transfusion support and infection management.",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "UX Design"
+   ],
+   "subjectTags": [
+    "UX & Product Design"
+   ],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": []
   },
   {
    "id": "bluesky_Bvc3QvM212N2U3cGZiamsyeQ",
@@ -4845,6 +5105,67 @@
    "officialUrl": "https://bsky.app/search?q=%23science"
   },
   {
+   "id": "bluesky_Bvc3QvM211d2xidjY0YXMyag",
+   "title": "Interested in doing a PhD in philosophy of animal minds in lovely Murcia?",
+   "authorName": "Susana Monsó",
+   "authorTitle": "@susanamonso.com",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:7eso2gr2pochgragfjbcpydn/bafkreig7dp5ksvuzo4svhaw47lxg2yun2gayowbvcdxz4afgf5rgdvfyu4",
+   "institution": "Institution not stated",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/susanamonso.com/post/3muwlbv64as2j",
+   "postedAt": "2026-09-07T13:08:16.375Z",
+   "content": "Interested in doing a PhD in philosophy of animal minds in lovely Murcia? \n\nWe have just published a call for expressions of interest to do a PhD as part of our research project on ecological validity in comparative cognitive science.\n\nPlease consider applying if this is up your street!",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Human Factors",
+    "Neuroscience",
+    "Climate & Environment"
+   ],
+   "subjectTags": [
+    "Human Factors",
+    "Neuroscience & Neurotechnology"
+   ],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://ecologicalvalidity.wordpress.com/call-for-expressions-of-interest-phd-position/"
+  },
+  {
+   "id": "bluesky_Bvc3QvM211cTNoYXVkM24ybA",
+   "title": "Universite Grenoble-Alpes is hiring",
+   "authorName": "tenuretracker.info",
+   "authorTitle": "@tenuretracker.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:m2rhzyb4ihbylrrfy7hlsf3s/bafkreicuzqibcrs6a5x2gq25nrcuwjhexd56dprxpkmcky63aitifjfhwu",
+   "institution": "Institution not stated",
+   "country": "France",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/tenuretracker.bsky.social/post/3muq3haud3n2l",
+   "postedAt": "2026-09-04T23:08:57.790Z",
+   "content": "Universite Grenoble-Alpes is hiring:\nPhD Researcher in Computer Science for Serious Game Design\n\n#phd #computerscience #systemsdesign",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "UX Design",
+    "Computer Science"
+   ],
+   "subjectTags": [
+    "Computer Science",
+    "UX & Product Design"
+   ],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://tenuretracker.info/l/qfzkTGGh/phd-researcher-in-computer-science-for-serious-game-design?utm_source=bluesky"
+  },
+  {
    "id": "bluesky_Bvc3QvM211cG0yajZzZnMyZA",
    "title": "I'll be recruiting both Master's and PhD students, so if you know anyone that might be interested in…",
    "authorName": "Keely Brown",
@@ -4921,6 +5242,30 @@
    "officialUrl": "https://youtu.be/k3x4fJYb3fw?si=2mf8MQ4I21UgW4ZW"
   },
   {
+   "id": "bluesky_Bvc3QvM211bWpqZHY1NWkyag",
+   "title": "Join our new Cambridge Meta Research Network for the first workshop aimed at Cambridge PhD students and…",
+   "authorName": "Cancer Research UK Cambridge Centre",
+   "authorTitle": "@crukcamcentre.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:l63tzlkghnklgyv5ixnzfwkt/bafkreic6i7bxtxn444yl5epswo5lhxltv533jyypyujy2g26bkykvo4ooa",
+   "institution": "CRUK Cambridge Institute",
+   "country": "United Kingdom",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/crukcamcentre.bsky.social/post/3mumjjdv55i2j",
+   "postedAt": "2026-09-03T13:10:00.889Z",
+   "content": "Join our new Cambridge Meta Research Network for the first workshop aimed at Cambridge PhD students and early career researchers on embracing variation in experimental design.\n\n📅 Tues 29 Sept 2026\n🕛 2pm - 4pm\n📍 CRUK Cambridge Institute\n\nFind out more and register your interest ➡️ zurl.co/WKm38",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [],
+   "subjectTags": [],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://zurl.co/WKm38"
+  },
+  {
    "id": "bluesky_Bvc3QvM211bWc3Nml5c2MyaQ",
    "title": "I am excited to share that I will start my group @embl.org in Grenoble in February 2027, where we will…",
    "authorName": "Leonie Anton",
@@ -4945,6 +5290,34 @@
    "officialUrl": "https://www.embl.org/about/info/embl-international-phd-programme/"
   },
   {
+   "id": "bluesky_Bvc3QvM211bTRkazZnamMyeQ",
+   "title": "Hubrecht International PhD program (HIPP)",
+   "authorName": "scienceartnews.bsky.social",
+   "authorTitle": "@scienceartnews.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:7u3ppj2fcvvixdciq3wypswd/bafkreifhsrefjeb6ewojzbaehh7rlbkntkdicp6hpze4lvbjqcbz5vs6mm",
+   "institution": "Institution not stated",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/scienceartnews.bsky.social/post/3mum4dk6gjc2y",
+   "postedAt": "2026-09-03T09:14:08.429Z",
+   "content": "Hubrecht International PhD program (HIPP) \n\nApplications until 15 September\nThe projects themes: Biochemistry, biophysics, structural biology and protein design. \n\n@knaw-nl.bsky.social's research institute @hubrechtinstitute.bsky.social is a filial of @umcutrecht.bsky.social.\n\nwww.hubrecht.eu/hipp/.",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Physics",
+    "Chemistry",
+    "Biology"
+   ],
+   "subjectTags": [],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://www.hubrecht.eu/hipp/"
+  },
+  {
    "id": "bluesky_Bvc3QvM211bDdoM2NvMzIyZw",
    "title": "This time next week, I’ll be at #ECCV2026 in Malmö 🇸🇪",
    "authorName": "Kosta Derpanis",
@@ -4966,6 +5339,34 @@
    "publications": "none",
    "positionDetails": [],
    "applySteps": []
+  },
+  {
+   "id": "bluesky_Bvc3QvM211azIyd3dsZGMydg",
+   "title": "I am looking for a PhD student with a solid background in visualization and machine learning who is…",
+   "authorName": "Tobias Isenberg",
+   "authorTitle": "@tisenberg.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:cxgldkq5mtmld37fztfpd635/bafkreibpqenfkooxdi63d56f3yl7m2jgsmybafe7imn4yjyq6gc2jldjmi",
+   "institution": "Institution not stated",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/tisenberg.bsky.social/post/3muk22wwldc2v",
+   "postedAt": "2026-09-02T13:28:12.873Z",
+   "content": "I am looking for a PhD student with a solid background in visualization and machine learning who is interested in working with me on the topic of \"Visualization of the Plausibility and Bias for Data Resources used in a Geographic Digital Twin,\" starting in the fall of 2027. adum.fr/as/ed/voirpr...",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Machine Learning"
+   ],
+   "subjectTags": [
+    "Machine Learning"
+   ],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://adum.fr/as/ed/voirproposition.pl?site=adumR&matricule_prop=76145#version"
   },
   {
    "id": "mastodon_ExNzIwMTUzOTgwMDkyOTc0MA",
@@ -4992,6 +5393,34 @@
    "officialUrl": "https://www.academictransfer.com/en/jobs/363554/phd-position-exposing-the-contribution-of-epialleles-to-heritable-variation-in-plants/"
   },
   {
+   "id": "bluesky_Bvc3QvM211amd5dm12dTIyZA",
+   "title": "1/5 Looking for a PhD at the interface of chemistry, biology, physics, and materials science?",
+   "authorName": "Max Planck Institute of Colloids & Interfaces (MPICI)",
+   "authorTitle": "@mpici.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:vytd4zgdvgb45itgwaoxalei/bafkreigfwxdhrgxr6bdvwd376gbw5jcacukd5kvstedxtsqdlvf5vst24y",
+   "institution": "Institution not stated",
+   "country": "Germany",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/mpici.bsky.social/post/3mujgyvmvu22d",
+   "postedAt": "2026-09-02T07:47:03.283Z",
+   "content": "🧵 1/5 Looking for a PhD at the interface of chemistry, biology, physics, and materials science? \n\nApply now: www.imprs.mpikg.mpg.de\n\nOur International Max Planck Research School for Functional Material Design is offering nine doctoral positions for the upcoming year. Here's why you should apply 👇",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Physics",
+    "Chemistry",
+    "Biology"
+   ],
+   "subjectTags": [],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://www.imprs.mpikg.mpg.de"
+  },
+  {
    "id": "bluesky_Bvc3QvM211aGoyZmhxYmMyeA",
    "title": "I'm honored to receive an NIH R01 to study the cortical organization of syntax, focusing on aphasia. This…",
    "authorName": "William Matchin",
@@ -5013,6 +5442,36 @@
    "publications": "none",
    "positionDetails": [],
    "applySteps": []
+  },
+  {
+   "id": "bluesky_Bvc3QvM211Z3d3Y2EyaGMyMw",
+   "title": "Looking for a exciting PhD project intertwining archaeology, cognitive science and psychology? There’s…",
+   "authorName": "HUMAN ORIGINS - Cluster of Excellence",
+   "authorTitle": "@humanorigins.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:7rrk5rvoggbzbiixsyq2vdgf/bafkreibrh2ebpllgzhk32oilqyvtmzlpoh6vcdgzinzv3ptbha2q2oajbu",
+   "institution": "Institution not stated",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/humanorigins.bsky.social/post/3mugwwca2hc23",
+   "postedAt": "2026-09-01T07:53:56.500Z",
+   "content": "!!️Looking for a exciting PhD project intertwining archaeology, cognitive science and psychology? There’s still time to apply for this opportunity within HUMAN ORIGINS. \n\nDeadline at September 15th is approaching, though! \n\nuni-tuebingen.de/en/research/...",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Human Factors",
+    "Neuroscience"
+   ],
+   "subjectTags": [
+    "Human Factors",
+    "Neuroscience & Neurotechnology"
+   ],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://uni-tuebingen.de/en/research/core-research/cluster-of-excellence-human-origins/news/newsfullview/article/job-advertisement-phd-position-doctoral-researcher-m-f-d/"
   },
   {
    "id": "bluesky_Bvc3QvM211ZnRydGg1N3MyYQ",
@@ -5087,6 +5546,62 @@
    "officialUrl": "https://bsky.app/search?q=%23science"
   },
   {
+   "id": "bluesky_Bvc3QvM211N29zZWpxc20yZg",
+   "title": "Extract: The position involves leading research on offline processing of human memory using advanced…",
+   "authorName": "tenuretracker.info",
+   "authorTitle": "@tenuretracker.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:m2rhzyb4ihbylrrfy7hlsf3s/bafkreicuzqibcrs6a5x2gq25nrcuwjhexd56dprxpkmcky63aitifjfhwu",
+   "institution": "Institution not stated",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/tenuretracker.bsky.social/post/3mu7osejqsm2f",
+   "postedAt": "2026-08-29T10:39:56.267Z",
+   "content": "Job ID: 206553\nExtract: The position involves leading research on offline processing of human memory using advanced techniques. A PhD in neuroscience or cognitive science is required, along with experience in brain stimulation.",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Human Factors",
+    "Neuroscience"
+   ],
+   "subjectTags": [
+    "Human Factors",
+    "Neuroscience & Neurotechnology"
+   ],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": []
+  },
+  {
+   "id": "bluesky_Bvc3QvM211NXNwaDM0eWMyZQ",
+   "title": "Some exciting news: I'm joining the University of Lausanne @unil.bsky.social @dbc-unil.bsky.social as an…",
+   "authorName": "Janani Durairaj (Jay)",
+   "authorTitle": "@ninjani.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:2piz5r6qzd4ldyjrovtwgjgf/bafkreifaoccgjthrty5zrayfhm4x5mhd3b7yorgjuug4sr67afzq4ikxvy",
+   "institution": "University of Lausanne",
+   "country": "Switzerland",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/ninjani.bsky.social/post/3mu5sph34yc2e",
+   "postedAt": "2026-08-28T16:44:34.089Z",
+   "content": "Some exciting news: I'm joining the University of Lausanne @unil.bsky.social @dbc-unil.bsky.social as an Assistant Professor next month 🎉 My group will work on context-aware deep learning for protein structure, interaction & design. Postdoc and PhD openings coming soon - keep an eye out!",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Machine Learning"
+   ],
+   "subjectTags": [
+    "Machine Learning"
+   ],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": []
+  },
+  {
    "id": "bluesky_Bvc3QvM211NWZ0eXpiMjIybg",
    "title": "We are recruiting! Researchers, PhD students and postdocs in biologically informed AI and machine learning…",
    "authorName": "David Selby",
@@ -5117,6 +5632,30 @@
    "officialUrl": "https://jobs.dfki.de/en/vacancy/phd-postdoc-researcher-in-biologically-informed-machine-learning-and-ai-618256.html"
   },
   {
+   "id": "bluesky_Bvc3QvM211NWFpN2NrcWsybw",
+   "title": "UCL is hiring a Digital Health and Trial Senior Research Fellow. Hold a PhD in Infectious Diseases, Public…",
+   "authorName": "Epidemiology Job Openings (EpiJobs)",
+   "authorTitle": "@epijobs.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:ohc4qnycpwsygck2fmdskbht/bafkreibddckguoitehnmdouzxoa6zecwdlfphvan76rameqsxpifeuauoe",
+   "institution": "Institution not stated",
+   "country": "United Kingdom",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/epijobs.bsky.social/post/3mu5ai7ckqk2o",
+   "postedAt": "2026-08-28T11:18:23.714Z",
+   "content": "UCL is hiring a Digital Health and Trial Senior Research Fellow. Hold a PhD in Infectious Diseases, Public Health or related field, plus experience analyzing qualitative and quantitative data.\nLondon, United Kingdom #Epijobs\nwww.ucl.ac.uk/work-at-ucl/...",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [],
+   "subjectTags": [],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://www.ucl.ac.uk/work-at-ucl/search-ucl-jobs/details?nPostingId=19223&nPostingTargetId=46987&id=Q1KFK026203F3VBQBLO8M8M07&LG=UK&languageSelect=UK&mask=ext&source=jobs.ac.uk&sType=jobs.ac.uk&stype=NameOfSource&board_id=3086&board_name=jobs.ac.uk"
+  },
+  {
    "id": "bluesky_Bvc3QvM211M3FtaTd0aTIyZg",
    "title": "PhD student #1 is so epic he has a job interview ahead of me this cycle. And it is *early* in academic…",
    "authorName": "NexJql - 🏳️‍⚧️☢️ 🔜 Out of Florida ☢️🏳️‍⚧️",
@@ -5138,6 +5677,32 @@
    "publications": "none",
    "positionDetails": [],
    "applySteps": []
+  },
+  {
+   "id": "bluesky_Bvc3QvM210eWttbzZveDIycA",
+   "title": "New Associate Editorial role at @britishecologicalsociety.org, they are looking for folks including ECRs &…",
+   "authorName": "Biogeosciences Early Career Committee",
+   "authorTitle": "@biogeosciences-ecc.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:mayqdy4yqi2zdodjm5vkyhj6/bafkreidq72g5m42w4i42rv6of3xyb4uepuoqin7dkir2vknmodvsumlw34",
+   "institution": "Institution not stated",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/biogeosciences-ecc.bsky.social/post/3mtykmo6ox22p",
+   "postedAt": "2026-08-26T14:36:32.260Z",
+   "content": "New Associate Editorial role at @britishecologicalsociety.org, they are looking for folks including ECRs & PhD students to apply! \n\napply.workable.com/britishecolo...",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Climate & Environment"
+   ],
+   "subjectTags": [],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://apply.workable.com/britishecologicalsociety/j/AF12AB53FF"
   },
   {
    "id": "bluesky_Bvc3QvM210d2N5N2F5eGMyeg",
@@ -5196,6 +5761,36 @@
    "positionDetails": [],
    "applySteps": [],
    "officialUrl": "https://sas.rochester.edu/lin/graduate/apply.html"
+  },
+  {
+   "id": "bluesky_Bvc3QvM210aXd6czdxZWkycQ",
+   "title": "Considering your next steps? 🎓",
+   "authorName": "School of Advanced Study, University of London",
+   "authorTitle": "@sas-news.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:4usoexluunevx62dhrqu54pl/bafkreih5f4eyrgi3zua547kdc6vhzmeuikn3cjqi2qdav5r5abuekac23u",
+   "institution": "Institution not stated",
+   "country": "United Kingdom",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/sas-news.bsky.social/post/3mtiwzs7qei2q",
+   "postedAt": "2026-08-20T09:36:01.674Z",
+   "content": "Considering your next steps? 🎓\nApplications will be opening soon for PhD and LLM programmes. Join a renowned research community and explore master's and doctoral opportunities across the humanities and social sciences.\n📚 Find your next step: https://www.sas.ac.uk/postgraduate-study",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD",
+    "Masters"
+   ],
+   "fieldTags": [
+    "Artificial Intelligence",
+    "Social Sciences"
+   ],
+   "subjectTags": [
+    "Artificial Intelligence"
+   ],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://www.sas.ac.uk/postgraduate-study"
   },
   {
    "id": "mastodon_cG9zdC8zbXRneGJxYzVzYzJn",
@@ -5291,9 +5886,12 @@
     "PhD"
    ],
    "fieldTags": [
+    "Human Factors",
     "Social Sciences"
    ],
-   "subjectTags": [],
+   "subjectTags": [
+    "Human Factors"
+   ],
    "publications": "none",
    "positionDetails": [],
    "applySteps": [],
@@ -5477,6 +6075,62 @@
    "positionDetails": [],
    "applySteps": [],
    "officialUrl": "https://physicsworld.com/a/why-physics-should-move-beyond-prestige-in-phd-admissions/"
+  },
+  {
+   "id": "bluesky_Bvc3QvM21zcWRqbmtwancybA",
+   "title": "PhD position on ‘Restoring Communicative Agency: Human-centered AI smart glasses for people with speech…",
+   "authorName": "AcademicTransfer",
+   "authorTitle": "@academictransfer.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:7rhirb2l5jussvrikatczw4d/bafkreicafv5smbzu3oq74tsm3opc6mwchtxhp75p5ny4onufs6runzet4e",
+   "institution": "Institution not stated",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/academictransfer.bsky.social/post/3msqdjnkpjw2l",
+   "postedAt": "2026-08-10T14:43:05.093Z",
+   "content": "PhD position on ‘Restoring Communicative Agency: Human-centered AI smart glasses for people with speech impairments’ https://www.academictransfer.com/363228/ @OU_Nederland",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Artificial Intelligence"
+   ],
+   "subjectTags": [
+    "Artificial Intelligence"
+   ],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://www.academictransfer.com/363228/"
+  },
+  {
+   "id": "bluesky_Bvc3QvM21zbXVwN3U1M3oycg",
+   "title": "Job ID: FB Ergo 02/26",
+   "authorName": "tenuretracker.info",
+   "authorTitle": "@tenuretracker.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:m2rhzyb4ihbylrrfy7hlsf3s/bafkreicuzqibcrs6a5x2gq25nrcuwjhexd56dprxpkmcky63aitifjfhwu",
+   "institution": "Institution not stated",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/tenuretracker.bsky.social/post/3msmup7u53z2r",
+   "postedAt": "2026-08-09T05:39:46.639Z",
+   "content": "Job ID: FB Ergo 02/26\nExtract: The Leibniz Research Centre for Working Environment and Human Factors is seeking a part-time Research Associate/PhD student to investigate the neurocognitive foundations of working memory.",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Human Factors",
+    "Climate & Environment"
+   ],
+   "subjectTags": [
+    "Human Factors"
+   ],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": []
   },
   {
    "id": "bluesky_Bvc3QvM21zaXp0YnlhYXQybg",
@@ -5698,6 +6352,34 @@
    "officialUrl": "https://jobs.ruhr-uni-bochum.de/jobposting/870a96abc9c1d265d30d96c359a15f0d1c02b97c0"
   },
   {
+   "id": "bluesky_Bvc3QvM21ydjZkb3pqeXYyYQ",
+   "title": "Technische Universitat Munchen (@tum.de) is hiring",
+   "authorName": "tenuretracker.info",
+   "authorTitle": "@tenuretracker.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:m2rhzyb4ihbylrrfy7hlsf3s/bafkreicuzqibcrs6a5x2gq25nrcuwjhexd56dprxpkmcky63aitifjfhwu",
+   "institution": "Technische Universitat",
+   "country": "Germany",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/tenuretracker.bsky.social/post/3mrv6dozjyv2a",
+   "postedAt": "2026-07-30T19:28:23.247Z",
+   "content": "Technische Universitat Munchen (@tum.de) is hiring:\nResearch Associates/Ph.D. Candidates for a Cross-Border Research Project on Virtual Reality\n\n#phd #psychology #virtualreality",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Human-Computer Interaction"
+   ],
+   "subjectTags": [
+    "Human-Computer Interaction (HCI)"
+   ],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://tenuretracker.info/l/NJk1dZHG/job-offering-for-two-research-associates-ph-d-candidates-f-m-d?utm_source=bluesky"
+  },
+  {
    "id": "mastodon_cG9zdC8zbXJ1emtocjRlYzJs",
    "title": "PhD position: Improving Language Models with Formal Knowledge in Industry",
    "authorName": "Science HR",
@@ -5798,6 +6480,30 @@
    "officialUrl": "https://miriamkforbes.academic.ws/"
   },
   {
+   "id": "bluesky_Bvc3QvM21yZWl6d2Z2cWsybA",
+   "title": "Join us for our August webinar",
+   "authorName": "Optimal Ageing Centre",
+   "authorTitle": "@optimalageing.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:3g2azh2o2wmhtppuxdshsooi/bafkreid44meyue4qdlfti4qrjk3pe2jtquhykdmjejihw7yf7wcgkixgka",
+   "institution": "Institution not stated",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/optimalageing.bsky.social/post/3mreizwfvqk2l",
+   "postedAt": "2026-07-24T04:24:31.582Z",
+   "content": "📢 Join us for our August webinar.\n\nPhD candidates Shelci Martin & Irushi Ediriweera (Federation Uni) will present preliminary findings on digital mental health & workforce wellbeing interventions for healthy ageing. 🧠💻\n\n🗓 Mon 3 Aug | ⏰ 11am AEST\n🔗 Register: docs.google.com/forms/d/e/1F...",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [],
+   "subjectTags": [],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://docs.google.com/forms/d/e/1FAIpQLSd9fLD6bikNoyp_U98LAh2JA2UwuUbrSI9LzxlP6ZHLKu01mA/viewform?usp=sharing&ouid=100633264104647036392"
+  },
+  {
    "id": "mastodon_cG9zdC8zbXJhdHRlcGxvYzJr",
    "title": "Ph.D. Position in Computer Science (Wearable Intelligence & Data Fusion)",
    "authorName": "Science HR",
@@ -5824,6 +6530,62 @@
    "positionDetails": [],
    "applySteps": [],
    "officialUrl": "https://bsky.app/search?q=%23science"
+  },
+  {
+   "id": "bluesky_Bvc3QvM21yNXFkamVxbWMyag",
+   "title": "Vacancy for an Industrial PhD position, at Noldus and the Dept of Information and Computing Sciences of…",
+   "authorName": "Measuring Behavior",
+   "authorTitle": "@measuringbehavior.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:bupqtk254peaalma2c2t6yua/bafkreidgqlnyhnqkz3bbzmpymvcggwdzlmfk5qd2c6eof5vnwovtctui4i",
+   "institution": "Utrecht University",
+   "country": "Netherlands",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/measuringbehavior.bsky.social/post/3mr5qdjeqmc2j",
+   "postedAt": "2026-07-21T11:46:31.485Z",
+   "content": "Vacancy for an Industrial PhD position, at Noldus and the Dept of Information and Computing Sciences of Utrecht University. It is about developing new methods to semi-automatically detect and analyse behaviours in videos of human interactions, using AI methods:\nnoldus.recruitee.com/o/phd-candid...",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Artificial Intelligence"
+   ],
+   "subjectTags": [
+    "Artificial Intelligence"
+   ],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://noldus.recruitee.com/o/phd-candidate-ai-for-automated-human-behavior-annotation"
+  },
+  {
+   "id": "bluesky_Bvc3QvM21xdWtjamNhYmYyYw",
+   "title": "5 Funded PhD Positions in Educational Sciences at the University of Foggia, Italy (2026)",
+   "authorName": "Agristok",
+   "authorTitle": "@agristok.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:4ncs6lgxeiz4x7ccwn7otero/bafkreiclgvxt43mrrmsvqn7qbx4pn7saa4jxtxt45o3tbpc4lfqdv7scu4",
+   "institution": "University of Foggia",
+   "country": "Italy",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/agristok.bsky.social/post/3mqukcjcabf2c",
+   "postedAt": "2026-07-17T20:04:36.000Z",
+   "content": "5 Funded PhD Positions in Educational Sciences at the University of Foggia, Italy (2026)\n\nThe University of Foggia is accepting applications for five funded PhD positions in Educational, Development and Learning Sciences for the 2026/2027 academic year. Learn about the research focus, eligibility,...",
+   "funding": "Funded PhD Positions in Educational Sciences at the Universi",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Human Factors"
+   ],
+   "subjectTags": [
+    "Human Factors"
+   ],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://agristok.net/2026/07/17/5-funded-phd-educational-sciences-university-foggia-italy-2026/"
   },
   {
    "id": "bluesky_Bvc3QvM21xdTNtemtjdHMyZw",
@@ -5877,6 +6639,82 @@
    "positionDetails": [],
    "applySteps": [],
    "officialUrl": "https://www.academictransfer.com/nl/jobs/362524/phd-position-in-game-theory-for-socio-technical-systems/"
+  },
+  {
+   "id": "bluesky_Bvc3QvM21xcnZidnd1MzUyYQ",
+   "title": "PhD Position in Developing a Digital Health Passport for Railway Tracks on Bridges…",
+   "authorName": "AcademicTransfer",
+   "authorTitle": "@academictransfer.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:7rhirb2l5jussvrikatczw4d/bafkreicafv5smbzu3oq74tsm3opc6mwchtxhp75p5ny4onufs6runzet4e",
+   "institution": "Institution not stated",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/academictransfer.bsky.social/post/3mqrvbvwu352a",
+   "postedAt": "2026-07-16T18:43:09.321Z",
+   "content": "PhD Position in Developing a Digital Health Passport for Railway Tracks on Bridges https://www.academictransfer.com/362701/ @TUDelft",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [],
+   "subjectTags": [],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://www.academictransfer.com/362701/"
+  },
+  {
+   "id": "bluesky_Bvc3QvM21xbXdnenZ3N3Myeg",
+   "title": "Interested in accessibility, visualization, or data ethics? I'm looking for Ph.D. students to join…",
+   "authorName": "jonathan zong",
+   "authorTitle": "@jonathanzong.com",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:h64zikrh5yier66hy6zrystu/bafkreie6lzfb6zeohyz23ebtevr6zhqkldqwpibmzszsrfvdt7aqmhseby",
+   "institution": "Institution not stated",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/jonathanzong.com/post/3mqmwgzvw7s2z",
+   "postedAt": "2026-07-14T19:20:36.386Z",
+   "content": "Interested in accessibility, visualization, or data ethics? I'm looking for Ph.D. students to join @data-and-design.org in Fall 2027.\n\nI've updated this post with additional information about this year's focus area.\n\ndata-and-design.org/recruiting/phd",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Human Factors"
+   ],
+   "subjectTags": [
+    "Human Factors"
+   ],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "http://data-and-design.org/recruiting/phd"
+  },
+  {
+   "id": "bluesky_Bvc3QvM21xa2R2NzR1d3gyNg",
+   "title": "PhD position in Design Integration of Bio-Inclusive Façade Interventions…",
+   "authorName": "AcademicTransfer",
+   "authorTitle": "@academictransfer.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:7rhirb2l5jussvrikatczw4d/bafkreicafv5smbzu3oq74tsm3opc6mwchtxhp75p5ny4onufs6runzet4e",
+   "institution": "Institution not stated",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/academictransfer.bsky.social/post/3mqkdv74uwx26",
+   "postedAt": "2026-07-13T18:43:10.965Z",
+   "content": "PhD position in Design Integration of Bio-Inclusive Façade Interventions https://www.academictransfer.com/362563/ @TUDelft",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [],
+   "subjectTags": [],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://www.academictransfer.com/362563/"
   },
   {
    "id": "mastodon_cG9zdC8zbXFqeHlweW5mYzI2",
@@ -5999,10 +6837,10 @@
     "PhD"
    ],
    "fieldTags": [
-    "Human-Computer Interaction"
+    "UX Design"
    ],
    "subjectTags": [
-    "Human-Computer Interaction (HCI)"
+    "UX & Product Design"
    ],
    "publications": "none",
    "positionDetails": [],
@@ -6132,6 +6970,32 @@
    "officialUrl": "https://bsky.app/search?q=%23science"
   },
   {
+   "id": "bluesky_Bvc3QvM21wc3hidnlmamsydg",
+   "title": "One day left to apply!",
+   "authorName": "Lukas Rudolph",
+   "authorTitle": "@lukrudolph.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:uq6nhuxavcvaqzcjimmxlztp/bafkreideackhsplutwa7kwz5acc7ytljpdzrnoeoqta7hjediovongv4la",
+   "institution": "Institution not stated",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/lukrudolph.bsky.social/post/3mpsxbvyfjk2v",
+   "postedAt": "2026-07-04T11:26:25.045Z",
+   "content": "One day left to apply! \nJoin us @uni-konstanz.de as #PhD researcher on Electoral Behavior, Inequality and Climate Change Policies\n\nstellen.uni-konstanz.de/jobposting/d...\n\n#AcademicJobs",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Climate & Environment"
+   ],
+   "subjectTags": [],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://stellen.uni-konstanz.de/jobposting/d7d8039819236d2a2fa5885b3dd5de4b1bbad8650"
+  },
+  {
    "id": "mastodon_ExNjg1MDQ3MzgyMTEyNjk3Mw",
    "title": "The #Nikhef in Amsterdam has open #phdPosition and #postdocPosition s in theoretical #physics. For \"QCD…",
    "authorName": "Paul Balduf",
@@ -6156,6 +7020,119 @@
    "positionDetails": [],
    "applySteps": [],
    "officialUrl": "https://jobs.nikhef.nl/jobs/phd-and-postdoc-positions-on-qcd-and-proton-structure-with-lhc-neutrinos-1315029/"
+  },
+  {
+   "id": "bluesky_Bvc3QvM21wbHhpZ2Z2dzQyYQ",
+   "title": "Extract: The IDEAS PhD program offers interdisciplinary projects in data science applied to environmental…",
+   "authorName": "tenuretracker.info",
+   "authorTitle": "@tenuretracker.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:m2rhzyb4ihbylrrfy7hlsf3s/bafkreicuzqibcrs6a5x2gq25nrcuwjhexd56dprxpkmcky63aitifjfhwu",
+   "institution": "Institution not stated",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/tenuretracker.bsky.social/post/3mplxigfvw42a",
+   "postedAt": "2026-07-01T16:41:25.233Z",
+   "content": "Extract: The IDEAS PhD program offers interdisciplinary projects in data science applied to environmental and life sciences, focusing on advanced machine learning and AI methods. Candidates will engage in original research and contribute to scientific publications.",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Artificial Intelligence",
+    "Machine Learning",
+    "Data Science",
+    "Climate & Environment"
+   ],
+   "subjectTags": [
+    "Artificial Intelligence",
+    "Machine Learning",
+    "Data Science & Analytics"
+   ],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": []
+  },
+  {
+   "id": "bluesky_Bvc3QvM21wN29wcWI1dnQyZQ",
+   "title": "University of South Carolina, Columbia, is seeking highly motivated PhD students to work on cutting-edge…",
+   "authorName": "Cosmos Scholarship Network",
+   "authorTitle": "@cosmossn.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:xk36e7xxxlpbi42pmav4keg3/bafkreid6e5iyvzk2uka2zqd2lmodn5qvjep22m2birtmuwcnc7h2xvf4bq",
+   "institution": "University of South Carolina",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/cosmossn.bsky.social/post/3mp7opqb5vt2e",
+   "postedAt": "2026-06-26T19:32:29.356Z",
+   "content": "University of South Carolina, Columbia, is seeking highly motivated PhD students to work on cutting-edge research in human factors,etc . Multiple Ph.D. positions are anticipated beginning Spring/Fall 2027.",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Human Factors"
+   ],
+   "subjectTags": [
+    "Human Factors"
+   ],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": []
+  },
+  {
+   "id": "bluesky_Bvc3QvM21wNmttdXR4dDIybw",
+   "title": "Calling early-stage PhD students working with - or are interested in - FReDA data",
+   "authorName": "Sebastian Will",
+   "authorTitle": "@swillecon.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:lfjybh437634qz53pkedivjl/bafkreicagdkxkyx7sawjnlxlatmgbq2bi2hvh3j3wpdxfsa6znstrftuua",
+   "institution": "Institution not stated",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/swillecon.bsky.social/post/3mp6kmutxt22o",
+   "postedAt": "2026-06-26T08:46:39.539Z",
+   "content": "Calling early-stage PhD students working with - or are interested in - FReDA data:\n👉 Apply for our Pre-Conference Workshop and discuss your research ideas with peers and FReDA experts.\nDeadline: 30 June\nwww.freda-panel.de/FReDA/EN/New...",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [],
+   "subjectTags": [],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://www.freda-panel.de/FReDA/EN/News-Events/FReDA-Userconference/pre-conference-workshop_EN.html?nn=239308"
+  },
+  {
+   "id": "bluesky_Bvc3QvM21wMmRpcjY2YjIybQ",
+   "title": "PhD Scholarship: Explainable AI & Critical Human-AI Interaction",
+   "authorName": "UCDiSchool - UCD School of Information & Communication Studies",
+   "authorTitle": "@ucdischool.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:cizr2igt34axyvhrxpo4rrvy/bafkreihygwhiuyr4ktzg2mezsud3xnc3v4vccp6eh2i63jvmhkxi47djvq",
+   "institution": "Institution not stated",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/ucdischool.bsky.social/post/3mp2dir66b22m",
+   "postedAt": "2026-06-24T16:28:26.289Z",
+   "content": "🎓🤖 #PhD Scholarship: Explainable AI & Critical Human-AI Interaction\n\nThe candidate will be interested in developing methods & techniques within Explainable AI (XAI) complete a project of their own design, ideally on one or more topic areas\n\n↪️Apply: www.ucd.ie/ics/vacancie...\n\n#ExplainableAI #AI #XAI",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Human-Computer Interaction",
+    "Artificial Intelligence"
+   ],
+   "subjectTags": [
+    "Artificial Intelligence",
+    "Human-Computer Interaction (HCI)"
+   ],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://www.ucd.ie/ics/vacancies/phdopenings/phdscholarship-explainableaiandcriticalhuman-aiinteraction/#d.en.896554"
   },
   {
    "id": "mastodon_ExNjc5OTcwOTE4ODYyODU4Nw",
@@ -6215,6 +7192,32 @@
    "positionDetails": [],
    "applySteps": [],
    "officialUrl": "https://www.jyu.fi/en/research/centres-of-excellence/mmbb"
+  },
+  {
+   "id": "bluesky_Bvc3QvM21vaWxkdGxydHMyZA",
+   "title": "We're offering a fully-funded PhD studentship as part of the ORCHID project to investigate and address the…",
+   "authorName": "Institute of Psychiatry, Psychology & Neuroscience",
+   "authorTitle": "@kingsioppn.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:k3mxwxh2c2r5b6ywr3cnd6gv/bafkreiedlax7nyrmmsnopytncu7ilipn7puzhikgvyzptby75qpuekzs3e",
+   "institution": "Institution not stated",
+   "country": "United Kingdom",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/kingsioppn.bsky.social/post/3moildtlrts2d",
+   "postedAt": "2026-06-17T15:00:55.731Z",
+   "content": "We're offering a fully-funded PhD studentship as part of the ORCHID project to investigate and address the critical gap in understanding how digital experiences affect #MentalHealth and development during childhood.\n\nLearn more and apply before 10 July: \nwww.kcl.ac.uk/study/fundin...",
+   "funding": "fully-funded PhD studentship as part of the ORCHID project to investigat",
+   "fundingTags": [
+    "Full Funding"
+   ],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [],
+   "subjectTags": [],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://www.kcl.ac.uk/study/funding/funding-opportunities/orchid-phd"
   },
   {
    "id": "mastodon_MTE2NzYzOTg0Mjc3NDUzODM5",
@@ -6315,6 +7318,62 @@
    "officialUrl": "https://bsky.app/search?q=%23science"
   },
   {
+   "id": "bluesky_Bvc3QvM21ueXV2bHpqbHMyeg",
+   "title": "SMIT is hiring! We have three exciting opportunities to join our team in Brussels",
+   "authorName": "imec-SMIT, Vrije Universiteit Brussel",
+   "authorTitle": "@imec-smit.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:7fn4yi7pvgww2uowauzcmhn6/bafkreibq43p3iycqf6gibiys6pmf5vpxugurjknchro6ynie3oejscsgpe",
+   "institution": "Institution not stated",
+   "country": "Belgium",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/imec-smit.bsky.social/post/3mnyuvlzjls2z",
+   "postedAt": "2026-06-11T09:09:19.635Z",
+   "content": "SMIT is hiring! We have three exciting opportunities to join our team in Brussels:\n\nUser Researcher Human-Robot Interaction & Safety\nDeadline: 14/06\n\nPhD Student Digital News Audiences & Policy Analysis\nDeadline: 22/06\n\nSummer Research Stay 2026\nDeadline: 30/06\nsmit.research.vub.be/en/vacancies...",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "UX Design",
+    "Human-Computer Interaction",
+    "Robotics"
+   ],
+   "subjectTags": [
+    "Human-Computer Interaction (HCI)",
+    "UX & Product Design",
+    "Robotics & Autonomous Systems"
+   ],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://smit.research.vub.be/en/vacancies/open-vacancies"
+  },
+  {
+   "id": "bluesky_Bvc3QvM21ueGJ3a2dqZWMyaA",
+   "title": "PhD Researcher at the #PoliticalScience Department & Inequality-Cluster @uni-konstanz.de",
+   "authorName": "Lukas Rudolph",
+   "authorTitle": "@lukrudolph.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:uq6nhuxavcvaqzcjimmxlztp/bafkreideackhsplutwa7kwz5acc7ytljpdzrnoeoqta7hjediovongv4la",
+   "institution": "Institution not stated",
+   "country": "Location not stated",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/lukrudolph.bsky.social/post/3mnxbwkgjec2h",
+   "postedAt": "2026-06-10T17:57:10.685Z",
+   "content": "📢 #PhD Researcher at the #PoliticalScience Department & Inequality-Cluster @uni-konstanz.de\n\nApply by July 5 to join our @dfg.de funded team researching citizens' demand for representation amidst Green Transition infrastructure conflict\n\n#AcademicJobs \n\nCall: stellen.uni-konstanz.de/jobposting/d...",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [],
+   "subjectTags": [],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://stellen.uni-konstanz.de/jobposting/d7d8039819236d2a2fa5885b3dd5de4b1bbad8650"
+  },
+  {
    "id": "mastodon_xMTY3MjYwNzIyODM4Mjc0OTE",
    "title": "Great news to share",
    "authorName": "Dorothée Goetze",
@@ -6337,6 +7396,36 @@
    "positionDetails": [],
    "applySteps": [],
    "officialUrl": "https://www.sh.se/ledigajobb?rmpage=job&rmjob=9711&rmlang=SE"
+  },
+  {
+   "id": "bluesky_Bvc3QvM21uaTdqd3RiZ3MyaQ",
+   "title": "Reminder: applications for the HuME PhD Programme close on 12/06/2026 at 13h CEST)!",
+   "authorName": "Centre for Philosophy of Time",
+   "authorTitle": "@cptmilano.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:br6l3mltzmnceh4bl6zply7x/bafkreif6jl5yd25ajgg6vrxnathtitwmip55fjrgkdusowxczj3mu5n3ei",
+   "institution": "Milan University",
+   "country": "Italy",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/cptmilano.bsky.social/post/3mni7jwtbgs2i",
+   "postedAt": "2026-06-04T18:04:23.917Z",
+   "content": "⏳ Reminder: applications for the HuME PhD Programme close on 12/06/2026 at 13h CEST)!\n\nA joint initiative of IUSS Pavia, the Milan University & the Scuola Normale Superiore, bringing together philosophy, cognitive science, logic, and linguistics to study the human mind. \n\n🔗 More info: goo.su/uWulG0y",
+   "funding": "Funding not stated in the post",
+   "fundingTags": [],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Human Factors",
+    "Neuroscience"
+   ],
+   "subjectTags": [
+    "Human Factors",
+    "Neuroscience & Neurotechnology"
+   ],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://goo.su/uWulG0y"
   },
   {
    "id": "mastodon_ExNjYxODgwOTkyMDQ0Njg2NA",
@@ -6470,6 +7559,34 @@
    "publications": "none",
    "positionDetails": [],
    "applySteps": []
+  },
+  {
+   "id": "bluesky_Bvc3QvM21scHFvbXVuZ3Yycw",
+   "title": "4 years Fully Funded PhD in Natural Sciences at University of Gothenburg, Sweden",
+   "authorName": "Agristok",
+   "authorTitle": "@agristok.bsky.social",
+   "authorAvatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:4ncs6lgxeiz4x7ccwn7otero/bafkreiclgvxt43mrrmsvqn7qbx4pn7saa4jxtxt45o3tbpc4lfqdv7scu4",
+   "institution": "University of Gothenburg",
+   "country": "Sweden",
+   "source": "bluesky",
+   "sourceUrl": "https://bsky.app/profile/agristok.bsky.social/post/3mlpqomungv2s",
+   "postedAt": "2026-05-13T07:09:28.000Z",
+   "content": "4 years Fully Funded PhD in Natural Sciences at University of Gothenburg, Sweden\n\nThe University of Gothenburg is recruiting a fully funded PhD student in Biology as part of Sweden’s prestigious Data-Driven Life Science (DDLS) program. This doctoral opportunity combines evolutionary biology,...",
+   "funding": "Fully Funded PhD in Natural Sciences at University of Gothenburg, Sweden",
+   "fundingTags": [
+    "Full Funding"
+   ],
+   "degreeLevels": [
+    "PhD"
+   ],
+   "fieldTags": [
+    "Biology"
+   ],
+   "subjectTags": [],
+   "publications": "none",
+   "positionDetails": [],
+   "applySteps": [],
+   "officialUrl": "https://agristok.net/2026/05/13/ddls-phd-position-biology-university-of-gothenburg-2026/"
   }
  ]
 }

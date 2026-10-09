@@ -27,7 +27,9 @@ export type MastodonPost = {
 };
 
 export function htmlToText(html: string): string {
+  // NFKC turns styled Unicode (𝗣𝗼𝘀𝘁𝗱𝗼𝗰) into plain letters so the rules below can read it
   return html
+    .normalize('NFKC')
     .replace(/<br\s*\/?>/gi, '\n')
     .replace(/<\/p>\s*<p>/gi, '\n\n')
     .replace(/<[^>]+>/g, '')
@@ -147,7 +149,9 @@ function degreesFor(text: string): DegreeLevel[] {
 }
 
 const FIELD_RULES: [string, RegExp][] = [
-  ['Human-Computer Interaction', /\bhci\b|human[- ]computer|interaction design|user experience|\bux\b|cscw|human[- ]ai\b|human[- ]cent(?:er|re)d|user stud(?:y|ies)|participatory design/i],
+  ['UX Design', /\bux\b|\bui\b design|user experience|interaction design|\bixd\b|product design|service design|user research|usability|design research|human[- ]cent(?:er|re)d design|participatory design|co-?design|information architecture|user interfaces?|game design|games user research|inclusive design/i],
+  ['Human-Computer Interaction', /\bhci\b|human[- ]computer|cscw|social computing|ubiquitous computing|pervasive computing|tangible (?:interaction|interface|computing)|wearable computing|human[- ]ai\b|human[- ]cent(?:er|re)d ai|human[- ]robot interaction|\bhri\b|conversational (?:agents?|interfaces?|user)|voice (?:user )?interfaces?|information visuali[sz]ation|data visuali[sz]ation|visual analytics|virtual reality|augmented reality|mixed reality|extended reality|\b(?:vr|ar|xr)\b|creativity support|creative computing|interactive systems?|usable security|usable privacy|privacy ux|digital health design|health ux|user stud(?:y|ies)/i],
+  ['Human Factors', /cognitive|ergonomics|human factors|haptics|accessib|assistive|behaviou?r change|persuasive technolog|learning sciences|edtech|educational technology/i],
   ['Artificial Intelligence', /artificial intelligence|\bai\b|\bllms?\b|large language model/i],
   ['Machine Learning', /machine learning|deep learning|neural network|reinforcement learning/i],
   ['Computer Vision', /computer vision|image analysis/i],
@@ -185,6 +189,9 @@ function titleFor(text: string): string {
 /** The post says it's for a student (PhD / master's) position, not a postdoc or faculty job */
 const STUDENT_POSITION =
   /\b(ph\.?d\.?|doctoral)\s*(position|student|candidate|researcher|project|programme|program|opportunit|scholarship|fellowship|studentship|vacanc|opening|in\b)|studentships?\b|fully[- ]funded ph\.?d|master'?s?\s*(student|thesis|position)/i;
+/** News, study-participant calls and personal stories that mention a PhD but offer no position */
+const NOT_AN_AD =
+  /recruiting participants|participants (?:for|in) (?:a|an|our|my) (?:study|survey|experiment)|take (?:our|a|my) survey|gave a (?:talk|presentation)|defended (?:his|her|their|my)|congrat|got married|passed away/i;
 const NON_STUDENT_HEADLINE = /\b(postdoc|post-doc|postdoctoral|professor|lecturer|faculty|engineer|research assistant|technician|tenure)/i;
 
 /** Links in the post body, minus hashtag and @mention links */
@@ -202,7 +209,7 @@ export function postToOpportunity(
 ): Opportunity | null {
   const text = htmlToText(post.content);
   if (text.length < 80) return null;
-  if (!STUDENT_POSITION.test(text) || !AD_CUE.test(text)) return null;
+  if (!STUDENT_POSITION.test(text) || !AD_CUE.test(text) || NOT_AN_AD.test(text)) return null;
   const headline = titleFor(text);
   if (NON_STUDENT_HEADLINE.test(headline) && !/ph\.?d|doctoral|studentship/i.test(headline)) return null;
   const postedAt = new Date(post.created_at);

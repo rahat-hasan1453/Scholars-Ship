@@ -39,4 +39,18 @@ describe('Bluesky post parsing', () => {
       postToOpportunity(blueskyToPost(bsky('We are recruiting PhD students in HCI, apply now through the department portal please.', '2025-12-01T00:00:00Z')), now, 'bluesky'),
     ).toBeNull();
   });
+
+  it('skips study-participant calls and news, and reads styled Unicode', () => {
+    expect(postToOpportunity(blueskyToPost(bsky('PhD student Tianwei Ma is recruiting participants for a study on VR interfaces. Apply via the form, position of your choice.')), now, 'bluesky')).toBeNull();
+    expect(postToOpportunity(blueskyToPost(bsky('I am hiring a \u{1D5E3}\u{1D5FC}\u{1D600}\u{1D601}\u{1D5F1}\u{1D5FC}\u{1D5F0} in HCI. PhD required. Apply now, position open in our lab.')), now, 'bluesky')).toBeNull();
+  });
+
+  it('tags UX, HCI and human-factors topics', () => {
+    const o = postToOpportunity(
+      blueskyToPost(bsky('Fully funded PhD position in information visualization and usability at our lab in Copenhagen, Denmark. Apply now!')),
+      now,
+      'bluesky',
+    )!;
+    expect(o.subjectTags).toEqual(expect.arrayContaining(['Human-Computer Interaction (HCI)', 'UX & Product Design']));
+  });
 });
