@@ -8,21 +8,10 @@ import { HeaderGlobalSearch } from '@/components/layout/HeaderGlobalSearch';
 import { MenuIcon } from 'lucide-react';
 import { MultiSelectField } from '@/components/layout/MultiSelectField';
 import { UserAvatar } from '@/components/UserAvatar';
+import { SUBJECTS } from '@/data/subjectCatalog';
+import { WORLD_COUNTRIES } from '@/data/countries';
 
-export const ALL_SUBJECTS = [
-  'UX & Product Design',
-  'HCI',
-  'Computer Science',
-  'Artificial Intelligence',
-  'Data Science',
-  'Machine Learning',
-  'Human Factors',
-  'Robotics',
-  'Information Systems',
-  'Cybersecurity',
-  'Biomedical Informatics',
-  'Electrical Engineering'
-];
+export const ALL_SUBJECTS: string[] = [...SUBJECTS];
 
 export const ALL_DEGREES = [
   'Masters',
@@ -56,6 +45,12 @@ export const ALL_FUNDING = [
   'High Acceptance (85%+)',
   'University Fellowship'
 ];
+
+// Featured countries first, then every other country the onboarding offers
+const COUNTRY_OPTIONS = [...ALL_COUNTRIES, ...WORLD_COUNTRIES.map((c) => c.value).filter((v) => !ALL_COUNTRIES.includes(v))];
+
+// A value the user chose (e.g. a custom subject) is always listed, so it can be seen and removed
+const withSelected = (options: string[], selected: string[]) => [...options, ...selected.filter((v) => !options.includes(v))];
 
 // Round flags in /public/flags, keyed by ALL_COUNTRIES value
 export const COUNTRY_FLAGS: Record<string, string> = {
@@ -184,7 +179,7 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <MultiSelectField
             label="Subject"
-            options={ALL_SUBJECTS}
+            options={withSelected(ALL_SUBJECTS, selectedSubjects)}
             selected={selectedSubjects}
             onChange={setSelectedSubjects}
             searchable
@@ -199,7 +194,7 @@ export const UnifiedDiscoveryHeader: React.FC<UnifiedDiscoveryHeaderProps> = ({
           />
           <MultiSelectField
             label="Country"
-            options={ALL_COUNTRIES}
+            options={withSelected(COUNTRY_OPTIONS, selectedCountries)}
             selected={selectedCountries}
             onChange={setSelectedCountries}
             searchable

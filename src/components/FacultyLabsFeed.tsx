@@ -2,6 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { useSessionState } from '@/hooks/useSessionState';
+import { matchesSubjects } from '@/data/subjectCatalog';
 import { profileFilterDefaults, useProfileFilterDefaults } from '@/hooks/useProfileFilterDefaults';
 import { FilterIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
@@ -16,7 +17,7 @@ import { matchScore } from '@/lib/professorDetails';
 import { formatPercentRange } from '@/lib/utils';
 
 // Figma defaults (Faculty & Research Labs, node 251:22127)
-const DEFAULT_SUBJECTS = ['UX & Product Design', 'HCI', 'Computer Science', 'Artificial Intelligence'];
+const DEFAULT_SUBJECTS = ['UX & Product Design', 'Human-Computer Interaction (HCI)', 'Computer Science', 'Artificial Intelligence'];
 const DEFAULT_DEGREES = ['Masters', 'PhD'];
 const DEFAULT_COUNTRIES = ['USA', 'Germany', 'Norway', 'United Kingdom', 'Canada'];
 const DEFAULT_FUNDING = ['Safe Regional'];
@@ -67,20 +68,7 @@ export const FacultyLabsFeed: React.FC = () => {
       }
 
       // 4. Subject filter
-      if (selectedSubjects.length > 0 && prof.researchTags?.length) {
-        const matchesSubject = prof.researchTags.some(tag =>
-          selectedSubjects.some(sub => {
-            const t = tag.toLowerCase().trim();
-            const s = sub.toLowerCase().trim();
-            if (t.includes(s) || s.includes(t)) return true;
-            if (s.includes('ux') && (t.includes('design') || t.includes('ux') || t.includes('hci'))) return true;
-            if (s.includes('hci') && (t.includes('hci') || t.includes('interaction') || t.includes('human'))) return true;
-            if (s.includes('computer') && (t.includes('cs') || t.includes('computer'))) return true;
-            return false;
-          })
-        );
-        if (!matchesSubject) return false;
-      }
+      if (prof.researchTags?.length && !matchesSubjects(selectedSubjects, prof.researchTags)) return false;
 
       return true;
     });

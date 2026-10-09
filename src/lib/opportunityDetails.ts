@@ -27,26 +27,9 @@ export function countryShortLabel(country: string): string {
   return country === 'United Kingdom' ? 'UK' : country;
 }
 
-// Subject filter values (ALL_SUBJECTS) matched against free-text field tags
-const SUBJECT_RULES: [string, RegExp][] = [
-  ['UX & Product Design', /\bux\b|product design|interaction design|service design/i],
-  ['HCI', /\bhci\b|human-computer/i],
-  ['Computer Science', /computer science|informatics|software|computing|\bcs\b/i],
-  ['Artificial Intelligence', /artificial intelligence|\bai\b/i],
-  ['Data Science', /data science|statistics|econometrics/i],
-  ['Machine Learning', /machine learning|deep learning|computer vision|natural language/i],
-  ['Human Factors', /cognitive|ergonomics|human factors|haptics|accessib|assistive/i],
-  ['Robotics', /robot|mechatronics|autonomous/i],
-  ['Information Systems', /information science|information systems|social computing|cscw/i],
-  ['Cybersecurity', /cyber/i],
-  ['Biomedical Informatics', /bioinformatics|biomedical|health informatics|genomics/i],
-  ['Electrical Engineering', /electrical|internet of things|quantum computing/i],
-];
+import { subjectTagsFor } from '@/data/subjectCatalog';
 
-export function subjectTagsFor(fieldTags: string[]): string[] {
-  const text = fieldTags.join(' | ');
-  return SUBJECT_RULES.filter(([, re]) => re.test(text)).map(([subject]) => subject);
-}
+export { subjectTagsFor };
 
 /** Acceptance rate (%) at or above which a listing counts as a "Safe Regional" pick */
 export const SAFE_REGIONAL_MIN_ACCEPTANCE = 20;
@@ -90,9 +73,14 @@ export function positionTypeFor(degreeLevels: DegreeLevel[], duration: string): 
 }
 
 const SUBJECT_CODES: Record<string, string> = {
-  HCI: 'HCI', 'UX & Product Design': 'UX', 'Computer Science': 'CS', 'Artificial Intelligence': 'AI',
-  'Data Science': 'DS', 'Machine Learning': 'ML', 'Human Factors': 'HF', Robotics: 'ROBOTICS',
-  'Information Systems': 'IS', Cybersecurity: 'SEC', 'Biomedical Informatics': 'BIO', 'Electrical Engineering': 'EE',
+  'Human-Computer Interaction (HCI)': 'HCI', 'UX & Product Design': 'UX', 'Computer Science': 'CS',
+  'Software Engineering & Distributed Systems': 'SE', 'Artificial Intelligence': 'AI', 'Machine Learning': 'ML',
+  'Data Science & Analytics': 'DS', 'Human Factors': 'HF', 'Robotics & Autonomous Systems': 'ROBOTICS',
+  'Information Systems': 'IS', Cybersecurity: 'SEC', 'Electrical & Computer Engineering': 'ECE',
+  'Mechanical & Aerospace Engineering': 'MAE', 'Materials Science & Nanotechnology': 'MSE',
+  'Biomedical Engineering': 'BME', 'Biomedical Informatics': 'BMI', 'Biotechnology & Genomics': 'BIO',
+  'Neuroscience & Neurotechnology': 'NEURO', 'Public Health & Epidemiology': 'PH',
+  'Economics & Quantitative Finance': 'ECON', 'Public Policy & Governance': 'POLICY',
 };
 
 /** Short email subject code, e.g. "HCI-PhD-2027" */
