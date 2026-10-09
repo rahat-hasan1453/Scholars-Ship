@@ -320,7 +320,7 @@ Vercel-এ `SKIP_DB_SEED` আছে কিনা দেখে জানানো
 
 ---
 
-# PHASE 2 (≈ 14–20 লাখ token, ৪–৫ সপ্তাহ)
+# PHASE 2 (≈ 14–20 লাখ token; সূচি নিচে "Step-by-step সূচি"-তে)
 
 এই তিনটা কাজ [DATA-VISION-5Y.md](DATA-VISION-5Y.md)-এর সাথে এভাবে মেলে:
 - **I-1** = L4 (টাকা) স্তর; বছর ১-এর স্কলারশিপ লক্ষ্য 1,500-এর প্রথম ধাপ; পাইপলাইন প্ল্যানের ধাপ 7।
@@ -383,12 +383,12 @@ eligibleNationalities String[] @default([])
 ### ব্যাচ পরিকল্পনা (~150টা)
 গণনা আনুমানিক। প্রতিটা ব্যাচ শুরুর আগে তালিকা চূড়ান্ত হবে, আর `data:misses` লগে যে দেশ বেশি খোঁজা হয় সেটা আগে আসবে।
 
-| ব্যাচ | সপ্তাহ | থিম | উদাহরণ (প্রধান প্রোগ্রাম, প্রতিটা দেশের ১–৪টা ধরন) | সংখ্যা |
+| ব্যাচ | Step | থিম | উদাহরণ (প্রধান প্রোগ্রাম, প্রতিটা দেশের ১–৪টা ধরন) | সংখ্যা |
 |---|---|---|---|---|
-| 01 | ২ | **Flagship** (সবচেয়ে বেশি খোঁজা) | Fulbright (Foreign Student), Chevening, Commonwealth (Master's + PhD), DAAD (EPOS, Research Grants, Helmut-Schmidt), MEXT (Research + Master's), CSC (Chinese Government), GKS (Korea, Graduate), Erasmus Mundus (সাধারণ এন্ট্রি; প্রতিটা প্রোগ্রাম পরে L2-তে), Australia Awards, Stipendium Hungaricum, Türkiye Bursları, Eiffel, Swedish Institute (SISGP), Swiss Government Excellence, Holland Scholarship, Manaaki NZ, Vanier/Banting (কানাডা), Gates Cambridge, Rhodes, Clarendon, Marshall | 35–40 |
-| 02 | ৩ | **ইউরোপ বাকি** | Ireland (GOI-IES), Belgium (VLIR-UOS, ARES), Austria (OeAD), Italy (Invest Your Talent / MAECI), Spain (MAEC-AECID যদি চালু), Czech, Slovakia, Poland (NAWA), Finland, Norway (প্রাসঙ্গিক যা আছে), Denmark, Iceland, Estonia, Lithuania, Latvia, Slovenia, Romania, Greece, Portugal, Luxembourg | 35–40 |
-| 03 | ৪ | **এশিয়া + মধ্যপ্রাচ্য + ওশেনিয়া** | Singapore (SINGA, ASEAN), Taiwan (TaiwanICDF, MOE), Thailand (TICA), Malaysia (MIS), Indonesia (KNB), Brunei, India (ICCR), Japan বাকি (JASSO, ADB-JSP), China বাকি (প্রাদেশিক সরকারি), Hong Kong (HKPFS), Saudi (KSU/KAUST নয়, সরকারি), UAE, Qatar, Kuwait, Israel (PBC), Kazakhstan, Australia বাকি (RTP) | 35–40 |
-| 04 | ৫ | **আমেরিকা + আফ্রিকা + আন্তর্জাতিক সংস্থা + বাংলাদেশ** | OAS, Mexico (AMEXCID), Brazil (PEC-PG), Chile, Argentina, South Africa, Egypt, Morocco, Mauritius; World Bank JJ/WBGSP, ADB, IsDB, AKF (Aga Khan), OFID, Mastercard Foundation (সরকারি না, কিন্তু বড়: আলাদা `tags`-এ); বাংলাদেশ: PM Fellowship, NST Fellowship, ICT Division Fellowship (প্রতিটার বর্তমান নাম আর অবস্থা অফিসিয়াল সাইটে যাচাই করে) | 30–40 |
+| 01 | 8–9 | **Flagship** (সবচেয়ে বেশি খোঁজা) | Fulbright (Foreign Student), Chevening, Commonwealth (Master's + PhD), DAAD (EPOS, Research Grants, Helmut-Schmidt), MEXT (Research + Master's), CSC (Chinese Government), GKS (Korea, Graduate), Erasmus Mundus (সাধারণ এন্ট্রি; প্রতিটা প্রোগ্রাম পরে L2-তে), Australia Awards, Stipendium Hungaricum, Türkiye Bursları, Eiffel, Swedish Institute (SISGP), Swiss Government Excellence, Holland Scholarship, Manaaki NZ, Vanier/Banting (কানাডা), Gates Cambridge, Rhodes, Clarendon, Marshall | 35–40 |
+| 02 | 16–17 | **ইউরোপ বাকি** | Ireland (GOI-IES), Belgium (VLIR-UOS, ARES), Austria (OeAD), Italy (Invest Your Talent / MAECI), Spain (MAEC-AECID যদি চালু), Czech, Slovakia, Poland (NAWA), Finland, Norway (প্রাসঙ্গিক যা আছে), Denmark, Iceland, Estonia, Lithuania, Latvia, Slovenia, Romania, Greece, Portugal, Luxembourg | 35–40 |
+| 03 | 18–19 | **এশিয়া + মধ্যপ্রাচ্য + ওশেনিয়া** | Singapore (SINGA, ASEAN), Taiwan (TaiwanICDF, MOE), Thailand (TICA), Malaysia (MIS), Indonesia (KNB), Brunei, India (ICCR), Japan বাকি (JASSO, ADB-JSP), China বাকি (প্রাদেশিক সরকারি), Hong Kong (HKPFS), Saudi (KSU/KAUST নয়, সরকারি), UAE, Qatar, Kuwait, Israel (PBC), Kazakhstan, Australia বাকি (RTP) | 35–40 |
+| 04 | 20–21 | **আমেরিকা + আফ্রিকা + আন্তর্জাতিক সংস্থা + বাংলাদেশ** | OAS, Mexico (AMEXCID), Brazil (PEC-PG), Chile, Argentina, South Africa, Egypt, Morocco, Mauritius; World Bank JJ/WBGSP, ADB, IsDB, AKF (Aga Khan), OFID, Mastercard Foundation (সরকারি না, কিন্তু বড়: আলাদা `tags`-এ); বাংলাদেশ: PM Fellowship, NST Fellowship, ICT Division Fellowship (প্রতিটার বর্তমান নাম আর অবস্থা অফিসিয়াল সাইটে যাচাই করে) | 30–40 |
 
 > **নোট:** "Erasmus Mundus" একটা ছাতা প্রোগ্রাম, ২০০+ আলাদা Master's। I-1-এ একটা এন্ট্রি; প্রতিটা প্রোগ্রাম আলাদা করে আনা L2 (প্রোগ্রাম) কাজে, বছর ২-এ।
 
@@ -626,26 +626,74 @@ A (পাসওয়ার্ড) ──► সবকিছুর আগে, �
 ```
 
 - B, K, J একে অপরের উপর নির্ভর করে না, কিন্তু **একবারে একটা session** নিয়মে পরপর হবে।
-- I-1 ব্যাচ, G-1 আর F আলাদা PR। সপ্তাহে একটা ব্যাচ + একটা বড় কাজ।
+- I-1 ব্যাচ, G-1 আর F আলাদা PR। কোন সপ্তাহে কোনটা, নিচের table-এ।
 
-## সাপ্তাহিক সময়সূচি (Claude Pro weekly limit)
+## Step-by-step সূচি: model, token আর weekly limit
 
-**একটা অনুমান:** Pro-র সাপ্তাহিক সীমা token সংখ্যায় সরাসরি দেখা যায় না, শুধু % দেখা যায়। তাই প্রথম কাজ (B) শেষে দেখা হবে **কত লাখ token-এ কত % খরচ হলো**, তারপর নিচের সূচি ঠিক করা হবে। নিচের সূচি ধরে নিয়েছে সপ্তাহে এই প্রজেক্টে ~4–5 লাখ token নিরাপদে খরচ করা যায়। প্রতি সপ্তাহে **~15% বাড়তি রাখা** (ছোট bug বা প্রশ্নের জন্য); ~85% হলে থামা।
+### নিয়ম (আপনার শর্ত)
+- এই project-এ প্রতি সপ্তাহে **Claude Pro weekly limit-এর সর্বোচ্চ 50%**। আমরা **45%-এ থামব** (5% বাড়তি)।
+- বড় কাজ ভেঙে **chunk** করা: প্রতিটা step ≤ ~1.8 লাখ token, এক session-এ আর এক 5-hour window-এ শেষ হয়।
+- **এক step = এক নতুন session।** শুরুতে এই ডকুমেন্টের শুধু ওই অংশ পড়া।
 
-| সপ্তাহ | তারিখ (আনুমানিক) | কাজ | token | নোট |
-|---|---|---|---|---|
-| **০ (এই সপ্তাহ)** | 10-09 → সপ্তাহের reset | **A** (আপনি), **B**, **K** | ~0.7–1 লাখ | ইতিমধ্যে 31% খরচ। J এখানে শুরু করব না, যাতে অর্ধেক কাজ পড়ে না থাকে |
-| **১** | পরের reset থেকে | **J** | 1.2–1.8 লাখ | বাকি জায়গায় I-1a-র পরিকল্পনা আর ব্যাচ 01-এর তালিকা অনুমোদন |
-| **২** | | **I-1a** framework + **ব্যাচ 01** (flagship) | 3.5–5 লাখ | সবচেয়ে ভারী সপ্তাহ। দরকার হলে ব্যাচ 01 দুই ভাগে |
-| **৩** | | **G-1** (ROR) + **ব্যাচ 02** | 4–6 লাখ | ভারী হলে ব্যাচ 02 সপ্তাহ ৪-এ |
-| **৪** | | **F** (পেপার cron) + **ব্যাচ 03** | 3.5–5.5 লাখ | |
-| **৫** | | **ব্যাচ 04** + সব সংখ্যা আপডেট + TECH-GUIDE | 2.5–3.5 লাখ | বাফার সপ্তাহ |
+### % হিসাব কীভাবে (2026-10-09-এ মাপা)
+- আসল usage (app থেকে): Weekly 32% শেষ, reset **2026-10-15 14:59 UTC** (বাংলাদেশ সময় রাত 8:59)।
+- এই planning session (~1.5 লাখ token) চলার সময় weekly 31% → 32%। মানে **1 লাখ ≈ ~1%**।
+- একটাই মাপ, তাই নিরাপদে থাকতে দ্বিগুণ ধরা হয়েছে: **1 লাখ token ≈ 2% weekly** (Opus ধরে)। Sonnet/Haiku step-এ আসল খরচ এর চেয়ে কম হওয়ার কথা।
+- **প্রতিটা step-এর আগে আর পরে আসল % মাপা হবে।** Step 2-এর পর হিসাব মিলিয়ে দরকার হলে এই table নতুন করে করা হবে। Limit কম পড়লে step পরের সপ্তাহে যাবে, কিন্তু ক্রম বদলাবে না।
 
-মোট: ~16–22 লাখ, ৬ সপ্তাহ। Limit কম পড়লে ব্যাচ পিছিয়ে যাবে, কিন্তু ক্রম বদলাবে না।
+### কোন model কেন
+| Model | কখন |
+|---|---|
+| **Opus** | নতুন কিছুর নকশা, বা ভুল হলে ডেটা হারাতে পারে এমন কাজ। সবচেয়ে বেশি limit খায় |
+| **Sonnet** | পরিষ্কার নির্দেশ আছে বা একই কাজ বারবার। Opus-এর চেয়ে অনেক কম limit খায় |
+| **Haiku** | শুধু ছোট, সহজ কাজ। তথ্য সঠিক রাখা জরুরি এমন কাজে না |
+
+(Fable 5.1 এই plan-এর কোনো কাজে লাগবে না।)
+
+### সপ্তাহ ০: 2026-10-09 → 10-15 (শুরু 32%, থামা ~45%)
+
+| Step | কাজ | Model | Token | Weekly % | মোট (সপ্তাহে) |
+|---|---|---|---|---|---|
+| 1 | **A:** Neon পাসওয়ার্ড বদলানো (আপনি করবেন, Claude গাইড) | Haiku | ~15 হাজার | 0.3% | 32.3% |
+| 2 | **B:** Onboarding bug ঠিক + টেস্ট। ⚖️ আগে-পরে আসল % মাপা | Sonnet | ~40 হাজার | 0.8% | 33.1% |
+| 3 | **K:** Seed যেন cron-এর ডেটা না মোছে + `data:stats` | Sonnet | ~30 হাজার | 0.6% | 33.7% |
+| 4 | **J-1:** ফেল করা e2e-র তালিকা, টেস্ট DB, seed-e2e, production পাহারা, CI নকশা | **Opus** | ~60 হাজার | 1.2% | 34.9% |
+| 5 | **J-2:** ফেল করা spec-এর প্রথম অর্ধেক | Sonnet | ~50 হাজার | 1.0% | 35.9% |
+| 6 | **J-3:** বাকি অর্ধেক + CI-তে `e2e` job | Sonnet | ~50 হাজার | 1.0% | 36.9% |
+| 7 | **I-1a:** স্কলারশিপ framework (ফোল্ডার, zod, link checker, টেস্ট, verification doc) | **Opus** | ~1.8 লাখ | 3.6% | 40.5% |
+| 8 | **ব্যাচ 01 (ক):** ~২০টা flagship (Fulbright, Chevening, DAAD, MEXT, CSC…) | Sonnet | ~1.3 লাখ | 2.6% | 43.1% |
+| 9 | **ব্যাচ 01 (খ):** আরও ~১৮টা flagship | Sonnet | ~1.2 লাখ | 2.4% | **45.5% 🛑** |
+
+### সপ্তাহ ১: 2026-10-15 → 10-22 (শুরু 0%)
+
+| Step | কাজ | Model | Token | Weekly % | মোট (সপ্তাহে) |
+|---|---|---|---|---|---|
+| 10 | **G-1a:** ROR index স্ক্রিপ্ট + নাম মেলানোর কোড + টেস্ট | **Opus** | ~1.3 লাখ | 2.6% | 2.6% |
+| 11 | **G-1b:** নতুন পোস্টে চালু + schema (২ কলাম) + backfill dry-run | Sonnet | ~1.0 লাখ | 2.0% | 4.6% |
+| 12 | **G-1c:** অনুমোদনের পর live backfill + আগে/পরে সংখ্যা | Sonnet | ~30 হাজার | 0.6% | 5.2% |
+| 13 | **F-1:** OpenAlex-এর বর্তমান নিয়ম/সীমা দেখা + paper কোড একজায়গায় | Sonnet | ~70 হাজার | 1.4% | 6.6% |
+| 14 | **F-2:** Paper cron + schema + seed-এর মোছার নিয়ম + টেস্ট | **Opus** | ~1.2 লাখ | 2.4% | 9.0% |
+| 15 | **F-3:** Live-এ প্রথম run, যাচাই | Sonnet | ~20 হাজার | 0.4% | 9.4% |
+| 16 | **ব্যাচ 02 (ক):** ইউরোপ ~২০টা | Sonnet | ~1.3 লাখ | 2.6% | 12.0% |
+| 17 | **ব্যাচ 02 (খ):** ইউরোপ ~১৮টা | Sonnet | ~1.2 লাখ | 2.4% | 14.4% |
+| 18 | **ব্যাচ 03 (ক):** এশিয়া + মধ্যপ্রাচ্য ~২০টা | Sonnet | ~1.3 লাখ | 2.6% | 17.0% |
+| 19 | **ব্যাচ 03 (খ):** আরও ~১৮টা | Sonnet | ~1.2 লাখ | 2.4% | 19.4% |
+| 20 | **ব্যাচ 04 (ক):** আমেরিকা + আফ্রিকা ~২০টা | Sonnet | ~1.3 লাখ | 2.6% | 22.0% |
+| 21 | **ব্যাচ 04 (খ):** আন্তর্জাতিক সংস্থা + বাংলাদেশ ~১৮টা | Sonnet | ~1.2 লাখ | 2.4% | 24.4% |
+| 22 | শেষ সংখ্যা (`data:stats`), TECH-GUIDE আপডেট | Haiku | ~30 হাজার | 0.6% | **25.0% ✅** |
+
+**মোট ≈ 19.4 লাখ token।** সপ্তাহ ০-তে ~13.5%, সপ্তাহ ১-এ ~25% (Opus ধরে হিসাব; Sonnet/Haiku step-এ কম হবে)। কোনো সপ্তাহে 50% পার হয় না।
+
+**Opus মাত্র ৪টা step-এ** (4, 7, 10, 14), Haiku ২টায় (1, 22), বাকি ১৬টা Sonnet।
+
+### চলার নিয়ম
+1. Step শুরুর আগে app-এর model selector থেকে table-এর model বেছে নেওয়া। Claude প্রতিটা step-এর আগে মনে করিয়ে দেবে।
+2. **5-hour limit 80% পার হলে** chunk গুছিয়ে থামা, reset-এর পর বাকিটা।
+3. **সপ্তাহে 45% ছুঁলে** থামা, বাকিটা পরের সপ্তাহে।
+4. **Opus-এর কাজ, Sonnet-এর রিভিউ:** Step 4, 7, 10, 14-এর PR Sonnet দিয়ে রিভিউ (Opus দিয়ে আবার রিভিউর চেয়ে সস্তা)।
 
 **Token বাঁচানোর নিয়ম:**
 - প্রতিটা কাজে শুধু দরকারি ফাইল পড়া (পুরো repo না)।
-- একটা কাজ শেষ = নতুন session (পুরোনো context বয়ে বেড়ানো না)। শুরুতে এই ডকুমেন্টের ওই অংশটাই পড়তে বলা।
 - স্কলারশিপের অফিসিয়াল পেজ থেকে শুধু দরকারি অংশ।
 - বড় আউটপুট (টেস্ট লগ) ফাইলে রেখে শুধু ফেল করা লাইন দেখা।
 
