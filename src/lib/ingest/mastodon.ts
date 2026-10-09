@@ -8,13 +8,14 @@ import { INSTITUTION_NOT_STATED, LOCATION_NOT_STATED, fundingTagsFor, subjectTag
 
 export { INSTITUTION_NOT_STATED, LOCATION_NOT_STATED };
 
-const INSTANCES = ['mastodon.social', 'fediscience.org', 'sigmoid.social', 'mstdn.science'];
+// hci.social: the HCI research community's own server
+const INSTANCES = ['mastodon.social', 'fediscience.org', 'sigmoid.social', 'mstdn.science', 'hci.social'];
 const TAGS = ['PhDPosition', 'PhDPositions', 'PhDJobs', 'AcademicJobs', 'PhDStudentship', 'FundedPhD'];
 const PAGES_PER_TAG = 2;
 /** Posts older than this are dropped: most positions are filled within a few months */
 export const MAX_AGE_DAYS = 150;
 
-type MastodonPost = {
+export type MastodonPost = {
   id: string;
   uri: string;
   url: string | null;
@@ -146,7 +147,7 @@ function degreesFor(text: string): DegreeLevel[] {
 }
 
 const FIELD_RULES: [string, RegExp][] = [
-  ['Human-Computer Interaction', /\bhci\b|human[- ]computer|interaction design|user experience|\bux\b|cscw/i],
+  ['Human-Computer Interaction', /\bhci\b|human[- ]computer|interaction design|user experience|\bux\b|cscw|human[- ]ai\b|human[- ]cent(?:er|re)d|user stud(?:y|ies)|participatory design/i],
   ['Artificial Intelligence', /artificial intelligence|\bai\b|\bllms?\b|large language model/i],
   ['Machine Learning', /machine learning|deep learning|neural network|reinforcement learning/i],
   ['Computer Vision', /computer vision|image analysis/i],
@@ -194,7 +195,11 @@ function linksIn(html: string): string[] {
 }
 
 /** One Mastodon post → listing, or null when it isn't a student position ad */
-export function postToOpportunity(post: MastodonPost, now = new Date()): Opportunity | null {
+export function postToOpportunity(
+  post: MastodonPost,
+  now = new Date(),
+  source: Extract<Opportunity['source'], 'mastodon' | 'bluesky'> = 'mastodon',
+): Opportunity | null {
   const text = htmlToText(post.content);
   if (text.length < 80) return null;
   if (!STUDENT_POSITION.test(text) || !AD_CUE.test(text)) return null;
@@ -218,14 +223,14 @@ export function postToOpportunity(post: MastodonPost, now = new Date()): Opportu
   const link = linksIn(post.content)[0];
 
   return {
-    id: `mastodon_${Buffer.from(post.uri).toString('base64url').slice(-24)}`,
+    id: `${source}_${Buffer.from(post.uri).toString('base64url').slice(-24)}`,
     title: headline,
     authorName: poster,
     authorTitle: `@${post.account.acct}`,
     authorAvatar: post.account.avatar || undefined,
     institution,
     country: countryFor(text) ?? LOCATION_NOT_STATED,
-    source: 'mastodon',
+    source,
     sourceUrl: post.url ?? post.uri,
     postedAt: postedAt.toISOString(),
     content: text,

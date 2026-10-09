@@ -119,6 +119,7 @@ const SOURCE_LABEL: Record<OpportunitySource, string> = {
   web: 'the web',
   reddit: 'Reddit',
   mastodon: 'Mastodon',
+  bluesky: 'Bluesky',
 };
 
 export const sourceLabel = (source: OpportunitySource) => SOURCE_LABEL[source] ?? 'the web';
