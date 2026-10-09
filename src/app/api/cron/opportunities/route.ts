@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { fetchMastodonOpportunities } from '@/lib/ingest/mastodon';
+import { fetchAllOpportunities } from '@/lib/ingest';
 import { saveOpportunities } from '@/lib/opportunities';
 
-// Daily refresh of the Opportunity Feed from public Mastodon position posts (scheduled in vercel.json).
+// Daily refresh of the Opportunity Feed from public Mastodon and Bluesky position posts (scheduled in vercel.json).
 // Vercel sends `Authorization: Bearer $CRON_SECRET`; once CRON_SECRET is set, other callers get 401.
 export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET;
@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const found = await fetchMastodonOpportunities();
+    const found = await fetchAllOpportunities();
     const added = await saveOpportunities(found);
     console.log(`[cron/opportunities] ${found.length} current posts, ${added} new`);
     return NextResponse.json({ success: true, found: found.length, added });
