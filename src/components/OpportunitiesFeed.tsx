@@ -12,6 +12,7 @@ import { FeedGrid, FeedSkeleton } from '@/components/opportunity-feed/FeedGrid';
 import { OpportunityListBar, MatchMode, ViewMode } from '@/components/opportunity-feed/OpportunityListBar';
 import type { Opportunity } from '@/types';
 import { useSessionState } from '@/hooks/useSessionState';
+import { profileFilterDefaults, useProfileFilterDefaults } from '@/hooks/useProfileFilterDefaults';
 import { useOpportunityBookmarks } from '@/hooks/useOpportunityBookmarks';
 import { isOpportunityEligible } from '@/lib/eligibility';
 
@@ -34,6 +35,7 @@ export const OpportunitiesFeed: React.FC = () => {
   const [selectedSubjects, setSelectedSubjects] = useSessionState<string[]>('feed:subjects', DEFAULT_SUBJECTS);
   const [selectedDegrees, setSelectedDegrees] = useSessionState<string[]>('feed:degrees', DEFAULT_DEGREES);
   const [selectedCountries, setSelectedCountries] = useSessionState<string[]>('feed:countries', DEFAULT_COUNTRIES);
+  useProfileFilterDefaults('feed', { setSubjects: setSelectedSubjects, setDegrees: setSelectedDegrees, setCountries: setSelectedCountries });
   const [selectedFunding, setSelectedFunding] = useSessionState<string[]>('feed:funding', DEFAULT_FUNDING);
   const [viewMode, setViewMode] = useSessionState<ViewMode>('feed:view', 'grid');
   const [matchMode, setMatchMode] = useSessionState<MatchMode>('feed:match', 'all');
@@ -89,9 +91,10 @@ export const OpportunitiesFeed: React.FC = () => {
   ]);
 
   const resetFilters = () => {
-    setSelectedSubjects(DEFAULT_SUBJECTS);
-    setSelectedDegrees(DEFAULT_DEGREES);
-    setSelectedCountries(DEFAULT_COUNTRIES);
+    const d = profileFilterDefaults(profile);
+    setSelectedSubjects(d.subjects.length ? d.subjects : DEFAULT_SUBJECTS);
+    setSelectedDegrees(d.degrees.length ? d.degrees : DEFAULT_DEGREES);
+    setSelectedCountries(d.countries.length ? d.countries : DEFAULT_COUNTRIES);
     setSelectedFunding(DEFAULT_FUNDING);
   };
 

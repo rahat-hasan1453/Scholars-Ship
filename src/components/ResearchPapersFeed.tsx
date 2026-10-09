@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react'
 import { FilterIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { useSessionState } from '@/hooks/useSessionState';
+import { profileFilterDefaults, useProfileFilterDefaults } from '@/hooks/useProfileFilterDefaults';
 import { ResearchPaper } from '@/types';
 import { UnifiedDiscoveryHeader } from '@/components/layout/UnifiedDiscoveryHeader';
 import { ResearchPaperCard } from '@/components/ResearchPaperCard';
@@ -30,6 +31,7 @@ export const ResearchPapersFeed: React.FC = () => {
   const [selectedSubjects, setSelectedSubjects] = useSessionState<string[]>('research:subjects', DEFAULT_SUBJECTS);
   const [selectedDegrees, setSelectedDegrees] = useSessionState<string[]>('research:degrees', DEFAULT_DEGREES);
   const [selectedCountries, setSelectedCountries] = useSessionState<string[]>('research:countries', DEFAULT_COUNTRIES);
+  useProfileFilterDefaults('research', { setSubjects: setSelectedSubjects, setDegrees: setSelectedDegrees, setCountries: setSelectedCountries });
   const [selectedFunding, setSelectedFunding] = useSessionState<string[]>('research:funding', DEFAULT_FUNDING);
   const [viewMode, setViewMode] = useSessionState<ViewMode>('research:view', 'grid');
   const [matchMode, setMatchMode] = useSessionState<MatchMode>('research:match', 'all');
@@ -133,9 +135,10 @@ export const ResearchPapersFeed: React.FC = () => {
   const scrollResetKey = JSON.stringify([globalSearchQuery, selectedSubjects, matchMode, viewMode]);
 
   const resetFilters = () => {
-    setSelectedSubjects(DEFAULT_SUBJECTS);
-    setSelectedDegrees(DEFAULT_DEGREES);
-    setSelectedCountries(DEFAULT_COUNTRIES);
+    const d = profileFilterDefaults(profile);
+    setSelectedSubjects(d.subjects.length ? d.subjects : DEFAULT_SUBJECTS);
+    setSelectedDegrees(d.degrees.length ? d.degrees : DEFAULT_DEGREES);
+    setSelectedCountries(d.countries.length ? d.countries : DEFAULT_COUNTRIES);
     setSelectedFunding(DEFAULT_FUNDING);
   };
 

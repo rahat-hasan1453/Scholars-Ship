@@ -2,6 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { useSessionState } from '@/hooks/useSessionState';
+import { profileFilterDefaults, useProfileFilterDefaults } from '@/hooks/useProfileFilterDefaults';
 import { FilterIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { UnifiedDiscoveryHeader } from '@/components/layout/UnifiedDiscoveryHeader';
@@ -29,6 +30,7 @@ export const FacultyLabsFeed: React.FC = () => {
   const [selectedSubjects, setSelectedSubjects] = useSessionState<string[]>('faculty:subjects', DEFAULT_SUBJECTS);
   const [selectedDegrees, setSelectedDegrees] = useSessionState<string[]>('faculty:degrees', DEFAULT_DEGREES);
   const [selectedCountries, setSelectedCountries] = useSessionState<string[]>('faculty:countries', DEFAULT_COUNTRIES);
+  useProfileFilterDefaults('faculty', { setSubjects: setSelectedSubjects, setDegrees: setSelectedDegrees, setCountries: setSelectedCountries });
   const [selectedFunding, setSelectedFunding] = useSessionState<string[]>('faculty:funding', DEFAULT_FUNDING);
   const [viewMode, setViewMode] = useSessionState<ViewMode>('faculty:view', 'grid');
   const [matchMode, setMatchMode] = useSessionState<MatchMode>('faculty:match', 'all');
@@ -96,9 +98,10 @@ export const FacultyLabsFeed: React.FC = () => {
   ]);
 
   const resetFilters = () => {
-    setSelectedSubjects(DEFAULT_SUBJECTS);
-    setSelectedDegrees(DEFAULT_DEGREES);
-    setSelectedCountries(DEFAULT_COUNTRIES);
+    const d = profileFilterDefaults(profile);
+    setSelectedSubjects(d.subjects.length ? d.subjects : DEFAULT_SUBJECTS);
+    setSelectedDegrees(d.degrees.length ? d.degrees : DEFAULT_DEGREES);
+    setSelectedCountries(d.countries.length ? d.countries : DEFAULT_COUNTRIES);
     setSelectedFunding(DEFAULT_FUNDING);
   };
 

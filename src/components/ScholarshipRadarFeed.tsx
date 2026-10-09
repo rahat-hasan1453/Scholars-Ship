@@ -2,6 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { useSessionState } from '@/hooks/useSessionState';
+import { profileFilterDefaults, useProfileFilterDefaults } from '@/hooks/useProfileFilterDefaults';
 import { FilterIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { UnifiedDiscoveryHeader } from '@/components/layout/UnifiedDiscoveryHeader';
@@ -28,6 +29,7 @@ export const ScholarshipRadarFeed: React.FC = () => {
   const [selectedSubjects, setSelectedSubjects] = useSessionState<string[]>('radar:subjects', DEFAULT_SUBJECTS);
   const [selectedDegrees, setSelectedDegrees] = useSessionState<string[]>('radar:degrees', DEFAULT_DEGREES);
   const [selectedCountries, setSelectedCountries] = useSessionState<string[]>('radar:countries', DEFAULT_COUNTRIES);
+  useProfileFilterDefaults('radar', { setSubjects: setSelectedSubjects, setDegrees: setSelectedDegrees, setCountries: setSelectedCountries });
   const [selectedFunding, setSelectedFunding] = useSessionState<string[]>('radar:funding', DEFAULT_FUNDING);
   const [viewMode, setViewMode] = useSessionState<ViewMode>('radar:view', 'grid');
   const [matchMode, setMatchMode] = useSessionState<MatchMode>('radar:match', 'all');
@@ -101,9 +103,10 @@ export const ScholarshipRadarFeed: React.FC = () => {
   ]);
 
   const resetFilters = () => {
-    setSelectedSubjects(DEFAULT_SUBJECTS);
-    setSelectedDegrees(DEFAULT_DEGREES);
-    setSelectedCountries(DEFAULT_COUNTRIES);
+    const d = profileFilterDefaults(profile);
+    setSelectedSubjects(d.subjects.length ? d.subjects : DEFAULT_SUBJECTS);
+    setSelectedDegrees(d.degrees.length ? d.degrees : DEFAULT_DEGREES);
+    setSelectedCountries(d.countries.length ? d.countries : DEFAULT_COUNTRIES);
     setSelectedFunding(DEFAULT_FUNDING);
   };
 
