@@ -67,7 +67,9 @@ export const UniversityOpportunityCard: React.FC<UniversityOpportunityCardProps>
               ? `Rank ${o.rankRange} • Acceptance Rate (${o.acceptanceRate}%)`
               : o.deadline
                 ? `Apply by ${formatDeadline(o.deadline)}`
-                : `Posted ${formatDeadline(o.postedAt)} on ${sourceLabel(o.source)}`}
+                : o.source === 'university'
+                  ? `Programme listing • Checked ${formatDeadline(o.postedAt)}`
+                  : `Posted ${formatDeadline(o.postedAt)} on ${sourceLabel(o.source)}`}
           </p>
         </div>
       </div>
