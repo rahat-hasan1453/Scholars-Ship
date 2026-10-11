@@ -195,15 +195,17 @@ async function seedResearchPapers() {
   console.log(`Seeded ${papers.length} research papers (removed ${removed.count} old rows).`);
 }
 
+const LEGACY_DEMO_SOURCES = ['linkedin', 'twitter', 'lab_website', 'web', 'reddit'];
+
 async function seedOpportunities() {
   const { opportunities } = await readJson<{ opportunities: Opportunity[] }>('opportunities.json');
   for (const o of opportunities) {
     const data = toOpportunityData(o);
     await prisma.opportunity.upsert({ where: { id: o.id }, create: { id: o.id, ...data }, update: data });
   }
-  // Posts added later by /api/cron/opportunities are kept; only the old demo listings go
+  // Only the old demo sources are removed; live posts from the cron (mastodon, bluesky, …) are kept
   const removed = await prisma.opportunity.deleteMany({
-    where: { id: { notIn: opportunities.map((o) => o.id) }, source: { not: 'mastodon' } },
+    where: { id: { notIn: opportunities.map((o) => o.id) }, source: { in: LEGACY_DEMO_SOURCES } },
   });
   console.log(`Seeded ${opportunities.length} opportunities (removed ${removed.count} old rows).`);
 }
