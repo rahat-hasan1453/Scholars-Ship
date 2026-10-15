@@ -1,6 +1,7 @@
 import { expect, installFakeBackend, signedInUser, test } from './fixtures';
+import { E2E_IDS, E2E_NAMES } from './ids';
 
-const DEEP_LINK = '/?tab=research&paper=paper-ux-01';
+const DEEP_LINK = `/?tab=research&paper=${E2E_IDS.paper}`;
 
 test.describe('Research Paper details modal', () => {
   test('opens from a card, closes with Esc and keeps the list state', async ({ page, consoleErrors }) => {
@@ -38,12 +39,13 @@ test.describe('Research Paper details modal', () => {
     await installFakeBackend(page, { user: signedInUser() });
     await page.goto(DEEP_LINK);
 
-    const dialog = page.getByRole('dialog', { name: /Generative AI as a Design Partner/ });
+    const dialog = page.getByRole('dialog', { name: E2E_NAMES.paperTitle });
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByText('📄 Conference paper · Published November 2025')).toBeVisible();
+    await expect(dialog.getByText('Conference paper').first()).toBeVisible();
+    await expect(dialog.getByText('November 2025').first()).toBeVisible();
     await expect(dialog.getByRole('heading', { name: 'Key Findings' })).toBeVisible();
     await expect(dialog.getByText('−43%')).toBeVisible();
-    await expect(dialog.getByRole('link', { name: '10.1145/3613904.3642100' })).toHaveAttribute('href', 'https://doi.org/10.1145/3613904.3642100');
+    await expect(dialog.getByRole('link', { name: E2E_IDS.paperDoi })).toHaveAttribute('href', `https://doi.org/${E2E_IDS.paperDoi}`);
 
     await dialog.getByRole('button', { name: 'Close' }).click();
     await expect(dialog).toBeHidden();

@@ -1,6 +1,6 @@
 import { test as base, type Page, type Route } from '@playwright/test';
 import type { Application, OutreachRecord } from '../../src/types';
-import { mockScholarships, initialApplications, initialUserProfile } from '../fixtures/mockData';
+import { initialApplications, initialUserProfile } from '../fixtures/mockData';
 
 /* Browser-level fake backend: every /api call is answered here, so no database, email, Google or OpenAlex is touched. */
 export const VALID_CODE = '12345';
@@ -50,7 +50,7 @@ export async function installFakeBackend(page: Page, init: Partial<FakeBackend> 
 
     if (/^\/api\/(profile|applications|outreach|bookmarks|import)(\/|$)/.test(path)) {
       if (!state.user) return json(route, { success: false, error: 'Unauthorized. Please sign in.' }, 401);
-      return userData(route, state, req.method(), path, body);
+      return userData(page, route, state, req.method(), path, body);
     }
 
     switch (path) {
@@ -92,10 +92,21 @@ export async function installFakeBackend(page: Page, init: Partial<FakeBackend> 
   return state;
 }
 
+/** The scholarship as the app's own /api/scholarships serves it from the e2e test database (page.request is not intercepted by the fake backend) */
+async function findScholarship(page: Page, id: string) {
+  try {
+    const res = await page.request.get(`http://localhost:${process.env.E2E_PORT ?? 3100}/api/scholarships`);
+    const { data } = await res.json();
+    return (data as Application['scholarship'][]).find((s) => s.id === id);
+  } catch {
+    return undefined; // the test already ended and closed the page; nobody is waiting for this answer
+  }
+}
+
 const ts = () => new Date().toISOString();
 
 /* Minimal in-memory version of the user-data API (src/app/api/{profile,applications,outreach,bookmarks,import}) */
-function userData(route: Route, state: FakeBackend, method: string, path: string, body: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+async function userData(page: Page, route: Route, state: FakeBackend, method: string, path: string, body: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
   const seg = path.split('/').slice(2); // e.g. ['applications', '<id>', 'tasks', '<taskId>']
   const [resource, id, sub, subId] = seg;
   const user = state.user!;
@@ -128,7 +139,7 @@ function userData(route: Route, state: FakeBackend, method: string, path: string
       if (method === 'GET') return json(route, { success: true, data: state.applications });
       const existing = state.applications.find((a) => a.scholarshipId === body.scholarshipId);
       if (existing) return json(route, { success: true, data: existing });
-      const scholarship = mockScholarships.find((s) => s.id === body.scholarshipId);
+      const scholarship = await findScholarship(page, body.scholarshipId);
       if (!scholarship) return json(route, { success: false, error: 'Scholarship not found.' }, 404);
       const app: Application = {
         id: body.id, scholarshipId: scholarship.id, scholarship, status: body.status ?? 'Wishlist', decision: body.decision ?? 'Pending',

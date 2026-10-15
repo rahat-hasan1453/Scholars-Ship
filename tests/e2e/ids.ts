@@ -13,6 +13,7 @@ export const E2E_IDS = {
   /** Same field as `professor`, so it shows under "Similar faculty" */
   professorSimilar: 'e2e_prof_hci_2',
   paper: 'e2e_paper_genai',
+  paperDoi: '10.0000/e2e.paper.1',
   university: 'e2e_uni_berlin',
 } as const;
 
@@ -21,4 +22,5 @@ export const E2E_NAMES = {
   professor: 'Dr. Ada Testwell',
   lab: 'E2E Test Lab',
   paperTitle: 'Generative AI as a Design Partner: An E2E Test Study',
+  scholarshipTitle: 'E2E DAAD HCI Scholarship',
 } as const;

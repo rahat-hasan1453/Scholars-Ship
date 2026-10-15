@@ -1,4 +1,5 @@
 import { expect, installFakeBackend, signedInUser, test } from './fixtures';
+import { E2E_IDS } from './ids';
 
 test.describe('Opportunity details', () => {
   test('opens from an Opportunity Feed card and goes back with the list state kept', async ({ page, consoleErrors }) => {
@@ -33,7 +34,7 @@ test.describe('Opportunity details', () => {
 
   test('Save on the details page bookmarks the listing', async ({ page }) => {
     await installFakeBackend(page, { user: signedInUser() });
-    await page.goto('/opportunities/opp_bremen_ux_03');
+    await page.goto(`/opportunities/${E2E_IDS.opportunity}`);
     const save = page.getByRole('button', { name: '🔖 Save' });
     await save.click();
     await expect(page.getByRole('button', { name: '🔖 Saved' })).toHaveAttribute('aria-pressed', 'true');

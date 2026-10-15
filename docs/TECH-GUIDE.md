@@ -207,7 +207,7 @@ Mistakes never break the live site, parallel sessions stay separate, and changes
 | **বাংলা** | GitHub-এর নিজস্ব রোবট। প্রতিটা PR খোলা বা আপডেট হলে এবং `main`-এ push হলে এটা নিজে থেকে কোড নামিয়ে type check (`tsc`) ও `npm test` চালায়। কিছু ভাঙলে PR-এ লাল ✗ দেখায়, তাই merge-এর আগেই ধরা পড়ে। একে **CI (Continuous Integration)** বলে। |
 | **English** | GitHub's built-in robot. On every PR and every push to `main` it installs the project and runs the type check and `npm test`. A red ✗ on the PR means something broke, before it is merged. This is **CI (Continuous Integration)**. |
 | **উপমা / Analogy** | কারখানার গেটে মান-পরীক্ষক: প্রতিটা নতুন জিনিস ঢোকার আগে চেক হয়। / A quality inspector at the factory gate. |
-| **প্রজেক্টে / In project** | `.github/workflows/test.yml` (Node 22, `npm ci` → `tsc --noEmit` → `npm test`)। কোনো secret লাগে না, সব mock। E2E (Playwright) এখনো CI-তে নেই, লোকালে `npm run test:e2e`। নকশা: `docs/QA-REPORT.md` → "CI-তে e2e" (J-3-তে চালু হবে)। / No secrets needed; E2E joins CI in step J-3. |
+| **প্রজেক্টে / In project** | `.github/workflows/test.yml` (Node 22, `npm ci` → `tsc --noEmit` → `npm test`)। কোনো secret লাগে না, সব mock। আলাদা `e2e` job-এ Playwright (Chromium desktop + mobile, Postgres 16 service, secret লাগে না)। / A separate `e2e` job runs Playwright on Chromium, with a throwaway Postgres; no secrets. |
 | **দেখার জায়গা / Where to see** | PR পেজের নিচে "Checks", বা repo-র **Actions** ট্যাব / The PR's "Checks" section or the repo's **Actions** tab |
 
 ---
