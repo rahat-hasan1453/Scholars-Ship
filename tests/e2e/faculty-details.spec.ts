@@ -1,4 +1,5 @@
 import { expect, installFakeBackend, signedInUser, test } from './fixtures';
+import { E2E_IDS, E2E_NAMES } from './ids';
 
 test.describe('Faculty details', () => {
   test('opens from a Faculty & Research Labs card and goes back with the list state kept', async ({ page, consoleErrors }) => {
@@ -10,9 +11,9 @@ test.describe('Faculty details', () => {
     await page.getByRole('button', { name: 'List view' }).click();
     await expect(page.getByRole('button', { name: 'List view' })).toHaveAttribute('aria-pressed', 'true');
 
-    // List view is a table: open the first row with its Explore link
-    const row = page.getByRole('table').getByRole('row').filter({ has: page.getByRole('link', { name: /^Explore / }) }).first();
-    const name = (await row.getAttribute('aria-label'))!.trim();
+    // List view is a table: open the seeded professor's row with its Explore link (one who accepts students)
+    const name = E2E_NAMES.professor;
+    const row = page.getByRole('table').getByRole('row', { name }).filter({ has: page.getByRole('link', { name: /^Explore / }) });
     await row.getByRole('link', { name: /^Explore / }).click();
 
     await expect(page).toHaveURL(/\/professors\/[^/?]+$/);
@@ -32,7 +33,7 @@ test.describe('Faculty details', () => {
 
   test('Save on the details page bookmarks the professor', async ({ page }) => {
     await installFakeBackend(page, { user: signedInUser() });
-    await page.goto('/professors/prof_baudisch_hpi_06');
+    await page.goto(`/professors/${E2E_IDS.professor}`);
     await page.getByRole('button', { name: '🔖 Save' }).click();
     await expect(page.getByRole('button', { name: '🔖 Saved' })).toHaveAttribute('aria-pressed', 'true');
     // The top-bar Save shares the same bookmark
@@ -41,10 +42,10 @@ test.describe('Faculty details', () => {
 
   test('Similar faculty links to another details page', async ({ page }) => {
     await installFakeBackend(page, { user: signedInUser() });
-    await page.goto('/professors/prof_baudisch_hpi_06');
+    await page.goto(`/professors/${E2E_IDS.professor}`);
     const similar = page.locator('section', { has: page.getByRole('heading', { name: 'Similar faculty' }) }).getByRole('link').first();
     const href = await similar.getAttribute('href');
-    expect(href).toMatch(/^\/professors\/(?!prof_baudisch_hpi_06)/);
+    expect(href).toMatch(new RegExp(`^/professors/(?!${E2E_IDS.professor}$)`));
     await similar.click();
     await expect(page).toHaveURL(new RegExp(`${href}$`));
   });

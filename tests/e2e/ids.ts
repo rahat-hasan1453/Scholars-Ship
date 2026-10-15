@@ -3,9 +3,12 @@ export const E2E_IDS = {
   scholarship: 'e2e_sch_daad_hci',
   scholarshipMasters: 'e2e_sch_nl_masters',
   opportunity: 'e2e_opp_hci_berlin',
-  opportunityMasters: 'e2e_opp_masters_delft',
+  opportunityMasters: 'e2e_opp_masters_zurich',
   opportunityNoDeadline: 'e2e_opp_no_deadline',
   opportunityNoCountry: 'e2e_opp_no_country',
+  /** Needs a CGPA above the e2e student's, so "Eligible Now" drops it */
+  opportunityDemanding: 'e2e_opp_demanding_ml',
+  professorDemanding: 'e2e_prof_closed',
   professor: 'e2e_prof_hci',
   /** Same field as `professor`, so it shows under "Similar faculty" */
   professorSimilar: 'e2e_prof_hci_2',

@@ -243,6 +243,21 @@ How to re-run: build in a folder without `'`, start `next start`, then `npx ligh
 
 নতুন id আর নাম: `tests/e2e/ids.ts` (`E2E_IDS`, `E2E_NAMES`)।
 
+### J-2 ফল (2026-10-16) / J-2 result
+Chromium desktop, `--retries=0`: **J-1-এর পরে 19 ফেল → J-2-র পরে 13 ফেল** (66টার মধ্যে 53 পাস)। Default 1 retry দিয়ে: 54 পাস, 11 ফেল, 1 flaky।
+
+J-2-র 7টা টেস্ট এখন সবুজ, একটা বাদে: #2, 5, 6, 7, 8, 10 পাস করে (#1 নিচে দেখুন)। কী বদলেছে:
+- `a11y`, `faculty-details`: সব id এখন `E2E_IDS` থেকে। আগে পুরোনো id-তে 404 পেজ খুলত আর axe সেটাই পরীক্ষা করে "পাস" দেখাত, এখন আসল details পেজ পরীক্ষা হয়।
+- `faculty-details:5`: সুনির্দিষ্ট প্রফেসরের (Dr. Ada Testwell) row খোলে, তাই "● Accepting Students" নিশ্চিত থাকে।
+- `feeds:50`: "Georgia Tech" টেক্সটের বদলে seed-এর "E2E Demanding Masters in Machine Learning" (CGPA 3.95 চায়, ছাত্রের 3.82) বাদ পড়া দেখে।
+- Seed ডেটা e2e ছাত্রের default profile (Masters, UX/HCI/CS/AI/Data Science, Germany/Switzerland/UK…) অনুযায়ী মেলানো, কারণ প্রতিটা feed শুরুতে profile দিয়ে filter করা থাকে।
+
+**আসল bug (এই PR-এ ঠিক করা হয়নি) · BUG-19 ফিরে এসেছে:** `a11y › home` ফেল করছে। Home-এর filter bar-এ "Select funding..." placeholder (`text-[#90a1b9]`, italic 12px) সাদা ব্যাকগ্রাউন্ডে contrast **2.63** (লাগে 4.5)। আগের কারণও এটাই, দেখা গেছে আলাদা করে। ঠিক করতে placeholder-এর রঙ গাঢ় করতে হবে (production CSS), তাই আলাদা ছোট PR।
+
+**Flaky:** `auth.spec.ts:125` (signed-out `/` → `/login`) আর details পেজের a11y টেস্ট dev server প্রথমবার পেজ compile করার সময় মাঝে মাঝে ফেল করে ("Execution context was destroyed"); retry-তে পাস। J-3-তে CI চালুর আগে আবার দেখব।
+
+**J-3-তে বাকি (11টা):** `feeds` scroll ×2, `home` logout, `opportunity-details` Save, `pipeline` ×2, `research-paper-details` ×4।
+
 ### CI-তে e2e: নকশা (J-3-তে যোগ হবে) / CI design
 `.github/workflows/test.yml`-এ আলাদা একটা `e2e` job, যাতে সমস্যা হলে শুধু এটা সরালেই চলে।
 ```yaml

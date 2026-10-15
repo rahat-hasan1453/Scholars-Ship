@@ -52,9 +52,9 @@ test.describe('Feed header toggle', () => {
     await openFeed(page, 'opportunities');
     const all = await count(page);
     await page.getByRole('button', { name: 'Eligible Now' }).click();
-    // The default profile is a Masters student, so PhD-only posts (e.g. Georgia Tech) drop out
-    expect(await count(page)).toBeLessThan(all);
-    await expect(page.getByText('Georgia Institute of Technology')).toHaveCount(0);
+    // The e2e student has CGPA 3.82; the seeded "Demanding Masters" post asks for 3.95, so it drops out
+    await expect.poll(() => count(page)).toBeLessThan(all);
+    await expect(page.getByText('E2E Demanding Masters in Machine Learning')).toHaveCount(0);
   });
 
   test('"Eligible Now" survives list → details → back', async ({ page }) => {

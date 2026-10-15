@@ -1,15 +1,16 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, installFakeBackend, signedInUser, test } from './fixtures';
+import { E2E_IDS } from './ids';
 
 const pages = [
   { name: 'login', path: '/login', user: null },
   { name: 'onboarding', path: '/onboarding', user: signedInUser({ onboardingCompleted: false }) },
   { name: 'home', path: '/', user: signedInUser() },
   { name: 'pipeline', path: '/?tab=tracker', user: signedInUser() },
-  { name: 'scholarship details', path: '/scholarships/sch_daad_design_02', user: signedInUser() },
-  { name: 'opportunity details', path: '/opportunities/opp_bremen_ux_03', user: signedInUser() },
-  { name: 'faculty details', path: '/professors/prof_baudisch_hpi_06', user: signedInUser() },
-  { name: 'research paper modal', path: '/?tab=research&paper=paper-ux-01', user: signedInUser(), waitFor: 'dialog' },
+  { name: 'scholarship details', path: `/scholarships/${E2E_IDS.scholarship}`, user: signedInUser() },
+  { name: 'opportunity details', path: `/opportunities/${E2E_IDS.opportunity}`, user: signedInUser() },
+  { name: 'faculty details', path: `/professors/${E2E_IDS.professor}`, user: signedInUser() },
+  { name: 'research paper modal', path: `/?tab=research&paper=${E2E_IDS.paper}`, user: signedInUser(), waitFor: 'dialog' },
 ];
 
 for (const p of pages) {
