@@ -187,7 +187,7 @@ export interface HiringOpportunity {
   authorAvatar?: string;
   institution: string;
   labName?: string;
-  source: 'linkedin' | 'twitter' | 'lab_website' | 'web' | 'reddit' | 'mastodon' | 'bluesky';
+  source: 'linkedin' | 'twitter' | 'lab_website' | 'web' | 'reddit' | 'mastodon' | 'bluesky' | 'university';
   sourceUrl: string;
   postedAgo: string;
   postedDate: string;

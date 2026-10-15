@@ -114,7 +114,7 @@ export const OpportunityDetailsView: React.FC<Props> = ({ opportunity: o, others
         facts={[
           { icon: '💼', label: 'Position Type', value: o.positionType ?? o.degreeLevels.map((d) => (d === 'PhD' ? 'PhD position' : `${d} position`)).join(' / ') },
           { icon: '📚', label: 'Research Area', value: o.fieldTags.slice(0, 2).join(' & ') || 'Not stated' },
-          { icon: '💰', label: 'Funding', value: o.fundingTags.length ? fundingKind(o.funding) : 'Not stated' },
+          { icon: '💰', label: 'Funding', value: o.source === 'university' ? 'See programme details' : o.fundingTags.length ? fundingKind(o.funding) : 'Not stated' },
           { icon: '🗓', label: 'Start Date', value: o.startDate ?? 'Not stated' },
           { icon: '📍', label: 'Location', value: location },
           { icon: '🔬', label: 'Lab', value: o.labName ?? '—' },
@@ -125,10 +125,10 @@ export const OpportunityDetailsView: React.FC<Props> = ({ opportunity: o, others
           <ChipList items={o.fieldTags} />
         </DetailSection>
       )}
-      <DetailSection label="Original Post">
+      <DetailSection label={o.source === 'university' ? 'About the programme' : 'Original Post'}>
         <ExpandableText
           text={o.content}
-          link={{ label: `View original post on ${sourceLabel(o.source)} ↗`, href: o.sourceUrl }}
+          link={{ label: o.source === 'university' ? 'View the official programme page ↗' : `View original post on ${sourceLabel(o.source)} ↗`, href: o.sourceUrl }}
         />
       </DetailSection>
       {o.positionDetails.length > 0 && (
@@ -158,7 +158,9 @@ export const OpportunityDetailsView: React.FC<Props> = ({ opportunity: o, others
         title="Apply for this position"
         note={
           left === null
-            ? 'The post gives no deadline; check the original post before applying'
+            ? o.source === 'university'
+              ? 'Deadlines depend on the intake; check the official programme page before applying'
+              : 'The post gives no deadline; check the original post before applying'
             : left > 0
               ? `⏰ Closes ${deadline}  ·  ${left} day${left === 1 ? '' : 's'} left`
               : `⏰ Closed on ${deadline}`

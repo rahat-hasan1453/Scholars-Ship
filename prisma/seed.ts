@@ -9,6 +9,7 @@ import type { Opportunity } from '../src/types';
 import { degreeToDb } from '../src/lib/scholarships';
 import { toOpportunityData } from '../src/lib/opportunities';
 import { SCHOLARSHIPS } from './data/scholarships';
+import { PROGRAM_OPPORTUNITIES } from './data/programs';
 
 const prisma = new PrismaClient();
 const DATA = path.join(__dirname, 'data');
@@ -210,10 +211,22 @@ async function seedOpportunities() {
   console.log(`Seeded ${opportunities.length} opportunities (removed ${removed.count} old rows).`);
 }
 
+async function seedPrograms() {
+  for (const o of PROGRAM_OPPORTUNITIES) {
+    const data = toOpportunityData(o);
+    await prisma.opportunity.upsert({ where: { id: o.id }, create: { id: o.id, ...data }, update: data });
+  }
+  const removed = await prisma.opportunity.deleteMany({
+    where: { source: 'university', id: { notIn: PROGRAM_OPPORTUNITIES.map((o) => o.id) } },
+  });
+  console.log(`Seeded ${PROGRAM_OPPORTUNITIES.length} programme listings (removed ${removed.count} old rows).`);
+}
+
 seedScholarships()
   .then(seedFaculty)
   .then(seedResearchPapers)
   .then(seedOpportunities)
+  .then(seedPrograms)
   .catch((e) => {
     console.error(e);
     process.exitCode = 1;

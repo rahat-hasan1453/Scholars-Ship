@@ -120,6 +120,7 @@ const SOURCE_LABEL: Record<OpportunitySource, string> = {
   reddit: 'Reddit',
   mastodon: 'Mastodon',
   bluesky: 'Bluesky',
+  university: 'the university',
 };
 
 export const sourceLabel = (source: OpportunitySource) => SOURCE_LABEL[source] ?? 'the web';
@@ -128,6 +129,7 @@ export const sourceLabel = (source: OpportunitySource) => SOURCE_LABEL[source] ?
 export function postedLine(o: Pick<Opportunity, 'source' | 'postedAt'>, now = Date.now()): string {
   const days = Math.max(0, Math.floor((now - new Date(o.postedAt).getTime()) / 86_400_000));
   const ago = days === 0 ? 'today' : days === 1 ? '1 day ago' : `${days} days ago`;
+  if (o.source === 'university') return `Programme listing · checked ${ago}`;
   return `Posted on ${sourceLabel(o.source)} · ${ago}`;
 }
 
