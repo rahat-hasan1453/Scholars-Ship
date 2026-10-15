@@ -1,5 +1,8 @@
 // Small, fixed data for the e2e test database. Made up for tests: every link is on example.test,
 // every name says "E2E" or "Test". It never goes near production (see seed-guard.ts).
+// Subjects, degrees and countries are chosen to match the default e2e profile (tests/fixtures/mockData.ts:
+// Masters, CGPA 3.82, IELTS 8, subjects UX/HCI/CS/AI/Data Science, countries incl. Germany/Switzerland/UK),
+// because every feed starts filtered by the profile. Rows outside those filters are there on purpose too.
 // Dates are relative to `now`, so deadlines stay in the future however old this file gets.
 import type { Prisma } from '@prisma/client';
 import { E2E_IDS, E2E_NAMES } from '../ids';
@@ -37,16 +40,16 @@ export function e2eData(now = new Date()) {
 
   const universities: Prisma.UniversityCreateManyInput[] = [
     { id: E2E_IDS.university, name: 'E2E Technical University Berlin', country: 'Germany', city: 'Berlin', website: link('tu-berlin') },
-    { id: 'e2e_uni_delft', name: 'E2E University of Delft', country: 'Netherlands', city: 'Delft', website: link('delft') },
+    { id: 'e2e_uni_zurich', name: 'E2E University of Zurich', country: 'Switzerland', city: 'Zurich', website: link('zurich') },
   ];
 
   const labs: Prisma.ResearchLabCreateManyInput[] = [
     {
       id: 'e2e_lab_hci', name: E2E_NAMES.lab, universityId: E2E_IDS.university, department: 'Computer Science', website: link('lab'),
       researchTags: ['HCI', 'Generative AI'], fundingSummary: 'Fully funded PhD positions', fundingSource: 'E2E Research Fund',
-      degreeLevels: ['PHD'], acceptingTerms: ['Fall 2027'], phdStudents: 8, postdocs: 2, openPositionCount: 2,
+      degreeLevels: ['MASTERS', 'PHD'], acceptingTerms: ['Fall 2027'], phdStudents: 8, postdocs: 2, openPositionCount: 2,
     },
-    { id: 'e2e_lab_vis', name: 'E2E Visualization Group', universityId: 'e2e_uni_delft', researchTags: ['Visualization'], degreeLevels: ['MASTERS', 'PHD'], acceptingTerms: ['Spring 2027'] },
+    { id: 'e2e_lab_vis', name: 'E2E Visualization Group', universityId: 'e2e_uni_zurich', researchTags: ['Data Visualization'], degreeLevels: ['MASTERS', 'PHD'], acceptingTerms: ['Spring 2027'] },
   ];
 
   const professor = (p: Partial<Prisma.ProfessorCreateManyInput> & Pick<Prisma.ProfessorCreateManyInput, 'id' | 'name'>): Prisma.ProfessorCreateManyInput => ({
@@ -73,8 +76,9 @@ export function e2eData(now = new Date()) {
       contactSteps: ['Read a recent paper', 'Email a short research pitch'],
     }),
     professor({ id: E2E_IDS.professorSimilar, name: 'Dr. Ben Testmore', title: 'Associate Professor' }),
-    professor({ id: 'e2e_prof_vis', name: 'Dr. Cleo Mockley', university: universities[1].name, universityId: 'e2e_uni_delft', country: 'Netherlands', labId: 'e2e_lab_vis', labName: 'E2E Visualization Group', researchTags: ['Visualization'] }),
-    professor({ id: 'e2e_prof_closed', name: 'Dr. Dan Fixture', openPositions: false, researchTags: ['Accessibility'] }),
+    professor({ id: 'e2e_prof_vis', name: 'Dr. Cleo Mockley', university: universities[1].name, universityId: 'e2e_uni_zurich', country: 'Switzerland', labId: 'e2e_lab_vis', labName: 'E2E Visualization Group', researchTags: ['Data Visualization'], acceptingTerms: ['Spring 2027'] }),
+    // Visible in the feed, but asks for a CGPA above the e2e student's 3.82, so "Eligible Now" drops it
+    professor({ id: 'e2e_prof_closed', name: 'Dr. Dan Fixture', openPositions: false, researchTags: ['HCI', 'Accessibility'], lookingFor: { degree: "Master's in HCI", minCgpa: 3.95, publications: 'none' } }),
     professor({ id: 'e2e_prof_uk', name: 'Dr. Eve Stubbs', university: 'E2E London College', universityId: null, labId: null, labName: null, country: 'United Kingdom', researchTags: ['Machine Learning'] }),
   ];
 
@@ -96,9 +100,9 @@ export function e2eData(now = new Date()) {
     content: 'We are hiring! A fully funded position in our test lab. Apply via the link.',
     funding: 'Full Funding',
     fundingTags: ['Full Funding'],
-    degreeLevels: ['PHD'],
+    degreeLevels: ['MASTERS', 'PHD'],
     fieldTags: ['HCI'],
-    subjectTags: ['HCI'],
+    subjectTags: ['Human-Computer Interaction (HCI)'],
     minCgpa: 3.0,
     publications: 'preferred',
     positionType: 'PhD position',
@@ -114,11 +118,13 @@ export function e2eData(now = new Date()) {
 
   const opportunities = [
     opportunity({ id: E2E_IDS.opportunity, title: 'E2E PhD in Human-Computer Interaction' }),
-    opportunity({ id: E2E_IDS.opportunityMasters, title: 'E2E Funded Masters in Visualization', authorName: 'Dr. Cleo Mockley', professorId: 'e2e_prof_vis', institution: universities[1].name, labName: 'E2E Visualization Group', country: 'Netherlands', city: 'Delft', degreeLevels: ['MASTERS'], fieldTags: ['Visualization'], subjectTags: ['Visualization'], positionType: 'Masters scholarship' }),
-    opportunity({ id: E2E_IDS.opportunityNoDeadline, title: 'E2E Rolling PhD Call', deadline: null, startDate: null, postedAt: inDays(-10) }),
+    opportunity({ id: E2E_IDS.opportunityMasters, title: 'E2E Funded Masters in Data Visualization', authorName: 'Dr. Cleo Mockley', professorId: 'e2e_prof_vis', institution: universities[1].name, labName: 'E2E Visualization Group', country: 'Switzerland', city: 'Zurich', degreeLevels: ['MASTERS'], fieldTags: ['Visualization'], subjectTags: ['Data Science & Analytics'], positionType: 'Masters scholarship' }),
+    opportunity({ id: E2E_IDS.opportunityNoDeadline, title: 'E2E Rolling Research Call', subjectTags: ['Computer Science'], deadline: null, startDate: null, postedAt: inDays(-10) }),
+    // No country: the default country filter hides it, so specs that want it clear the filter first
     opportunity({ id: E2E_IDS.opportunityNoCountry, title: 'E2E Remote Research Assistant', country: '', city: null, professorId: null, authorName: 'E2E Recruiter', source: 'web', minCgpa: null, publications: 'none' }),
-    opportunity({ id: 'e2e_opp_ml_uk', title: 'E2E PhD in Machine Learning', authorName: 'Dr. Eve Stubbs', professorId: 'e2e_prof_uk', institution: 'E2E London College', labName: null, country: 'United Kingdom', city: 'London', fieldTags: ['Machine Learning'], subjectTags: ['Computer Science'], minCgpa: 3.7, publications: 'required' }),
-    opportunity({ id: 'e2e_opp_partial', title: 'E2E Partially Funded Masters', degreeLevels: ['MASTERS'], funding: 'Partial Funding', fundingTags: ['Partial Funding'], postedAt: inDays(-20) }),
+    // Visible in the feed, but asks for a CGPA above the e2e student's 3.82, so "Eligible Now" drops it
+    opportunity({ id: E2E_IDS.opportunityDemanding, title: 'E2E Demanding Masters in Machine Learning', authorName: 'Dr. Eve Stubbs', professorId: 'e2e_prof_uk', institution: 'E2E London College', labName: null, country: 'United Kingdom', city: 'London', fieldTags: ['Machine Learning'], subjectTags: ['Artificial Intelligence'], minCgpa: 3.95, publications: 'required' }),
+    opportunity({ id: 'e2e_opp_partial', title: 'E2E Partially Funded Masters', subjectTags: ['Computer Science'], degreeLevels: ['MASTERS'], funding: 'Partial Funding', fundingTags: ['Partial Funding'], postedAt: inDays(-20) }),
   ];
 
   const paper = (p: Partial<Prisma.ResearchPaperCreateManyInput> & Pick<Prisma.ResearchPaperCreateManyInput, 'id' | 'title'>): Prisma.ResearchPaperCreateManyInput => ({
@@ -141,7 +147,7 @@ export function e2eData(now = new Date()) {
 
   const papers = [
     paper({ id: E2E_IDS.paper, title: E2E_NAMES.paperTitle, citationCount: 120, tags: ['HCI', 'Generative AI'], keyFindings: [{ label: 'Speed', text: 'Designers worked faster', value: '2x', met: true }] }),
-    paper({ id: 'e2e_paper_vis', title: 'E2E Visualization Study', tags: ['Visualization'], institution: universities[1].name, year: 2025 }),
+    paper({ id: 'e2e_paper_vis', title: 'E2E Visualization Study', tags: ['Data Visualization'], institution: universities[1].name, year: 2025 }),
     paper({ id: 'e2e_paper_access', title: 'E2E Accessibility Audit Methods', tags: ['Accessibility'], citationCount: 4 }),
     paper({ id: 'e2e_paper_ml', title: 'E2E Small Models for Test Data', tags: ['Machine Learning'], paperType: 'Preprint', peerReviewed: false, isOpenAccess: false, pdfUrl: null }),
     paper({ id: 'e2e_paper_old', title: 'E2E Older Interaction Paper', year: 2024, publishedAt: inDays(-700), citationCount: 55 }),
