@@ -21,11 +21,22 @@ vi.mock('@/lib/prisma', () => {
       researchPaper: {
         count: async ({ where }: any) => db.papers.filter((r) => matches(r, where)).length,
         findMany: async ({ where }: any) => db.papers.filter((r) => matches(r, where)),
-        create: async ({ data }: any) => {
-          if (db.papers.some((r) => r.id === data.id || (data.doi && r.doi === data.doi))) throw new Error('unique constraint');
-          db.papers.push({ ...data, authors: data.authors.create });
+        createMany: async ({ data }: any) => {
+          let count = 0;
+          for (const row of data) {
+            if (db.papers.some((r) => r.id === row.id || r.openAlexId === row.openAlexId || (row.doi && r.doi === row.doi))) continue;
+            db.papers.push({ ...row, authors: [] });
+            count++;
+          }
+          return { count };
         },
         update: async ({ where, data }: any) => Object.assign(db.papers.find((r) => r.id === where.id), data),
+      },
+      paperAuthor: {
+        createMany: async ({ data }: any) => {
+          for (const { paperId, ...a } of data) db.papers.find((r) => r.id === paperId).authors.push(a);
+          return { count: data.length };
+        },
       },
     },
   };

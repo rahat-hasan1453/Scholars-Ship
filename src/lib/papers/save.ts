@@ -58,9 +58,9 @@ export async function savePapers(papers: PaperData[]): Promise<{ added: number; 
     (await prisma.researchPaper.findMany({ where: { doi: { in: dois } }, select: { id: true, doi: true } })).map((r) => [r.doi, r.id]),
   );
 
-  let added = 0;
   let updated = 0;
   let skipped = 0;
+  const fresh: PaperData[] = [];
   for (const p of papers) {
     const row = byId.get(p.id) ?? byOpenAlex.get(p.openAlexId);
     if (row) {
@@ -68,37 +68,53 @@ export async function savePapers(papers: PaperData[]): Promise<{ added: number; 
         await prisma.researchPaper.update({ where: { id: row.id }, data: { citationCount: p.citationCount } });
         updated++;
       }
-      continue;
-    }
-    if (p.doi && doiOwner.has(p.doi)) {
+    } else if (p.doi && doiOwner.has(p.doi)) {
       skipped++;
-      continue;
+    } else {
+      if (p.doi) doiOwner.set(p.doi, p.id);
+      fresh.push(p);
     }
-    await prisma.researchPaper.create({
-      data: {
-        id: p.id,
-        openAlexId: p.openAlexId,
-        importedBy: 'cron',
-        title: p.title,
-        abstract: p.abstract,
-        year: p.year,
-        publishedAt: p.publishedAt ? new Date(`${p.publishedAt}T00:00:00Z`) : null,
-        venue: p.venue,
-        citationCount: p.citationCount,
-        doi: p.doi,
-        pdfUrl: p.pdfUrl,
-        fieldsOfStudy: p.fieldsOfStudy,
-        tags: p.tags,
-        isOpenAccess: p.isOpenAccess,
-        paperType: p.paperType,
-        peerReviewed: p.paperType === 'Preprint' ? false : null,
-        institution: p.institution,
-        funding: p.funding,
-        authors: { create: p.authors },
-      },
+  }
+
+  // New papers go in SAVE_BATCH at a time (two queries per batch), so the first backfill of thousands fits in the cron's time limit
+  let added = 0;
+  for (let i = 0; i < fresh.length; i += SAVE_BATCH) {
+    const batch = fresh.slice(i, i + SAVE_BATCH);
+    const { count } = await prisma.researchPaper.createMany({ data: batch.map(toRow), skipDuplicates: true });
+    added += count;
+    // Authors only for rows that are now cron papers (a row added meanwhile by someone else is left alone)
+    const created = new Set(
+      (await prisma.researchPaper.findMany({ where: { id: { in: batch.map((p) => p.id) }, importedBy: 'cron' }, select: { id: true } })).map((r) => r.id),
+    );
+    await prisma.paperAuthor.createMany({
+      data: batch.filter((p) => created.has(p.id)).flatMap((p) => p.authors.map((a) => ({ paperId: p.id, ...a }))),
+      skipDuplicates: true,
     });
-    if (p.doi) doiOwner.set(p.doi, p.id);
-    added++;
   }
   return { added, updated, skipped };
+}
+
+const SAVE_BATCH = 500;
+
+function toRow(p: PaperData): Prisma.ResearchPaperCreateManyInput {
+  return {
+    id: p.id,
+    openAlexId: p.openAlexId,
+    importedBy: 'cron',
+    title: p.title,
+    abstract: p.abstract,
+    year: p.year,
+    publishedAt: p.publishedAt ? new Date(`${p.publishedAt}T00:00:00Z`) : null,
+    venue: p.venue,
+    citationCount: p.citationCount,
+    doi: p.doi,
+    pdfUrl: p.pdfUrl,
+    fieldsOfStudy: p.fieldsOfStudy,
+    tags: p.tags,
+    isOpenAccess: p.isOpenAccess,
+    paperType: p.paperType,
+    peerReviewed: p.paperType === 'Preprint' ? false : null,
+    institution: p.institution,
+    funding: p.funding,
+  };
 }

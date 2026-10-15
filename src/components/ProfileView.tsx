@@ -313,7 +313,7 @@ const SavedTab: React.FC = () => {
   const { bookmarks, toggleBookmark } = useOpportunityBookmarks();
   const { bookmarks: savedProfs } = useProfessorBookmarks();
   const opportunities = useFetchedList<Opportunity>('/api/opportunities');
-  const papers = useFetchedList<ResearchPaper>('/api/research/papers');
+  const papers = useFetchedList<ResearchPaper>(`/api/research/papers?ids=${encodeURIComponent(savedPaperIds.join(','))}`);
   const [filter, setFilter] = useState<SavedFilter>('all');
   const [openPaper, setOpenPaper] = useState<ResearchPaper | null>(null);
 

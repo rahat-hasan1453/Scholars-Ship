@@ -10,7 +10,7 @@ export const maxDuration = 300;
 
 const RECENT_DAYS = 10;
 /** Stop starting OpenAlex requests after this long, leaving time to save */
-const FETCH_BUDGET_MS = 240_000;
+const FETCH_BUDGET_MS = 200_000;
 
 export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET;
@@ -32,7 +32,7 @@ export async function GET(request: Request) {
       perPage: 100,
       sort: 'publication_date:desc',
       types: CRON_PAPER_TYPES,
-      pages: backfill ? 3 : 1,
+      pages: backfill ? 2 : 1,
       stopAt: started + FETCH_BUDGET_MS,
     });
     const papers = selectRecentPapers(works.values(), profByAuthor);
