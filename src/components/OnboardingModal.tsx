@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, ArrowRight, Check, Info, Mail } from 'lucide-react';
@@ -647,14 +647,28 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ isStandalonePage
   );
 };
 
+const PROFILE_WAIT_MS = 4000;
+
 export const OnboardingModal: React.FC = () => {
-  const { isOnboardingOpen, setIsOnboardingOpen } = useApp();
+  const { isOnboardingOpen, setIsOnboardingOpen, isUserDataLoaded } = useApp();
+  const [waitTimedOut, setWaitTimedOut] = useState(false);
+
+  // The form reads the saved answers once, when it mounts; wait for the profile so it doesn't mount empty.
+  useEffect(() => {
+    if (!isOnboardingOpen || isUserDataLoaded) return;
+    const timer = setTimeout(() => setWaitTimedOut(true), PROFILE_WAIT_MS);
+    return () => clearTimeout(timer);
+  }, [isOnboardingOpen, isUserDataLoaded]);
 
   if (!isOnboardingOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-white animate-in fade-in duration-200">
-      <OnboardingFlow isStandalonePage={false} onFinish={() => setIsOnboardingOpen(false)} />
+      {isUserDataLoaded || waitTimedOut ? (
+        <OnboardingFlow isStandalonePage={false} onFinish={() => setIsOnboardingOpen(false)} />
+      ) : (
+        <p className="p-10 text-center text-[14px] text-[#627181]">Loading your profile…</p>
+      )}
     </div>
   );
 };
