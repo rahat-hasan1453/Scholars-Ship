@@ -196,6 +196,9 @@ Mistakes never break the live site, parallel sessions stay separate, and changes
 | **প্রজেক্টে / In project** | `tests/e2e/` (spec), `tests/e2e/fixtures.ts` (নকল backend: সব `/api` call browser-এই উত্তর পায় / fake backend), কনফিগ `playwright.config.ts` (Desktop 1728px: Chromium, Firefox, WebKit; Mobile 375px: Chromium)। টেস্ট নিজেই `next dev` (port 3100) চালু করে। |
 | **কমান্ড / Commands** | `npm run test:e2e` (সব / all), `npx playwright test --project=chromium-desktop` (একটা browser / one browser), `npx playwright show-report` (রিপোর্ট দেখা / open the HTML report), `npx playwright install` (browser নামানো, একবার / download browsers once) |
 | **`test.fail()`** | জানা bug-এর E2E টেস্ট (Vitest-এর `it.fails`-এর মতো) / Known-bug E2E test, like `it.fails` in Vitest |
+| **টেস্ট DB / Test database** | Detail পেজ server-এ Prisma দিয়ে ডেটা পড়ে, তাই e2e-র জন্য আলাদা একটা ছোট আসল DB লাগে। প্রতিবার শুরুর আগে `tests/e2e/global-setup.ts` এতে schema push করে, সব খালি করে, তারপর `tests/e2e/seed/e2e-data.ts`-এর বানানো ডেটা (id `e2e_…`, লিংক `example.test`) ঢোকায়। Spec-এ id হাতে লেখা যাবে না, `tests/e2e/ids.ts` থেকে নিতে হবে। / Server-rendered pages need a real but tiny database, re-seeded before every run. |
+| **পাহারা / Safety guard** | `tests/e2e/seed/seed-guard.ts`: `E2E_DB=1` না থাকলে, host `localhost` না হলে (Neon তো নয়ই), `VERCEL`/production হলে, বা URL আপনার dev `DATABASE_URL`-এর সমান হলে seed চলবেই না। Unit টেস্ট: `tests/unit/e2e-seed-guard.test.ts`। / The seed refuses anything but a local, non-dev test database. |
+| **e2e কীভাবে চালাবেন / How to run e2e** | ১) একবার: `npm run test:e2e:db` (আলাদা লোকাল DB `scholarsship_e2e`; আপনার dev DB `scholarsship` ছোঁয় না)। ২) `npx prisma dev ls` থেকে `scholarsship_e2e`-এর `postgres://…` URL নিয়ে `.env.local`-এ লিখুন: `E2E_DATABASE_URL="postgres://postgres:postgres@localhost:<port>/template1?sslmode=disable&connection_limit=1&pgbouncer=true"`। ৩) `npm run test:e2e`। URL না থাকলে টেস্ট শুরুই হবে না, পরিষ্কার মেসেজ দেবে। Port 3100-এ পুরোনো কোনো server চললে বন্ধ করুন, কারণ লোকালে চালু server আবার ব্যবহার হয়। / Start the test DB once, put its URL in `.env.local` as `E2E_DATABASE_URL`, then `npm run test:e2e`. |
 
 ## 18. GitHub Actions (CI / স্বয়ংক্রিয় চেক)
 
@@ -204,7 +207,7 @@ Mistakes never break the live site, parallel sessions stay separate, and changes
 | **বাংলা** | GitHub-এর নিজস্ব রোবট। প্রতিটা PR খোলা বা আপডেট হলে এবং `main`-এ push হলে এটা নিজে থেকে কোড নামিয়ে type check (`tsc`) ও `npm test` চালায়। কিছু ভাঙলে PR-এ লাল ✗ দেখায়, তাই merge-এর আগেই ধরা পড়ে। একে **CI (Continuous Integration)** বলে। |
 | **English** | GitHub's built-in robot. On every PR and every push to `main` it installs the project and runs the type check and `npm test`. A red ✗ on the PR means something broke, before it is merged. This is **CI (Continuous Integration)**. |
 | **উপমা / Analogy** | কারখানার গেটে মান-পরীক্ষক: প্রতিটা নতুন জিনিস ঢোকার আগে চেক হয়। / A quality inspector at the factory gate. |
-| **প্রজেক্টে / In project** | `.github/workflows/test.yml` (Node 22, `npm ci` → `tsc --noEmit` → `npm test`)। কোনো secret লাগে না, সব mock। E2E (Playwright) এখনো CI-তে নেই, লোকালে `npm run test:e2e`। / No secrets needed; E2E is not in CI yet. |
+| **প্রজেক্টে / In project** | `.github/workflows/test.yml` (Node 22, `npm ci` → `tsc --noEmit` → `npm test`)। কোনো secret লাগে না, সব mock। E2E (Playwright) এখনো CI-তে নেই, লোকালে `npm run test:e2e`। নকশা: `docs/QA-REPORT.md` → "CI-তে e2e" (J-3-তে চালু হবে)। / No secrets needed; E2E joins CI in step J-3. |
 | **দেখার জায়গা / Where to see** | PR পেজের নিচে "Checks", বা repo-র **Actions** ট্যাব / The PR's "Checks" section or the repo's **Actions** tab |
 
 ---
@@ -220,6 +223,7 @@ Mistakes never break the live site, parallel sessions stay separate, and changes
 | `npm test` | সব unit ও API টেস্ট একবার চালানো | Run all unit and API tests once |
 | `npm run test:watch` | ফাইল বদলালেই টেস্ট আবার চালানো | Re-run tests whenever a file changes |
 | `npm run test:e2e` | ব্রাউজারে E2E ও accessibility টেস্ট চালানো | Run browser E2E and accessibility tests |
+| `npm run test:e2e:db` | e2e-র আলাদা লোকাল টেস্ট DB চালু করা (একবার) | Start the local e2e test database (once) |
 
 ## Glossary / শব্দকোষ
 
