@@ -7,7 +7,7 @@ import path from 'node:path';
 import { Prisma, PrismaClient } from '@prisma/client';
 import type { Opportunity } from '../src/types';
 import { degreeToDb } from '../src/lib/scholarships';
-import { toOpportunityData } from '../src/lib/opportunities';
+import { staleDemoOpportunitiesWhere, toOpportunityData } from '../src/lib/opportunities';
 import { SCHOLARSHIPS } from './data/scholarships';
 
 const prisma = new PrismaClient();
@@ -195,8 +195,6 @@ async function seedResearchPapers() {
   console.log(`Seeded ${papers.length} research papers (removed ${removed.count} old rows).`);
 }
 
-const LEGACY_DEMO_SOURCES = ['linkedin', 'twitter', 'lab_website', 'web', 'reddit'];
-
 async function seedOpportunities() {
   const { opportunities } = await readJson<{ opportunities: Opportunity[] }>('opportunities.json');
   for (const o of opportunities) {
@@ -204,9 +202,7 @@ async function seedOpportunities() {
     await prisma.opportunity.upsert({ where: { id: o.id }, create: { id: o.id, ...data }, update: data });
   }
   // Only the old demo sources are removed; live posts from the cron (mastodon, bluesky, …) are kept
-  const removed = await prisma.opportunity.deleteMany({
-    where: { id: { notIn: opportunities.map((o) => o.id) }, source: { in: LEGACY_DEMO_SOURCES } },
-  });
+  const removed = await prisma.opportunity.deleteMany({ where: staleDemoOpportunitiesWhere(opportunities.map((o) => o.id)) });
   console.log(`Seeded ${opportunities.length} opportunities (removed ${removed.count} old rows).`);
 }
 
