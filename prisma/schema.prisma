@@ -324,7 +324,11 @@ model ResearchPaper {
   citationCount     Int           @default(0)
   doi               String?       @unique
   semanticScholarId String?       @unique
-  pdfUrl            String?
+  /// OpenAlex work id (W…), so the daily cron never adds the same work twice
+  openAlexId        String?       @unique
+  /// "seed" (prisma/data/papers.json) | "cron" (/api/cron/papers). The seed only deletes its own rows.
+  importedBy        String        @default("seed")
+  pdfUrl           String?
   googleScholarUrl  String?
   fieldsOfStudy     String[]
   tags              String[]

@@ -8,6 +8,7 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import type { Opportunity } from '../src/types';
 import { degreeToDb } from '../src/lib/scholarships';
 import { staleDemoOpportunitiesWhere, toOpportunityData } from '../src/lib/opportunities';
+import { staleSeedPapersWhere } from '../src/lib/papers/save';
 import { SCHOLARSHIPS } from './data/scholarships';
 import { PROGRAM_OPPORTUNITIES } from './data/programs';
 
@@ -37,6 +38,7 @@ type ProfessorSeed = {
 
 type PaperSeed = {
   id: string;
+  openAlexId?: string;
   title: string;
   abstract: string;
   year: number | null;
@@ -156,6 +158,8 @@ async function seedResearchPapers() {
   const known = new Set((await prisma.professor.findMany({ select: { id: true } })).map((p) => p.id));
   for (const p of papers) {
     const data = {
+      openAlexId: p.openAlexId ?? null,
+      importedBy: 'seed',
       title: p.title,
       abstract: p.abstract,
       year: p.year,
@@ -192,7 +196,8 @@ async function seedResearchPapers() {
       });
     });
   }
-  const removed = await prisma.researchPaper.deleteMany({ where: { id: { notIn: papers.map((p) => p.id) } } });
+  // Only seed papers that left papers.json are removed; papers from the daily cron are kept
+  const removed = await prisma.researchPaper.deleteMany({ where: staleSeedPapersWhere(papers.map((p) => p.id)) });
   console.log(`Seeded ${papers.length} research papers (removed ${removed.count} old rows).`);
 }
 

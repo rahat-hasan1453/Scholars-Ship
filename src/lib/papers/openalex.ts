@@ -1,4 +1,4 @@
-// OpenAlex works → research papers. Shared by the import script (prisma/import/import-papers.ts) and, later, the daily cron.
+// OpenAlex works → research papers. Shared by the import script (prisma/import/import-papers.ts) and the daily cron (/api/cron/papers).
 //
 // OpenAlex rules (docs.openalex.org / help.openalex.org, checked 2026-10-16):
 // - An API key is optional. Without one the budget is $0.10 a day: a works list call costs $0.0001, so ~1,000 calls a day.
@@ -9,6 +9,8 @@
 // Only what OpenAlex returns is kept; a work without a title or an abstract of 80+ characters is skipped.
 
 export const MAILTO = process.env.OPENALEX_MAILTO ?? 'xyz.brothers99@gmail.com';
+/** Optional free key (10x the daily budget); set OPENALEX_API_KEY in Vercel if the keyless budget is ever too small */
+const API_KEY = process.env.OPENALEX_API_KEY;
 export const AUTHORS_PER_REQUEST = 50;
 export const REQUEST_GAP_MS = 150;
 
@@ -107,12 +109,19 @@ export type FetchWorksOptions = {
   /** Results kept per request of AUTHORS_PER_REQUEST authors */
   perPage: number;
   sort?: string;
+  /** Only these OpenAlex work types, e.g. ['article', 'preprint'] */
+  types?: string[];
+  /** Pages fetched per batch of authors (default 1); paging stops early on a short page */
+  pages?: number;
+  /** Stop starting new requests after this time (ms since epoch); the rest waits for the next run */
+  stopAt?: number;
 };
 
-export function worksUrl(authorIds: string[], { fromDate, perPage, sort = 'cited_by_count:desc' }: FetchWorksOptions): string {
+export function worksUrl(authorIds: string[], { fromDate, perPage, sort = 'cited_by_count:desc', types }: FetchWorksOptions, page = 1): string {
+  const typeFilter = types?.length ? `,type:${types.join('|')}` : '';
   return (
-    `https://api.openalex.org/works?filter=author.id:${authorIds.join('|')},from_publication_date:${fromDate},has_abstract:true` +
-    `&sort=${sort}&per_page=${perPage}&mailto=${MAILTO}`
+    `https://api.openalex.org/works?filter=author.id:${authorIds.join('|')},from_publication_date:${fromDate},has_abstract:true${typeFilter}` +
+    `&sort=${sort}&per_page=${perPage}${page > 1 ? `&page=${page}` : ''}&mailto=${MAILTO}${API_KEY ? `&api_key=${API_KEY}` : ''}`
   );
 }
 
@@ -121,20 +130,28 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 /** Works for many authors, AUTHORS_PER_REQUEST at a time. A 429 waits and retries once; any other failure skips that batch. */
 export async function fetchWorks(authorIds: string[], options: FetchWorksOptions, log: (msg: string) => void = console.warn): Promise<Map<string, OpenAlexWork>> {
   const works = new Map<string, OpenAlexWork>();
+  const pages = options.pages ?? 1;
   for (let i = 0; i < authorIds.length; i += AUTHORS_PER_REQUEST) {
-    const url = worksUrl(authorIds.slice(i, i + AUTHORS_PER_REQUEST), options);
-    let res = await fetch(url);
-    if (res.status === 429) {
-      await sleep(2000);
-      res = await fetch(url);
+    for (let page = 1; page <= pages; page++) {
+      if (options.stopAt && Date.now() >= options.stopAt) {
+        log(`[openalex] time limit reached at batch ${i / AUTHORS_PER_REQUEST}`);
+        return works;
+      }
+      const url = worksUrl(authorIds.slice(i, i + AUTHORS_PER_REQUEST), options, page);
+      let res = await fetch(url);
+      if (res.status === 429) {
+        await sleep(2000);
+        res = await fetch(url);
+      }
+      if (!res.ok) {
+        log(`[openalex] batch ${i / AUTHORS_PER_REQUEST}: HTTP ${res.status}`);
+        break;
+      }
+      const json = (await res.json()) as { results: OpenAlexWork[] };
+      for (const w of json.results) works.set(w.id, w);
+      await sleep(REQUEST_GAP_MS);
+      if (json.results.length < options.perPage) break;
     }
-    if (!res.ok) {
-      log(`[openalex] batch ${i / AUTHORS_PER_REQUEST}: HTTP ${res.status}`);
-      continue;
-    }
-    const json = (await res.json()) as { results: OpenAlexWork[] };
-    for (const w of json.results) works.set(w.id, w);
-    await sleep(REQUEST_GAP_MS);
   }
   return works;
 }

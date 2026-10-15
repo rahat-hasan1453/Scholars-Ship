@@ -9,7 +9,7 @@ import { fetchWorks, workToPaper } from '../../src/lib/papers/openalex';
 
 const PROFESSORS = path.join(process.cwd(), 'prisma', 'data', 'professors.json');
 const OUT = path.join(process.cwd(), 'prisma', 'data', 'papers.json');
-const FROM_DATE = '2024-01-01';
+const FROM_DATE = '2025-01-01';
 const PER_BATCH = 12;
 
 async function main() {
