@@ -212,6 +212,67 @@ How to re-run: build in a folder without `'`, start `next start`, then `npx ligh
 ### টেস্ট পরিবেশের নোট / Test environment notes
 - E2E runs on `next dev` because `npm run build` fails in this folder (BUG-01). The dev server compiles pages on first visit, which occasionally races in Firefox, so the config allows 1 retry and reports such tests as "flaky".
 
+### E2E ফেলের তালিকা (J-1, 2026-10-16) / E2E failure list
+`npx playwright test --project=chromium-desktop --retries=0`, `main` = `3a67cfa`.
+- **আগে / Before** (dev DB, কোনো e2e seed নেই): **44 পাস, 22 ফেল**
+- **J-1-এর পরে / After** (test DB + e2e seed, spec এখনও বদলানো হয়নি): **47 পাস, 19 ফেল** (একটা flaky: `auth.spec.ts:14` প্রথম compile-এর সময়; একা চালালে 3/3 পাস)
+
+কারণ: (ক) পুরোনো demo id · (খ) পুরোনো টেক্সট · (গ) dev DB-র বড় ডেটার উপর নির্ভর · (ঘ) এখনও পরিষ্কার না, খতিয়ে দেখতে হবে। (ঘ) আসল bug হলে আলাদা কাজ।
+
+| # | Spec › টেস্ট | কারণ | J-1-এর পরে | কে ঠিক করবে |
+|---|---|---|---|---|
+| 1 | `a11y.spec.ts` › home | (ঘ) axe `color-contrast` | ✘ | J-2 |
+| 2 | `a11y.spec.ts` › research paper modal | (ক) `paper-ux-01` | ✘ | J-2 |
+| 3 | `auth.spec.ts:125` › signed-out → `/login` | (ঘ) | ✅ test DB দিয়ে পাস | — |
+| 4 | `auth.spec.ts:132` › not onboarded → `/onboarding` | (ঘ) | ✅ test DB দিয়ে পাস | — |
+| 5 | `faculty-details.spec.ts:4` › opens from card | (খ) "● Accepting Students"; এখন list table-এ কোনো row আসে না | ✘ | J-2 |
+| 6 | `faculty-details.spec.ts:33` › Save | (ক) `prof_baudisch_hpi_06` | ✘ | J-2 |
+| 7 | `faculty-details.spec.ts:42` › Similar faculty | (ক) `prof_baudisch_hpi_06` | ✘ | J-2 |
+| 8 | `feeds.spec.ts:26` › professors "Eligible Now" | (গ) 833 আশা, 48 দেখায় | ✘ | J-2 |
+| 9 | `feeds.spec.ts:26` › research "Eligible Now" | (গ) | ✅ | — |
+| 10 | `feeds.spec.ts:50` › Opportunity "Eligible Now" | (গ) সংখ্যা কমে না | ✘ | J-2 |
+| 11 | `feeds.spec.ts:73` › desktop natural scroll | (গ) scroll করার মতো কার্ড নেই | ✘ | J-3 |
+| 12 | `feeds.spec.ts:95` › filter → scroll to top | (গ) | ✘ | J-3 |
+| 13 | `feeds.spec.ts:107` › list view table | (গ) | ✘ | J-3 |
+| 14 | `home.spec.ts:14` › logout | (খ) "QA Student" বোতাম আর নেই | ✘ | J-3 |
+| 15 | `opportunity-details.spec.ts:4` › opens from card | (খ) "Original Post" | ✅ | — |
+| 16 | `opportunity-details.spec.ts:34` › Save | (ক) `opp_bremen_ux_03` | ✘ | J-3 |
+| 17 | `pipeline.spec.ts:62` › add from dialog to Decided | (ঘ) কার্ড যোগ হয় না | ✘ | J-3 |
+| 18 | `pipeline.spec.ts:108` › save scholarship, reload | (ক) `sch_daad_design_02` | ✘ | J-3 |
+| 19–22 | `research-paper-details.spec.ts` › deep link, focus, Save, screenshot | (ক) `paper-ux-01` (+ পুরোনো শিরোনাম) | ✘ | J-3 |
+
+নতুন id আর নাম: `tests/e2e/ids.ts` (`E2E_IDS`, `E2E_NAMES`)।
+
+### CI-তে e2e: নকশা (J-3-তে যোগ হবে) / CI design
+`.github/workflows/test.yml`-এ আলাদা একটা `e2e` job, যাতে সমস্যা হলে শুধু এটা সরালেই চলে।
+```yaml
+e2e:
+  runs-on: ubuntu-latest
+  timeout-minutes: 20
+  services:
+    postgres:
+      image: postgres:16
+      env: { POSTGRES_PASSWORD: postgres, POSTGRES_DB: e2e }
+      ports: ['5432:5432']
+      options: --health-cmd pg_isready --health-interval 5s --health-retries 10
+  env:
+    E2E_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/e2e
+  steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with: { node-version: 22, cache: npm }
+    - run: npm ci
+    - run: npx playwright install --with-deps chromium
+    - run: npx playwright test --project=chromium-desktop --project=chromium-mobile
+    - uses: actions/upload-artifact@v4
+      if: failure()
+      with: { name: playwright-report, path: playwright-report, retention-days: 7 }
+```
+- GitHub নিজে `CI=true` দেয়, তাই নতুন server চালু হয় (`reuseExistingServer: !CI`)।
+- প্রতিবার খালি নতুন Postgres। পাসওয়ার্ড গোপন না, কোনো secret লাগে না। `.env.local` নেই, তাই পাহারা শুধু host (`localhost`) আর `E2E_DB=1` দেখে।
+- শুধু Chromium (desktop + mobile), যাতে কম মিনিট খরচ হয়। Firefox/WebKit লোকালে, পরে চাইলে সপ্তাহে একবার `schedule` দিয়ে।
+- Job চালু হবে J-3-তে, যখন সব spec সবুজ। তার আগে চালু করলে প্রতিটা PR লাল দেখাবে।
+
 ## পরের ধাপ / Next runs
 1. Figma visual comparison (needs the Figma connector authorized). Re-run Lighthouse after PERF-01/02 fixes.
 2. `AppContext` unit tests; E2E for bookmarks/track, Kanban, feed filters and search.

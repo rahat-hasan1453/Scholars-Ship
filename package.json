@@ -15,7 +15,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:db": "prisma dev --name scholarsship_e2e --detach"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
