@@ -106,7 +106,7 @@ export function MultiSelectField({
           >
             <div ref={chipAreaRef} className="flex min-w-0 flex-1 items-start gap-1">
               {selected.length === 0 ? (
-                <span className="truncate text-[12px] leading-[18px] italic text-[#90a1b9]">{placeholder}</span>
+                <span className="truncate text-[12px] leading-[18px] italic text-[#627181]">{placeholder}</span>
               ) : (
                 <>
                   {selected.slice(0, visibleCount).map((value) => (
