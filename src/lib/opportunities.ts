@@ -94,6 +94,14 @@ export async function saveOpportunities(list: Opportunity[]): Promise<number> {
   return list.filter((o) => !existing.has(o.id)).length;
 }
 
+/** Sources of the old demo listings. The seed removes only these; live sources (mastodon, bluesky, university, ...) are never removed. */
+export const LEGACY_DEMO_SOURCES = ['linkedin', 'twitter', 'lab_website', 'web', 'reddit'];
+
+/** Rows the seed may delete: old demo listings that are no longer in the seed data. */
+export function staleDemoOpportunitiesWhere(keepIds: string[]): Prisma.OpportunityWhereInput {
+  return { id: { notIn: keepIds }, source: { in: LEGACY_DEMO_SOURCES } };
+}
+
 /** Still open: deadline in the future, or no stated deadline and posted within MAX_AGE_DAYS. */
 export function currentWhere(now = new Date()): Prisma.OpportunityWhereInput {
   return {
