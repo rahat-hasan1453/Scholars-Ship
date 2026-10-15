@@ -155,6 +155,7 @@ Each known bug has a test that is expected to fail while the bug exists, so `npm
 - **Expected:** Read the tab with `useSearchParams()`, or set it in an effect after mount.
 
 ### BUG-19 · ✅ Fixed (PR #8 + follow-up; axe now reports nothing in 4 browsers) · Accessibility (WCAG 2.1 AA, axe)
+- **Came back, fixed again (2026-10-16):** the "Select funding..." placeholder in `MultiSelectField` used `#90a1b9` (2.63:1 on white). Changed to `#627181` (~5:1); `a11y › home` passes on desktop and mobile.
 - **Fixed (run #5):** the main grey text token `#919EAB` (2.73:1) is gone. Home contrast violations dropped from 81 to 23 elements (desktop) and 21 (mobile); `/login` now has only the logo issue; Firefox reports nothing on home.
 - **Still open (run #5):**
 
