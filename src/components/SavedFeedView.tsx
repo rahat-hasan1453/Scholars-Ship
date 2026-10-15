@@ -24,7 +24,7 @@ export function SavedFeedView() {
   const { bookmarks: savedOpps, toggleBookmark } = useOpportunityBookmarks();
   const { bookmarks: savedProfs } = useProfessorBookmarks();
   const opportunities = useFetchedList<Opportunity>('/api/opportunities');
-  const papers = useFetchedList<ResearchPaper>('/api/research/papers');
+  const papers = useFetchedList<ResearchPaper>(`/api/research/papers?ids=${encodeURIComponent(savedPaperIds.join(','))}`);
   const [kind, setKind] = useSessionState<Kind>('saved:kind', 'all');
   const [openPaper, setOpenPaper] = useState<ResearchPaper | null>(null);
 

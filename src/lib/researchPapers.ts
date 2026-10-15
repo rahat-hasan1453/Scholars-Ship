@@ -2,6 +2,9 @@ import type { PaperAuthor, ResearchPaper as ResearchPaperRow } from '@prisma/cli
 import type { PaperFinding, ResearchPaper, UserProfile } from '@/types';
 import { subjectTagsFor } from '@/lib/opportunityDetails';
 
+/** Papers in the Research Paper tab. The daily cron adds thousands, and a Vercel response is capped at 4.5 MB (~2.5 KB a paper). */
+export const FEED_LIMIT = 800;
+
 export type ResearchPaperWithAuthors = ResearchPaperRow & { authors: PaperAuthor[] };
 
 // Semantic Scholar paper ids are 40-char hex hashes; anything else is not a real id

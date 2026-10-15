@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { abstractText, fetchWorks, workToPaper, worksUrl, type OpenAlexWork } from '@/lib/papers/openalex';
+import { selectRecentPapers } from '@/lib/papers/save';
 
 const LONG = 'Deep learning methods for robust perception under distribution shift in autonomous driving scenes with limited labels';
 const index = (text: string) => {
@@ -83,6 +84,47 @@ describe('worksUrl', () => {
     expect(url).toContain('sort=cited_by_count:desc');
     expect(url).toContain('per_page=12');
     expect(url).toContain('mailto=');
+    expect(url).not.toContain('page=2');
+  });
+
+  it('adds the type filter and the page number', () => {
+    const url = worksUrl(['A1'], { fromDate: '2025-01-01', perPage: 100, types: ['article', 'preprint'] }, 2);
+    expect(url).toContain(',has_abstract:true,type:article|preprint&');
+    expect(url).toContain('&page=2&');
+  });
+});
+
+describe('selectRecentPapers', () => {
+  const profs = new Map([['A1', 'prof_1']]);
+
+  it('keeps new articles, conference papers and preprints, newest first', () => {
+    const papers = selectRecentPapers(
+      [
+        work({ id: 'https://openalex.org/W1', publication_date: '2025-02-01' }),
+        work({ id: 'https://openalex.org/W2', publication_date: '2026-05-01', type: 'preprint' }),
+        work({ id: 'https://openalex.org/W3', publication_date: '2025-08-01', type: 'article' }),
+      ],
+      profs,
+    );
+    expect(papers.map((p) => p.id)).toEqual(['paper_W2', 'paper_W3', 'paper_W1']);
+  });
+
+  it('drops old work, other types, missing abstracts and papers without one of our professors', () => {
+    const papers = selectRecentPapers(
+      [
+        work({ id: 'https://openalex.org/W1', publication_year: 2024, publication_date: '2024-12-30' }),
+        work({ id: 'https://openalex.org/W2', type: 'book-chapter' }),
+        work({ id: 'https://openalex.org/W3', abstract_inverted_index: null }),
+        work({ id: 'https://openalex.org/W4', authorships: [{ author: { id: 'https://openalex.org/A9', display_name: 'Someone' }, institutions: [] }] }),
+      ],
+      profs,
+    );
+    expect(papers).toEqual([]);
+  });
+
+  it('keeps at most perProfessor papers for each professor', () => {
+    const works = Array.from({ length: 5 }, (_, i) => work({ id: `https://openalex.org/W${i}`, publication_date: `2025-0${i + 1}-01` }));
+    expect(selectRecentPapers(works, profs, { perProfessor: 2 }).map((p) => p.id)).toEqual(['paper_W4', 'paper_W3']);
   });
 });
 
