@@ -16,8 +16,8 @@ test.describe('Home', () => {
     const backend = await installFakeBackend(page, { user: signedInUser() });
     await page.goto('/');
     await page.waitForLoadState('networkidle');
-    await page.getByRole('button', { name: /^QA Student/ }).click();
-    await page.getByText('Logout', { exact: true }).filter({ visible: true }).click();
+    await page.getByRole('button', { name: /^Account menu for QA Student/ }).click();
+    await page.getByRole('menuitem', { name: 'Log out' }).click();
     await expect(page).toHaveURL(/\/login$/);
     expect(backend.user).toBeNull();
   });

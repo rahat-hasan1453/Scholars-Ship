@@ -259,7 +259,15 @@ J-2-র 7টা টেস্ট এখন সবুজ, একটা বাদ�
 
 **J-3-তে বাকি (11টা):** `feeds` scroll ×2, `home` logout, `opportunity-details` Save, `pipeline` ×2, `research-paper-details` ×4।
 
-### CI-তে e2e: নকশা (J-3-তে যোগ হবে) / CI design
+### J-3 ফল (2026-10-16) / J-3 result
+Chromium desktop + mobile: **126 পাস, 0 ফেল** (6 skipped: কিছু টেস্ট desktop বা mobile-এ ইচ্ছা করে বাদ)। দুবার চালিয়ে 0–1 flaky, retry-তে পাস। Firefox + WebKit: 126 পাস, 0 ফেল (2 flaky, Firefox, retry-তে পাস)। সব মিলিয়ে ~26 ফেল থেকে 0।
+- Seed: 8টা বাড়তি Masters opportunity (scroll টেস্টের জন্য), paper-এ DOI + Key Findings (`−43%`) + Nov 2025 তারিখ।
+- Fake backend: নতুন application-এর scholarship এখন test DB থেকে আসে (`/api/scholarships`), পুরোনো mock তালিকা থেকে না।
+- `home` logout: মেনুর লেখা এখন "Log out"।
+- `global-setup`: শুরুতে সব ধরনের পেজ একবার খুলে compile করিয়ে নেয়, তাই প্রথম-visit race কমেছে।
+- **CI `e2e` job চালু** (`.github/workflows/test.yml`)। নিচের নকশাই সেটা।
+
+### CI-তে e2e: নকশা / CI design
 `.github/workflows/test.yml`-এ আলাদা একটা `e2e` job, যাতে সমস্যা হলে শুধু এটা সরালেই চলে।
 ```yaml
 e2e:

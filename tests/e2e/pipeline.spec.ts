@@ -1,5 +1,6 @@
 import { demoApplications, expect, installFakeBackend, signedInUser, test } from './fixtures';
 import type { Page } from '@playwright/test';
+import { E2E_IDS, E2E_NAMES } from './ids';
 
 const column = (page: Page, status: string) => page.locator(`[data-testid="pipeline-column"][data-column="${status}"]`);
 const card = (page: Page, id: string) => page.locator(`[data-card-id="${id}"]`);
@@ -63,11 +64,11 @@ test.describe('Pipeline (Kanban)', () => {
     await column(page, 'Decided').getByRole('button', { name: 'Add new to Decided' }).click();
     const dialog = page.getByRole('dialog', { name: 'Add application' });
     await expect(dialog).toBeVisible();
-    await dialog.getByRole('combobox').fill('Fulbright');
+    await dialog.getByRole('combobox').fill(E2E_NAMES.scholarshipTitle);
     await dialog.getByRole('option').first().click();
     await expect(dialog).toBeHidden();
     await expect(column(page, 'Decided').getByTestId('pipeline-card')).toHaveCount(1);
-    await expect(column(page, 'Decided').getByText(/Fulbright/)).toBeVisible();
+    await expect(column(page, 'Decided').getByText(E2E_NAMES.scholarshipTitle)).toBeVisible();
   });
 
   test('switches to Professor Outreach', async ({ page }) => {
@@ -107,10 +108,10 @@ test.describe('Pipeline saved on the server', () => {
 
   test('save a scholarship, move it on the board, reload: it is still there', async ({ page }) => {
     const backend = await installFakeBackend(page, { user: signedInUser() });
-    await page.goto('/scholarships/sch_daad_design_02');
+    await page.goto(`/scholarships/${E2E_IDS.scholarship}`);
     await page.getByRole('button', { name: '🔖 Save' }).click();
     await expect(page.getByRole('button', { name: '🔖 Saved' })).toBeVisible();
-    await expect.poll(() => backend.applications.map((a) => a.scholarshipId)).toEqual(['sch_daad_design_02']);
+    await expect.poll(() => backend.applications.map((a) => a.scholarshipId)).toEqual([E2E_IDS.scholarship]);
     const id = backend.applications[0].id;
 
     await page.goto('/?tab=tracker');
@@ -128,16 +129,16 @@ test.describe('Pipeline saved on the server', () => {
 
   test('imports the old browser-only data once, then clears it', async ({ page }) => {
     const backend = await installFakeBackend(page, { user: signedInUser() });
-    await page.addInitScript(() => {
+    await page.addInitScript((oppId) => {
       if (sessionStorage.getItem('seeded')) return;
       sessionStorage.setItem('seeded', '1');
-      localStorage.setItem('highscholar_bookmarked_programs', JSON.stringify(['opp_bremen_ux_03']));
+      localStorage.setItem('highscholar_bookmarked_programs', JSON.stringify([oppId]));
       localStorage.setItem('highscholar_applications_v2', JSON.stringify([{ id: 'app_01', scholarshipId: 'sch_chevening_uk_01', status: 'Preparing' }]));
-    });
+    }, E2E_IDS.opportunity);
     await page.goto('/?tab=tracker');
     await expect.poll(() => backend.importCalls.length).toBe(1);
     // demo cards are not sent; real bookmarks are
-    expect(backend.importCalls[0]).toMatchObject({ applications: [], opportunities: ['opp_bremen_ux_03'] });
+    expect(backend.importCalls[0]).toMatchObject({ applications: [], opportunities: [E2E_IDS.opportunity] });
     await expect.poll(() => page.evaluate(() => localStorage.getItem('highscholar_bookmarked_programs'))).toBeNull();
     await page.reload();
     await expect(page.getByRole('heading', { name: 'Pipeline', level: 1 })).toBeVisible();

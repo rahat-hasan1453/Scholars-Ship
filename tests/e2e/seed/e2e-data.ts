@@ -116,6 +116,11 @@ export function e2eData(now = new Date()) {
     ...o,
   });
 
+  // Enough visible cards that the feed is taller than the window, for the scroll specs
+  const extraOpportunities = Array.from({ length: 8 }, (_, i) =>
+    opportunity({ id: `e2e_opp_extra_${i + 1}`, title: `E2E Extra Masters Position ${i + 1}`, subjectTags: ['Computer Science'], degreeLevels: ['MASTERS'], postedAt: inDays(-(i + 1)), deadline: inDays(30 + i) }),
+  );
+
   const opportunities = [
     opportunity({ id: E2E_IDS.opportunity, title: 'E2E PhD in Human-Computer Interaction' }),
     opportunity({ id: E2E_IDS.opportunityMasters, title: 'E2E Funded Masters in Data Visualization', authorName: 'Dr. Cleo Mockley', professorId: 'e2e_prof_vis', institution: universities[1].name, labName: 'E2E Visualization Group', country: 'Switzerland', city: 'Zurich', degreeLevels: ['MASTERS'], fieldTags: ['Visualization'], subjectTags: ['Data Science & Analytics'], positionType: 'Masters scholarship' }),
@@ -125,6 +130,7 @@ export function e2eData(now = new Date()) {
     // Visible in the feed, but asks for a CGPA above the e2e student's 3.82, so "Eligible Now" drops it
     opportunity({ id: E2E_IDS.opportunityDemanding, title: 'E2E Demanding Masters in Machine Learning', authorName: 'Dr. Eve Stubbs', professorId: 'e2e_prof_uk', institution: 'E2E London College', labName: null, country: 'United Kingdom', city: 'London', fieldTags: ['Machine Learning'], subjectTags: ['Artificial Intelligence'], minCgpa: 3.95, publications: 'required' }),
     opportunity({ id: 'e2e_opp_partial', title: 'E2E Partially Funded Masters', subjectTags: ['Computer Science'], degreeLevels: ['MASTERS'], funding: 'Partial Funding', fundingTags: ['Partial Funding'], postedAt: inDays(-20) }),
+    ...extraOpportunities,
   ];
 
   const paper = (p: Partial<Prisma.ResearchPaperCreateManyInput> & Pick<Prisma.ResearchPaperCreateManyInput, 'id' | 'title'>): Prisma.ResearchPaperCreateManyInput => ({
@@ -146,7 +152,11 @@ export function e2eData(now = new Date()) {
   });
 
   const papers = [
-    paper({ id: E2E_IDS.paper, title: E2E_NAMES.paperTitle, citationCount: 120, tags: ['HCI', 'Generative AI'], keyFindings: [{ label: 'Speed', text: 'Designers worked faster', value: '2x', met: true }] }),
+    paper({
+      id: E2E_IDS.paper, title: E2E_NAMES.paperTitle, citationCount: 120, tags: ['HCI', 'Generative AI'],
+      year: 2025, publishedAt: new Date('2025-11-12T00:00:00Z'), doi: '10.0000/e2e.paper.1',
+      keyFindings: [{ label: 'Task time', text: 'Designers finished tasks faster with the AI partner', value: '−43%', met: true }],
+    }),
     paper({ id: 'e2e_paper_vis', title: 'E2E Visualization Study', tags: ['Data Visualization'], institution: universities[1].name, year: 2025 }),
     paper({ id: 'e2e_paper_access', title: 'E2E Accessibility Audit Methods', tags: ['Accessibility'], citationCount: 4 }),
     paper({ id: 'e2e_paper_ml', title: 'E2E Small Models for Test Data', tags: ['Machine Learning'], paperType: 'Preprint', peerReviewed: false, isOpenAccess: false, pdfUrl: null }),
