@@ -3,7 +3,7 @@
 import React, { useMemo } from 'react';
 import { useSessionState } from '@/hooks/useSessionState';
 import { useSearchMissLog } from '@/hooks/useSearchMissLog';
-import { matchesSubjects } from '@/data/subjectCatalog';
+import { rankBySubject } from '@/data/subjectCatalog';
 import { profileFilterDefaults, useProfileFilterDefaults } from '@/hooks/useProfileFilterDefaults';
 import { FilterIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
@@ -38,7 +38,7 @@ export const FacultyLabsFeed: React.FC = () => {
   const [matchMode, setMatchMode] = useSessionState<MatchMode>('faculty:match', 'all');
 
   const filteredProfessors = useMemo(() => {
-    return professors.filter((prof) => {
+    const matching = professors.filter((prof) => {
       // 1. Global search query
       if (globalSearchQuery.trim()) {
         const q = globalSearchQuery.toLowerCase();
@@ -68,11 +68,10 @@ export const FacultyLabsFeed: React.FC = () => {
         if (!matchesCountry) return false;
       }
 
-      // 4. Subject filter
-      if (prof.researchTags?.length && !matchesSubjects(selectedSubjects, prof.researchTags)) return false;
-
       return true;
     });
+    // 4. Subject filter: labs about the subject first, then close ones; labs with no research tags stay at the end
+    return rankBySubject(matching, selectedSubjects, (prof) => prof.researchTags ?? [], true);
   }, [professors, globalSearchQuery, matchMode, profile, selectedDegrees, selectedCountries, selectedSubjects]);
 
   // Any filter, search or mode change scrolls the cards back to the top
