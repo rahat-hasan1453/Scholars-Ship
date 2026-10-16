@@ -61,6 +61,15 @@ describe('scholarship details helpers', () => {
     ]);
   });
 
+  it('says "Not specified" (not "Not required") when the source states no minimum score', () => {
+    const rows = eligibilityRows(sch({ requirements: {} }), profile);
+    expect(rows.map((r) => [r.label, r.requirement, r.met])).toEqual([
+      ['CGPA', 'Not specified', true],
+      ['IELTS', 'Not specified', true],
+      ['GRE', 'Not specified', true],
+    ]);
+  });
+
   it('scores match bars per criterion', () => {
     expect(matchBreakdown(sch(), profile)).toEqual([
       { label: 'Academic (CGPA)', percent: 100 },

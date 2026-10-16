@@ -111,9 +111,9 @@ export function eligibilityRows(s: Scholarship, profile: UserProfile): Eligibili
   const rows = [
     scoreRow('CGPA', r.minCgpa, profile.cgpa, 'Not specified'),
     r.minToefl && !r.minIelts
-      ? scoreRow('TOEFL', r.minToefl, profile.testScores?.toefl, 'Not required')
-      : scoreRow('IELTS', r.minIelts, profile.testScores?.ielts, 'Not required'),
-    scoreRow('GRE', r.minGre, profile.testScores?.gre, 'Not required'),
+      ? scoreRow('TOEFL', r.minToefl, profile.testScores?.toefl, 'Not specified')
+      : scoreRow('IELTS', r.minIelts, profile.testScores?.ielts, 'Not specified'),
+    scoreRow('GRE', r.minGre, profile.testScores?.gre, 'Not specified'),
   ];
   if (r.minWorkYears) {
     rows.push({ label: 'Work experience', requirement: `${r.minWorkYears} years after graduation`, you: 'You: not set', met: false });
