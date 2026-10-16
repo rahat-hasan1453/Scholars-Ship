@@ -1,4 +1,5 @@
-// Real scholarships, checked against official pages and public announcements on 2026-10-09.
+// The first 24 scholarships, checked against official pages and public announcements on 2026-10-09
+// (CURATED_VERIFIED_ON in index.ts). New scholarships go in a batch-*.ts file, not here.
 //
 // Rules for this file:
 // - Only facts a source states. Unknown amounts are described in words ("monthly stipend"), never invented.
@@ -6,35 +7,10 @@
 //   `deadlineEstimated: true` means the new call isn't published yet; the date follows last cycle's pattern
 //   and the UI labels it "Expected".
 // - `sourceUrl` is the official page to re-check before every update.
-import type { DegreeLevel, FundingType } from '../../src/types';
+// - Ids stay `sch_…`: bookmarks and applications point at them.
+import { ALL_FIELDS, type CuratedSeed } from './schema';
 
-export type ScholarshipSeed = {
-  id: string;
-  title: string;
-  provider: string;
-  providerShort?: string;
-  deadline: string;
-  deadlineEstimated: boolean;
-  deadlineNote?: string;
-  fundingAmount: string;
-  fundingType: FundingType;
-  degreeLevels: DegreeLevel[];
-  countries: string[];
-  specializations: string[];
-  requirements: { minCgpa?: number; minIelts?: number; minToefl?: number; minWorkYears?: number; notes?: string };
-  admissionSummary?: string;
-  applySteps?: string[];
-  officialUrl: string;
-  sourceUrl: string;
-  description: string;
-  featured?: boolean;
-  tags: string[];
-};
-
-/** Matches every subject in the Subject filter */
-export const ALL_FIELDS = 'All fields';
-
-export const SCHOLARSHIPS: ScholarshipSeed[] = [
+export const CURATED: CuratedSeed[] = [
   {
     id: 'sch_commonwealth_masters',
     title: "Commonwealth Master's Scholarships",

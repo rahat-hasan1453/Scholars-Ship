@@ -9,6 +9,7 @@
     "postinstall": "prisma generate",
     "db:seed": "tsx --env-file=.env.local prisma/seed.ts",
     "data:stats": "tsx --env-file=.env.local prisma/report/data-stats.ts",
+    "data:scholarships:check": "tsx prisma/import/check-scholarships.ts",
     "data:misses": "tsx --env-file=.env.local prisma/report/search-misses.ts",
     "data:import": "tsx prisma/import/import-professors.ts && tsx prisma/import/import-papers.ts && tsx prisma/import/import-opportunities.ts",
     "start": "next start",

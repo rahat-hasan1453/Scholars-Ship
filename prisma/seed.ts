@@ -14,7 +14,6 @@ import { PROGRAM_OPPORTUNITIES } from './data/programs';
 
 const prisma = new PrismaClient();
 const DATA = path.join(__dirname, 'data');
-const VERIFIED_AT = new Date('2026-10-09T00:00:00Z');
 
 const readJson = async <T>(file: string): Promise<T> => JSON.parse(await readFile(path.join(DATA, file), 'utf8')) as T;
 
@@ -70,6 +69,8 @@ async function seedScholarships() {
       degreeLevels: s.degreeLevels.map(degreeToDb),
       countries: s.countries,
       specializations: s.specializations,
+      providerCountry: s.providerCountry ?? null,
+      eligibleNationalities: s.eligibleNationalities ?? [],
       requirementsJson: s.requirements,
       admissionSummary: s.admissionSummary ?? null,
       livingCost: null,
@@ -79,7 +80,7 @@ async function seedScholarships() {
       tags: s.tags,
       officialUrl: s.officialUrl,
       sourceUrl: s.sourceUrl,
-      verifiedAt: VERIFIED_AT,
+      verifiedAt: new Date(`${s.verifiedOn}T00:00:00Z`),
       description: s.description,
       featured: s.featured ?? false,
     };
