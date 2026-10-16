@@ -1,5 +1,5 @@
-# HighScholar 🎓
-> Intelligent Global Scholarship, Professor & Safe-Bet University Discovery Portal
+# Scholars'ship 🎓
+> Global Scholarship, Professor & Safe-Bet University Discovery Portal
 
 HighScholar is a portal designed to help international students discover fully-funded scholarships, contact hiring professors and research labs, and match with high-acceptance safe-bet regional universities with guaranteed graduate assistantships (TA/RA).
 
