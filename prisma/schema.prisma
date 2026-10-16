@@ -96,39 +96,44 @@ model UserProfile {
 }
 
 model Scholarship {
-  id                String        @id @default(uuid())
-  title             String
-  provider          String
-  deadline          DateTime
-  fundingAmount     String
-  fundingType       String        @default("FULL")
-  degreeLevels      DegreeLevel[]
-  countries         String[]
-  specializations   String[]
-  requirementsJson  Json?
-  admissionSummary  String?
-  livingCost        String?
+  id                    String        @id @default(uuid())
+  title                 String
+  provider              String
+  deadline              DateTime
+  fundingAmount         String
+  fundingType           String        @default("FULL")
+  degreeLevels          DegreeLevel[]
+  /// Where you study
+  countries             String[]
+  specializations       String[]
+  /// Country that funds it, e.g. "Japan" (null for international bodies like the World Bank)
+  providerCountry       String?
+  /// Who can apply, only when the source lists it. Empty = the source doesn't say
+  eligibleNationalities String[]      @default([])
+  requirementsJson      Json?
+  admissionSummary      String?
+  livingCost            String?
   /// Short provider name for the facts grid, e.g. "DAAD"
-  providerShort     String?
+  providerShort         String?
   /// Field of study line for the facts grid
-  fieldOfStudy      String?
+  fieldOfStudy          String?
   /// [{ label, value }] rows for the Funding section
-  fundingBreakdown  Json?
-  applySteps        String[]      @default([])
-  tags              String[]      @default([])
-  officialUrl       String
+  fundingBreakdown      Json?
+  applySteps            String[]      @default([])
+  tags                  String[]      @default([])
+  officialUrl           String
   /// true while the provider hasn't published the new call: the date follows last cycle and the UI says "Expected"
-  deadlineEstimated Boolean       @default(false)
+  deadlineEstimated     Boolean       @default(false)
   /// Short note on how the deadline works, e.g. "Each country has its own deadline"
-  deadlineNote      String?
+  deadlineNote          String?
   /// Page the facts were checked against, and when
-  sourceUrl         String?
-  verifiedAt        DateTime?
-  description       String
-  featured          Boolean       @default(false)
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
-  applications      Application[]
+  sourceUrl             String?
+  verifiedAt            DateTime?
+  description           String
+  featured              Boolean       @default(false)
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  applications          Application[]
 }
 
 model University {
@@ -328,7 +333,7 @@ model ResearchPaper {
   openAlexId        String?       @unique
   /// "seed" (prisma/data/papers.json) | "cron" (/api/cron/papers). The seed only deletes its own rows.
   importedBy        String        @default("seed")
-  pdfUrl           String?
+  pdfUrl            String?
   googleScholarUrl  String?
   fieldsOfStudy     String[]
   tags              String[]
