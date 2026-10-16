@@ -13,6 +13,7 @@ import { OpportunityListBar, MatchMode, ViewMode } from '@/components/opportunit
 import type { Opportunity } from '@/types';
 import { useSessionState } from '@/hooks/useSessionState';
 import { useSearchMissLog } from '@/hooks/useSearchMissLog';
+import { rankBySubject } from '@/data/subjectCatalog';
 import { profileFilterDefaults, useProfileFilterDefaults } from '@/hooks/useProfileFilterDefaults';
 import { useOpportunityBookmarks } from '@/hooks/useOpportunityBookmarks';
 import { isOpportunityEligible } from '@/lib/eligibility';
@@ -59,7 +60,7 @@ export const OpportunitiesFeed: React.FC = () => {
 
   const filteredListings = useMemo(() => {
     const q = globalSearchQuery.trim().toLowerCase();
-    return (listings ?? []).filter((p) => {
+    const matching = (listings ?? []).filter((p) => {
       if (q) {
         const haystack = [p.title, p.institution, p.authorName, p.labName ?? '', p.country, p.funding, ...p.fieldTags, ...p.subjectTags]
           .join(' ')
@@ -68,12 +69,13 @@ export const OpportunitiesFeed: React.FC = () => {
       }
       if (matchMode === 'eligible' && !isOpportunityEligible(p, profile)) return false;
       return (
-        matchesAny(selectedSubjects, p.subjectTags) &&
         matchesAny(selectedDegrees, p.degreeLevels) &&
         matchesAny(selectedCountries, [p.country]) &&
         matchesAny(selectedFunding, p.fundingTags)
       );
     });
+    // Subject filter: listings about the subject first, then close ones
+    return rankBySubject(matching, selectedSubjects, (p) => [p.title, ...p.subjectTags, ...p.fieldTags]);
   }, [listings, globalSearchQuery, matchMode, profile, selectedSubjects, selectedDegrees, selectedCountries, selectedFunding]);
 
   const acceptanceRange = useMemo(() => {

@@ -3,7 +3,7 @@
 import React, { useMemo } from 'react';
 import { useSessionState } from '@/hooks/useSessionState';
 import { useSearchMissLog } from '@/hooks/useSearchMissLog';
-import { matchesSubjects } from '@/data/subjectCatalog';
+import { rankBySubject } from '@/data/subjectCatalog';
 import { profileFilterDefaults, useProfileFilterDefaults } from '@/hooks/useProfileFilterDefaults';
 import { FilterIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
@@ -37,7 +37,7 @@ export const ScholarshipRadarFeed: React.FC = () => {
   const [matchMode, setMatchMode] = useSessionState<MatchMode>('radar:match', 'all');
 
   const filteredScholarships = useMemo(() => {
-    return scholarships.filter((sch) => {
+    const matching = scholarships.filter((sch) => {
       // 1. Global search query
       if (globalSearchQuery.trim()) {
         const q = globalSearchQuery.toLowerCase();
@@ -70,11 +70,10 @@ export const ScholarshipRadarFeed: React.FC = () => {
         if (!matchesCountry) return false;
       }
 
-      // 4. Subject filter
-      if (!matchesSubjects(selectedSubjects, [...(sch.specializations || []), ...(sch.tags || [])])) return false;
-
       return true;
     });
+    // 4. Subject filter: scholarships about the subject first, then close ones ("All fields" counts as close)
+    return rankBySubject(matching, selectedSubjects, (sch) => [sch.title, ...(sch.specializations || []), ...(sch.tags || [])]);
   }, [scholarships, globalSearchQuery, matchMode, profile, selectedDegrees, selectedCountries, selectedSubjects]);
 
   // Any filter, search or mode change scrolls the cards back to the top

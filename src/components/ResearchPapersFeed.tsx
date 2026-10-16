@@ -5,7 +5,7 @@ import { FilterIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { useSessionState } from '@/hooks/useSessionState';
 import { useSearchMissLog } from '@/hooks/useSearchMissLog';
-import { matchesSubjects } from '@/data/subjectCatalog';
+import { rankBySubject } from '@/data/subjectCatalog';
 import { profileFilterDefaults, useProfileFilterDefaults } from '@/hooks/useProfileFilterDefaults';
 import { ResearchPaper } from '@/types';
 import { UnifiedDiscoveryHeader } from '@/components/layout/UnifiedDiscoveryHeader';
@@ -96,7 +96,7 @@ export const ResearchPapersFeed: React.FC = () => {
 
   // Papers have no degree/country/funding data; those filters only matter on the other tabs
   const filteredPapers = useMemo(() => {
-    return (papers ?? []).filter((paper) => {
+    const matching = (papers ?? []).filter((paper) => {
       // 1. Global search query
       if (globalSearchQuery.trim()) {
         const q = globalSearchQuery.toLowerCase();
@@ -112,11 +112,10 @@ export const ResearchPapersFeed: React.FC = () => {
       // Eligible Now: papers have no admission rules, so this keeps the ones relevant to the student's interests
       if (matchMode === 'eligible' && !isPaperEligible(paper, profile)) return false;
 
-      // 2. Subject filter
-      if (!matchesSubjects(selectedSubjects, [...(paper.fieldsOfStudy || []), ...(paper.tags || [])])) return false;
-
       return true;
     });
+    // 2. Subject filter: papers about the subject first, then close ones
+    return rankBySubject(matching, selectedSubjects, (paper) => [paper.title, ...(paper.fieldsOfStudy || []), ...(paper.tags || [])]);
   }, [papers, globalSearchQuery, matchMode, profile, selectedSubjects]);
 
   // Any filter, search or mode change scrolls the cards back to the top
