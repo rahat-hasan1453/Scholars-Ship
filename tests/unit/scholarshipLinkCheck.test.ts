@@ -86,12 +86,61 @@ describe('link check', () => {
     });
     const problems = await checkLinks(
       [one('gone', 'https://d.gov/gone'), one('blocked', 'https://d.gov/blocked'), one('down', 'https://e.gov/down')],
-      { fetch, sleep },
+      { fetch, sleep, hasDns: async () => false },
     );
     expect(problems.map((p) => [p.where, p.level])).toEqual([
       ['gone', 'error'],
       ['blocked', 'warning'],
       ['down', 'error'],
     ]);
+  });
+
+  it('retries a timeout, network error or 5xx once after a pause, and passes if the retry works', async () => {
+    sleep.mockClear();
+    let tries = 0;
+    const fetch = vi.fn(async (url: string | URL | Request) => {
+      if (String(url).endsWith('/robots.txt')) return new Response('', { status: 404 });
+      tries += 1;
+      if (tries === 1) throw new DOMException('The operation was aborted due to timeout', 'TimeoutError');
+      return new Response('', { status: 200 });
+    }) as unknown as typeof globalThis.fetch;
+    expect(await checkLinks([one('x', 'https://f.gov/slow')], { fetch, sleep })).toEqual([]);
+    expect(tries).toBe(2);
+    expect(sleep).toHaveBeenCalledWith(5000);
+  });
+
+  it('only warns when a flaky site fails twice; 404, 410 and domains with no DNS record stay errors', async () => {
+    const fetchFailed = new TypeError('fetch failed', { cause: { code: 'ECONNRESET' } });
+    const noDomain = new TypeError('fetch failed', { cause: { code: 'ENOTFOUND' } });
+    const { fetch, calls } = fakeFetch({
+      'https://g.gov/500': { status: 500 },
+      'https://g.gov/503': { HEAD: { status: 405 }, GET: { status: 503 } },
+      'https://g.gov/reset': fetchFailed,
+      'https://g.gov/timeout': new DOMException('The operation was aborted due to timeout', 'TimeoutError'),
+      'https://g.gov/cdn': new TypeError('fetch failed', { cause: { code: 'ENOTFOUND' } }),
+      'https://g.gov/gone': { status: 410 },
+      'https://g.gov/missing': { status: 404 },
+      'https://nope.gov/page': noDomain,
+    });
+    const urls = ['500', '503', 'reset', 'timeout', 'cdn', 'gone', 'missing'].map((p) => one(p, `https://g.gov/${p}`));
+    const hasDns = async (host: string) => host !== 'nope.gov';
+    const problems = await checkLinks([...urls, one('nodomain', 'https://nope.gov/page')], { fetch, sleep, hasDns });
+    expect(problems.map((p) => [p.where, p.level])).toEqual([
+      ['500', 'warning'],
+      ['503', 'warning'],
+      ['reset', 'warning'],
+      ['timeout', 'warning'],
+      ['cdn', 'warning'],
+      ['gone', 'error'],
+      ['missing', 'error'],
+      ['nodomain', 'error'],
+    ]);
+    expect(problems.filter((p) => p.level === 'warning').every((p) => p.message.includes('open it in a browser'))).toBe(true);
+    const tried = (u: string) => calls.filter((c) => c.url === u).map((c) => c.method);
+    expect(tried('https://g.gov/500')).toEqual(['HEAD', 'GET', 'GET']);
+    expect(tried('https://g.gov/timeout')).toEqual(['HEAD', 'GET']);
+    expect(tried('https://g.gov/gone')).toEqual(['HEAD', 'GET']);
+    expect(tried('https://g.gov/cdn')).toEqual(['HEAD', 'GET']);
+    expect(tried('https://nope.gov/page')).toEqual(['HEAD']);
   });
 });
