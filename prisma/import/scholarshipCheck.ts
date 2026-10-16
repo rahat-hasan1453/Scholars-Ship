@@ -1,5 +1,6 @@
 // The checks behind `npm run data:scholarships:check` (check-scholarships.ts). Kept apart from the CLI so
 // tests can run them with a fake fetch.
+import { promises as dns } from 'node:dns';
 import { curatedSchema, offCatalogSubjects, scholarshipSchema, type ScholarshipSeed } from '../data/scholarships/schema';
 
 export const USER_AGENT = 'ScholarsShip/1.0 (+https://github.com/rahat-hasan1453/Scholars-Ship; scholarship link check)';
@@ -117,10 +118,30 @@ export type LinkCheckOptions = {
   /** Pause between any two requests (robots.txt included) */
   delayMs?: number;
   timeoutMs?: number;
+  /** Wait before the one retry of a timeout, network error or 5xx */
+  retryDelayMs?: number;
+  /** Does the host have any DNS record (CNAME, A or AAAA)? Tells a gone domain from a broken CDN lookup */
+  hasDns?: (host: string) => Promise<boolean>;
   log?: (line: string) => void;
 };
 
-/** One request per second, robots.txt first, HEAD then GET. Each URL is checked once */
+const hostHasDns = async (host: string) => {
+  const found = await Promise.all(
+    [dns.resolveCname, dns.resolve4, dns.resolve6].map((resolve) => resolve(host).then((r) => r.length > 0, () => false)),
+  );
+  return found.some(Boolean);
+};
+
+/** The host name did not resolve */
+const isDnsMiss = (e: unknown) => {
+  const code = (e as { cause?: { code?: unknown } })?.cause?.code;
+  return code === 'ENOTFOUND' || (e instanceof Error && e.message.includes('ENOTFOUND'));
+};
+
+/**
+ * One request per second, robots.txt first, HEAD then GET. Each URL is checked once; a timeout, network
+ * error or 5xx is retried once, then only warned about (the site is flaky, not gone)
+ */
 export async function checkLinks(
   entries: Pick<ScholarshipSeed, 'id' | 'officialUrl' | 'sourceUrl'>[],
   opts: LinkCheckOptions = {},
@@ -129,6 +150,8 @@ export async function checkLinks(
   const sleep = opts.sleep ?? ((ms: number) => new Promise<void>((r) => setTimeout(r, ms)));
   const delayMs = opts.delayMs ?? 1000;
   const timeoutMs = opts.timeoutMs ?? 15_000;
+  const retryDelayMs = opts.retryDelayMs ?? 5000;
+  const hasDns = opts.hasDns ?? hostHasDns;
   const headers = { 'User-Agent': USER_AGENT };
 
   let first = true;
@@ -165,23 +188,51 @@ export async function checkLinks(
       problems.push({ level: 'warning', where, message: `${url}: robots.txt asks bots not to open it (not checked; open it in a browser)` });
       continue;
     }
-    try {
-      let res = await request(url, 'HEAD');
-      // Many sites don't answer HEAD properly; ask for the page itself before calling it broken
-      if (!res.ok) res = await request(url, 'GET');
-      opts.log?.(`${res.status} ${url}`);
-      if (res.ok) continue;
-      // Bot protection, not a dead page (412: some CDNs' challenge page, e.g. campuschina.org)
-      const blocked = [401, 403, 412, 429].includes(res.status);
-      problems.push({
-        level: blocked ? 'warning' : 'error',
-        where,
-        message: blocked ? `${url}: site refused the checker (${res.status}); open it in a browser` : `${url}: HTTP ${res.status}`,
-      });
-    } catch (e) {
-      opts.log?.(`ERR ${url}`);
-      problems.push({ level: 'error', where, message: `${url}: ${e instanceof Error ? e.message : String(e)}` });
+    const open = async (retry: boolean) => {
+      try {
+        if (retry) return await request(url, 'GET');
+        const res = await request(url, 'HEAD');
+        // Many sites don't answer HEAD properly; ask for the page itself before calling it broken
+        return res.ok ? res : await request(url, 'GET');
+      } catch (e) {
+        return e;
+      }
+    };
+    // No DNS record at all = the domain is gone. A name that exists but doesn't resolve (e.g. a CNAME to a
+    // CDN that fails from here, as campuschina.org does) is flaky like a timeout
+    const deadDomain = async (r: unknown) => isDnsMiss(r) && !(await hasDns(u.hostname));
+
+    let result = await open(false);
+    if (result instanceof Response ? result.status >= 500 : !(await deadDomain(result))) {
+      opts.log?.(`${result instanceof Response ? result.status : 'ERR'} ${url} (retrying)`);
+      await sleep(retryDelayMs);
+      result = await open(true);
     }
+
+    if (!(result instanceof Response)) {
+      opts.log?.(`ERR ${url}`);
+      const reason = result instanceof Error ? result.message : String(result);
+      problems.push(
+        (await deadDomain(result))
+          ? { level: 'error', where, message: `${url}: ${reason}` }
+          : { level: 'warning', where, message: `${url}: ${reason} twice; open it in a browser` },
+      );
+      continue;
+    }
+    const res = result;
+    opts.log?.(`${res.status} ${url}`);
+    if (res.ok) continue;
+    if (res.status >= 500) {
+      problems.push({ level: 'warning', where, message: `${url}: HTTP ${res.status} twice (site having trouble); open it in a browser` });
+      continue;
+    }
+    // Bot protection, not a dead page (412: some CDNs' challenge page, e.g. campuschina.org)
+    const blocked = [401, 403, 412, 429].includes(res.status);
+    problems.push({
+      level: blocked ? 'warning' : 'error',
+      where,
+      message: blocked ? `${url}: site refused the checker (${res.status}); open it in a browser` : `${url}: HTTP ${res.status}`,
+    });
   }
   return problems;
 }
