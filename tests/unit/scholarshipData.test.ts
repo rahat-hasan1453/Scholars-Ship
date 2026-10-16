@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BATCHES, CURATED_SCHOLARSHIPS, SCHOLARSHIPS } from '../../prisma/data/scholarships';
+import { BATCHES, CURATED_SCHOLARSHIPS, CURATED_VERIFIED_ON, SCHOLARSHIPS } from '../../prisma/data/scholarships';
 import { scholarshipSchema, type ScholarshipSeed } from '../../prisma/data/scholarships/schema';
 import { checkEntries } from '../../prisma/import/scholarshipCheck';
 import { WORLD_COUNTRIES } from '@/data/countries';
@@ -38,10 +38,15 @@ describe('scholarship data', () => {
     expect(valid.length).toBe(SCHOLARSHIPS.length);
   });
 
-  it('keeps the 24 curated ids that bookmarks and applications point at', () => {
-    expect(CURATED_SCHOLARSHIPS.length).toBe(24);
+  it('keeps the curated ids that bookmarks and applications point at', () => {
+    // 24 at first; SINGA was dropped on 2026-10-16 when A*STAR took its page down
+    expect(CURATED_SCHOLARSHIPS.length).toBe(23);
     expect(CURATED_SCHOLARSHIPS.every((s) => s.id.startsWith('sch_'))).toBe(true);
-    expect(CURATED_SCHOLARSHIPS.every((s) => s.verifiedOn === '2026-10-09')).toBe(true);
+  });
+
+  it('gives curated entries CURATED_VERIFIED_ON unless they were re-checked later', () => {
+    const recheck = CURATED_SCHOLARSHIPS.filter((s) => s.verifiedOn !== CURATED_VERIFIED_ON).map((s) => s.id);
+    expect(recheck.sort()).toEqual(['sch_kaust_fellowship', 'sch_stipendium_hungaricum', 'sch_turkiye_burslari']);
   });
 
   it('uses catalog countries, and every scholarship is found by some Subject filter', () => {

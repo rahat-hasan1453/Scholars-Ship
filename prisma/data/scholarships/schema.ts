@@ -75,8 +75,8 @@ export const scholarshipSchema = z
 export const curatedSchema = scholarshipSchema.extend({ id: z.string().regex(LEGACY_ID) });
 
 export type ScholarshipSeed = z.infer<typeof scholarshipSchema>;
-/** Entries in _curated.ts: get verifiedOn from CURATED_VERIFIED_ON in index.ts */
-export type CuratedSeed = Omit<ScholarshipSeed, 'verifiedOn'>;
+/** Entries in _curated.ts: verifiedOn defaults to CURATED_VERIFIED_ON in index.ts; set it on an entry re-checked later */
+export type CuratedSeed = Omit<ScholarshipSeed, 'verifiedOn'> & { verifiedOn?: string };
 
 /** Specializations the Subject filter only matches by free-text rules (not an error) */
 export const offCatalogSubjects = (s: Pick<ScholarshipSeed, 'specializations'>) =>
