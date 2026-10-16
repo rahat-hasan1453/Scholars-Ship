@@ -7,10 +7,10 @@ import type { ScholarshipSeed } from './schema';
 
 export { ALL_FIELDS, type ScholarshipSeed } from './schema';
 
-/** Day the 24 curated entries were checked against their sources */
+/** Day the curated entries were checked against their sources, unless an entry has its own verifiedOn */
 export const CURATED_VERIFIED_ON = '2026-10-09';
 
-export const CURATED_SCHOLARSHIPS: ScholarshipSeed[] = CURATED.map((s) => ({ ...s, verifiedOn: CURATED_VERIFIED_ON }));
+export const CURATED_SCHOLARSHIPS: ScholarshipSeed[] = CURATED.map((s) => ({ ...s, verifiedOn: s.verifiedOn ?? CURATED_VERIFIED_ON }));
 
 /** File name → entries, so the checker can say where a problem is */
 export const BATCHES: Record<string, ScholarshipSeed[]> = {
