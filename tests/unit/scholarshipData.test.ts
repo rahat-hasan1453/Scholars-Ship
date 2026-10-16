@@ -46,7 +46,7 @@ describe('scholarship data', () => {
 
   it('gives curated entries CURATED_VERIFIED_ON unless they were re-checked later', () => {
     const recheck = CURATED_SCHOLARSHIPS.filter((s) => s.verifiedOn !== CURATED_VERIFIED_ON).map((s) => s.id);
-    expect(recheck.sort()).toEqual(['sch_kaust_fellowship', 'sch_stipendium_hungaricum', 'sch_turkiye_burslari']);
+    expect(recheck.sort()).toEqual(['sch_kaust_fellowship', 'sch_sisgp', 'sch_stipendium_hungaricum', 'sch_turkiye_burslari']);
   });
 
   it('uses catalog countries, and every scholarship is found by some Subject filter', () => {
