@@ -210,6 +210,67 @@ Mistakes never break the live site, parallel sessions stay separate, and changes
 | **প্রজেক্টে / In project** | `.github/workflows/test.yml` (Node 22, `npm ci` → `tsc --noEmit` → `npm test`)। কোনো secret লাগে না, সব mock। আলাদা `e2e` job-এ Playwright (Chromium desktop + mobile, Postgres 16 service, secret লাগে না)। / A separate `e2e` job runs Playwright on Chromium, with a throwaway Postgres; no secrets. |
 | **দেখার জায়গা / Where to see** | PR পেজের নিচে "Checks", বা repo-র **Actions** ট্যাব / The PR's "Checks" section or the repo's **Actions** tab |
 
+## 19. Opportunity ingest: Mastodon + Bluesky (cron)
+
+| | |
+|---|---|
+| **বাংলা** | PhD/RA/ফান্ডিং-এর পোস্ট প্রতিদিন নিজে থেকে বাইরের সোশ্যাল সাইট থেকে এনে ডেটাবেসে রাখা হয়। সাইট ব্রাউজারে কখনো সরাসরি ওই API ডাকে না, ডেটাবেস থেকে দেখায়। |
+| **English** | Every day the server pulls PhD/RA/funding posts from public social APIs and stores them in the database. The browser never calls those APIs; it reads from our DB. |
+| **প্রজেক্টে / In project** | `src/lib/ingest/{mastodon,bluesky,index}.ts`। Mastodon (hci.social সহ) ও Bluesky পাবলিক সার্চ (`api.bsky.app`, প্রায় ৫০টা "PhD <topic>" কুয়েরি, একটা একটা করে, ১ সেকেন্ড ফাঁকে)। `fetchAllOpportunities()` দুটো মিলিয়ে cross-post বাদ দেয়। / Both sources are merged and cross-posts are de-duplicated. |
+| **Cron** | `vercel.json`: `/api/cron/opportunities` প্রতিদিন 06:00 UTC, `CRON_SECRET` দিয়ে সুরক্ষিত। / Daily 06:00 UTC, protected by `CRON_SECRET`. |
+| **Programme listing** | `source = "university"`: হাতে লেখা ১৮টা প্রোগ্রাম, `prisma/data/programs.ts`। API নয়; "checked" তারিখ থাকে, নিজে আপডেট হয় না, তাই মাঝে মাঝে আবার চেক করতে হয়। / Hand-written, not from an API; recheck periodically. |
+| **Seed-এর নিয়ম / Seed rule** | `prisma/seed.ts` শুধু `LEGACY_DEMO_SOURCES` (`linkedin`, `twitter`, `lab_website`, `web`, `reddit`) মোছে। না হলে প্রতি deploy-এ Bluesky পোস্ট মুছে যেত। / The seed deletes only the legacy demo sources. |
+
+## 20. Research papers: OpenAlex (cron)
+
+| | |
+|---|---|
+| **বাংলা** | গবেষণা পেপার OpenAlex (ফ্রি একাডেমিক ডেটা API) থেকে প্রতিদিন আসে। |
+| **English** | Papers come daily from OpenAlex, a free academic-data API. |
+| **প্রজেক্টে / In project** | `src/lib/papers/openalex.ts` (`fetchWorks`, `workToPaper`, `abstractText`)। API key ঐচ্ছিক; key ছাড়া দিনে প্রায় ১,০০০ লিস্ট কল, 429 এলে একবার আবার চেষ্টা। `/api/cron/papers` প্রতিদিন 06:30 UTC। / Key optional; one retry on 429. |
+
+## 21. Subject system (বিষয়ের তালিকা ও কীওয়ার্ড ম্যাপিং)
+
+| | |
+|---|---|
+| **বাংলা** | পুরো সিস্টেমে একটাই ২১টা বিষয়ের তালিকা। ফিল্টার শুরুতেই অনবোর্ডিংয়ের উত্তর থেকে বসে। কোনো বিষয় বাছলে ওই বিষয়ের **core** শব্দ থাকা আইটেম আগে, **related** শব্দ থাকা পরে, বাকিগুলো বাদ। |
+| **English** | One list of 21 subjects everywhere. Filters start from the onboarding profile. A subject match ranks items with a **core** word first, **related** words next, and drops the rest. |
+| **প্রজেক্টে / In project** | `src/data/subjectCatalog.ts` (`SUBJECTS`, `normalizeSubjects`, `subjectTagsFor`, `subjectTier`, `rankBySubject`) ও `src/data/subjectKeywords.ts` (প্রতি বিষয়ের core/related শব্দ; `*` = যেকোনো শেষ; পুরো শব্দ মেলে; হাইফেন = স্পেস)। উদাহরণ: UX বাছলে "UI", "HCI", "interaction", "cognitive" ও related হিসেবে ধরা হয়। `src/hooks/useProfileFilterDefaults.ts` প্রোফাইল থেকে ডিফল্ট ফিল্টার বসায়। / Example: choosing UX also catches UI, HCI, interaction and cognitive as related. |
+
+## 22. SearchMiss (খালি সার্চের লগ)
+
+| | |
+|---|---|
+| **বাংলা** | ফিডে সার্চ/ফিল্টারে কিছু না পেলে নাম-পরিচয় ছাড়া (anonymous) লগ রাখা হয়, যাতে বুঝি কোন ডেটা আমাদের নেই। |
+| **English** | When a feed search returns nothing, an anonymous record is saved so we learn which data is missing. |
+| **প্রজেক্টে / In project** | `SearchMiss` মডেল (`page`, `query`, `subjects`, `degrees`, `countries`, `funding`, `matchMode`)। `src/app/api/search-miss/route.ts` (প্রতি IP-তে ঘণ্টায় ৬০), হুক `useSearchMissLog`। রিপোর্ট: `npm run data:misses`। / Report: `npm run data:misses`. |
+
+## 23. Scholarship data framework
+
+| | |
+|---|---|
+| **বাংলা** | স্কলারশিপ হাতে লেখা ডেটা, কিন্তু কড়া নিয়মে: শুধু অফিশিয়াল সাইট, রোবট নিয়ম মানা, অনুমান নয়, নিজের ভাষায় সারাংশ, `sourceUrl` ও `verifiedOn` বাধ্যতামূলক। |
+| **English** | Hand-written data under strict rules: official sources only, honour robots.txt, no guessing, own-words summary, `sourceUrl` and `verifiedOn` required. |
+| **প্রজেক্টে / In project** | `prisma/data/scholarships/` (`_curated.ts` পুরোনো ২৪টা, `batch-*.ts` নতুন, `schema.ts` zod নিয়ম, `index.ts` সব জোড়া)। নতুন id `gov-<country>-<slug>`; পুরোনো `sch_…` id কখনো বদলায় না (বুকমার্ক ভাঙবে)। চেকার: `npm run data:scholarships:check` (zod, ডুপ্লিকেট id/`officialUrl`, লিংক চেক, ৩৬৫ দিনের বেশি পুরোনো হলে সতর্কতা)। নিয়ম: `docs/SCHOLARSHIP-VERIFICATION.md`। যেগুলো যোগ করা যায়নি: `docs/SCHOLARSHIP-BACKLOG.md`। / Not-yet-added list: `docs/SCHOLARSHIP-BACKLOG.md`. |
+
+## 24. Data reports (রিপোর্ট)
+
+| | |
+|---|---|
+| **বাংলা** | ডেটাবেসে কোন ধরনের কতটা ডেটা আছে তার সংখ্যা। |
+| **English** | Counts of what data is in the database. |
+| **প্রজেক্টে / In project** | `npm run data:stats` (`prisma/report/data-stats.ts`): opportunity, paper, scholarship, professor সংখ্যা। / Counts per data type. |
+
+## 25. Data কোথা থেকে আসে (সারাংশ)
+
+| ডেটা / Data | উৎস / Source | কীভাবে / How |
+|---|---|---|
+| Opportunities | Mastodon + Bluesky API | cron, প্রতিদিন / daily |
+| Research papers | OpenAlex API | cron, প্রতিদিন / daily |
+| Scholarships | অফিশিয়াল সাইট দেখে হাতে লেখা / hand-written | seed file + deploy |
+| Programme listings | হাতে লেখা / hand-written | `prisma/data/programs.ts` |
+| Professors / Labs | seed file (`professors.json`), এখনো real API নয় / not yet a real source | seed |
+
 ---
 
 ## npm Commands / npm কমান্ড
@@ -224,6 +285,10 @@ Mistakes never break the live site, parallel sessions stay separate, and changes
 | `npm run test:watch` | ফাইল বদলালেই টেস্ট আবার চালানো | Re-run tests whenever a file changes |
 | `npm run test:e2e` | ব্রাউজারে E2E ও accessibility টেস্ট চালানো | Run browser E2E and accessibility tests |
 | `npm run test:e2e:db` | e2e-র আলাদা লোকাল টেস্ট DB চালু করা (একবার) | Start the local e2e test database (once) |
+| `npm run db:seed` | লোকাল ডেটাবেসে seed ডেটা বসানো | Seed the local database |
+| `npm run data:stats` | ডেটাবেসে কোন ডেটা কতটা আছে | Count data per type |
+| `npm run data:misses` | ফিডে যা খুঁজে পাওয়া যায়নি তার রিপোর্ট | Report of empty feed searches |
+| `npm run data:scholarships:check` | স্কলারশিপ ডেটা ও লিংক চেক | Validate scholarship data and links |
 
 ## Glossary / শব্দকোষ
 
