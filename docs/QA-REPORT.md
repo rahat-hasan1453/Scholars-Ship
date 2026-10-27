@@ -55,7 +55,7 @@ Each known bug has a test that is expected to fail while the bug exists, so `npm
 | BUG-01 | Medium | Local `npm run build` fails because of `'` in folder path | GenOps |
 | BUG-03 | ~~Medium~~ ✅ **Fixed (PR #5)** | No per-IP rate limit on send-code (email bombing) | Signup |
 | BUG-04 | ~~Medium~~ ✅ **Fixed** | Search "USA" matches Australia/Austria/Russia | GenOps (Home) |
-| BUG-13 | Medium | Professor search invents data (open positions, PI title, random photo) | GenOps (Home) |
+| BUG-13 | ~~Medium~~ ✅ **Fixed** | Professor search invented data (open positions, PI title, random photo, fallback institution/country) | GenOps (Home) |
 | BUG-05 | Low | Degree/category keyword false positives ("systems" = Masters) | GenOps (Home) |
 | BUG-09 | Low | `complete-onboarding` stores any JSON with no validation/size limit | Signup / Onboarding |
 | BUG-10 | Low | Ingest API "key" check accepts any `highscholar_*` string | GenOps |
@@ -99,7 +99,8 @@ Each known bug has a test that is expected to fail while the bug exists, so `npm
 - **Repro:** `matchItemSemantically('PhD position', 'Australia', parse('phd position usa'))` → `matches: true`.
 - **Expected:** Exact or alias match (`usa`, `united states`, `us`).
 
-### BUG-13 · Medium · Professor search shows invented data / ভুয়া তথ্য
+### BUG-13 · ✅ Fixed (was Medium) · Professor search shows invented data / ভুয়া তথ্য
+- **Fixed:** title is "Researcher", `openPositions` false, initials avatar (earlier), and now a missing institution/country shows "Institution not stated" / "Location not stated" instead of "Global Research Institute" / USA. The LinkedIn link no longer includes a guessed institution.
 - **File:** `src/app/api/professors/search/route.ts:70-85`
 - **বাংলা:** OpenAlex-এর যেকোনো লেখক (৫টার বেশি paper থাকলেই) দেখানো হয়:
   - "Principal Investigator & Research Faculty" পদবি দিয়ে

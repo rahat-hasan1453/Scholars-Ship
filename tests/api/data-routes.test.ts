@@ -79,6 +79,16 @@ describe('GET /api/professors/search (OpenAlex mocked)', () => {
   });
 });
 
+describe('GET /api/professors/search (nothing invented)', () => {
+  it('says "not stated" when OpenAlex has no institution or country', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({
+      results: [{ id: 'https://openalex.org/A9', display_name: 'No Affiliation', works_count: 30 }],
+    })));
+    const body = await (await professorSearch(get('/api/professors/search?query=x'))).json();
+    expect(body.professors[0]).toMatchObject({ university: 'Institution not stated', country: 'Location not stated', openPositions: false, title: 'Researcher' });
+  });
+});
+
 describe('GET /api/opportunities/live (Mastodon mocked)', () => {
   it('survives every upstream failing', async () => {
     vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('network down'));
