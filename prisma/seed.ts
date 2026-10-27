@@ -11,6 +11,7 @@ import { staleDemoOpportunitiesWhere, toOpportunityData } from '../src/lib/oppor
 import { staleSeedPapersWhere } from '../src/lib/papers/save';
 import { SCHOLARSHIPS } from './data/scholarships';
 import { PROGRAM_OPPORTUNITIES } from './data/programs';
+import { FACULTY_FILES, staleFacultyWhere } from './facultyFiles';
 
 const prisma = new PrismaClient();
 const DATA = path.join(__dirname, 'data');
@@ -33,6 +34,9 @@ type ProfessorSeed = {
   publicationCount: number | null;
   email: string | null;
   grant: { title: string; amount: string; year: number; funder: string; url: string } | null;
+  /** Set by professors-openalex.json ("Researcher · <subject>", "OpenAlex"); CSRankings rows derive them */
+  title?: string;
+  dataSource?: string;
 };
 
 type PaperSeed = {
@@ -90,66 +94,80 @@ async function seedScholarships() {
   console.log(`Seeded ${SCHOLARSHIPS.length} scholarships (removed ${removed.count} old rows).`);
 }
 
-async function seedFaculty() {
-  const { professors } = await readJson<{ professors: ProfessorSeed[] }>('professors.json');
+const BATCH = 500;
+const chunks = <T>(list: T[], size = BATCH) => Array.from({ length: Math.ceil(list.length / size) }, (_, i) => list.slice(i * size, (i + 1) * size));
 
-  // Universities first, one row per (name, country)
-  const uniIds = new Map<string, string>();
+async function seedFaculty() {
+  const started = Date.now();
+  const [csrankings, openalex] = await Promise.all(FACULTY_FILES.map(async (f) => (await readJson<{ professors: ProfessorSeed[] }>(f)).professors));
+  // CSRankings wins when both files have the same id
+  const csIds = new Set(csrankings.map((p) => p.id));
+  const professors = [...csrankings, ...openalex.filter((p) => !csIds.has(p.id))];
+
+  // Universities first, one row per (name, country); only CSRankings gives a website
+  const unis = new Map<string, { name: string; country: string; website: string | null }>();
   for (const p of professors) {
     const key = `${p.university}|${p.country}`;
-    if (uniIds.has(key)) continue;
-    const u = await prisma.university.upsert({
-      where: { name_country: { name: p.university, country: p.country } },
-      create: { name: p.university, country: p.country, website: p.universityWebsite },
-      update: { website: p.universityWebsite },
-    });
-    uniIds.set(key, u.id);
+    if (!unis.has(key) || p.universityWebsite) unis.set(key, { name: p.university, country: p.country, website: p.universityWebsite });
+  }
+  for (const batch of chunks([...unis.values()])) await prisma.university.createMany({ data: batch, skipDuplicates: true });
+  for (const batch of chunks([...unis.values()].filter((u) => u.website), 100)) {
+    await prisma.$transaction(batch.map((u) => prisma.university.update({ where: { name_country: { name: u.name, country: u.country } }, data: { website: u.website } })));
+  }
+  const uniIds = new Map(
+    (await prisma.university.findMany({ select: { id: true, name: true, country: true } })).map((u) => [`${u.name}|${u.country}`, u.id]),
+  );
+
+  const rows = professors.map((p) => ({
+    id: p.id,
+    name: p.name,
+    title: p.title ?? `Faculty · ${p.department}`,
+    university: p.university,
+    department: p.department,
+    country: p.country,
+    universityId: uniIds.get(`${p.university}|${p.country}`)!,
+    labId: null,
+    labName: null,
+    researchTags: p.researchTags,
+    // No source says whether they are hiring; the "Recently Funded" signal comes from the grant instead
+    openPositions: false,
+    recentGrants: p.grant ? `${p.grant.amount} NSF award (${p.grant.year}): ${p.grant.title}` : null,
+    email: p.email,
+    googleScholar: p.googleScholar,
+    orcid: p.orcid,
+    openAlexId: p.openAlexId,
+    dataSource: p.dataSource ?? ['CSRankings', p.openAlexId && 'OpenAlex', (p.grant || p.email) && 'NSF'].filter(Boolean).join(' + '),
+    labWebsite: p.homepage,
+    avatarUrl: null,
+    acceptingTerms: [],
+    hIndex: p.hIndex,
+    publicationCount: p.publicationCount,
+  }));
+  // New rows in bulk, existing rows updated in batched transactions (thousands of single upserts are too slow for the Vercel build)
+  const existing = new Set((await prisma.professor.findMany({ select: { id: true } })).map((p) => p.id));
+  for (const batch of chunks(rows.filter((r) => !existing.has(r.id)))) await prisma.professor.createMany({ data: batch, skipDuplicates: true });
+  for (const batch of chunks(rows.filter((r) => existing.has(r.id)), 100)) {
+    await prisma.$transaction(batch.map(({ id, ...data }) => prisma.professor.update({ where: { id }, data })));
   }
 
   let grants = 0;
   for (const p of professors) {
-    const recentGrants = p.grant ? `${p.grant.amount} NSF award (${p.grant.year}): ${p.grant.title}` : null;
-    const data = {
-      name: p.name,
-      title: `Faculty · ${p.department}`,
-      university: p.university,
-      department: p.department,
-      country: p.country,
-      universityId: uniIds.get(`${p.university}|${p.country}`)!,
-      labId: null,
-      labName: null,
-      researchTags: p.researchTags,
-      // No source says whether they are hiring; the "Recently Funded" signal comes from the grant instead
-      openPositions: false,
-      recentGrants,
-      email: p.email,
-      googleScholar: p.googleScholar,
-      orcid: p.orcid,
-      openAlexId: p.openAlexId,
-      dataSource: ['CSRankings', p.openAlexId && 'OpenAlex', (p.grant || p.email) && 'NSF'].filter(Boolean).join(' + '),
-      labWebsite: p.homepage,
-      avatarUrl: null,
-      acceptingTerms: [],
-      hIndex: p.hIndex,
-      publicationCount: p.publicationCount,
-    };
-    await prisma.professor.upsert({ where: { id: p.id }, create: { id: p.id, ...data }, update: data });
-    if (p.grant) {
-      const id = `nsf_${p.grant.url.split('AWD_ID=').pop()}_${p.id}`.slice(0, 120);
-      const grant = { title: p.grant.title, funder: p.grant.funder, amount: p.grant.amount, year: p.grant.year, url: p.grant.url, professorId: p.id };
-      await prisma.grant.upsert({ where: { id }, create: { id, ...grant }, update: grant });
-      grants++;
-    }
+    if (!p.grant) continue;
+    const id = `nsf_${p.grant.url.split('AWD_ID=').pop()}_${p.id}`.slice(0, 120);
+    const grant = { title: p.grant.title, funder: p.grant.funder, amount: p.grant.amount, year: p.grant.year, url: p.grant.url, professorId: p.id };
+    await prisma.grant.upsert({ where: { id }, create: { id, ...grant }, update: grant });
+    grants++;
   }
 
-  const keep = professors.map((p) => p.id);
-  const removedProfs = await prisma.professor.deleteMany({ where: { id: { notIn: keep } } });
+  // Only rows in neither file are removed
+  const removedProfs = await prisma.professor.deleteMany({ where: staleFacultyWhere(professors.map((p) => p.id)) });
   // Demo labs and grants had no real source
   const removedGrants = await prisma.grant.deleteMany({ where: { OR: [{ professorId: null }, { url: null }] } });
   const removedLabs = await prisma.researchLab.deleteMany({});
   const removedUnis = await prisma.university.deleteMany({ where: { professors: { none: {} } } });
   console.log(
-    `Seeded ${professors.length} faculty at ${uniIds.size} universities, ${grants} NSF grants ` +
+    `Seeded ${professors.length} faculty (${csrankings.length} CSRankings + ${professors.length - csrankings.length} OpenAlex) at ${unis.size} universities, ` +
+      `${grants} NSF grants in ${((Date.now() - started) / 1000).toFixed(1)}s ` +
       `(removed ${removedProfs.count} old faculty, ${removedLabs.count} labs, ${removedGrants.count} grants, ${removedUnis.count} universities).`,
   );
 }

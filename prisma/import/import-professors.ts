@@ -8,6 +8,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
+import { COUNTRY_QUOTA } from './countryQuota';
 
 const CACHE = path.join(process.cwd(), '.data-cache', 'csrankings');
 const OUT = path.join(process.cwd(), 'prisma', 'data', 'professors.json');
@@ -15,15 +16,6 @@ const RAW = 'https://raw.githubusercontent.com/emeryberger/CSrankings/gh-pages';
 const MAILTO = 'xyz.brothers99@gmail.com';
 const RECENT_FROM = 2019;
 
-// How many institutions per country, ranked by recent CSRankings publication output
-const COUNTRY_QUOTA: Record<string, [name: string, institutions: number]> = {
-  us: ['USA', 25], gb: ['United Kingdom', 6], de: ['Germany', 6], ca: ['Canada', 5], au: ['Australia', 4],
-  nl: ['Netherlands', 4], ch: ['Switzerland', 3], se: ['Sweden', 3], dk: ['Denmark', 2], no: ['Norway', 2],
-  fi: ['Finland', 2], at: ['Austria', 2], ie: ['Ireland', 2], be: ['Belgium', 2], fr: ['France', 3],
-  it: ['Italy', 2], es: ['Spain', 2], sg: ['Singapore', 2], kr: ['South Korea', 3], jp: ['Japan', 2],
-  hk: ['Hong Kong', 2], tw: ['Taiwan', 1], cn: ['China', 3], in: ['India', 2], bd: ['Bangladesh', 3],
-  nz: ['New Zealand', 1], pt: ['Portugal', 1], pl: ['Poland', 1], cz: ['Czech Republic', 1],
-};
 const TOP_PER_INSTITUTION = 12;
 const EXTRA_HCI_PER_INSTITUTION = 6;
 

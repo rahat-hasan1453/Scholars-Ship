@@ -18,6 +18,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:db": "prisma dev --name scholarsship_e2e --detach",
+    "data:researchers:build": "tsx prisma/import/import-openalex-researchers.ts",
     "data:ror:build": "tsx prisma/import/build-ror-index.ts",
     "data:ror:backfill": "tsx --env-file=.env.local prisma/import/backfill-ror.ts"
   },
