@@ -1,7 +1,7 @@
 # কাজের বিস্তারিত পরিকল্পনা: Phase 1 + Phase 2 / Execution Plan
 
 **তারিখ / Date:** 2026-10-09
-**অবস্থা / Status:** শুধু পরিকল্পনা। কোনো কোড বদলানো হয়নি। প্রতিটা কাজ শুরুর আগে আলাদা অনুমতি লাগবে।
+**অবস্থা / Status (২০২৬-১০-২৮ আপডেট):** Phase 1 শেষ। Phase 2-এর G-1 ও F শেষ। I-1 (স্কলারশিপ) আংশিক: framework আর ব্যাচ 01 শেষ, কিন্তু অফিসিয়াল সোর্সের নিয়মে মাত্র **35টা** যোগ হয়েছে (লক্ষ্য ছিল ~175)। ফলাফলের সংখ্যা নিচে "## শেষ ফলাফল" অংশে। বাকি অংশ (নিচে) মূল পরিকল্পনা, বদলানো হয়নি।
 **যে ডকুমেন্টের সাথে মিলিয়ে লেখা:** [DATA-VISION-5Y.md](DATA-VISION-5Y.md) (৫ স্তর L1–L5, বছর ১-এর লক্ষ্য), [DATA-PIPELINE-PLAN.md](DATA-PIPELINE-PLAN.md) (১৫ ধাপ)
 **শুরুর অবস্থা:** `main` = `a9341b0` (PR #49 SearchMiss মার্জ হওয়ার পর)
 
@@ -699,19 +699,42 @@ A (পাসওয়ার্ড) ──► সবকিছুর আগে, �
 
 ---
 
+## শেষ ফলাফল (২০২৬-১০-২৮, production `data:stats`)
+
+| ডেটা | আগে | এখন | লক্ষ্য | অবস্থা |
+|---|---|---|---|---|
+| Opportunities | 38 (সেপ্টেম্বর) / 288 (এই পরিকল্পনা লেখার সময়) | **778** (Bluesky 715, Mastodon 45, University 18) | — | ✅ |
+| Opportunities: দেশ নেই | 63% | **42%** (328/778) | < 30% | ❌ লক্ষ্য পূরণ হয়নি |
+| Opportunities: প্রতিষ্ঠান নেই | 208 (72%) | 425 (55%) | — | আংশিক |
+| Research papers | 272 | **4,562** (2026: 4,283) | cron চালু | ✅ |
+| Scholarships | 24 | **35** | ~175 | ❌ আংশিক |
+| Professors / universities | 1,520 / 96 | 1,520 / 96 | — | অপরিবর্তিত |
+
+**কী শেষ হয়েছে:** A (Neon পাসওয়ার্ড), B (onboarding), K (seed Bluesky মোছা বন্ধ), J (e2e + CI), F-1/F-2/F-3 (paper cron live, প্রতিদিন 06:30 UTC), I-1a (scholarship framework), G-1a/b/c (ROR matcher, ingest-এ ব্যবহার, backfill)।
+
+**যা পূরণ হয়নি, আর কেন:**
+- **স্কলারশিপ ~175 না, 35:** ব্যাচ 01-এ 10টা, ব্যাচ 01 (খ)-তে 2টা (HKPFS, Pearson), ব্যাচ 02 (ক)-তে 0টা। বাকিগুলো অফিসিয়াল সাইট বট-ব্লক করে, robots.txt বন্ধ, Bangladesh eligibility নিশ্চিত না, বা স্কিমায় "any country" নেই। তালিকা: [SCHOLARSHIP-BACKLOG.md](SCHOLARSHIP-BACKLOG.md)। এগোনোর উপায়: ব্যবহারকারী ব্রাউজারে পেজ খুলে তথ্য দিলে সেটা থেকে এন্ট্রি বানানো, বা লক্ষ্য কমিয়ে ~60–80 ধরা।
+- **দেশ-নেই 42%, লক্ষ্য < 30%:** অনেক পোস্টে প্রতিষ্ঠানের নামই নেই ("We're recruiting!"), তাই ROR-এর মেলানোর কিছু নেই। বাকিটার জন্য পরে AI parser (বছর ১, ধাপ 4) লাগবে।
+- **subject tag নেই 565/778 (73%):** keyword backfill পরীক্ষা করা হয়েছে (লোকাল DB, 193টা খালির মধ্যে মাত্র 13টা tag পেত, কিছু ভুলসহ)। তাই করা হয়নি। বেশিরভাগ পোস্টের বিষয় আমাদের 21টা তালিকার বাইরে, বা পোস্টে বিষয়ই লেখা নেই।
+- Programme listing 18টা (`university` source), মেয়াদ ~8 মার্চ 2027, আবার চেক লাগবে।
+
+**বাকি (এই পরিকল্পনার বাইরে বা পরের ধাপ):** স্কলারশিপ ব্যাচ 02–04 (Step 17–21), Pipeline Filter/Sort dropdown একরকম করা, "Contact Professor" বাটন programme পেজে, accessibility-র ছোট কাজ, Professors/Labs-এর real সোর্স।
+
+---
+
 # শেষ চেকলিস্ট
 
 **Phase 1**
-- [ ] A: Neon পাসওয়ার্ড reset, Vercel আপডেট + redeploy, সাইট আর cron চালু (আপনি)
-- [ ] B: Onboarding আবার খুললে সব ভরা, PR merge
-- [ ] K: Vercel-এ `SKIP_DB_SEED` আছে কিনা জানা; seed cron-ডেটা মোছে না; `data:stats` চালু
-- [ ] J: e2e টেস্ট DB + seed, সব spec সবুজ, CI-তে `e2e` job
+- [x] A: Neon পাসওয়ার্ড reset, Vercel আপডেট + redeploy, সাইট আর cron চালু (আপনি)
+- [x] B: Onboarding আবার খুললে সব ভরা, PR merge
+- [x] K: Vercel-এ `SKIP_DB_SEED` আছে কিনা জানা; seed cron-ডেটা মোছে না; `data:stats` চালু
+- [x] J: e2e টেস্ট DB + seed, সব spec সবুজ, CI-তে `e2e` job
 
 **Phase 2**
-- [ ] I-1a: স্কলারশিপ framework (zod, link checker, verification doc)
-- [ ] I-1b: ব্যাচ 01 ☐ 02 ☐ 03 ☐ 04 ☐ → মোট ~175
-- [ ] G-1: ROR index + ম্যাচার + backfill; দেশ-নেই < 30%
-- [ ] F: পেপার cron চালু, 2025–26 পেপার দেখা যায়, seed মোছে না
+- [x] I-1a: স্কলারশিপ framework (zod, link checker, verification doc)
+- [ ] I-1b: ব্যাচ 01 ✅ (35টা মোট, 12টা নতুন) 02 ☐ 03 ☐ 04 ☐ → মোট ~175 (এখন 35)
+- [x] G-1: ROR index + ম্যাচার + backfill শেষ (দেশ-নেই 63% → 42%, লক্ষ্য < 30% পূরণ হয়নি)
+- [x] F: পেপার cron চালু, 2025–26 পেপার দেখা যায়, seed মোছে না
 
 **প্রতিটা PR-এ**
 - [ ] বাংলা ব্রিফ → আপনার অনুমতি → কোড
