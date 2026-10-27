@@ -125,6 +125,46 @@ describe('matchInstitution (ROR)', () => {
   });
 });
 
+describe('precision fixes from the prod dry-run', () => {
+  const PRECISION: RorRecord[] = [
+    ...FIXTURE,
+    rec('dhrc', 'Digital Health Research Center', 'Peru', 'Lima', ['Digital Health']),
+    rec('dlab', 'Digital Innovation Lab', 'Spain', 'Bilbao'),
+    rec('imagine', 'Initial MAnagement and prevention of acute orGan failures IN critically ill patiEnts', 'France', 'Paris', [], ['IMAGINE']),
+    { ...rec('aei', 'Agencia Estatal de Investigación', 'Spain', 'Madrid', ['State Research Agency of Spain'], ['AEI']), nonHost: true },
+    { ...rec('irl', 'Government of Ireland', 'Ireland', 'Dublin'), nonHost: true },
+  ];
+  // "digital" and "health" each appear in 2 names here; with the threshold at 1 that makes the pair an everyday phrase
+  const precise = createRorMatcher(PRECISION, { commonWordRecords: 1 });
+
+  it('ignores an everyday two-word alias ("Digital Health") without its city or country', () => {
+    expect(precise('UCL is hiring a Digital Health and Trial Senior Researcher')).toBeUndefined();
+    expect(precise('PhD Position in Developing a Digital Health Passport for patients')).toBeUndefined();
+    expect(precise('PhD at Digital Health, our lab in Lima')?.country).toBe('Peru');
+  });
+
+  it('never takes a project backronym or its acronym as an institution', () => {
+    expect(precise('Our international PPU-IMAGINE PhD call is open! Initial MAnagement and prevention of acute orGan failures IN critically ill patiEnts, Paris')).toBeUndefined();
+  });
+
+  it('uses a funder or government body for the country only', () => {
+    expect(precise('PhD funded by the Agencia Estatal de Investigación')).toEqual({ country: 'Spain', city: '' });
+    expect(precise('Government of Ireland International Education Scholarship for PhD study')).toEqual({ country: 'Ireland', city: '' });
+  });
+
+  it('prefers the host institution over its funder', () => {
+    expect(precise('PhD at the University of Bremen, funded by the Agencia Estatal de Investigación')).toMatchObject({
+      name: 'University of Bremen', country: 'Germany',
+    });
+  });
+
+  it('keeps the earlier correct matches', () => {
+    expect(precise('PhD in fusion at DIFFER in Eindhoven')?.country).toBe('Netherlands');
+    expect(precise('Open PhD position at KTH in robotics')?.name).toBe('KTH Royal Institute of Technology');
+    expect(precise('PhD position at the University of Bremen')?.country).toBe('Germany');
+  });
+});
+
 describe('resolveCountry', () => {
   const leuven = match('PhD at KU Leuven');
 

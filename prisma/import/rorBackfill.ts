@@ -13,7 +13,7 @@ export function rorFill(row: BackfillRow, match: RorMatch | undefined): Backfill
     change.country = match.country;
     change.countrySource = 'ror';
   }
-  if (row.institution === INSTITUTION_NOT_STATED) change.institution = match.name;
-  if (!row.rorId) change.rorId = match.rorId;
+  if (row.institution === INSTITUTION_NOT_STATED && match.name) change.institution = match.name;
+  if (!row.rorId && match.rorId) change.rorId = match.rorId;
   return Object.keys(change).length ? change : undefined;
 }

@@ -7,7 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { gzipSync } from 'node:zlib';
 import { WORLD_COUNTRIES } from '../../src/data/countries';
-import type { RorIndexFile, RorIndexRow } from '../../src/lib/ingest/ror';
+import { normName, type RorIndexFile, type RorIndexRow } from '../../src/lib/ingest/ror';
 
 // Zenodo "concept" record for ROR Data; /versions/latest always points at the newest release
 const CONCEPT_RECORD = 'https://zenodo.org/api/records/6347574/versions/latest';
@@ -16,6 +16,9 @@ const CACHE = path.join(os.tmpdir(), 'ror-dump-cache');
 // Zenodo refuses requests without a recognisable User-Agent
 const HEADERS = { 'User-Agent': 'ScholarsShip-ror-index/1.0 (+https://ror.org)', Accept: 'application/json' };
 const KEEP_TYPES = new Set(['education', 'facility', 'government', 'nonprofit']);
+// Words in the names of bodies that fund or govern research rather than employ PhD students
+const FUNDER_NAME =
+  /\b(agency|agencia|agence|agentur|agenzia|foundation|fundacion|fundacao|fondation|fondazione|stiftung|fonds|fund|council|government|ministry|ministerio|ministere|ministero|ministerium|department of|commission|forschungsgemeinschaft|trust)\b/;
 
 interface RorName {
   value: string;
@@ -73,7 +76,12 @@ function toRow(r: RorDumpRecord): RorIndexRow | undefined {
     .map((n) => n.value);
   const acronyms = r.names.filter((n) => n.types.includes('acronym')).map((n) => n.value);
   const country = COUNTRY_BY_CODE.get(loc.country_code) ?? loc.country_name;
-  return [r.id.replace('https://ror.org/', ''), display, country, loc.name ?? '', [...new Set(aliases)], [...new Set(acronyms)]];
+  const row: RorIndexRow = [r.id.replace('https://ror.org/', ''), display, country, loc.name ?? '', [...new Set(aliases)], [...new Set(acronyms)]];
+  // Funders and government bodies pay for or oversee research; a post's position is rarely "at" them.
+  // ROR types alone can't tell CNRS (hosts researchers) from AEI (pays them): both are funder+government
+  const payer = r.types.includes('funder') || r.types.includes('government');
+  if (payer && !r.types.includes('education') && FUNDER_NAME.test(normName(display))) row.push(1);
+  return row;
 }
 
 async function main() {
