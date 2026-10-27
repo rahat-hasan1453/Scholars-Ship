@@ -15,18 +15,21 @@ export interface RorRecord {
   /** Labels and aliases other than the main name */
   aliases: string[];
   acronyms: string[];
+  /** Funder or government body (no education/facility type): it pays for or regulates research, posts aren't "at" it */
+  nonHost?: boolean;
 }
 
 export interface RorMatch {
-  rorId: string;
-  name: string;
+  /** Unset when only a funder/government body matched: it gives the country, not the institution */
+  rorId?: string;
+  name?: string;
   /** Empty when the post names institutions in different countries */
   country?: string;
   city: string;
 }
 
-/** Compact on-disk row: [id suffix, name, country, city, aliases, acronyms] */
-export type RorIndexRow = [string, string, string, string, string[], string[]];
+/** Compact on-disk row: [id suffix, name, country, city, aliases, acronyms, 1 if funder/government only] */
+export type RorIndexRow = [string, string, string, string, string[], string[], 1?];
 
 export interface RorIndexFile {
   source: string;
@@ -76,23 +79,47 @@ function shouted(orig: string[], i: number): boolean {
   return [orig[i - 1], orig[i + 1]].some((t) => t !== undefined && t.length >= 5 && isAllCaps(t));
 }
 
-export function rowToRecord([id, name, country, city, aliases, acronyms]: RorIndexRow): RorRecord {
-  return { id: `https://ror.org/${id}`, name, country, city, aliases, acronyms };
+export function rowToRecord([id, name, country, city, aliases, acronyms, nonHost]: RorIndexRow): RorRecord {
+  return { id: `https://ror.org/${id}`, name, country, city, aliases, acronyms, ...(nonHost ? { nonHost: true } : {}) };
+}
+
+// Two-word names whose words both appear in this many ROR names are everyday phrases ("Digital Health")
+const COMMON_WORD_RECORDS = 100;
+/** Project backronyms written into ROR as names: "Initial MAnagement and prevention of acute orGan failures …" */
+const BACKRONYM_WORD = /^\p{Lu}{2,}\p{Ll}|\p{Ll}\p{Lu}/u;
+export function isBackronym(name: string): boolean {
+  return tokens(name).filter((t) => BACKRONYM_WORD.test(t)).length >= 2;
 }
 
 interface Hit {
   start: number;
   end: number;
   record: RorRecord;
+  /** Everyday two-word phrase: counts only with the institution's city or country in the post */
+  weak?: boolean;
 }
 
-export function createRorMatcher(records: RorRecord[]): (text: string) => RorMatch | undefined {
+export function createRorMatcher(
+  records: RorRecord[],
+  { commonWordRecords = COMMON_WORD_RECORDS } = {},
+): (text: string) => RorMatch | undefined {
   // normalised full name → records that carry it; whether it is someone's main name
   const byName = new Map<string, { record: RorRecord; main: boolean }[]>();
   const byAcronym = new Map<string, RorRecord[]>();
+  const weakNames = new Set<string>();
   let maxWords = 1;
 
+  // How many records use each word in a name, to spot everyday phrases
+  const wordRecords = new Map<string, number>();
   for (const record of records) {
+    const words = new Set([record.name, ...record.aliases].flatMap((n) => normName(n).split(' ')));
+    for (const w of words) wordRecords.set(w, (wordRecords.get(w) ?? 0) + 1);
+  }
+  const common = (w: string) => GENERIC.has(w) || FILLER.has(w) || (wordRecords.get(w) ?? 0) > commonWordRecords;
+
+  for (const record of records) {
+    // A project's backronym is not an institution, and neither is its acronym ("IMAGINE")
+    if (isBackronym(record.name)) continue;
     const seen = new Set<string>();
     for (const [i, raw] of [record.name, ...record.aliases].entries()) {
       const key = normName(raw);
@@ -103,6 +130,7 @@ export function createRorMatcher(records: RorRecord[]): (text: string) => RorMat
       if (words.length < 2) continue;
       // Rule 5: names made only of generic words never match
       if (words.every((w) => GENERIC.has(w) || FILLER.has(w))) continue;
+      if (words.length === 2 && words.every(common)) weakNames.add(key);
       maxWords = Math.max(maxWords, words.length);
       const list = byName.get(key) ?? [];
       list.push({ record, main: i === 0 });
@@ -143,7 +171,7 @@ export function createRorMatcher(records: RorRecord[]): (text: string) => RorMat
         const span = orig.slice(i, i + n);
         // Real names are written capitalised; "open university position" is not a name
         if (!span.every((t, k) => FILLER.has(norm[i + k]) || isCapitalised(t))) continue;
-        hits.push({ start: i, end: i + n, record });
+        hits.push({ start: i, end: i + n, record, weak: weakNames.has(key) });
         break; // longest at this start position
       }
       // Rule 3: acronyms only in capitals, 3+ letters, owned by exactly one institution, not a hashtag
@@ -153,13 +181,15 @@ export function createRorMatcher(records: RorRecord[]): (text: string) => RorMat
         if (owners?.length === 1) hits.push({ start: i, end: i + 1, record: owners[0] });
       }
     }
+    const backed = (r: RorRecord) => mentions(r.city) || mentions(r.country);
+    hits = hits.filter((h) => !h.weak || backed(h.record));
     // A full name is stronger evidence than an acronym: once any full name matched, keep only
     // acronyms of those same institutions ("SAIL" for a Stanford lab is also an Indian steel company)
     const named = new Set(hits.filter((h) => h.end - h.start > 1).map((h) => h.record));
     if (named.size) hits = hits.filter((h) => h.end - h.start > 1 || named.has(h.record));
     // An acronym alone counts only if well known or backed by the institution's city or country
     hits = hits.filter((h) => h.end - h.start > 1 || named.has(h.record) || KNOWN_ACRONYMS.has(orig[h.start])
-      || mentions(h.record.city) || mentions(h.record.country));
+      || backed(h.record));
     if (!hits.length) return undefined; // Rule 6
 
     // Longest match wins; drop matches inside it ("University of Munich" inside "Technical University of Munich")
@@ -170,15 +200,15 @@ export function createRorMatcher(records: RorRecord[]): (text: string) => RorMat
     }
     kept.sort((a, b) => a.start - b.start);
 
+    // Funders and governments ("Agencia Estatal de Investigación") only fill the country when no host matched
+    const hosts = kept.filter((h) => !h.record.nonHost);
+    const used = hosts.length ? hosts : kept;
     // Rule 4: first institution mentioned; country only if every named institution agrees
-    const first = kept[0].record;
-    const countries = new Set(kept.map((h) => h.record.country).filter(Boolean));
-    return {
-      rorId: first.id,
-      name: first.name,
-      country: countries.size === 1 && first.country ? first.country : undefined,
-      city: first.city,
-    };
+    const first = used[0].record;
+    const countries = new Set(used.map((h) => h.record.country).filter(Boolean));
+    const country = countries.size === 1 && first.country ? first.country : undefined;
+    if (!hosts.length) return country ? { country, city: '' } : undefined;
+    return { rorId: first.id, name: first.name, country, city: first.city };
   };
 }
 
