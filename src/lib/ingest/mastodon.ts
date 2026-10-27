@@ -5,6 +5,7 @@
 // deadline, …) stays undefined so the UI hides it instead of showing a guess.
 import type { DegreeLevel, Opportunity } from '@/types';
 import { INSTITUTION_NOT_STATED, LOCATION_NOT_STATED, fundingTagsFor, subjectTagsFor } from '@/lib/opportunityDetails';
+import { matchInstitution, resolveCountry, type RorMatch } from '@/lib/ingest/ror';
 
 export { INSTITUTION_NOT_STATED, LOCATION_NOT_STATED };
 
@@ -91,6 +92,19 @@ export function institutionFor(text: string): string | undefined {
   // A lone generic word ("Institute", "the University") isn't a name
   if (!/\s/.test(m) || /^(the|our|a|an|my|this|at)\s/i.test(m)) return undefined;
   return m;
+}
+
+let rorWarned = false;
+
+/** ROR match, or undefined if the index can't be loaded: ingest then falls back to the regexes above */
+export function rorFor(text: string): RorMatch | undefined {
+  try {
+    return matchInstitution(text);
+  } catch (err) {
+    if (!rorWarned) console.warn('ROR index unavailable, using regex fallback:', (err as Error).message);
+    rorWarned = true;
+    return undefined;
+  }
 }
 
 const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
@@ -225,7 +239,9 @@ export function postToOpportunity(
   const fieldTags = fieldsFor(text, tags);
   const funding = fundingFor(text);
   const poster = (post.account.display_name || post.account.username).replace(/:\w+:/g, '').trim();
-  const institution = institutionFor(text) ?? INSTITUTION_NOT_STATED;
+  const ror = rorFor(text);
+  const { country, countrySource } = resolveCountry(countryFor(text), ror);
+  const institution = ror?.name ?? institutionFor(text) ?? INSTITUTION_NOT_STATED;
   const email = text.match(/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/)?.[0]?.replace(/[.,;:)]+$/, '');
   const link = linksIn(post.content)[0];
 
@@ -236,7 +252,11 @@ export function postToOpportunity(
     authorTitle: `@${post.account.acct}`,
     authorAvatar: post.account.avatar || undefined,
     institution,
-    country: countryFor(text) ?? LOCATION_NOT_STATED,
+    country: country ?? LOCATION_NOT_STATED,
+    // ROR's city only when the country also came from ROR, so the two can't disagree
+    city: countrySource === 'ror' && ror?.city ? ror.city : undefined,
+    rorId: ror?.rorId,
+    countrySource,
     source,
     sourceUrl: post.url ?? post.uri,
     postedAt: postedAt.toISOString(),

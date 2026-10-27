@@ -219,6 +219,10 @@ export interface Opportunity {
   /** Same values as the Country filter, e.g. "United Kingdom" */
   country: string;
   city?: string;
+  /** ROR id when the institution matched the ROR registry */
+  rorId?: string;
+  /** Where the country came from: stated in the post, or from the ROR institution */
+  countrySource?: 'post' | 'ror';
   source: OpportunitySource;
   sourceUrl: string;
   postedAt: string; // ISO date
