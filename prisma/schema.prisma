@@ -257,6 +257,10 @@ model Opportunity {
   labName         String?
   country         String
   city            String?
+  /// ROR id (https://ror.org/…) when the institution name matched ROR
+  rorId           String?
+  /// Where the country came from: "post" (stated in the post) | "ror" (from the institution name)
+  countrySource   String?
   /// linkedin | twitter | lab_website | web | reddit
   source          String
   sourceUrl       String

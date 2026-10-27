@@ -18,7 +18,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:db": "prisma dev --name scholarsship_e2e --detach",
-    "data:ror:build": "tsx prisma/import/build-ror-index.ts"
+    "data:ror:build": "tsx prisma/import/build-ror-index.ts",
+    "data:ror:backfill": "tsx --env-file=.env.local prisma/import/backfill-ror.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
