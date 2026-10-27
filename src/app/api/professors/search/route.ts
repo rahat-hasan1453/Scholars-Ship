@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Professor } from '@/types';
 import { initialsAvatar } from '@/lib/initialsAvatar';
+import { INSTITUTION_NOT_STATED, LOCATION_NOT_STATED } from '@/lib/opportunityDetails';
 
 // Map country code to readable name
 const countryMap: Record<string, string> = {
@@ -52,9 +53,10 @@ export async function GET(request: Request) {
     const mappedProfessors: Professor[] = results
       .filter((author: any) => author.display_name && author.works_count > 5)
       .map((author: any, index: number) => {
-        const institutionName = author.last_known_institution?.display_name || 'Global Research Institute';
-        const countryCode = author.last_known_institution?.country_code || 'US';
-        const country = countryMap[countryCode] || author.last_known_institution?.country_code || 'USA';
+        // No institution or country in OpenAlex: say so instead of guessing one
+        const institutionName = author.last_known_institution?.display_name || INSTITUTION_NOT_STATED;
+        const countryCode: string | undefined = author.last_known_institution?.country_code;
+        const country = countryCode ? (countryMap[countryCode] ?? countryCode) : LOCATION_NOT_STATED;
 
         // Extract topics as research tags
         const topics = (author.topics || [])
@@ -75,7 +77,7 @@ export async function GET(request: Request) {
           // OpenAlex says nothing about hiring or intakes, so these stay empty instead of guessed
           openPositions: false,
           googleScholar: `https://scholar.google.com/scholar?q=${encodeURIComponent(author.display_name)}`,
-          linkedInUrl: `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(author.display_name + ' ' + institutionName)}`,
+          linkedInUrl: `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(author.display_name)}`,
           labWebsite: author.id || `https://openalex.org/${author.id?.split('/').pop()}`,
           avatarUrl: initialsAvatar(author.display_name),
           acceptingTerms: [],

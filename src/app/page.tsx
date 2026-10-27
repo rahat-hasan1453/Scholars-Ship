@@ -120,7 +120,9 @@ export default function HomePage() {
 
   // Live OpenAlex / ApplyKite Database Search Handler
   const handleOpenAlexSearch = async () => {
-    const query = profSearchQuery.trim() || profSubjectFilter !== 'ALL' ? (profSubjectFilter === 'UX' ? 'Human-Computer Interaction UX' : profSubjectFilter) : 'Human-Computer Interaction';
+    const query =
+      profSearchQuery.trim() ||
+      (profSubjectFilter !== 'ALL' ? (profSubjectFilter === 'UX' ? 'Human-Computer Interaction UX' : profSubjectFilter) : 'Human-Computer Interaction');
     setIsLiveSearching(true);
     setLiveSearchError('');
     try {
