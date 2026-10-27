@@ -88,7 +88,8 @@ test.describe('Pipeline (Kanban)', () => {
 
   test('filters by deadline window', async ({ page }) => {
     await page.getByRole('button', { name: 'Filter' }).click();
-    await page.getByLabel('Deadline').selectOption('7');
+    await page.getByRole('combobox', { name: 'Deadline' }).click();
+    await page.getByRole('option', { name: 'Next 7 days' }).click();
     await page.keyboard.press('Escape');
     await expect(page.getByRole('button', { name: /Filter/ })).toContainText('1');
   });
