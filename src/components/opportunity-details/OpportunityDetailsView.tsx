@@ -96,6 +96,7 @@ export const OpportunityDetailsView: React.FC<Props> = ({ opportunity: o, others
   const location = [o.city, o.country].filter(Boolean).join(', ');
   const contactHref = o.contactEmail ? `mailto:${o.contactEmail}` : o.sourceUrl;
   const person = shortName(o.authorName);
+  const isProgramme = o.source === 'university';
 
   const main = (
     <>
@@ -165,7 +166,7 @@ export const OpportunityDetailsView: React.FC<Props> = ({ opportunity: o, others
               ? `⏰ Closes ${deadline}  ·  ${left} day${left === 1 ? '' : 's'} left`
               : `⏰ Closed on ${deadline}`
         }
-        primary={{ label: 'Contact Professor', href: contactHref }}
+        primary={{ label: isProgramme ? 'View programme page' : 'Contact Professor', href: contactHref }}
         secondary={[
           { label: saved ? '🔖 Saved' : '🔖 Save', onClick: () => toggleBookmark(o.id), pressed: saved },
           {
@@ -179,12 +180,21 @@ export const OpportunityDetailsView: React.FC<Props> = ({ opportunity: o, others
       />
       <MatchCard score={match} rows={matchBreakdown(o, profile)} />
       <AskAiCard
-        prompts={[
-          'Am I a good fit for this lab?',
-          `Draft an email to ${person}`,
-          'Summarise their recent papers',
-          'Write my research statement',
-        ]}
+        prompts={
+          isProgramme
+            ? [
+                'Am I a good fit for this programme?',
+                'Draft an enquiry to the programme office',
+                'What should my application include?',
+                'Write my research statement',
+              ]
+            : [
+                'Am I a good fit for this lab?',
+                `Draft an email to ${person}`,
+                'Summarise their recent papers',
+                'Write my research statement',
+              ]
+        }
       />
       <SimilarCard
         title="Similar opportunities"
