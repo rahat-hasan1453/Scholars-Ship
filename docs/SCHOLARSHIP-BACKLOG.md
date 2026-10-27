@@ -1,7 +1,7 @@
 # Scholarship backlog: not yet added
 
 Scholarships we looked at but could not add under the official-source rule (`docs/SCHOLARSHIP-VERIFICATION.md`).
-Last reviewed: 2026-10-22 (Step 8 PR #64, Step 9 PR #69).
+Last reviewed: 2026-10-27 (Step 8 PR #64, Step 9 PR #69, Step 16 batch 02a).
 
 ## Blocked: bot-block, needs the user to open the page in a browser and share the facts
 
@@ -31,6 +31,21 @@ Last reviewed: 2026-10-22 (Step 8 PR #64, Step 9 PR #69).
 | Denmark (government) | Same | Same |
 | SINGA (Singapore) | Official page not reachable | Retry later |
 | Orange Knowledge (Netherlands) | Could not verify | Check whether the programme still runs |
+
+## Step 16 (Europe, batch 02a): tried 2026-10-27, nothing verified
+
+| Scholarship | Country | Reason | Retry when |
+|---|---|---|---|
+| VLIR-UOS ICP Connect | Belgium | Bangladesh is not on the 25-country eligible list | Ruled out unless the list changes |
+| OeAD | Austria | `robots.txt` disallows all pages | User opens it in a browser and shares the facts |
+| NAWA (Banach, Poland My First Choice) | Poland | Index page has no eligibility, nationality or deadline; needs each programme's own call page | Programme call page found |
+| National Scholarship Programme (SAIA) | Slovakia | Page does not say whether Bangladesh can apply (mobility programme; deadline 31 Oct 2026 seen) | Terms page found |
+| Romanian Government scholarships | Romania | roburse.ro page covers Romanians studying abroad, not incoming students | Find the incoming-student page |
+| Slovenian Government (Ad Futura) | Slovenia | URL tried returned 404 | Find the right page |
+| IKY / Greek state scholarships | Greece | Home page has no foreign-student scholarship details | Find the right page |
+| MAEC-AECID | Spain | URL tried returned 404 | Find the right page |
+| ARES | Belgium | Not fetched | Try |
+| Iceland, Estonia, Lithuania, Latvia, Czech Republic, Portugal, Luxembourg, Norway, Denmark | Various | Not tried (stopped to save tokens) | Next session |
 
 ## Ruled out
 - Finland: no government scholarship for degree students.

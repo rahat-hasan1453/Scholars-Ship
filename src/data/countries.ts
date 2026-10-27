@@ -38,6 +38,10 @@ export const WORLD_COUNTRIES: CountryOption[] = [
   { label: 'Cyprus', value: 'Cyprus', code: 'CY', flag: '🇨🇾', region: 'Europe' },
   { label: 'Greece', value: 'Greece', code: 'GR', flag: '🇬🇷', region: 'Europe' },
   { label: 'Luxembourg', value: 'Luxembourg', code: 'LU', flag: '🇱🇺', region: 'Europe' },
+  { label: 'Slovakia', value: 'Slovakia', code: 'SK', flag: '🇸🇰', region: 'Europe' },
+  { label: 'Iceland', value: 'Iceland', code: 'IS', flag: '🇮🇸', region: 'Europe' },
+  { label: 'Slovenia', value: 'Slovenia', code: 'SI', flag: '🇸🇮', region: 'Europe' },
+  { label: 'Romania', value: 'Romania', code: 'RO', flag: '🇷🇴', region: 'Europe' },
   { label: 'Turkey', value: 'Turkey', code: 'TR', flag: '🇹🇷', region: 'Europe', popularForScholarships: true },
 
   // Asia & Middle East
