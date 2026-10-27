@@ -29,6 +29,14 @@ const FIXTURE: RorRecord[] = [
   rec('focus', 'Focus', 'Spain', 'Madrid'),
   rec('phd', 'Philosophical Hermeneutics Department', 'Italy', 'Rome', [], ['PHD']),
   rec('nus', 'National University of Singapore', 'Singapore', 'Singapore', [], ['NUS']),
+  // Acronym owners that gave wrong countries in the prod dry-run (real ROR records)
+  rec('dtp', 'Department of Transport and Planning', 'Australia', 'Melbourne', [], ['DTP']),
+  rec('lcbc', 'Lake Chad Basin Commission', 'Chad', "N'Djamena", [], ['LCBC']),
+  rec('differ', 'Dutch Institute for Fundamental Energy Research', 'Netherlands', 'Eindhoven', [], ['DIFFER']),
+  rec('zmb', 'Center for Microscopy and Image Analysis', 'Switzerland', 'Zurich', [], ['ZMB']),
+  rec('ibd', 'Freies Institut für Bauforschung und Dokumentation e.V.', 'Germany', 'Marburg', [], ['IBD']),
+  rec('anr', 'University of California Division of Agriculture and Natural Resources', 'USA', 'Oakland', [], ['ANR']),
+  rec('sdu', 'University of Southern Denmark', 'Denmark', 'Odense', ['Syddansk Universitet']),
 ];
 const match = createRorMatcher(FIXTURE);
 
@@ -59,6 +67,29 @@ describe('matchInstitution (ROR)', () => {
   it('skips shouted words and degree names that look like acronyms', () => {
     expect(match('FULLY FUNDED PHD POSITIONS AVAILABLE')).toBeUndefined();
     expect(match('Open PHD call')).toBeUndefined();
+  });
+
+  it('ignores a lone acronym unless the post names its city or country', () => {
+    expect(match('Fully funded PhD in hydrology with the NERC E5 DTP')).toBeUndefined();
+    expect(match('PhD studentships, South Coast DTP, apply by January')).toBeUndefined();
+    expect(match('MRC DTP studentship in neuroscience')).toBeUndefined();
+    expect(match('Postdoc in brain ageing at LCBC, Oslo')).toBeUndefined();
+    expect(match('PhD on the DIFFER project at our lab in Alicante')).toBeUndefined();
+    expect(match('PhD on IBD and the gut microbiome')).toBeUndefined();
+    expect(match('Thèse financée par l\'ANR à Lyon')).toBeUndefined();
+    expect(match('PhD in fusion at DIFFER in Eindhoven')?.country).toBe('Netherlands');
+  });
+
+  it('ignores hashtags and handles that look like acronyms', () => {
+    expect(match('#ZMB member is recruiting PhD students in Munich')).toBeUndefined();
+    expect(match('#ZMB member is recruiting PhD students in Zurich')).toBeUndefined();
+    expect(match('Congrats @DIFFER on the new grant, Eindhoven')).toBeUndefined();
+  });
+
+  it('a full name wins over a stray acronym from another country', () => {
+    const m = match('PhD on IBD at Syddansk Universitet');
+    expect(m?.rorId).toBe('https://ror.org/sdu');
+    expect(m?.country).toBe('Denmark');
   });
 
   it('trusts a full name over a clashing acronym', () => {

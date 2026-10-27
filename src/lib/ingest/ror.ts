@@ -67,6 +67,9 @@ const isCapitalised = (t: string) => /^[\p{Lu}\p{N}]/u.test(t);
 
 // Capitals that are degree or job words, not institutions
 const COMMON_CAPS = new Set('PHD MSC BSC MBA DPHIL POSTDOC CEO USA NEW AND THE FOR ALL JOB JOBS HIRING OPEN APPLY NOW CV FAQ STEM HCI'.split(' '));
+// Well-known acronyms trusted on their own. Any other acronym needs the institution's city or country
+// in the post too: "NERC E5 DTP" is a UK Doctoral Training Partnership, not Australia's Department of Transport
+const KNOWN_ACRONYMS = new Set('MIT KTH EPFL RWTH KAUST KAIST UNIGE INRIA'.split(' '));
 const isAllCaps = (t: string) => t === t.toUpperCase() && /\p{Lu}/u.test(t);
 /** "FULLY FUNDED PHD AT ..." is shouting, not acronyms: a long all-caps neighbour gives it away */
 function shouted(orig: string[], i: number): boolean {
@@ -122,8 +125,13 @@ export function createRorMatcher(records: RorRecord[]): (text: string) => RorMat
   }
 
   return (text: string) => {
-    const orig = tokens(text);
+    const words = [...text.matchAll(/[\p{L}\p{N}]+/gu)];
+    const orig = words.map((m) => m[0]);
     const norm = orig.map(normToken);
+    // "#ZMB" and "@DIFFER" are hashtags and handles, not institutions
+    const tagged = words.map((m) => m.index > 0 && '#@'.includes(text[m.index - 1]));
+    const normText = ` ${norm.join(' ')} `;
+    const mentions = (place: string) => !!normName(place) && normText.includes(` ${normName(place)} `);
     let hits: Hit[] = [];
 
     for (let i = 0; i < orig.length; i++) {
@@ -138,9 +146,9 @@ export function createRorMatcher(records: RorRecord[]): (text: string) => RorMat
         hits.push({ start: i, end: i + n, record });
         break; // longest at this start position
       }
-      // Rule 3: acronyms only in capitals, 3+ letters, owned by exactly one institution
+      // Rule 3: acronyms only in capitals, 3+ letters, owned by exactly one institution, not a hashtag
       const t = orig[i];
-      if (t.length >= 3 && t === t.toUpperCase() && /\p{Lu}/u.test(t) && !COMMON_CAPS.has(t) && !shouted(orig, i)) {
+      if (t.length >= 3 && isAllCaps(t) && !COMMON_CAPS.has(t) && !tagged[i] && !shouted(orig, i)) {
         const owners = byAcronym.get(t);
         if (owners?.length === 1) hits.push({ start: i, end: i + 1, record: owners[0] });
       }
@@ -149,6 +157,9 @@ export function createRorMatcher(records: RorRecord[]): (text: string) => RorMat
     // acronyms of those same institutions ("SAIL" for a Stanford lab is also an Indian steel company)
     const named = new Set(hits.filter((h) => h.end - h.start > 1).map((h) => h.record));
     if (named.size) hits = hits.filter((h) => h.end - h.start > 1 || named.has(h.record));
+    // An acronym alone counts only if well known or backed by the institution's city or country
+    hits = hits.filter((h) => h.end - h.start > 1 || named.has(h.record) || KNOWN_ACRONYMS.has(orig[h.start])
+      || mentions(h.record.city) || mentions(h.record.country));
     if (!hits.length) return undefined; // Rule 6
 
     // Longest match wins; drop matches inside it ("University of Munich" inside "Technical University of Munich")
