@@ -48,6 +48,7 @@ import {
 } from '@/lib/pipeline';
 import { SegmentedToggle } from '@/components/feed/SegmentedToggle';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/shadcn/popover';
+import { SingleSelectField } from '@/components/layout/SingleSelectField';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -72,9 +73,6 @@ const FUNDING_LABELS: Record<string, string> = {
 
 const neutralButton =
   'flex items-center gap-[6px] rounded-[10px] bg-[#f8fafc] px-3 py-[6px] text-[14px] leading-5 font-medium text-[#344054] hover:bg-[#eef2f6] focus-visible:outline-2 focus-visible:outline-[#7150e7] cursor-pointer data-[state=open]:bg-[#eef2f6]';
-
-const selectCls =
-  'h-9 w-full rounded-[8px] border border-[#d0d5dd] bg-white px-2 text-[14px] font-normal text-[#101828] focus-visible:outline-2 focus-visible:outline-[#7150e7]';
 
 // Pipeline page (Figma 315:5151): scholarship applications or professor outreach as a drag-and-drop Kanban board.
 /** `embedded`: board only (no header / toolbar), scholarships mode, used inside My Profile → Pipeline (Figma 327:5400) */
@@ -282,37 +280,30 @@ export function PipelineBoard({ embedded = false }: { embedded?: boolean } = {})
           </PopoverTrigger>
           <PopoverContent align="start" className="flex w-72 flex-col gap-3 rounded-[12px] p-4">
             <p className="text-[14px] leading-5 font-medium text-[#101828]">Filter cards</p>
-            <label className="flex flex-col gap-1 text-[12px] leading-4 font-medium text-[#344054]">
-              Country
-              <select className={selectCls} value={filters.country} onChange={(e) => setFilters((f) => ({ ...f, country: e.target.value }))}>
-                <option value="ALL">All countries</option>
-                {countryOptions.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="flex flex-col gap-1 text-[12px] leading-4 font-medium text-[#344054]">
-              Funding type
-              <select className={selectCls} value={filters.funding} onChange={(e) => setFilters((f) => ({ ...f, funding: e.target.value as PipelineFilters['funding'] }))}>
-                <option value="ALL">Any funding</option>
-                {Object.entries(FUNDING_LABELS).map(([v, l]) => (
-                  <option key={v} value={v}>
-                    {l}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="flex flex-col gap-1 text-[12px] leading-4 font-medium text-[#344054]">
-              {mode === 'scholarships' ? 'Deadline' : 'Follow-up date'}
-              <select className={selectCls} value={filters.deadline} onChange={(e) => setFilters((f) => ({ ...f, deadline: e.target.value as PipelineFilters['deadline'] }))}>
-                <option value="any">Any time</option>
-                <option value="7">Next 7 days</option>
-                <option value="30">Next 30 days</option>
-                <option value="90">Next 90 days</option>
-              </select>
-            </label>
+            <SingleSelectField
+              label="Country"
+              searchable
+              value={filters.country}
+              onChange={(country) => setFilters((f) => ({ ...f, country }))}
+              options={[{ value: 'ALL', label: 'All countries' }, ...countryOptions.map((c) => ({ value: c, label: c }))]}
+            />
+            <SingleSelectField
+              label="Funding type"
+              value={filters.funding}
+              onChange={(funding) => setFilters((f) => ({ ...f, funding: funding as PipelineFilters['funding'] }))}
+              options={[{ value: 'ALL', label: 'Any funding' }, ...Object.entries(FUNDING_LABELS).map(([value, label]) => ({ value, label }))]}
+            />
+            <SingleSelectField
+              label={mode === 'scholarships' ? 'Deadline' : 'Follow-up date'}
+              value={filters.deadline}
+              onChange={(deadline) => setFilters((f) => ({ ...f, deadline: deadline as PipelineFilters['deadline'] }))}
+              options={[
+                { value: 'any', label: 'Any time' },
+                { value: '7', label: 'Next 7 days' },
+                { value: '30', label: 'Next 30 days' },
+                { value: '90', label: 'Next 90 days' },
+              ]}
+            />
             <button
               type="button"
               disabled={filterCount === 0}
