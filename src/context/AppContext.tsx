@@ -3,6 +3,7 @@ import { normalizeSubjects } from '@/data/subjectCatalog';
 import { UserProfile, Scholarship, Professor, Application, ApplicationStatus, DecisionResult, HiringOpportunity, OutreachRecord, OutreachStatus } from '@/types';
 import { GUEST_PROFILE } from '@/lib/guestProfile';
 import { apiFetch, ApiError, newId } from '@/lib/apiClient';
+import { initialsAvatar } from '@/lib/initialsAvatar';
 import { DEMO_RECORD_IDS, IMPORT_DONE_KEY, LEGACY_EXTRA_KEYS, LEGACY_STORAGE_KEYS } from '@/lib/legacyStorage';
 import confetti from 'canvas-confetti';
 
@@ -309,7 +310,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
     const [sch, prof] = await Promise.all([get<Scholarship>('/api/scholarships'), get<Professor>('/api/professors')]);
     if (sch) setScholarships(sch);
-    if (prof) setProfessors(prof);
+    // The list leaves the generated initials avatar out to stay small; make it here
+    if (prof) setProfessors(prof.map((p) => (p.avatarUrl ? p : { ...p, avatarUrl: initialsAvatar(p.name) })));
   }, []);
 
   // Mount: theme + catalogue caches from localStorage, then the session and the user's data from the server
