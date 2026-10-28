@@ -17,10 +17,15 @@ const INCLUDE = {
   _count: { select: { papers: true } },
 } satisfies Prisma.ProfessorInclude;
 
+// The list (every professor in one response) needs no papers: they are only shown on the details page
+const { papers: _papers, ...LIST_INCLUDE } = INCLUDE;
+void _papers;
+
 type ProfessorRow = Prisma.ProfessorGetPayload<{ include: typeof INCLUDE }>;
+type ProfessorListRow = Prisma.ProfessorGetPayload<{ include: typeof LIST_INCLUDE }>;
 
 /** Maps a database row (with its university, lab, latest grant and papers) to the `Professor` shape the UI uses. */
-export function toProfessor(row: ProfessorRow): Professor {
+export function toProfessor(row: ProfessorListRow & { papers?: ProfessorRow['papers'] }): Professor {
   const lab = row.lab;
   const grant = row.grants[0];
   return withFacultyDefaults({
@@ -56,7 +61,7 @@ export function toProfessor(row: ProfessorRow): Professor {
     recentGrant: grant ? { amount: grant.amount, title: grant.title, year: grant.year ?? undefined } : undefined,
     lookingFor: (row.lookingFor as LookingFor | null) ?? undefined,
     contactSteps: row.contactSteps,
-    recentPapers: row.papers.map(({ paper }) => ({
+    recentPapers: (row.papers ?? []).map(({ paper }) => ({
       id: paper.id,
       title: paper.title,
       venue: paper.venue ?? undefined,
@@ -66,11 +71,22 @@ export function toProfessor(row: ProfessorRow): Professor {
   });
 }
 
-/** All faculty from the database. Empty when the DB is down (the UI shows its empty state). */
+/**
+ * A professor as sent in the big list: without the details-page extras (recent papers, contact steps)
+ * and without the generated initials avatar (the browser makes it from the name). Keeps the response small.
+ */
+export function toListProfessor(row: ProfessorListRow): Professor {
+  const { recentPapers: _recentPapers, contactSteps: _contactSteps, ...rest } = toProfessor(row);
+  void _recentPapers;
+  void _contactSteps;
+  return { ...rest, avatarUrl: row.avatarUrl ?? '' };
+}
+
+/** All faculty from the database, slimmed for the list. Empty when the DB is down (the UI shows its empty state). */
 export async function getProfessors(): Promise<Professor[]> {
   try {
-    const rows = await prisma.professor.findMany({ include: INCLUDE, orderBy: [{ hIndex: { sort: 'desc', nulls: 'last' } }, { id: 'asc' }] });
-    return rows.map(toProfessor);
+    const rows = await prisma.professor.findMany({ include: LIST_INCLUDE, orderBy: [{ hIndex: { sort: 'desc', nulls: 'last' } }, { id: 'asc' }] });
+    return rows.map(toListProfessor);
   } catch (error) {
     console.error('[professors] database read failed', error);
     return [];
