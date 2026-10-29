@@ -9,10 +9,10 @@ Last reviewed: 2026-10-29 (Step 8 PR #64, Step 9 PR #69, Step 16 batch 02a, brow
 |---|---|
 | GREAT Scholarships (UK) | **Added** (`gov-gb-great`): Bangladesh is on the 18-country list |
 | Ontario Graduate Scholarship | **Added** (`gov-ca-ogs`); the page does not say if international students may apply |
-| Vanier Canada Graduate Scholarships | **Not added: archived.** "No longer accepting applications"; replaced by the Canada Graduate Research Scholarship – Doctoral (CGRS-D). Check CGRS-D next |
+| Vanier Canada Graduate Scholarships | **Not added: archived.** "No longer accepting applications"; replaced by CGRS D, which **is added** (`gov-ca-cgrs-d`) |
 | Rhodes Scholarship | Applications closed; next round opens 2027 (entry 2028). Bangladesh eligibility not found; look for the constituencies page |
 | Manaaki New Zealand | Not added: Bangladesh is not on the eligible-countries page |
-| Rotary Peace Fellowships | Not added yet: next application opens Feb 2027 (2028-29 cohort); up to 50 master's and 120 certificate fellowships a year. The eligibility and cost pages were not read |
+| Rotary Peace Fellowships | **Added** (master's only, `gov-int-rotary-peace`). The professional certificate programme is not listed |
 | Marshall Scholarship | Not tried |
 | OeAD (Austria) | Not opened: `robots.txt` disallows all pages |
 
