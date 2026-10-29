@@ -275,9 +275,9 @@ Mistakes never break the live site, parallel sessions stay separate, and changes
 
 | | |
 |---|---|
-| **বাংলা** | প্রফেসর/গবেষক তালিকা দুই ফাইল থেকে: CSRankings (শুধু CS, `professors.json`) আর OpenAlex (CS-এর বাইরে, `professors-openalex.json`, title "Researcher · <subject>", কখনো "Professor" নয়)। "Recently funded" সংকেত NSF (CS) আর NIH (USA, `grants-nih.json`) থেকে। প্রতিদিন একটা cron h-index আর paper সংখ্যা নতুন করে (সপ্তাহে একবার প্রতিজন)। |
-| **English** | Faculty come from two files: CSRankings (CS only) and OpenAlex researchers (other subjects). "Recently funded" comes from NSF and NIH awards, matched only when last name, first-name start and institution all agree. A daily cron refreshes h-index and paper counts (each person once a week). |
-| **Commands** | `npm run data:researchers:build` (OpenAlex researchers), `npm run data:grants:nih` (NIH awards; ~20 min, 1 request/second, cached in `.data-cache/`). Seed loads all files; it removes only faculty in none of them. |
+| **বাংলা** | প্রফেসর/গবেষক তালিকা দুই ফাইল থেকে: CSRankings (শুধু CS, `professors.json`) আর OpenAlex (CS-এর বাইরে, `professors-openalex.json`, title "Researcher · <subject>", কখনো "Professor" নয়)। "Recently funded" সংকেত NSF (CS), NIH (USA, `grants-nih.json`) আর UKRI (UK, `grants-ukri.json`) থেকে। প্রতিদিন একটা cron h-index আর paper সংখ্যা নতুন করে (সপ্তাহে একবার প্রতিজন)। |
+| **English** | Faculty come from two files: CSRankings (CS only) and OpenAlex researchers (other subjects). "Recently funded" comes from NSF, NIH and UKRI awards, matched only when last name, first-name start and institution all agree. A daily cron refreshes h-index and paper counts (each person once a week). |
+| **Commands** | `npm run data:researchers:build` (OpenAlex researchers), `npm run data:grants:nih` (NIH awards; ~25 min) and `npm run data:grants:ukri` (UK awards; ~25 min); both 1 request/second, cached in `.data-cache/`. Seed loads all files; it removes only faculty in none of them. |
 | **Cron** | `/api/cron/professors` daily 07:00 UTC (`CRON_SECRET`). Never creates or deletes, only updates metrics. |
 
 ---
