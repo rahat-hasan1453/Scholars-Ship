@@ -5,12 +5,15 @@ import { useRouter } from 'next/navigation';
 import { ArrowDown, ArrowUp, ChevronDown } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/shadcn/table';
 import { cn } from '@/lib/utils';
+import { FEED_PAGE_SIZE } from '@/components/opportunity-feed/FeedGrid';
+import { pageGroups } from '@/lib/feedPaging';
 
 /*
  * List view shared by all four feeds (shadcn Table).
  * - Click a sortable header to sort (click again to flip the direction).
  * - Click a row (or press Enter on it) to open its details; buttons and links inside a row work on their own.
  * - Optional `groupBy` splits rows into collapsible sections, e.g. Closing soon / Open / Closed.
+ * - Rows show FEED_PAGE_SIZE at a time ("Show more"), like the card grid; sorting still covers every row.
  */
 
 export type FeedColumn<T> = {
@@ -66,6 +69,13 @@ export function FeedTable<T>({
   const router = useRouter();
   const [sort, setSort] = useState<SortState>(defaultSort);
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  const [limit, setLimit] = useState(FEED_PAGE_SIZE);
+  // A new result set (filters changed) starts again from the first page
+  const [seenCount, setSeenCount] = useState(rows.length);
+  if (seenCount !== rows.length) {
+    setSeenCount(rows.length);
+    setLimit(FEED_PAGE_SIZE);
+  }
 
   const sorted = useMemo(() => {
     const col = sort && columns.find((c) => c.key === sort.key);
@@ -88,6 +98,9 @@ export function FeedTable<T>({
     }
     return [...map.values()].sort((a, b) => a.group.order - b.group.order);
   }, [sorted, groupBy]);
+
+  // The first `limit` rows in table order, across groups (collapsed groups show none)
+  const { visible: visibleGroups, hidden } = useMemo(() => pageGroups(groups, collapsed, limit), [groups, collapsed, limit]);
 
   const open = (row: T) => (onOpen ? onOpen(row) : getHref && router.push(getHref(row)));
   const toggleSort = (key: string) =>
@@ -140,7 +153,7 @@ export function FeedTable<T>({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {groups.map(({ group, items }) => (
+          {visibleGroups.map(({ group, items, shown }) => (
             <React.Fragment key={group?.id ?? 'all'}>
               {group && (
                 <TableRow className="border-[#f1f1f1] bg-white hover:bg-white">
@@ -164,7 +177,7 @@ export function FeedTable<T>({
                 </TableRow>
               )}
               {!(group && collapsed.has(group.id)) &&
-                items.map((row) => (
+                shown.map((row) => (
                   <TableRow
                     key={getKey(row)}
                     tabIndex={0}
@@ -184,6 +197,17 @@ export function FeedTable<T>({
           ))}
         </TableBody>
       </Table>
+      {hidden > 0 && (
+        <div className="flex justify-center border-t border-[#f1f1f1] py-3">
+          <button
+            type="button"
+            onClick={() => setLimit((l) => l + FEED_PAGE_SIZE)}
+            className="h-9 px-4 rounded-[6px] border border-[#7150e7] text-[14px] leading-5 font-medium text-[#7150e7] hover:bg-[#f4f2fd] transition-colors cursor-pointer"
+          >
+            Show more ({hidden.toLocaleString()} left)
+          </button>
+        </div>
+      )}
     </div>
   );
 }

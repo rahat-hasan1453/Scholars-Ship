@@ -74,6 +74,12 @@ export const FacultyLabsFeed: React.FC = () => {
     return rankBySubject(matching, selectedSubjects, (prof) => prof.researchTags ?? [], true);
   }, [professors, globalSearchQuery, matchMode, profile, selectedDegrees, selectedCountries, selectedSubjects]);
 
+  // Scoring thousands of faculty is not free, so only when the list or profile changes (not on every render)
+  const matchRange = useMemo(
+    () => formatPercentRange(filteredProfessors.map((p) => matchScore(p, profile))),
+    [filteredProfessors, profile],
+  );
+
   // Any filter, search or mode change scrolls the cards back to the top
   const scrollResetKey = JSON.stringify([
     globalSearchQuery,
@@ -127,7 +133,7 @@ export const FacultyLabsFeed: React.FC = () => {
           title="Faculty & Lab List"
           count={filteredProfessors.length}
           rangeLabel="Match"
-          acceptanceRange={formatPercentRange(filteredProfessors.map((p) => matchScore(p, profile)))}
+          acceptanceRange={matchRange}
           acceptanceColor="#36b37e"
           viewMode={viewMode}
           onViewModeChange={setViewMode}
