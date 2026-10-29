@@ -15,7 +15,7 @@ describe('who is the same person', () => {
   const prof = { name: 'Stefanos Zafeiriou', university: 'Imperial College London' };
   it('matches last name and the start of the first name, ignoring accents and case', () => {
     expect(namedLike(prof, [person('Stefanos', 'Zafeiriou'), person('STEFANOS', 'ZAFEIRIOU')])).toHaveLength(2);
-    expect(namedLike({ name: 'José Álvarez', university: 'x' }, [person('Jose', 'Alvarez')])).toHaveLength(1);
+    expect(namedLike({ name: 'José Álvarez' }, [person('Jose', 'Alvarez')])).toHaveLength(1);
   });
   it('drops other people the free-text search returned', () => {
     expect(namedLike(prof, [person('Stefan', 'Zafeiriou-Smith'), person('Maria', 'Zafeiriou'), person('Stefanos', 'Zafeiridis')])).toHaveLength(0);
