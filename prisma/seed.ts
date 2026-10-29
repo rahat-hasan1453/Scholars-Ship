@@ -39,6 +39,8 @@ type ProfessorSeed = {
   dataSource?: string;
 };
 
+type GrantSeed = { id: string; professorId: string; title: string; funder: string; amount: string; year: number; url: string };
+
 type PaperSeed = {
   id: string;
   openAlexId?: string;
@@ -159,6 +161,18 @@ async function seedFaculty() {
     grants++;
   }
 
+  // Latest NIH award for US faculty (prisma/data/grants-nih.json, built by import-nih-grants.ts)
+  const nih = await readJson<{ grants: GrantSeed[] }>('grants-nih.json').then((f) => f.grants, () => [] as GrantSeed[]);
+  const knownProfs = new Set(professors.map((p) => p.id));
+  const nihRows = nih.filter((g) => knownProfs.has(g.professorId));
+  for (const g of nihRows) {
+    const { id, ...data } = g;
+    await prisma.grant.upsert({ where: { id }, create: { id, ...data }, update: data });
+  }
+  // NIH grants that are no longer in the file (the file is rebuilt from time to time)
+  await prisma.grant.deleteMany({ where: { funder: 'NIH', id: { notIn: nihRows.map((g) => g.id) } } });
+  grants += nihRows.length;
+
   // Only rows in neither file are removed
   const removedProfs = await prisma.professor.deleteMany({ where: staleFacultyWhere(professors.map((p) => p.id)) });
   // Demo labs and grants had no real source
@@ -167,7 +181,7 @@ async function seedFaculty() {
   const removedUnis = await prisma.university.deleteMany({ where: { professors: { none: {} } } });
   console.log(
     `Seeded ${professors.length} faculty (${csrankings.length} CSRankings + ${professors.length - csrankings.length} OpenAlex) at ${unis.size} universities, ` +
-      `${grants} NSF grants in ${((Date.now() - started) / 1000).toFixed(1)}s ` +
+      `${grants} grants (NSF + NIH) in ${((Date.now() - started) / 1000).toFixed(1)}s ` +
       `(removed ${removedProfs.count} old faculty, ${removedLabs.count} labs, ${removedGrants.count} grants, ${removedUnis.count} universities).`,
   );
 }

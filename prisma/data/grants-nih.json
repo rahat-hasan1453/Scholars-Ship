@@ -1,0 +1,1167 @@
+{
+ "generatedAt": "2026-10-28T23:22:39.894Z",
+ "source": "NIH RePORTER",
+ "grants": [
+  {
+   "id": "nih_R01LM013772_prof_byron-c-wallace_northeastern-univers",
+   "professorId": "prof_byron-c-wallace_northeastern-univers",
+   "title": "Targeted Neural Text Summarization of Electronic Medical Records to Improve Imaging Diagnostics",
+   "funder": "NIH",
+   "amount": "$304K",
+   "year": 2024,
+   "url": "https://reporter.nih.gov/project-details/10916390"
+  },
+  {
+   "id": "nih_R34DA059507_prof_kostas-daniilidis_university-of-pennsy",
+   "professorId": "prof_kostas-daniilidis_university-of-pennsy",
+   "title": "Development of a \"Smart Aviary\" to Probe Neural Dynamics of Complex Social Behaviors in a Gregarious Songbird",
+   "funder": "NIH",
+   "amount": "$342K",
+   "year": 2025,
+   "url": "https://reporter.nih.gov/project-details/11074544"
+  },
+  {
+   "id": "nih_R01EY037101_prof_insup-lee_university-of-pennsy",
+   "professorId": "prof_insup-lee_university-of-pennsy",
+   "title": "Sch: Advancing Clinical Decision Support for Glaucoma Detection and Progression Using Multi-Modal AI",
+   "funder": "NIH",
+   "amount": "$297K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11419179"
+  },
+  {
+   "id": "nih_R01MH140883_prof_nadir-weibel_univ-of-california--",
+   "professorId": "prof_nadir-weibel_univ-of-california--",
+   "title": "Understand: Uplifting the New Generation Through Dbt Education and Resilience for Social Triggers, Anxiety, Negativity, and Depression",
+   "funder": "NIH",
+   "amount": "$2.1M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11205293"
+  },
+  {
+   "id": "nih_UM1TR006031_prof_james-zou_stanford-university",
+   "professorId": "prof_james-zou_stanford-university",
+   "title": "Advancing Personalized Cardiac Organoids - Converging in Vitro, in Chemico, and in Silico Models",
+   "funder": "NIH",
+   "amount": "$3.1M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11305575"
+  },
+  {
+   "id": "nih_P30AG102665_prof_james-a-landay_stanford-university",
+   "professorId": "prof_james-a-landay_stanford-university",
+   "title": "Stanford University Artificial Intelligence and Technology Collaboratory (Su-Aitc) Center for Precision Health & Interventions in Aging and Ad/adrd",
+   "funder": "NIH",
+   "amount": "$4.9M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11440261"
+  },
+  {
+   "id": "nih_R01MH139114_prof_haiyi-zhu_carnegie-mellon-univ",
+   "professorId": "prof_haiyi-zhu_carnegie-mellon-univ",
+   "title": "Sch: Training Mental Health Supporters with Virtual Patients and Automated Feedback",
+   "funder": "NIH",
+   "amount": "$290K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11324585"
+  },
+  {
+   "id": "nih_R01EB034116_prof_heng-huang_univ-of-maryland---c",
+   "professorId": "prof_heng-huang_univ-of-maryland---c",
+   "title": "Sch: New Advanced Machine Learning Framework for Mining Heterogeneous Ocular Data to Accelerate",
+   "funder": "NIH",
+   "amount": "$300K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11177624"
+  },
+  {
+   "id": "nih_R01EY037193_prof_alan-l-yuille_johns-hopkins-univer",
+   "professorId": "prof_alan-l-yuille_johns-hopkins-univer",
+   "title": "\"Crcns\": Brain-Derived Network Architectures for Deciphering and Applying Brain Algorithms",
+   "funder": "NIH",
+   "amount": "$409K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11418913"
+  },
+  {
+   "id": "nih_R01EB038734_prof_vishal-m-patel_johns-hopkins-univer",
+   "professorId": "prof_vishal-m-patel_johns-hopkins-univer",
+   "title": "Sch: Technology for Personalized Surgical Feedback Using Vision and Language Data.",
+   "funder": "NIH",
+   "amount": "$288K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11385947"
+  },
+  {
+   "id": "nih_P30AG073104_prof_rama-chellappa_johns-hopkins-univer",
+   "professorId": "prof_rama-chellappa_johns-hopkins-univer",
+   "title": "Utilizing Technology and AI Approaches to Facilitate Independence Andresilience in Older Adults",
+   "funder": "NIH",
+   "amount": "$4.9M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11439492"
+  },
+  {
+   "id": "nih_R01HL192731_prof_chien-ming-huang_johns-hopkins-univer",
+   "professorId": "prof_chien-ming-huang_johns-hopkins-univer",
+   "title": "Sch: Intelligent Decision-Support System for ICU Respiratory Management",
+   "funder": "NIH",
+   "amount": "$308K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11579177"
+  },
+  {
+   "id": "nih_R01EB033788_prof_younghyun-kim_purdue-university",
+   "professorId": "prof_younghyun-kim_purdue-university",
+   "title": "Maternal Mhealth Blood Hemoglobin Analysis with Informed Deep Learning",
+   "funder": "NIH",
+   "amount": "$497K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11345177"
+  },
+  {
+   "id": "nih_R01HD114147_prof_sunghoon-ivan-lee_univ-of-massachusett",
+   "professorId": "prof_sunghoon-ivan-lee_univ-of-massachusett",
+   "title": "Sch: a Sensing Platform Monitoring Interactions with Daily Objects to Assess Real-World Motor Performance in Stroke Survivors",
+   "funder": "NIH",
+   "amount": "$272K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11345633"
+  },
+  {
+   "id": "nih_R01AG092220_prof_vikas-singh_university-of-wiscon",
+   "professorId": "prof_vikas-singh_university-of-wiscon",
+   "title": "Crcns: Repurposing Transformers to Characterize Gut Microbiome & Aging Brain Axis",
+   "funder": "NIH",
+   "amount": "$369K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11333837"
+  },
+  {
+   "id": "nih_R01EY037100_prof_yuhang-zhao_university-of-wiscon",
+   "professorId": "prof_yuhang-zhao_university-of-wiscon",
+   "title": "Sch: Scene-Aware AR Systems for Low Vision People in Activities of Daily Living",
+   "funder": "NIH",
+   "amount": "$285K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11392197"
+  },
+  {
+   "id": "nih_R01LM014026_prof_cyrus-shahabi_university-of-southe",
+   "professorId": "prof_cyrus-shahabi_university-of-southe",
+   "title": "Sch: Wearables for Health and Disease Knowledge (W4h)",
+   "funder": "NIH",
+   "amount": "$294K",
+   "year": 2025,
+   "url": "https://reporter.nih.gov/project-details/11001923"
+  },
+  {
+   "id": "nih_DP2LM014564_prof_mahdi-soltanolkotabi_university-of-southe",
+   "professorId": "prof_mahdi-soltanolkotabi_university-of-southe",
+   "title": "Reliable AI for Medical Image Reconstruction",
+   "funder": "NIH",
+   "amount": "$954K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11456899"
+  },
+  {
+   "id": "nih_T15LM007450_oa_A5090647314",
+   "professorId": "oa_A5090647314",
+   "title": "Vanderbilt Biomedical Informatics Training Program",
+   "funder": "NIH",
+   "amount": "$509K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11369161"
+  },
+  {
+   "id": "nih_R01AI206896_oa_A5006753786",
+   "professorId": "oa_A5006753786",
+   "title": "Sch: Collaborative and Grounded Al Agents for Accountable Bacteremia Decision",
+   "funder": "NIH",
+   "amount": "$300K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11579169"
+  },
+  {
+   "id": "nih_R01DE035845_oa_A5055469774",
+   "professorId": "oa_A5055469774",
+   "title": "Develop an AI-Powered Digital Platform for Remote Oral Disease Detection and Prediction",
+   "funder": "NIH",
+   "amount": "$642K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11340411"
+  },
+  {
+   "id": "nih_R01LM015260_oa_A5081511803",
+   "professorId": "oa_A5081511803",
+   "title": "Advancing AI for Weaklysupervised Multimodal Alignment and Query-Based Interpretation in Biological Imaging",
+   "funder": "NIH",
+   "amount": "$1.4M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11347800"
+  },
+  {
+   "id": "nih_U24MH123423_oa_A5100354377",
+   "professorId": "oa_A5100354377",
+   "title": "Bicoastal Marmoset Breeding Center",
+   "funder": "NIH",
+   "amount": "$1.3M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11367382"
+  },
+  {
+   "id": "nih_K01AI177102_oa_A5084981711",
+   "professorId": "oa_A5084981711",
+   "title": "Combining Sources of Information to Improve HIV Pre-Exposure Prophylaxis",
+   "funder": "NIH",
+   "amount": "$136K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11372954"
+  },
+  {
+   "id": "nih_R01AG066883_oa_A5001016275",
+   "professorId": "oa_A5001016275",
+   "title": "Transforming Clinical Trials for Elderly and Rare Cancers Through Intelligent and Robust Information Borrowing",
+   "funder": "NIH",
+   "amount": "$466K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11448693"
+  },
+  {
+   "id": "nih_R01AI157758_oa_A5101692794",
+   "professorId": "oa_A5101692794",
+   "title": "Improved Analyses of Randomized and Nonrandomized HIV Studies",
+   "funder": "NIH",
+   "amount": "$1.4M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11327933"
+  },
+  {
+   "id": "nih_R01AI157758_oa_A5054161918",
+   "professorId": "oa_A5054161918",
+   "title": "Improved Analyses of Randomized and Nonrandomized HIV Studies",
+   "funder": "NIH",
+   "amount": "$1.4M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11327933"
+  },
+  {
+   "id": "nih_P30CA016086_oa_A5078399867",
+   "professorId": "oa_A5078399867",
+   "title": "Biostatistics",
+   "funder": "NIH",
+   "amount": "$377K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11469267"
+  },
+  {
+   "id": "nih_R01HS029877_oa_A5055917772",
+   "professorId": "oa_A5055917772",
+   "title": "Improving Results and Conclusions About Harms in Systematic Reviews of Drugs",
+   "funder": "NIH",
+   "amount": "$382K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11425334"
+  },
+  {
+   "id": "nih_K01AI182506_oa_A5000971824",
+   "professorId": "oa_A5000971824",
+   "title": "Generalizing Effects of Infectious Disease Prevention Interventions in the Presence of Interference",
+   "funder": "NIH",
+   "amount": "$170K",
+   "year": 2025,
+   "url": "https://reporter.nih.gov/project-details/11146421"
+  },
+  {
+   "id": "nih_R01GM124104_oa_A5056322441",
+   "professorId": "oa_A5056322441",
+   "title": "Statistical and Machine Learning Methods to Improve Dynamic Treatment Regimens Estimation Using Real World Data",
+   "funder": "NIH",
+   "amount": "$0K",
+   "year": 2023,
+   "url": "https://reporter.nih.gov/project-details/10654927"
+  },
+  {
+   "id": "nih_P50CA257911_oa_A5045963637",
+   "professorId": "oa_A5045963637",
+   "title": "Core C - Integrated Quantitative Science (Iqs)",
+   "funder": "NIH",
+   "amount": "$189K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11416761"
+  },
+  {
+   "id": "nih_UG1CA275403_oa_A5078111251",
+   "professorId": "oa_A5078111251",
+   "title": "Unc Cascade Network Research Base",
+   "funder": "NIH",
+   "amount": "$607K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11411185"
+  },
+  {
+   "id": "nih_R35GM155070_oa_A5100727498",
+   "professorId": "oa_A5100727498",
+   "title": "Advancing Causal Inference in Integrative Omics Analysis",
+   "funder": "NIH",
+   "amount": "$354K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11380306"
+  },
+  {
+   "id": "nih_R03AG080413_oa_A5084061899",
+   "professorId": "oa_A5084061899",
+   "title": "Social Virtual Reality Experiences for Hospitalized Older Adult Trauma Patients to Reduce Pain",
+   "funder": "NIH",
+   "amount": "$79K",
+   "year": 2024,
+   "url": "https://reporter.nih.gov/project-details/10784719"
+  },
+  {
+   "id": "nih_P50MH115837_oa_A5068504623",
+   "professorId": "oa_A5068504623",
+   "title": "Uw Alacrity Center for Psychosocial Interventions Research",
+   "funder": "NIH",
+   "amount": "$2.2M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11306630"
+  },
+  {
+   "id": "nih_R01NR021711_oa_A5009747354",
+   "professorId": "oa_A5009747354",
+   "title": "Evaluating Nurse Demands and Resources with Virtual Nursing to Mitigate Burnout",
+   "funder": "NIH",
+   "amount": "$742K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11296608"
+  },
+  {
+   "id": "nih_R21MH145210_oa_A5046479021",
+   "professorId": "oa_A5046479021",
+   "title": "Choose Your Own Adventure: a Novel Intervention to Regulate Social Media Use in Adolescents with Depression",
+   "funder": "NIH",
+   "amount": "$411K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11442429"
+  },
+  {
+   "id": "nih_G08LM013797_oa_A5084374376",
+   "professorId": "oa_A5084374376",
+   "title": "Consent-Asl Toolkit for Deaf and Hard of Hearing People",
+   "funder": "NIH",
+   "amount": "$138K",
+   "year": 2023,
+   "url": "https://reporter.nih.gov/project-details/10682412"
+  },
+  {
+   "id": "nih_R01EB034580_oa_A5063086622",
+   "professorId": "oa_A5063086622",
+   "title": "Nri: Adaptive Teleoperation Interfaces for in-Home Assistive Robots",
+   "funder": "NIH",
+   "amount": "$124K",
+   "year": 2025,
+   "url": "https://reporter.nih.gov/project-details/11178721"
+  },
+  {
+   "id": "nih_R01GM164731_oa_A5050821883",
+   "professorId": "oa_A5050821883",
+   "title": "Sos: Bio: the Anatomy of Scientific Biomedical Open-Source Software--from Code to Communities",
+   "funder": "NIH",
+   "amount": "$247K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11413385"
+  },
+  {
+   "id": "nih_R21EB032480_oa_A5017741575",
+   "professorId": "oa_A5017741575",
+   "title": "Bayesian Dynamical Modeling of Microbial Communities",
+   "funder": "NIH",
+   "amount": "$236K",
+   "year": 2024,
+   "url": "https://reporter.nih.gov/project-details/10781938"
+  },
+  {
+   "id": "nih_R01CA278703_oa_A5054598974",
+   "professorId": "oa_A5054598974",
+   "title": "Automated Planning and Robotic Delivery of Needle Biopsies Under CT Image Guidance",
+   "funder": "NIH",
+   "amount": "$607K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11330632"
+  },
+  {
+   "id": "nih_R01DE034729_oa_A5007838414",
+   "professorId": "oa_A5007838414",
+   "title": "Multiscale Modeling of Enamel Dissolution",
+   "funder": "NIH",
+   "amount": "$633K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11364764"
+  },
+  {
+   "id": "nih_K23HL157610_oa_A5100703053",
+   "professorId": "oa_A5100703053",
+   "title": "Clots and Oxygen in Va-Extracorporeal Membrane Oxygenation (Clover) Study",
+   "funder": "NIH",
+   "amount": "$138K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11262222"
+  },
+  {
+   "id": "nih_R21EB037156_oa_A5061802675",
+   "professorId": "oa_A5061802675",
+   "title": "Real-Time Monitoring and Automated Electrolyte Repletion Using Ion-Selective, Sensor-Integrated Central Venous Catheters",
+   "funder": "NIH",
+   "amount": "$418K",
+   "year": 2025,
+   "url": "https://reporter.nih.gov/project-details/11116044"
+  },
+  {
+   "id": "nih_R01EB026572_oa_A5045551635",
+   "professorId": "oa_A5045551635",
+   "title": "Developing a Smart Scaffold for Bladder Augmentation",
+   "funder": "NIH",
+   "amount": "$612K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11252532"
+  },
+  {
+   "id": "nih_R21NS135045_oa_A5009073133",
+   "professorId": "oa_A5009073133",
+   "title": "Delta Ecmo Abi Study (Assessing Acute Brain Injury After Rapid Reduction of Paco2 Upon Ecmo Cannulation Using Portable MRI and Biomarkers)",
+   "funder": "NIH",
+   "amount": "$205K",
+   "year": 2025,
+   "url": "https://reporter.nih.gov/project-details/11163474"
+  },
+  {
+   "id": "nih_R01HD113598_oa_A5009266368",
+   "professorId": "oa_A5009266368",
+   "title": "Personalized Hip Vs Ankle Exoskeleton Assistance with Biofeedback to Enhance Mobility Post-Stroke",
+   "funder": "NIH",
+   "amount": "$513K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11262834"
+  },
+  {
+   "id": "nih_R01AR083470_oa_A5007724052",
+   "professorId": "oa_A5007724052",
+   "title": "Combined Photoacoustic and Ultrasound Imaging for Enabling Quantitative Evaluation of Hidradenitis Suppurativa",
+   "funder": "NIH",
+   "amount": "$641K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11266156"
+  },
+  {
+   "id": "nih_R01HL162882_oa_A5066548014",
+   "professorId": "oa_A5066548014",
+   "title": "Developing Machine Learning Models for Decision Support and Allocation Optimization in Heart Transplantation",
+   "funder": "NIH",
+   "amount": "$649K",
+   "year": 2025,
+   "url": "https://reporter.nih.gov/project-details/11092289"
+  },
+  {
+   "id": "nih_R01EB025741_oa_A5066766358",
+   "professorId": "oa_A5066766358",
+   "title": "Improved Detection of Prostate Cancer with Nanoparticle-Based Ultrasound Contrast Agents Targeted to Psma",
+   "funder": "NIH",
+   "amount": "$550K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11259498"
+  },
+  {
+   "id": "nih_R16GM158539_oa_A5073951891",
+   "professorId": "oa_A5073951891",
+   "title": "Additive Manufacturing Wearable Magnetic Sensors: Revolutionizing Cardiac Health Monitoring with Machine Learning for Arrhythmia Classification",
+   "funder": "NIH",
+   "amount": "$156K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11397238"
+  },
+  {
+   "id": "nih_R01AG075929_oa_A5023154530",
+   "professorId": "oa_A5023154530",
+   "title": "Advancing Coordination of Home and Community Based Services for the Adrd Population",
+   "funder": "NIH",
+   "amount": "$786K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11298975"
+  },
+  {
+   "id": "nih_R35GM126985_oa_A5082428303",
+   "professorId": "oa_A5082428303",
+   "title": "Multi-View Self-Supervised Deep Learning for Biological Sequences and Beyond",
+   "funder": "NIH",
+   "amount": "$375K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11581695"
+  },
+  {
+   "id": "nih_R01AG092810_oa_A5020212862",
+   "professorId": "oa_A5020212862",
+   "title": "The Impact of Changes in Primary Care Clinicians' Work Effort on the Health of Older Adults",
+   "funder": "NIH",
+   "amount": "$680K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11297315"
+  },
+  {
+   "id": "nih_U54OD036472_oa_A5058469124",
+   "professorId": "oa_A5058469124",
+   "title": "Connect: Collaborative Network for Nurturing Ecosystems of Common Fund Team Science",
+   "funder": "NIH",
+   "amount": "$1.9M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11330430"
+  },
+  {
+   "id": "nih_P30AG066587_oa_A5036759930",
+   "professorId": "oa_A5036759930",
+   "title": "Hopkins Economics of Alzheimer's Disease & Services Center",
+   "funder": "NIH",
+   "amount": "$765K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11401996"
+  },
+  {
+   "id": "nih_R33DA059884_oa_A5081630617",
+   "professorId": "oa_A5081630617",
+   "title": "Adapt: Adaptive Decision Support for Addiction Treatment",
+   "funder": "NIH",
+   "amount": "$1.2M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11378360"
+  },
+  {
+   "id": "nih_R18HS029345_oa_A5028798965",
+   "professorId": "oa_A5028798965",
+   "title": "Diagnostic Accuracy Through Advancing  EHR Display,  Education and Surveillance (Data-Eyes)",
+   "funder": "NIH",
+   "amount": "$990K",
+   "year": 2025,
+   "url": "https://reporter.nih.gov/project-details/11176919"
+  },
+  {
+   "id": "nih_U24CA271114_oa_A5032951414",
+   "professorId": "oa_A5032951414",
+   "title": "Proteogenomic Translator for Cancer Biomarker Discovery Towards Precision Medicine",
+   "funder": "NIH",
+   "amount": "$1.3M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11323117"
+  },
+  {
+   "id": "nih_R03LM014928_oa_A5040212698",
+   "professorId": "oa_A5040212698",
+   "title": "Enabling Large Scale Metabolomics Meta-Analyses and Data Integration of Metabolomics Workbench",
+   "funder": "NIH",
+   "amount": "$462K",
+   "year": 2025,
+   "url": "https://reporter.nih.gov/project-details/11239505"
+  },
+  {
+   "id": "nih_R03HS029417_oa_A5091806995",
+   "professorId": "oa_A5091806995",
+   "title": "Human Factors and Implementation Evaluation of Pediatric AI Sepsis Model in the Pediatric Emergency Department",
+   "funder": "NIH",
+   "amount": "$46K",
+   "year": 2024,
+   "url": "https://reporter.nih.gov/project-details/10890611"
+  },
+  {
+   "id": "nih_R01GM145937_oa_A5041597050",
+   "professorId": "oa_A5041597050",
+   "title": "Fine-Grained Annotation of the Protein Universe Through a Community of Practice",
+   "funder": "NIH",
+   "amount": "$433K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11416315"
+  },
+  {
+   "id": "nih_U24CA269436_oa_A5038117263",
+   "professorId": "oa_A5038117263",
+   "title": "The Network Data Exchange - a Network Commons for Biologists",
+   "funder": "NIH",
+   "amount": "$856K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11304470"
+  },
+  {
+   "id": "nih_U01TR002997_oa_A5017140014",
+   "professorId": "oa_A5017140014",
+   "title": "Translating Scientific Evidence Into Practice Using Digital Medicine and Electronic Patient Reported Outcomes",
+   "funder": "NIH",
+   "amount": "$1.2M",
+   "year": 2023,
+   "url": "https://reporter.nih.gov/project-details/10615922"
+  },
+  {
+   "id": "nih_U01DK124165_oa_A5015470174",
+   "professorId": "oa_A5015470174",
+   "title": "Characterizing and Predicting Colitis in Immune Checkpoint Blockade-Treated Cancer Patients",
+   "funder": "NIH",
+   "amount": "$554K",
+   "year": 2024,
+   "url": "https://reporter.nih.gov/project-details/10887508"
+  },
+  {
+   "id": "nih_R01DK139598_oa_A5062296084",
+   "professorId": "oa_A5062296084",
+   "title": "Leveraging Metabolic Pathways and Gene Expression Data to Propel Understanding of Severe Obesity in a Vulnerable and Understudied Population",
+   "funder": "NIH",
+   "amount": "$710K",
+   "year": 2024,
+   "url": "https://reporter.nih.gov/project-details/10900277"
+  },
+  {
+   "id": "nih_U01AG082042_oa_A5042360941",
+   "professorId": "oa_A5042360941",
+   "title": "Proteomic Biomarkers of Incident Cognitive Impairment in Black and White Adults",
+   "funder": "NIH",
+   "amount": "$728K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11308266"
+  },
+  {
+   "id": "nih_U01DK134321_oa_A5025171267",
+   "professorId": "oa_A5025171267",
+   "title": "Hyperbaric Oxygen Therapy for Ulcerative Colitis Patients Hospitalized for Moderate to Severe Flares: a Phase 3 Multi-Center, Randomized, Double-Blind, Sham-Controlled Trial",
+   "funder": "NIH",
+   "amount": "$2.5M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11378296"
+  },
+  {
+   "id": "nih_R03DK132440_oa_A5033087694",
+   "professorId": "oa_A5033087694",
+   "title": "Blood Protein Markers of Biologic Treatment Response in Crohn's Disease",
+   "funder": "NIH",
+   "amount": "$122K",
+   "year": 2024,
+   "url": "https://reporter.nih.gov/project-details/10823276"
+  },
+  {
+   "id": "nih_R03DK140415_oa_A5078565829",
+   "professorId": "oa_A5078565829",
+   "title": "Secondary Prevention of Pouchitis with Rifaximin",
+   "funder": "NIH",
+   "amount": "$250K",
+   "year": 2025,
+   "url": "https://reporter.nih.gov/project-details/11137189"
+  },
+  {
+   "id": "nih_U01HG011758_oa_A5002411386",
+   "professorId": "oa_A5002411386",
+   "title": "Baylor College of Medicine - Mendelian Genomics Research Center (Bcm-Mgrc)",
+   "funder": "NIH",
+   "amount": "$2.1M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11505433"
+  },
+  {
+   "id": "nih_U01CA287036_oa_A5063459619",
+   "professorId": "oa_A5063459619",
+   "title": "Identifying Factors Associated with Prostate Cancer Progression and Survival in African American Men: the Respond Cohort",
+   "funder": "NIH",
+   "amount": "$1.1M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11362385"
+  },
+  {
+   "id": "nih_U01HG008657_oa_A5059340927",
+   "professorId": "oa_A5059340927",
+   "title": "Emerge IV Northwest: a Partnership to Evaluate the Use of Genomic Information in the Health Care of Diverse Participants",
+   "funder": "NIH",
+   "amount": "$829K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11506039"
+  },
+  {
+   "id": "nih_U01HG011176_oa_A5046822527",
+   "professorId": "oa_A5046822527",
+   "title": "Genomic Risk in Clinical Care to Promote Preventive Health in New York City Patients",
+   "funder": "NIH",
+   "amount": "$964K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11510853"
+  },
+  {
+   "id": "nih_R01HG013163_oa_A5004946791",
+   "professorId": "oa_A5004946791",
+   "title": "Multi-Omics Study of Ancestry Enriched Associations in Hispanics/latinos",
+   "funder": "NIH",
+   "amount": "$695K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11402220"
+  },
+  {
+   "id": "nih_T32GM148382_oa_A5035704912",
+   "professorId": "oa_A5035704912",
+   "title": "Indiana Medical Scientist/engineer Training Program",
+   "funder": "NIH",
+   "amount": "$943K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11362037"
+  },
+  {
+   "id": "nih_R01CA276652_oa_A5057209864",
+   "professorId": "oa_A5057209864",
+   "title": "The Funding Mechanism of the Pilot Trial",
+   "funder": "NIH",
+   "amount": "$1.3M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11403818"
+  },
+  {
+   "id": "nih_R01CA283207_oa_A5067783851",
+   "professorId": "oa_A5067783851",
+   "title": "Personalizing Genetic Test Results Management and Outcomes After Diagnosis of Cancer: the Georgia-California Seer Genelink Study",
+   "funder": "NIH",
+   "amount": "$648K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11299528"
+  },
+  {
+   "id": "nih_UM1DA058229_oa_A5059626751",
+   "professorId": "oa_A5059626751",
+   "title": "Comprehensive Somatic Variant Characterization at the Hgsc",
+   "funder": "NIH",
+   "amount": "$6.7M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11358280"
+  },
+  {
+   "id": "nih_P30DK097512_oa_A5063131669",
+   "professorId": "oa_A5063131669",
+   "title": "Indiana Diabetes Research Center",
+   "funder": "NIH",
+   "amount": "$1.6M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11393663"
+  },
+  {
+   "id": "nih_U01HG011762_oa_A5084933406",
+   "professorId": "oa_A5084933406",
+   "title": "Stanford Mendelian Genomics Research Center",
+   "funder": "NIH",
+   "amount": "$2.5M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11494573"
+  },
+  {
+   "id": "nih_U01HG011758_oa_A5000612576",
+   "professorId": "oa_A5000612576",
+   "title": "Baylor College of Medicine - Mendelian Genomics Research Center (Bcm-Mgrc)",
+   "funder": "NIH",
+   "amount": "$2.1M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11505433"
+  },
+  {
+   "id": "nih_R01MH137212_oa_A5054332868",
+   "professorId": "oa_A5054332868",
+   "title": "4/7-Psychemerge: Advancing Precision Psychiatry",
+   "funder": "NIH",
+   "amount": "$492K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11362707"
+  },
+  {
+   "id": "nih_U01HG014629_oa_A5072490052",
+   "professorId": "oa_A5072490052",
+   "title": "Population Genomic Screening in Primary Care Practices Serving an Urban Population",
+   "funder": "NIH",
+   "amount": "$963K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11239524"
+  },
+  {
+   "id": "nih_R01AA030056_oa_A5075961872",
+   "professorId": "oa_A5075961872",
+   "title": "Leveraging Gwas Findings to Map Variants and Identify Novel Effector Genes for Alcohol-Related Traits",
+   "funder": "NIH",
+   "amount": "$630K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11261633"
+  },
+  {
+   "id": "nih_R56DK121843_oa_A5025974153",
+   "professorId": "oa_A5025974153",
+   "title": "Using Genetics in the Selection of Candidates for Therapies to Prevent Type 1 Diabetes and Its Progression.",
+   "funder": "NIH",
+   "amount": "$286K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11479587"
+  },
+  {
+   "id": "nih_R01NS151987_oa_A5070396294",
+   "professorId": "oa_A5070396294",
+   "title": "Integration of Basal Ganglia and Cerebellar Outputs in Motor Control and Parkinson's Disease",
+   "funder": "NIH",
+   "amount": "$637K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11461908"
+  },
+  {
+   "id": "nih_R01DC019408_oa_A5051973061",
+   "professorId": "oa_A5051973061",
+   "title": "Randomized Trial of Telehealth Vs Conventional Hearing Care Delivery in the Achieve Study",
+   "funder": "NIH",
+   "amount": "$612K",
+   "year": 2024,
+   "url": "https://reporter.nih.gov/project-details/10844504"
+  },
+  {
+   "id": "nih_R01MH137609_oa_A5032271246",
+   "professorId": "oa_A5032271246",
+   "title": "Links Between the Neonatal Connectome and Dimensions of Social Development",
+   "funder": "NIH",
+   "amount": "$835K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11351001"
+  },
+  {
+   "id": "nih_R21MH138919_oa_A5063702121",
+   "professorId": "oa_A5063702121",
+   "title": "Functional Differentiation of Dorsal and Ventral Hippocampal Place Cell Populations",
+   "funder": "NIH",
+   "amount": "$193K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11258542"
+  },
+  {
+   "id": "nih_R01EY034118_oa_A5073966731",
+   "professorId": "oa_A5073966731",
+   "title": "Deep Sampling of Cognitive Effects in the Human Visual System",
+   "funder": "NIH",
+   "amount": "$533K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11380034"
+  },
+  {
+   "id": "nih_R01EY027401_oa_A5036420641",
+   "professorId": "oa_A5036420641",
+   "title": "Linking Brain and Behavior Across and Around the Visual Field",
+   "funder": "NIH",
+   "amount": "$398K",
+   "year": 2025,
+   "url": "https://reporter.nih.gov/project-details/11172684"
+  },
+  {
+   "id": "nih_R01MH112558_oa_A5054437207",
+   "professorId": "oa_A5054437207",
+   "title": "Myaps: Development and Validation of an AI Platform for Generating Emotional Pictures",
+   "funder": "NIH",
+   "amount": "$697K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11222023"
+  },
+  {
+   "id": "nih_R01NS145438_oa_A5050552736",
+   "professorId": "oa_A5050552736",
+   "title": "Proprioceptive Detection of Joint Limits and Its Role in Limb Sensorimotor Control",
+   "funder": "NIH",
+   "amount": "$598K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11378996"
+  },
+  {
+   "id": "nih_U01DC022447_oa_A5004519450",
+   "professorId": "oa_A5004519450",
+   "title": "Transcranial Direct Current Stimulation to Treat Aphasia: a Superiority Study",
+   "funder": "NIH",
+   "amount": "$1.2M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11400528"
+  },
+  {
+   "id": "nih_R01AG085665_oa_A5035227520",
+   "professorId": "oa_A5035227520",
+   "title": "Functional Networks of White Matter in Alzheimer's Disease and Their Associations with Cognitive Decline",
+   "funder": "NIH",
+   "amount": "$615K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11311944"
+  },
+  {
+   "id": "nih_RF1MH133950_oa_A5085316776",
+   "professorId": "oa_A5085316776",
+   "title": "Basal Ganglia Circuit Mechanisms for Threat Coping",
+   "funder": "NIH",
+   "amount": "$1.3M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11310835"
+  },
+  {
+   "id": "nih_UM1TR004405_oa_A5041631498",
+   "professorId": "oa_A5041631498",
+   "title": "University of Minnesota Clinical and Translational Science Institute (Umn Ctsi)",
+   "funder": "NIH",
+   "amount": "$7.7M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11376527"
+  },
+  {
+   "id": "nih_P50DA042012_oa_A5063048612",
+   "professorId": "oa_A5063048612",
+   "title": "Neural Circuit Dynamics of Drug Action:revealing, Uncoupling, and Restoring Altered Brain States",
+   "funder": "NIH",
+   "amount": "$2.3M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11365032"
+  },
+  {
+   "id": "nih_UH3NS136631_oa_A5082661128",
+   "professorId": "oa_A5082661128",
+   "title": "Building Mood State Classifiers to Inform Deep Brain Stimulation (Dbs) of Treatment-Resistant Bipolar Depression",
+   "funder": "NIH",
+   "amount": "$1.9M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11392518"
+  },
+  {
+   "id": "nih_R01DC023439_oa_A5086016821",
+   "professorId": "oa_A5086016821",
+   "title": "Functional Reorganization and Recovery of the Language and Domain-General Multiple Demand Systems in Aphasia",
+   "funder": "NIH",
+   "amount": "$704K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11465093"
+  },
+  {
+   "id": "nih_R01MH129436_oa_A5052335069",
+   "professorId": "oa_A5052335069",
+   "title": "Learning Novel Structure Across Time and Sleep",
+   "funder": "NIH",
+   "amount": "$399K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11312592"
+  },
+  {
+   "id": "nih_U01NS132353_oa_A5054637446",
+   "professorId": "oa_A5054637446",
+   "title": "Brain Connects: Synaptic Resolution Whole-Brain Circuit Mapping of Molecularly Defined Cell Types Using a Barcoded Rabies Virus",
+   "funder": "NIH",
+   "amount": "$2.2M",
+   "year": 2023,
+   "url": "https://reporter.nih.gov/project-details/10672786"
+  },
+  {
+   "id": "nih_R01MH131595_oa_A5055278364",
+   "professorId": "oa_A5055278364",
+   "title": "Attention Allocation as a Computational Mechanism for Altered Sensory Processing in Autism",
+   "funder": "NIH",
+   "amount": "$802K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11361075"
+  },
+  {
+   "id": "nih_R01DC012379_oa_A5091099837",
+   "professorId": "oa_A5091099837",
+   "title": "Functional Organization of the Superior Temporal Gyrus for Speech Perception",
+   "funder": "NIH",
+   "amount": "$682K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11361054"
+  },
+  {
+   "id": "nih_R33AG089063_oa_A5016830859",
+   "professorId": "oa_A5016830859",
+   "title": "Sensory Aging, Late-Life Wellbeing, and Adrd Research Infrastructure to Catalyze Practice and Policy",
+   "funder": "NIH",
+   "amount": "$785K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11537510"
+  },
+  {
+   "id": "nih_R01MH119189_oa_A5048603098",
+   "professorId": "oa_A5048603098",
+   "title": "Uncovering the Architecture of Metacognition",
+   "funder": "NIH",
+   "amount": "$370K",
+   "year": 2024,
+   "url": "https://reporter.nih.gov/project-details/10799588"
+  },
+  {
+   "id": "nih_R01EY036594_oa_A5035043576",
+   "professorId": "oa_A5035043576",
+   "title": "Dynamic Retinal Coding in Natural Environments",
+   "funder": "NIH",
+   "amount": "$460K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11369923"
+  },
+  {
+   "id": "nih_P50DC000422_oa_A5080199119",
+   "professorId": "oa_A5080199119",
+   "title": "Experimental and Clinical Studies of Presbyacusis Extension and Supplement",
+   "funder": "NIH",
+   "amount": "$378K",
+   "year": 2025,
+   "url": "https://reporter.nih.gov/project-details/11366661"
+  },
+  {
+   "id": "nih_T32DK142622_oa_A5052059601",
+   "professorId": "oa_A5052059601",
+   "title": "Multidisciplinary Research Training in Digestive Physiology and Diseases",
+   "funder": "NIH",
+   "amount": "$364K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11374900"
+  },
+  {
+   "id": "nih_R01NS110600_oa_A5018437283",
+   "professorId": "oa_A5018437283",
+   "title": "Effects of Head Impact Exposure During Contact Sport on Middle School and High School Athletes",
+   "funder": "NIH",
+   "amount": "$468K",
+   "year": 2024,
+   "url": "https://reporter.nih.gov/project-details/10618147"
+  },
+  {
+   "id": "nih_K12TR004416_oa_A5077697410",
+   "professorId": "oa_A5077697410",
+   "title": "Ctsa K12 Program at Unc",
+   "funder": "NIH",
+   "amount": "$1.6M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11374555"
+  },
+  {
+   "id": "nih_R21AI202558_oa_A5018491787",
+   "professorId": "oa_A5018491787",
+   "title": "Investigating a Positively-Selected Chromosome 7 Haplotype Associated with Decreased Susceptibility of Plasmodium Falciparum to Artemisinin and Lumefantrine in Africa",
+   "funder": "NIH",
+   "amount": "$252K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11441530"
+  },
+  {
+   "id": "nih_75N93019C00052-P00029-9999_oa_A5033890850",
+   "professorId": "oa_A5033890850",
+   "title": "Civic: University of Georgia Center for Influenza Vaccine Research in High Risk Populations",
+   "funder": "NIH",
+   "amount": "$2.4M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11581344"
+  },
+  {
+   "id": "nih_R01CA316038_oa_A5007540843",
+   "professorId": "oa_A5007540843",
+   "title": "Overcoming Medulloblastoma Resistance to Treatment Using in Vivo Perturb-Seq and Preclinical Therapeutics",
+   "funder": "NIH",
+   "amount": "$681K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11428652"
+  },
+  {
+   "id": "nih_R21NS128641_oa_A5089032910",
+   "professorId": "oa_A5089032910",
+   "title": "Electroencephalographic Signatures of Dysfunctional Cerebrovascular Autoregulation as Biomarkers of Brain Injury in Aneurysmal Subarachnoid Hemorrhage (Sah)",
+   "funder": "NIH",
+   "amount": "$209K",
+   "year": 2024,
+   "url": "https://reporter.nih.gov/project-details/10821463"
+  },
+  {
+   "id": "nih_U19AI181593_oa_A5005484398",
+   "professorId": "oa_A5005484398",
+   "title": "Unraveling the Drivers of Persistent Malaria Transmission in Cameroon: a Systems Approach (Redial)",
+   "funder": "NIH",
+   "amount": "$410K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11512337"
+  },
+  {
+   "id": "nih_R01AG073286_oa_A5001292489",
+   "professorId": "oa_A5001292489",
+   "title": "Health Care Utilization During Recent Shocks to the US Provider Delivery System",
+   "funder": "NIH",
+   "amount": "$265K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11382845"
+  },
+  {
+   "id": "nih_R01MD020353_oa_A5011254773",
+   "professorId": "oa_A5011254773",
+   "title": "Medicare Advantage, Provider Networks and Disparities in Hospital Care in Rural America",
+   "funder": "NIH",
+   "amount": "$755K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11106921"
+  },
+  {
+   "id": "nih_U01FD005938_oa_A5031832642",
+   "professorId": "oa_A5031832642",
+   "title": "Yale-Mayo Clinic FDA Center of Excellence in Regulatory Science and Innovation (Cersi)",
+   "funder": "NIH",
+   "amount": "$200K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11494851"
+  },
+  {
+   "id": "nih_R01HL160588_oa_A5037705025",
+   "professorId": "oa_A5037705025",
+   "title": "The Impact of the Bundled Payment for Care Improvement Advanced on Outcomes for Patients with Sepsis",
+   "funder": "NIH",
+   "amount": "$584K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11262209"
+  },
+  {
+   "id": "nih_P01AG027296_oa_A5036202898",
+   "professorId": "oa_A5036202898",
+   "title": "Alzheimer's Disease and Related Disorders Treatment and Outcomes in America: Changing Policies and Systems.",
+   "funder": "NIH",
+   "amount": "$2.6M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11400758"
+  },
+  {
+   "id": "nih_K01CA304478_oa_A5091108268",
+   "professorId": "oa_A5091108268",
+   "title": "Improving Affordability in Cancer Care Through Economic Screening and Support (I-Access)",
+   "funder": "NIH",
+   "amount": "$198K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11391350"
+  },
+  {
+   "id": "nih_RF1AG103341_oa_A5004970620",
+   "professorId": "oa_A5004970620",
+   "title": "Medicaid Coverage Transitions and Instability Among Older Adults: Policy Interventions, Effects on Care, and Outcomes",
+   "funder": "NIH",
+   "amount": "$2.4M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11428980"
+  },
+  {
+   "id": "nih_U48DP006872_oa_A5060863301",
+   "professorId": "oa_A5060863301",
+   "title": "Sip 24-003 Cancer Prevention and Control Research Network (Cpcrn) Coordinating & Collaborating Centers at the University of North Carolina at Chapel Hill",
+   "funder": "NIH",
+   "amount": "$1.6M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11503923"
+  },
+  {
+   "id": "nih_K01MH137322_oa_A5052149671",
+   "professorId": "oa_A5052149671",
+   "title": "Access to Mental Health Care Specialists in Medicare Advantage: Improving Outcomes for Older Adults",
+   "funder": "NIH",
+   "amount": "$182K",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11360187"
+  },
+  {
+   "id": "nih_U19AI189183_oa_A5077902719",
+   "professorId": "oa_A5077902719",
+   "title": "Accelerator for the Rapid Development of Countermeasures Targeting Drug Resistant Fungal Pathogens",
+   "funder": "NIH",
+   "amount": "$7.1M",
+   "year": 2026,
+   "url": "https://reporter.nih.gov/project-details/11378642"
+  }
+ ]
+}
