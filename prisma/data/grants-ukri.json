@@ -1,0 +1,465 @@
+{
+ "generatedAt": "2026-10-29T05:05:20.688Z",
+ "source": "UKRI Gateway to Research",
+ "grants": [
+  {
+   "id": "ukri_98A57AF2_prof_stefanos-zafeiriou_imperial-college-lon",
+   "professorId": "prof_stefanos-zafeiriou_imperial-college-lon",
+   "title": "GNOMON: Deep Generative Models in non-Euclidean Spaces for Computer Vision & Graphics",
+   "funder": "UKRI",
+   "amount": "£1.1M",
+   "year": 2023,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FX011364%2F1"
+  },
+  {
+   "id": "ukri_1AFB5A13_prof_tolga-birdal_imperial-college-lon",
+   "professorId": "prof_tolga-birdal_imperial-college-lon",
+   "title": "UNTOLD: Unifying Foundations for Topological Deep Learning",
+   "funder": "UKRI",
+   "amount": "£1.7M",
+   "year": 2024,
+   "url": "https://gtr.ukri.org/projects?ref=MR%2FY018818%2F1"
+  },
+  {
+   "id": "ukri_D02E640E_prof_julie-a-mccann_imperial-college-lon",
+   "professorId": "prof_julie-a-mccann_imperial-college-lon",
+   "title": "CHEDDAR: Communications Hub for Empowering Distributed clouD computing Applications and Research - TMF uplift",
+   "funder": "UKRI",
+   "amount": "£14.1M",
+   "year": 2023,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FY037421%2F1"
+  },
+  {
+   "id": "ukri_D22BEA2A_prof_richard-bowden_university-of-surrey",
+   "professorId": "prof_richard-bowden_university-of-surrey",
+   "title": "SignGPT: Building Generative Predictive Transformers for Sign Language",
+   "funder": "UKRI",
+   "amount": "£6.8M",
+   "year": 2025,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FZ535370%2F1"
+  },
+  {
+   "id": "ukri_3E905081_prof_gustavo-carneiro_university-of-surrey",
+   "professorId": "prof_gustavo-carneiro_university-of-surrey",
+   "title": "People-centered Mammogram Analysis",
+   "funder": "UKRI",
+   "amount": "£435K",
+   "year": 2023,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FY018036%2F1"
+  },
+  {
+   "id": "ukri_C8F701D1_prof_nishanth-sastry_university-of-surrey",
+   "professorId": "prof_nishanth-sastry_university-of-surrey",
+   "title": "Digital Harms, Democratic Costs (DHDC): Understanding and Mitigating Gendered Online Abuse against Women MPs in the Age of Social Media and AI",
+   "funder": "UKRI",
+   "amount": "£102K",
+   "year": 2025,
+   "url": "https://gtr.ukri.org/projects?ref=UKRI3543"
+  },
+  {
+   "id": "ukri_5747D6FC_prof_cecilia-mascolo_university-of-cambri",
+   "professorId": "prof_cecilia-mascolo_university-of-cambri",
+   "title": "Embedded AI Systems and Applications",
+   "funder": "UKRI",
+   "amount": "£268K",
+   "year": 2025,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FU536891%2F1"
+  },
+  {
+   "id": "ukri_5D59C761_prof_michael-m-bronstein_university-of-oxford",
+   "professorId": "prof_michael-m-bronstein_university-of-oxford",
+   "title": "Mathematical Foundations of Intelligence: An \"Erlangen Programme\" for AI",
+   "funder": "UKRI",
+   "amount": "£8.6M",
+   "year": 2024,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FY028872%2F1"
+  },
+  {
+   "id": "ukri_4A51D00B_prof_nigel-shadbolt_university-of-oxford",
+   "professorId": "prof_nigel-shadbolt_university-of-oxford",
+   "title": "CHAILD - Children's Agency In the age of AI: Leveraging InterDisciplinarity",
+   "funder": "UKRI",
+   "amount": "£993K",
+   "year": 2025,
+   "url": "https://gtr.ukri.org/projects?ref=MR%2FZ505882%2F1"
+  },
+  {
+   "id": "ukri_86121CFF_prof_danail-stoyanov_university-college-l",
+   "professorId": "prof_danail-stoyanov_university-college-l",
+   "title": "Optical and Acoustic imaging for Surgical and Interventional Sciences (OASIS)",
+   "funder": "UKRI",
+   "amount": "£10.9M",
+   "year": 2025,
+   "url": "https://gtr.ukri.org/projects?ref=UKRI145"
+  },
+  {
+   "id": "ukri_5C8C0461_prof_marianna-obrist_university-college-l",
+   "professorId": "prof_marianna-obrist_university-college-l",
+   "title": "Engaging Users in Smell Self-Care at Home",
+   "funder": "UKRI",
+   "amount": "£403K",
+   "year": 2022,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FW031574%2F1"
+  },
+  {
+   "id": "ukri_BAF12073_oa_A5078598020",
+   "professorId": "oa_A5078598020",
+   "title": "Test FLARE (Test Flakiness Automated Reproduction and Explanation)",
+   "funder": "UKRI",
+   "amount": "£544K",
+   "year": 2023,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FX024539%2F1"
+  },
+  {
+   "id": "ukri_43D7EC90_oa_A5085691361",
+   "professorId": "oa_A5085691361",
+   "title": "OntoEm: Semantic Embedding for Ontologies",
+   "funder": "UKRI",
+   "amount": "£449K",
+   "year": 2024,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FY017706%2F1"
+  },
+  {
+   "id": "ukri_D6FC4CBF_oa_A5002080576",
+   "professorId": "oa_A5002080576",
+   "title": "Exploring Causality in Reinforcement Learning for Robust Decision Making",
+   "funder": "UKRI",
+   "amount": "£165K",
+   "year": 2024,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FY003187%2F1"
+  },
+  {
+   "id": "ukri_8797EE9A_oa_A5004447568",
+   "professorId": "oa_A5004447568",
+   "title": "Creating Foundation Systems for Environmental Planetary Intelligence",
+   "funder": "UKRI",
+   "amount": "£996K",
+   "year": 2025,
+   "url": "https://gtr.ukri.org/projects?ref=MR%2FZ505456%2F1"
+  },
+  {
+   "id": "ukri_A76E5D6A_oa_A5100770003",
+   "professorId": "oa_A5100770003",
+   "title": "EIMS: Edge Intelligence Empowered Vehicular Multimedia Service Optimization",
+   "funder": "UKRI",
+   "amount": "£192K",
+   "year": 2025,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FZ53433X%2F1"
+  },
+  {
+   "id": "ukri_EE5C9090_oa_A5005912060",
+   "professorId": "oa_A5005912060",
+   "title": "FORTRESS-TeHR: Federated, Open and Reliable TREs for Synthetic Textual Healthcare Records",
+   "funder": "UKRI",
+   "amount": "£319K",
+   "year": 2025,
+   "url": "https://gtr.ukri.org/projects?ref=UKRI3800"
+  },
+  {
+   "id": "ukri_59CD89D9_oa_A5002123043",
+   "professorId": "oa_A5002123043",
+   "title": "Chiplet-Guard: Proactive Threat Detection for Efficient and Interoperable Chiplet Security",
+   "funder": "UKRI",
+   "amount": "£965K",
+   "year": 2026,
+   "url": "https://gtr.ukri.org/projects?ref=UKRI2867"
+  },
+  {
+   "id": "ukri_91AB516C_oa_A5035054812",
+   "professorId": "oa_A5035054812",
+   "title": "Practical guidance on accessible statistical methods for different estimands in randomised trials",
+   "funder": "UKRI",
+   "amount": "£62K",
+   "year": 2024,
+   "url": "https://gtr.ukri.org/projects?ref=MR%2FZ503770%2F1"
+  },
+  {
+   "id": "ukri_0FB35AF9_oa_A5077581045",
+   "professorId": "oa_A5077581045",
+   "title": "Efficient Study Design",
+   "funder": "UKRI",
+   "amount": "£3.6M",
+   "year": 2024,
+   "url": "https://gtr.ukri.org/projects?ref=MC_UU_00040%2F3"
+  },
+  {
+   "id": "ukri_E15D9EE7_oa_A5042452579",
+   "professorId": "oa_A5042452579",
+   "title": "Towards an Equitable Social VR",
+   "funder": "UKRI",
+   "amount": "£387K",
+   "year": 2023,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FW02456X%2F1"
+  },
+  {
+   "id": "ukri_FCB37B7C_oa_A5038063824",
+   "professorId": "oa_A5038063824",
+   "title": "FLF extension proposal: Re-envisioning child mental health promotion interventions with digital technology",
+   "funder": "UKRI",
+   "amount": "£594K",
+   "year": 2025,
+   "url": "https://gtr.ukri.org/projects?ref=MR%2FY034295%2F1"
+  },
+  {
+   "id": "ukri_528FCB4B_oa_A5056992232",
+   "professorId": "oa_A5056992232",
+   "title": "Smart Cues Toolkit: Supporting Physical Activity at Home with Interactive Contextual Cues",
+   "funder": "UKRI",
+   "amount": "£627K",
+   "year": 2024,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FX036766%2F1"
+  },
+  {
+   "id": "ukri_0245D3D1_oa_A5030810433",
+   "professorId": "oa_A5030810433",
+   "title": "Playful Assistive Technology for Complex Trauma Healing in Young People (PACT)",
+   "funder": "UKRI",
+   "amount": "£416K",
+   "year": 2025,
+   "url": "https://gtr.ukri.org/projects?ref=UKRI829"
+  },
+  {
+   "id": "ukri_2CE22546_oa_A5056341554",
+   "professorId": "oa_A5056341554",
+   "title": "Total Communication Technologies (TACT) to Support Accessible Communication",
+   "funder": "UKRI",
+   "amount": "£1.6M",
+   "year": 2025,
+   "url": "https://gtr.ukri.org/projects?ref=UKRI3088"
+  },
+  {
+   "id": "ukri_76853781_oa_A5033160778",
+   "professorId": "oa_A5033160778",
+   "title": "Enhancing Cyber Resilience of Small and Medium-sized Enterprises through Cyber Security Communities of Support",
+   "funder": "UKRI",
+   "amount": "£691K",
+   "year": 2023,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FX037282%2F1"
+  },
+  {
+   "id": "ukri_69368B8B_oa_A5050119476",
+   "professorId": "oa_A5050119476",
+   "title": "Fair and modular blockchain data infrastructure for open science and society (FairOnChain)",
+   "funder": "UKRI",
+   "amount": "£96K",
+   "year": 2024,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FY036247%2F1"
+  },
+  {
+   "id": "ukri_81793174_oa_A5041603506",
+   "professorId": "oa_A5041603506",
+   "title": "Fraud, Cybercrime and Ageing in the UK and South Korea",
+   "funder": "UKRI",
+   "amount": "£50K",
+   "year": 2022,
+   "url": "https://gtr.ukri.org/projects?ref=ES%2FW011085%2F1"
+  },
+  {
+   "id": "ukri_F45ECC9A_oa_A5012646628",
+   "professorId": "oa_A5012646628",
+   "title": "TacDiff: Designing Tactile-based Robots via Differentiable Simulations",
+   "funder": "UKRI",
+   "amount": "£1.8M",
+   "year": 2026,
+   "url": "https://gtr.ukri.org/projects?ref=UKRI3438"
+  },
+  {
+   "id": "ukri_BC4921FC_oa_A5048122691",
+   "professorId": "oa_A5048122691",
+   "title": "RoboHike: Autonomous Quadrupedal Robot Navigation and Hiking in Challenging Rough Terrains",
+   "funder": "UKRI",
+   "amount": "£1.4M",
+   "year": 2022,
+   "url": "https://gtr.ukri.org/projects?ref=MR%2FV025333%2F1"
+  },
+  {
+   "id": "ukri_DDCBD519_oa_A5025970743",
+   "professorId": "oa_A5025970743",
+   "title": "Statistical Methods in Offline Reinforcement Learning",
+   "funder": "UKRI",
+   "amount": "£398K",
+   "year": 2022,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FW014971%2F1"
+  },
+  {
+   "id": "ukri_C4EFA0E2_oa_A5055883955",
+   "professorId": "oa_A5055883955",
+   "title": "An Abstraction-based Technique for Safe Reinforcement Learning",
+   "funder": "UKRI",
+   "amount": "£302K",
+   "year": 2023,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FX015823%2F1"
+  },
+  {
+   "id": "ukri_350E25FA_oa_A5088159296",
+   "professorId": "oa_A5088159296",
+   "title": "The UK Dynamic Nuclear Polarisation Magic Angle Spinning NMR Facility",
+   "funder": "UKRI",
+   "amount": "£248K",
+   "year": 2022,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FW021498%2F1"
+  },
+  {
+   "id": "ukri_532771D9_oa_A5038185979",
+   "professorId": "oa_A5038185979",
+   "title": "SolOLED: TADF Dendrimers for Highly Efficient Solution-Processed OLEDs",
+   "funder": "UKRI",
+   "amount": "£2.4M",
+   "year": 2025,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FZ535291%2F1"
+  },
+  {
+   "id": "ukri_AA70FADD_oa_A5081428881",
+   "professorId": "oa_A5081428881",
+   "title": "Advanced Device Concepts for Next-Generation Photovoltaics",
+   "funder": "UKRI",
+   "amount": "£7.7M",
+   "year": 2023,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FX038777%2F1"
+  },
+  {
+   "id": "ukri_E6C96D0C_oa_A5035761293",
+   "professorId": "oa_A5035761293",
+   "title": "Slri Nwtf",
+   "funder": "UKRI",
+   "amount": "£3M",
+   "year": 2024,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FY036492%2F1"
+  },
+  {
+   "id": "ukri_CA84B050_oa_A5100726028",
+   "professorId": "oa_A5100726028",
+   "title": "Development of functional porous particulates for green ammonia production",
+   "funder": "UKRI",
+   "amount": "£200K",
+   "year": 2023,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FX018253%2F1"
+  },
+  {
+   "id": "ukri_70B92F33_oa_A5079256599",
+   "professorId": "oa_A5079256599",
+   "title": "Transparent Transmitters and Programmable Metasurfaces for Transport and Beyond-5G (TRANSMETA)",
+   "funder": "UKRI",
+   "amount": "£637K",
+   "year": 2023,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FW037734%2F1"
+  },
+  {
+   "id": "ukri_915806C4_oa_A5043306953",
+   "professorId": "oa_A5043306953",
+   "title": "Integrated Material-Modelling-Manufacturing paradigm for Mechanical Meta-regulators (I5M)",
+   "funder": "UKRI",
+   "amount": "£331K",
+   "year": 2024,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FY011457%2F1"
+  },
+  {
+   "id": "ukri_82C653C5_oa_A5002566516",
+   "professorId": "oa_A5002566516",
+   "title": "Cell-Free Massive MIMO for Future Wireless Networks",
+   "funder": "UKRI",
+   "amount": "£571K",
+   "year": 2023,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FX013162%2F1"
+  },
+  {
+   "id": "ukri_58703297_oa_A5077479988",
+   "professorId": "oa_A5077479988",
+   "title": "EPSRC Network for Engineering Porous Materials at Multiple Scales (EPoMM)",
+   "funder": "UKRI",
+   "amount": "£262K",
+   "year": 2023,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FX013065%2F1"
+  },
+  {
+   "id": "ukri_FF29EF05_oa_A5039665389",
+   "professorId": "oa_A5039665389",
+   "title": "Designing and optimizing polar photovoltaics with physics informed machine learning",
+   "funder": "UKRI",
+   "amount": "£423K",
+   "year": 2024,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FY014405%2F1"
+  },
+  {
+   "id": "ukri_75B58F47_oa_A5081176603",
+   "professorId": "oa_A5081176603",
+   "title": "UK-Japan Collaboration: Next Generation AlGaN Electronics for Electric Vehicle Applications",
+   "funder": "UKRI",
+   "amount": "£1.6M",
+   "year": 2025,
+   "url": "https://gtr.ukri.org/projects?ref=UKRI3228"
+  },
+  {
+   "id": "ukri_1391DB3B_oa_A5054755054",
+   "professorId": "oa_A5054755054",
+   "title": "Advanced Diffraction Infrastructure for Materials Chemistry",
+   "funder": "UKRI",
+   "amount": "£2.9M",
+   "year": 2024,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FZ533294%2F1"
+  },
+  {
+   "id": "ukri_838457E6_oa_A5100700922",
+   "professorId": "oa_A5100700922",
+   "title": "Automated Nano AnaLysing, characterisatiOn and additive packaGing sUitE (ANALOGUE)",
+   "funder": "UKRI",
+   "amount": "£3.1M",
+   "year": 2024,
+   "url": "https://gtr.ukri.org/projects?ref=EP%2FY015215%2F1"
+  },
+  {
+   "id": "ukri_AB264EC9_oa_A5061139675",
+   "professorId": "oa_A5061139675",
+   "title": "The VIVO Hub for Enhanced Independent Living",
+   "funder": "UKRI",
+   "amount": "£10.9M",
+   "year": 2024,
+   "url": "https://gtr.ukri.org/projects?ref=UKRI142"
+  },
+  {
+   "id": "ukri_16277285_oa_A5087932701",
+   "professorId": "oa_A5087932701",
+   "title": "Causal Mechanisms",
+   "funder": "UKRI",
+   "amount": "£4M",
+   "year": 2024,
+   "url": "https://gtr.ukri.org/projects?ref=MC_UU_00040%2F1"
+  },
+  {
+   "id": "ukri_07B8FBA7_oa_A5040935447",
+   "professorId": "oa_A5040935447",
+   "title": "Understanding Pathways from Environmental Risk to Internalising Problems for Autistic Young People",
+   "funder": "UKRI",
+   "amount": "£567K",
+   "year": 2024,
+   "url": "https://gtr.ukri.org/projects?ref=ES%2FX014207%2F1"
+  },
+  {
+   "id": "ukri_1F07E826_oa_A5037076197",
+   "professorId": "oa_A5037076197",
+   "title": "Protecting high risk groups from Plasmodium knowlesi malaria",
+   "funder": "UKRI",
+   "amount": "£937K",
+   "year": 2025,
+   "url": "https://gtr.ukri.org/projects?ref=UKRI998"
+  },
+  {
+   "id": "ukri_1F9593E2_oa_A5083222970",
+   "professorId": "oa_A5083222970",
+   "title": "Exploring the impact of historical trials and perceptions of ethical consent among ethnic minority populations",
+   "funder": "UKRI",
+   "amount": "£491K",
+   "year": 2024,
+   "url": "https://gtr.ukri.org/projects?ref=MC_PC_24007"
+  },
+  {
+   "id": "ukri_9A89D451_oa_A5054267996",
+   "professorId": "oa_A5054267996",
+   "title": "Policing Academic Centre of Excellence",
+   "funder": "UKRI",
+   "amount": "£428K",
+   "year": 2025,
+   "url": "https://gtr.ukri.org/projects?ref=UKRI1357"
+  }
+ ]
+}
