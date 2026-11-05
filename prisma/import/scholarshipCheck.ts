@@ -202,8 +202,11 @@ export async function checkLinks(
     // CDN that fails from here, as campuschina.org does) is flaky like a timeout
     const deadDomain = async (r: unknown) => isDnsMiss(r) && !(await hasDns(u.hostname));
 
+    // fetch follows redirects itself, so a 3xx that reaches us had no usable destination (a bot-protection
+    // challenge such as cscuk.fcdo.gov.uk's answers 307 only some of the time): treat it like a flaky site
+    const flaky = (r: Response) => r.status >= 500 || (r.status >= 300 && r.status < 400);
     let result = await open(false);
-    if (result instanceof Response ? result.status >= 500 : !(await deadDomain(result))) {
+    if (result instanceof Response ? flaky(result) : !(await deadDomain(result))) {
       opts.log?.(`${result instanceof Response ? result.status : 'ERR'} ${url} (retrying)`);
       await sleep(retryDelayMs);
       result = await open(true);
@@ -222,8 +225,9 @@ export async function checkLinks(
     const res = result;
     opts.log?.(`${res.status} ${url}`);
     if (res.ok) continue;
-    if (res.status >= 500) {
-      problems.push({ level: 'warning', where, message: `${url}: HTTP ${res.status} twice (site having trouble); open it in a browser` });
+    if (flaky(res)) {
+      const what = res.status >= 500 ? 'site having trouble' : 'a redirect it could not follow';
+      problems.push({ level: 'warning', where, message: `${url}: HTTP ${res.status} twice (${what}); open it in a browser` });
       continue;
     }
     // Bot protection, not a dead page (412: some CDNs' challenge page, e.g. campuschina.org)
