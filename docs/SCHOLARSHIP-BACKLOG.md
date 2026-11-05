@@ -103,6 +103,22 @@ The schema now has "Any country" (`ANY_COUNTRY` in `src/data/countries.ts`), so 
 | Mastercard Foundation Scholars, Mandela Rhodes (Africa) | Not tried: mostly for African nationals |
 | Brazil, Chile, Argentina government programmes | Not tried yet |
 
+## Europe, third round (2026-11-05)
+
+| Scholarship | Result |
+|---|---|
+| Warwick Chancellor's Scholarships (PhD) | **Added** (`gov-gb-warwick-chancellors`). Scholarship application 10 Dec 2026 |
+| Bocconi Graduate Merit Award | **Added** (`gov-it-bocconi-merit`). Terms read are for 2026-27 |
+| Politecnico di Milano Merit Scholarships | **Added** (`gov-it-polimi-merit`). Early-bird fee until 1 Dec 2026 |
+| Uppsala University Global Scholarship | **Added** (`gov-se-uppsala-global`). Window 16 Jan to 1 Feb 2027 |
+| University of Manchester Equity and Merit Scholarship | **Not for Bangladesh:** only Ethiopia, Malawi, Rwanda, Tanzania, Uganda and Zimbabwe |
+| Trinity College Dublin Global Excellence Postgraduate Scholarship | Not added: EUR 2,000 to 5,000; excludes business, engineering, natural sciences, computer science and statistics, and the page does not say which region Bangladesh is in (deadlines 1 Apr to 15 Jul 2026, closed) |
+| Heidelberg University scholarship list | Not added: no amounts or deadlines; only Baden-Wurttemberg-STIPENDIUM (ACP/least developed countries) might fit, via nomination |
+| Stockholm University scholarships | Not read: the page timed out twice |
+| UZH Excellence Master's Scholarship | Not read |
+| Bocconi AI, Women and Cyber awards | Not read (the page lists them for 2027-28 without terms) |
+| TUM/LMU, Ghent, ARES, Denmark, Luxembourg, Baltics, Greece, Romania, Slovakia, Slovenia | Not tried yet |
+
 ## Blocked: could not verify
 
 | Scholarship | Reason | Retry when |
