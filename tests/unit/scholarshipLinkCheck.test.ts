@@ -109,6 +109,27 @@ describe('link check', () => {
     expect(sleep).toHaveBeenCalledWith(5000);
   });
 
+  it('retries a redirect it cannot follow (307 without a destination), passes if the retry works, warns if it repeats', async () => {
+    sleep.mockClear();
+    let tries = 0;
+    const flaky307 = vi.fn(async (url: string | URL | Request) => {
+      if (String(url).endsWith('/robots.txt')) return new Response('', { status: 404 });
+      tries += 1;
+      return new Response('', { status: tries <= 2 ? 307 : 200 });
+    }) as unknown as typeof globalThis.fetch;
+    // HEAD 307 then GET 307, then the retry's GET 200
+    expect(await checkLinks([one('x', 'https://c.gov/wobbly')], { fetch: flaky307, sleep })).toEqual([]);
+    expect(sleep).toHaveBeenCalledWith(5000);
+
+    const always307 = vi.fn(async (url: string | URL | Request) =>
+      new Response('', { status: String(url).endsWith('/robots.txt') ? 404 : 307 })) as unknown as typeof globalThis.fetch;
+    const problems = await checkLinks([one('y', 'https://c.gov/stuck')], { fetch: always307, sleep });
+    expect(problems).toHaveLength(1);
+    expect(problems[0]).toMatchObject({ level: 'warning', where: 'y' });
+    expect(problems[0].message).toContain('HTTP 307 twice');
+    expect(problems[0].message).toContain('open it in a browser');
+  });
+
   it('only warns when a flaky site fails twice; 404, 410 and domains with no DNS record stay errors', async () => {
     const fetchFailed = new TypeError('fetch failed', { cause: { code: 'ECONNRESET' } });
     const noDomain = new TypeError('fetch failed', { cause: { code: 'ENOTFOUND' } });
