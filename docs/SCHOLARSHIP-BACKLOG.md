@@ -92,6 +92,17 @@ The schema now has "Any country" (`ANY_COUNTRY` in `src/data/countries.ts`), so 
 | University of Groningen Ubbo Emmius | Not added: the pages found were news items about PhD positions |
 | Heidelberg, TUM/LMU, Manchester, Ghent, ARES, Denmark, Luxembourg, Baltics, Greece, Romania, Slovakia, Slovenia | Not tried yet |
 
+## Round 4, Americas (2026-11-05)
+
+| Scholarship | Result |
+|---|---|
+| Hubert H. Humphrey Fellowship (US Embassy Dhaka, Bangladesh only) | **Added** (`gov-us-humphrey-bangladesh`). The 2027-28 call closed 13 Aug 2026; next call assumed the same month. Benefits are not itemised on the call |
+| UBC International Scholars Program (undergraduate) | **Added** (`gov-ca-ubc-international-scholars`). Deadline 15 Nov 2026 |
+| AAUW International Fellowships (women, STEM) | **Added** (`gov-us-aauw-international`). Round closed 17 Sep 2026 |
+| AMEXCID Mexican government scholarships for foreigners | Not added: "more than 170 countries" but the eligible list is in a PDF annex not read, so Bangladesh is unconfirmed; no levels, amounts or dates on the page |
+| Mastercard Foundation Scholars, Mandela Rhodes (Africa) | Not tried: mostly for African nationals |
+| Brazil, Chile, Argentina government programmes | Not tried yet |
+
 ## Blocked: could not verify
 
 | Scholarship | Reason | Retry when |
