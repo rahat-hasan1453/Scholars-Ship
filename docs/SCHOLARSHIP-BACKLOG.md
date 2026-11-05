@@ -10,10 +10,10 @@ Last reviewed: 2026-11-05 (rounds read in the browser; Rounds 5, 1, 2 and 3 adde
 | GREAT Scholarships (UK) | **Added** (`gov-gb-great`): Bangladesh is on the 18-country list |
 | Ontario Graduate Scholarship | **Added** (`gov-ca-ogs`); the page does not say if international students may apply |
 | Vanier Canada Graduate Scholarships | **Not added: archived.** "No longer accepting applications"; replaced by CGRS D, which **is added** (`gov-ca-cgrs-d`) |
-| Rhodes Scholarship | Applications closed; next round opens 2027 (entry 2028). Bangladesh eligibility not found; look for the constituencies page |
+| Rhodes Scholarship | **Not added (checked 2026-11-05):** Bangladesh is not one of the listed constituencies (India and Pakistan are, separately); applicants whose country is not listed are told to choose "Other", and the page does not say whether that makes them eligible. Applications closed; reopen 2027 for entry 2028, no dates yet |
 | Manaaki New Zealand | Not added: Bangladesh is not on the eligible-countries page |
 | Rotary Peace Fellowships | **Added** (master's only, `gov-int-rotary-peace`). The professional certificate programme is not listed |
-| Marshall Scholarship | Not tried |
+| Marshall Scholarship | **Not for Bangladesh (checked 2026-11-05):** limited to US citizens |
 | OeAD (Austria) | Not opened: `robots.txt` disallows all pages |
 
 ## Round 5 (2026-11-05): international bodies and Bangladeshi funders
