@@ -4,6 +4,7 @@
 import { CURATED } from './_curated';
 import { BATCH_01 } from './batch-01-flagship';
 import { BATCH_02 } from './batch-02-europe';
+import { BATCH_03 } from './batch-03-asia-me';
 import { BATCH_04 } from './batch-04-americas-africa-intl';
 import type { ScholarshipSeed } from './schema';
 
@@ -18,6 +19,7 @@ export const CURATED_SCHOLARSHIPS: ScholarshipSeed[] = CURATED.map((s) => ({ ...
 export const BATCHES: Record<string, ScholarshipSeed[]> = {
   'batch-01-flagship.ts': BATCH_01,
   'batch-02-europe.ts': BATCH_02,
+  'batch-03-asia-me.ts': BATCH_03,
   'batch-04-americas-africa-intl.ts': BATCH_04,
 };
 

@@ -1,7 +1,7 @@
 # Scholarship backlog: not yet added
 
 Scholarships we looked at but could not add under the official-source rule (`docs/SCHOLARSHIP-VERIFICATION.md`).
-Last reviewed: 2026-11-05 (rounds read in the browser; Round 5 and Round 1 added).
+Last reviewed: 2026-11-05 (rounds read in the browser; Rounds 5, 1 and 2 added).
 
 ## Read in a browser on 2026-10-29 (Option 1)
 
@@ -47,6 +47,22 @@ The schema now has "Any country" (`ANY_COUNTRY` in `src/data/countries.ts`), so 
 | Russian Government Scholarship | Not added: `education-in-russia.com` showed only a title. Needs a page with the Bangladesh quota |
 | MAEC-AECID (Spain) | Not reached |
 | Heidelberg, TUM/LMU, KU Leuven, Lund/KTH, UCL, Manchester, ARES, Denmark, Luxembourg, Baltics, Greece, Romania, Slovakia, Slovenia | Not tried yet |
+
+## Round 2, Asia-Pacific (2026-11-05)
+
+| Scholarship | Result |
+|---|---|
+| ICCR Suborno Jayanti Scheme (India, for Bangladesh nationals) | **Added** (`gov-in-iccr-suborno-jayanti`). 500 slots, UG/PG/PhD; no dates on the page (placeholder) |
+| NTU Nanyang President's Graduate Scholarship (PhD) | **Added** (`gov-sg-ntu-npgs`). Window 1 Nov to 31 Dec 2026 |
+| KAIST Scholarship (KGPS/KPS) | **Added** (`gov-kr-kaist-scholarship`). Deadline = admission deadline (placeholder) |
+| Taiwan Scholarship (MOE) | **Added** (`gov-tw-moe-taiwan-scholarship`). No dates; Bangladesh not named |
+| UTokyo Fellowship | **Added** (`gov-jp-utokyo-fellowship`). 200,000 yen a month; no dates |
+| NUS Research Scholarship | Not added: both official pages showed no text to the browser or the fetch tool (script-built). Open it in a browser and share the facts |
+| Taiwan ICDF | Not added: Bangladesh is not on the page (it lists the countries ICDF works in); 2027 window is 1 Dec 2026 to 15 Mar 2027 |
+| Indonesia KNB | Not added: 2026 cycle was 2 Feb to 31 Mar 2026; the page does not name eligible countries, so Bangladesh is unconfirmed |
+| Australian Government RTP | Not added: the page timed out, and RTP places are given out by each university (look at one university's RTP international page) |
+| Thailand TICA (Thai International Postgraduate Programme) | Not added: the page is from 2022 and describes 2014 courses; Bangladesh was listed but nothing is current |
+| NTU Research Scholarship, other Singapore/Korea/Japan university awards, ITEC (India) | Not tried yet |
 
 ## Blocked: could not verify
 
