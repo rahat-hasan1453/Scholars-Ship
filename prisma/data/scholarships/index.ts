@@ -3,6 +3,7 @@
 // A new batch: add the file, then one line to BATCHES.
 import { CURATED } from './_curated';
 import { BATCH_01 } from './batch-01-flagship';
+import { BATCH_04 } from './batch-04-americas-africa-intl';
 import type { ScholarshipSeed } from './schema';
 
 export { ALL_FIELDS, type ScholarshipSeed } from './schema';
@@ -15,6 +16,7 @@ export const CURATED_SCHOLARSHIPS: ScholarshipSeed[] = CURATED.map((s) => ({ ...
 /** File name → entries, so the checker can say where a problem is */
 export const BATCHES: Record<string, ScholarshipSeed[]> = {
   'batch-01-flagship.ts': BATCH_01,
+  'batch-04-americas-africa-intl.ts': BATCH_04,
 };
 
 export const SCHOLARSHIPS: ScholarshipSeed[] = [...CURATED_SCHOLARSHIPS, ...Object.values(BATCHES).flat()];

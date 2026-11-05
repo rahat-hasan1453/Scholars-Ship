@@ -1,7 +1,7 @@
 // Rules every scholarship entry must follow. `npm run data:scholarships:check` and
 // tests/unit/scholarshipData.test.ts run these; see docs/SCHOLARSHIP-VERIFICATION.md for how to fill an entry.
 import { z } from 'zod';
-import { WORLD_COUNTRIES } from '../../../src/data/countries';
+import { ANY_COUNTRY, WORLD_COUNTRIES } from '../../../src/data/countries';
 import { SUBJECTS } from '../../../src/data/subjectCatalog';
 
 /** Matches every subject in the Subject filter */
@@ -19,6 +19,10 @@ const LEGACY_ID = /^sch_[a-z0-9_]+$/;
 const httpsUrl = z.string().url().refine((u) => u.startsWith('https://'), 'must be an https:// link');
 const country = z.string().refine((c) => COUNTRY_VALUES.has(c), (c) => ({
   message: `"${c}" is not in src/data/countries.ts (add it there first, using the same value)`,
+}));
+/** Where you study: a catalog country, or "Any country" when the scholarship can be used in many countries */
+const studyCountry = z.string().refine((c) => c === ANY_COUNTRY || COUNTRY_VALUES.has(c), (c) => ({
+  message: `"${c}" is not in src/data/countries.ts (add it there first, using the same value), and is not "${ANY_COUNTRY}"`,
 }));
 const isoDay = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'must be YYYY-MM-DD').refine((d) => !Number.isNaN(Date.parse(d)), 'not a real date');
 
@@ -43,7 +47,7 @@ export const scholarshipSchema = z
     fundingType: z.enum(['FULL', 'PARTIAL', 'TUITION_WAIVER', 'RESEARCH_ASSISTANTSHIP']),
     degreeLevels: z.array(z.enum(['Bachelors', 'Masters', 'PhD'])).min(1),
     /** Where you study */
-    countries: z.array(country).min(1),
+    countries: z.array(studyCountry).min(1),
     /** Subjects from src/data/subjectCatalog.ts or ALL_FIELDS. Other words still match the filter through
      * subjectTagsFor(), so the checker only warns about them */
     specializations: z.array(z.string().trim().min(1)).min(1),

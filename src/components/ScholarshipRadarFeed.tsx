@@ -7,6 +7,7 @@ import { rankBySubject } from '@/data/subjectCatalog';
 import { profileFilterDefaults, useProfileFilterDefaults } from '@/hooks/useProfileFilterDefaults';
 import { FilterIcon } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
+import { studyCountryMatches } from '@/data/countries';
 import { UnifiedDiscoveryHeader } from '@/components/layout/UnifiedDiscoveryHeader';
 import { ScholarshipRadarCard } from '@/components/ScholarshipRadarCard';
 import { FeedShell } from '@/components/opportunity-feed/FeedShell';
@@ -59,16 +60,7 @@ export const ScholarshipRadarFeed: React.FC = () => {
       }
 
       // 3. Country filter
-      if (selectedCountries.length > 0 && sch.countries?.length) {
-        const matchesCountry = sch.countries.some(c => {
-          const sc = c.toLowerCase();
-          return selectedCountries.some(userCountry => {
-            const uc = userCountry.toLowerCase();
-            return sc.includes(uc) || uc.includes(sc);
-          });
-        });
-        if (!matchesCountry) return false;
-      }
+      if (!studyCountryMatches(sch.countries ?? [], selectedCountries)) return false;
 
       return true;
     });

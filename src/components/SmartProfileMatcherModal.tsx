@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useApp } from '@/context/AppContext';
-import { WORLD_COUNTRIES, getCountryOptions } from '@/data/countries';
+import { ANY_COUNTRY, WORLD_COUNTRIES, getCountryOptions } from '@/data/countries';
 import { CustomDropdown } from './ui/CustomDropdown';
 
 interface SmartProfileMatcherModalProps {
@@ -53,7 +53,7 @@ export const SmartProfileMatcherModal: React.FC<SmartProfileMatcherModalProps> =
   const matchingScholarships = scholarships.filter((s) => {
     const text = (s.title + ' ' + s.specializations.join(' ') + ' ' + s.tags.join(' ')).toLowerCase();
     const matchesField = text.includes('all fields') || text.includes(field.toLowerCase()) || text.includes('design') || text.includes('tech') || text.includes('inclusive');
-    const matchesCountry = preferredCountry === 'ALL' || s.countries.includes(preferredCountry);
+    const matchesCountry = preferredCountry === 'ALL' || s.countries.includes(preferredCountry) || s.countries.includes(ANY_COUNTRY);
     return matchesField && matchesCountry;
   }).slice(0, 4);
 

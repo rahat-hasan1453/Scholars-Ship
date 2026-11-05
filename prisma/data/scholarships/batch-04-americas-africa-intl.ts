@@ -1,0 +1,91 @@
+// Batch 04 (Step 20–21): the Americas, Africa, international bodies and Bangladesh-based funders.
+// Round 5 (2026-11-05) started with the international bodies. Read each official page in the browser first
+// (docs/HANDOFF-SCHOLARSHIP-17-21.md), then follow docs/SCHOLARSHIP-VERIFICATION.md. Run `npm run data:scholarships:check`.
+import { ANY_COUNTRY } from '../../../src/data/countries';
+import { ALL_FIELDS, type ScholarshipSeed } from './schema';
+
+export const BATCH_04: ScholarshipSeed[] = [
+  // ── Round 5: international bodies, read 2026-11-05 ──
+  {
+    id: 'gov-int-world-bank-jj',
+    title: 'Joint Japan/World Bank Graduate Scholarship (JJ/WBGSP)',
+    provider: 'World Bank (funded by the Government of Japan)',
+    providerShort: 'World Bank',
+    deadline: '2027-02-26T23:59:00Z',
+    deadlineEstimated: false,
+    deadlineNote: 'Window 1 programmes: applications open 18 Jan to 26 Feb 2027. Window 2 programmes have their own dates on the World Bank site (not read).',
+    fundingAmount: 'Amounts are not in the application guidelines (see the World Bank scholarships page)',
+    fundingType: 'FULL',
+    degreeLevels: ['Masters'],
+    countries: [ANY_COUNTRY],
+    specializations: [ALL_FIELDS],
+    requirements: {
+      minWorkYears: 3,
+      notes: "For mid-career professionals from developing countries; Bangladesh is on the 2027 eligible list. You need a bachelor's degree, at least three years of paid development-related work in the last six years, a paid full-time development-related job when you apply, and unconditional admission (except for funding) to one of the participating master's programmes. Not open to dual citizens of a developed country, or to people already studying in a participating programme. The funding type is marked FULL as a programme scholarship; the guidelines read do not itemise what it covers.",
+    },
+    admissionSummary: 'Get unconditional admission to a participating programme first, then apply online with two recommendation letters',
+    applySteps: [
+      'Choose a participating master\'s programme from the Window 1 or Window 2 list',
+      'Get unconditional admission (except for funding) from that programme',
+      'Submit one online application with two recommendation letters by the window deadline',
+    ],
+    officialUrl: 'https://www.worldbank.org/en/programs/scholarships',
+    sourceUrl: 'https://www.worldbank.org/en/brief/2026/07/15/countries-eligible-for-jjwbgsp-scholarship',
+    verifiedOn: '2026-11-05',
+    description: "A Government of Japan scholarship, run by the World Bank, for mid-career professionals from developing countries (Bangladesh included) to do a development-related master's at one of about 30 partner programmes around the world.",
+    tags: ['World Bank', 'Japan', 'Bangladesh Eligible', 'Work Experience'],
+  },
+  {
+    id: 'gov-int-aga-khan-isp',
+    title: 'Aga Khan Foundation International Scholarship Programme',
+    provider: 'Aga Khan Foundation',
+    providerShort: 'Aga Khan Foundation',
+    deadline: '2027-03-31T23:59:00Z',
+    deadlineEstimated: true,
+    deadlineNote: 'The 2026-27 cycle is closed and the next one opens in early 2027; the closing date is not on the page. This date is only a placeholder.',
+    fundingAmount: 'Tuition and living costs, paid half as a grant and half as a loan (you repay 50%)',
+    fundingType: 'PARTIAL',
+    degreeLevels: ['Masters', 'PhD'],
+    countries: [ANY_COUNTRY],
+    specializations: [ALL_FIELDS],
+    requirements: {
+      notes: "For students from selected countries (Bangladesh is one) who have no other means of paying and are about to start the first year of a postgraduate course. Priority goes to master's programmes, PhDs are considered; part-time and short courses are not. You need a bachelor's degree or equivalent experience, a funding plan, and admission to a reputable institution. Preference is given to people under 30. The award does not cover international travel. Not available for study in the United Kingdom or Russia. It is meant as a last-resort source: other scholarships should be tried first.",
+    },
+    admissionSummary: 'Apply in the yearly cycle once you have admission; send a multi-source funding plan with the application',
+    officialUrl: 'https://the.akdn/en/what-we-do/developing-human-capacity/education/international-scholarships',
+    sourceUrl: 'https://the.akdn/en/what-we-do/developing-human-capacity/education/international-scholarships',
+    verifiedOn: '2026-11-05',
+    description: 'A need-based scholarship for postgraduate study from the Aga Khan Foundation, paid half as grant and half as loan, open to students from selected countries including Bangladesh.',
+    tags: ['Aga Khan Foundation', 'Partial Funding', 'Bangladesh Eligible', 'Need-based'],
+  },
+  {
+    id: 'gov-int-adb-japan',
+    title: 'ADB-Japan Scholarship Program (ADB-JSP)',
+    provider: 'Asian Development Bank (funded by the Government of Japan)',
+    providerShort: 'ADB',
+    providerCountry: 'Japan',
+    deadline: '2027-03-31T23:59:00Z',
+    deadlineEstimated: true,
+    deadlineNote: 'The page gives no closing date: you apply through your chosen partner institution, which sets its own. This date is only a placeholder.',
+    fundingAmount: 'Full tuition, monthly allowance including housing, books, medical insurance and travel',
+    fundingType: 'FULL',
+    degreeLevels: ['Masters'],
+    countries: ['Japan'],
+    specializations: [ALL_FIELDS],
+    requirements: {
+      minWorkYears: 2,
+      notes: "Citizens of listed member countries, Bangladesh among them, with admission to an approved master's course at a designated institution, at least two years of full-time work after a university degree, and aged 35 or under (a waiver is possible in exceptional cases). There are 27 designated institutions, 17 of them in Japan; the other countries are on a separate list page that was not read.",
+    },
+    admissionSummary: 'Ask your chosen partner institution for the application forms and send the documents to it',
+    applySteps: [
+      'Pick a designated institution and a master\'s course',
+      'Request the information sheet and forms from that institution',
+      "Send the documents to the institution; ADB makes the final selection",
+    ],
+    officialUrl: 'https://www.adb.org/work-with-us/careers/japan-scholarship-program',
+    sourceUrl: 'https://www.adb.org/work-with-us/careers/japan-scholarship-program',
+    verifiedOn: '2026-11-05',
+    description: "A Government of Japan scholarship administered by the Asian Development Bank for master's study at 27 designated institutions, 17 of them in Japan, for citizens of member countries including Bangladesh.",
+    tags: ['ADB', 'Japan', 'Full Funding', 'Bangladesh Eligible', 'Work Experience'],
+  },
+];

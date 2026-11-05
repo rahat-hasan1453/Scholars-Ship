@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { BATCHES, CURATED_SCHOLARSHIPS, CURATED_VERIFIED_ON, SCHOLARSHIPS } from '../../prisma/data/scholarships';
 import { scholarshipSchema, type ScholarshipSeed } from '../../prisma/data/scholarships/schema';
 import { checkEntries } from '../../prisma/import/scholarshipCheck';
-import { WORLD_COUNTRIES } from '@/data/countries';
+import { ANY_COUNTRY, WORLD_COUNTRIES } from '@/data/countries';
 import { matchesSubjects, SUBJECTS } from '@/data/subjectCatalog';
 
 const sources = [
@@ -52,7 +52,7 @@ describe('scholarship data', () => {
   it('uses catalog countries, and every scholarship is found by some Subject filter', () => {
     const countries = new Set(WORLD_COUNTRIES.map((c) => c.value));
     for (const s of SCHOLARSHIPS) {
-      for (const c of [...s.countries, ...(s.providerCountry ? [s.providerCountry] : [])]) expect(countries, s.id).toContain(c);
+      for (const c of [...s.countries.filter((x) => x !== ANY_COUNTRY), ...(s.providerCountry ? [s.providerCountry] : [])]) expect(countries, s.id).toContain(c);
       expect(SUBJECTS.some((subject) => matchesSubjects([subject], s.specializations)), s.id).toBe(true);
     }
   });
@@ -65,6 +65,11 @@ describe('scholarship rules', () => {
   it('accepts a well-formed new entry', () => {
     expect(scholarshipSchema.safeParse(entry()).success).toBe(true);
     expect(errors(entry({ id: 'gov-int-world-bank-jj', providerCountry: undefined }))).toEqual([]);
+  });
+
+  it('accepts "Any country" as the study country, but not as the provider country', () => {
+    expect(errors(entry({ id: 'gov-int-world-bank-jj', providerCountry: undefined, countries: [ANY_COUNTRY] }))).toEqual([]);
+    expect(errors(entry({ providerCountry: ANY_COUNTRY })).length).toBeGreaterThan(0);
   });
 
   it.each([
