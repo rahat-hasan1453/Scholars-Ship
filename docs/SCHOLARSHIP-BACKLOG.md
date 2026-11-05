@@ -119,6 +119,17 @@ The schema now has "Any country" (`ANY_COUNTRY` in `src/data/countries.ts`), so 
 | Bocconi AI, Women and Cyber awards | Not read (the page lists them for 2027-28 without terms) |
 | TUM/LMU, Ghent, ARES, Denmark, Luxembourg, Baltics, Greece, Romania, Slovakia, Slovenia | Not tried yet |
 
+## Europe, fourth round (2026-11-05)
+
+| Scholarship | Result |
+|---|---|
+| Ghent University BOF Doctoral Scholarships (Global South) | **Added** (`gov-be-ghent-bof-global-south`). Bangladesh is on the 2027 country list. Call closes 9 Feb 2027; monthly amount not stated |
+| University of Copenhagen Danish Government Scholarship | **Added** (`gov-dk-copenhagen-danish-government`). Automatic with admission; deadline 15 Jan (year not stated, so estimated) |
+| Amsterdam Merit Scholarship (UvA) | Not added: the main page has no amount or deadline; each faculty page differs and was not read |
+| Edinburgh Doctoral College / Global Research Scholarships | Not added: official page returns 403 (login wall) |
+| UCL Global Master's Scholarship | Not added: official page returns 403 |
+| TUM scholarship for international students | Not added: needs enrolment at TUM already and shows financial need, so it is no help to new applicants |
+
 ## Blocked: could not verify
 
 | Scholarship | Reason | Retry when |
