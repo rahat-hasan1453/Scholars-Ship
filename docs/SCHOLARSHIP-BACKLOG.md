@@ -1,7 +1,7 @@
 # Scholarship backlog: not yet added
 
 Scholarships we looked at but could not add under the official-source rule (`docs/SCHOLARSHIP-VERIFICATION.md`).
-Last reviewed: 2026-11-05 (rounds read in the browser; Round 5 added).
+Last reviewed: 2026-11-05 (rounds read in the browser; Round 5 and Round 1 added).
 
 ## Read in a browser on 2026-10-29 (Option 1)
 
@@ -30,6 +30,23 @@ The schema now has "Any country" (`ANY_COUNTRY` in `src/data/countries.ts`), so 
 | NST Fellowship, STFT fellowships, Bangabandhu fellowship (MoST, Bangladesh) | Not added: the official pages are empty or built with scripts (`most.gov.bd` shows no text, `grant.most.gov.bd` shows only "MOST"). **You open them in a browser and share the facts** |
 | ICT Division fellowship, Prime Minister's fellowship | Not tried (budget) |
 | UNESCO fellowships | Not tried; mostly short training |
+
+## Round 1, Europe (2026-11-05)
+
+| Scholarship | Result |
+|---|---|
+| Reach Oxford (undergraduate) | **Added** (`gov-gb-reach-oxford`). Bangladesh on the list; deadline 26 Jan 2027 |
+| Cambridge Trust International Scholarship (PhD) | **Added** (`gov-gb-cambridge-international`). Open to all but UK and Ireland; the deadline is the course funding deadline (placeholder date) |
+| Imperial President's PhD Scholarships | **Added** (`gov-gb-imperial-presidents-phd`). Next deadline 11 Jan 2027 |
+| EPFL Master Excellence Fellowships | **Added** (`gov-ch-epfl-excellence`). 15 Dec; the year is not on the page |
+| Czech Government Scholarships for Developing Countries | **Added** (`gov-cz-government-developing`). Bangladesh listed; the 2027/28 call closed 30 Sep 2026, next call assumed the same day |
+| Aalto Excellence Scholarship | **Added** (`gov-fi-aalto-excellence`). Tuition waiver only; Bangladesh not named |
+| Edinburgh Global Research Scholarships | Not added: the funding pages did not show it (only Edinburgh Doctoral College Scholarships and others, with no details). Look for the Doctoral College page |
+| Fundación Carolina (Spain) | Not added: the 2026-27 call closed (Jan to Apr 2026) and the page lists no eligible countries |
+| NAWA, Poland My First Choice / Banach | Not added: the page text was almost all navigation; read the "Call for proposals" page |
+| Russian Government Scholarship | Not added: `education-in-russia.com` showed only a title. Needs a page with the Bangladesh quota |
+| MAEC-AECID (Spain) | Not reached |
+| Heidelberg, TUM/LMU, KU Leuven, Lund/KTH, UCL, Manchester, ARES, Denmark, Luxembourg, Baltics, Greece, Romania, Slovakia, Slovenia | Not tried yet |
 
 ## Blocked: could not verify
 
