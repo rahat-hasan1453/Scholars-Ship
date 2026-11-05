@@ -1,7 +1,7 @@
 # Scholarship backlog: not yet added
 
 Scholarships we looked at but could not add under the official-source rule (`docs/SCHOLARSHIP-VERIFICATION.md`).
-Last reviewed: 2026-11-05 (rounds read in the browser; Rounds 5, 1 and 2 added).
+Last reviewed: 2026-11-05 (rounds read in the browser; Rounds 5, 1, 2 and 3 added).
 
 ## Read in a browser on 2026-10-29 (Option 1)
 
@@ -63,6 +63,20 @@ The schema now has "Any country" (`ANY_COUNTRY` in `src/data/countries.ts`), so 
 | Australian Government RTP | Not added: the page timed out, and RTP places are given out by each university (look at one university's RTP international page) |
 | Thailand TICA (Thai International Postgraduate Programme) | Not added: the page is from 2022 and describes 2014 courses; Bangladesh was listed but nothing is current |
 | NTU Research Scholarship, other Singapore/Korea/Japan university awards, ITEC (India) | Not tried yet |
+
+## Round 3, Middle East and rest of Asia (2026-11-05)
+
+| Scholarship | Result |
+|---|---|
+| MBZUAI MSc and PhD (UAE) | **Added** (`gov-ae-mbzuai`). Fully funded; deadline 15 Dec 2026 |
+| Khalifa University Graduate Scholarship (UAE) | **Added** (`gov-ae-khalifa-graduate`). The page is dated June 2023: check the amounts |
+| HBKU Graduate Scholarship (Qatar) | **Added** (`gov-qa-hbku-graduate`) |
+| KFUPM Graduate Scholarship (Saudi Arabia) | **Added** (`gov-sa-kfupm-graduate`) |
+| HEC Pakistan scholarships for foreign students | Not added: 350 fully funded places for "Central Asian and friendly countries"; Bangladesh is not named and the eligibility page was not read |
+| Malaysian Technical Cooperation Programme (MTCP) | Not added: `mtcp.kln.gov.my` has an invalid TLS certificate, so the browser refused it (not bypassed). Look at the embassy notices on `kln.gov.my` |
+| Saudi Ministry of Education scholarships at public universities | Not added: the summary page lists no countries, levels or amounts; the detail page was not read |
+| Kazakhstan government scholarships | Not read (page found: `gov.kz/org/kazaid/activities/30352`) |
+| QU/Qatar University, UAEU, other Gulf universities | Not tried yet |
 
 ## Blocked: could not verify
 
