@@ -53,6 +53,7 @@ export const WORLD_COUNTRIES: CountryOption[] = [
   { label: 'Hong Kong', value: 'Hong Kong', code: 'HK', flag: '🇭🇰', region: 'Asia & Middle East' },
   { label: 'China', value: 'China', code: 'CN', flag: '🇨🇳', region: 'Asia & Middle East', popularForScholarships: true },
   { label: 'Saudi Arabia', value: 'Saudi Arabia', code: 'SA', flag: '🇸🇦', region: 'Asia & Middle East', popularForScholarships: true },
+  { label: 'United Arab Emirates', value: 'United Arab Emirates', code: 'AE', flag: '🇦🇪', region: 'Asia & Middle East' },
   { label: 'United Arab Emirates', value: 'UAE', code: 'AE', flag: '🇦🇪', region: 'Asia & Middle East' },
   { label: 'Qatar', value: 'Qatar', code: 'QA', flag: '🇶🇦', region: 'Asia & Middle East' },
   { label: 'Thailand', value: 'Thailand', code: 'TH', flag: '🇹🇭', region: 'Asia & Middle East' },
