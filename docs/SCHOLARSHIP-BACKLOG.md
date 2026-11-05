@@ -78,6 +78,20 @@ The schema now has "Any country" (`ANY_COUNTRY` in `src/data/countries.ts`), so 
 | Kazakhstan government scholarships | Not read (page found: `gov.kz/org/kazaid/activities/30352`) |
 | QU/Qatar University, UAEU, other Gulf universities | Not tried yet |
 
+## Europe, second round (2026-11-05)
+
+| Scholarship | Result |
+|---|---|
+| TU Delft Justus & Louise van Effen Excellence Scholarship | **Added** (`gov-nl-delft-excellence`). Deadline 1 Dec 2026 |
+| Leiden Excellence Scholarship (LExS) | **Added** (`gov-nl-leiden-excellence`). Deadline 1 Dec 2026 |
+| KTH Scholarship | **Added** (`gov-se-kth-scholarship`). Form 1 Dec 2026 to 15 Jan 2027 |
+| Lund University Global Scholarship | **Added** (`gov-se-lund-global`). 2026 round closed; next date assumed 16 Feb 2027 |
+| Science@Leuven Scholarship (KU Leuven) | **Added** (`gov-be-kuleuven-science`). Deadline 15 Feb 2027 |
+| Amsterdam Merit Scholarship (UvA) | Not added: no amount on the page and deadlines differ by faculty. Read one faculty page (for example the humanities or social sciences one) |
+| UCL scholarships | Not added: the UCL page answered 403 to the fetch tool; open it in a browser |
+| University of Groningen Ubbo Emmius | Not added: the pages found were news items about PhD positions |
+| Heidelberg, TUM/LMU, Manchester, Ghent, ARES, Denmark, Luxembourg, Baltics, Greece, Romania, Slovakia, Slovenia | Not tried yet |
+
 ## Blocked: could not verify
 
 | Scholarship | Reason | Retry when |
