@@ -1,5 +1,7 @@
 # Scholarships: plan for Steps 17–21 (written 2026-10-29)
 
+> **STATUS: COMPLETE (closed 2026-11-05).** 71 scholarships live in production (from 24). All five rounds were done, plus four extra Europe rounds. "Done when" below is met: 60+ scholarships, every dropped candidate is in `SCHOLARSHIP-BACKLOG.md` with a reason, link checker has no ❌. Further rounds are optional (UvA faculty pages, Luxembourg, Baltics, Greece, ARES, UZH, Stockholm, NUS, NST/Bangabandhu). The text below is the original plan, kept for history.
+
 **Where we are:** 39 scholarships in production (target in the old plan: ~175). Steps 1–16 and 22 of
 `EXECUTION-PLAN-PHASE-1-2.md` are done. Steps 17–21 (batch 02 খ, 03, 04) are what is left of that plan.
 The old way (a script fetches official pages) fails for most sites: they refuse bots, disallow robots.txt, are
