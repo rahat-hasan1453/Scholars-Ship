@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getScholarships } from '@/lib/scholarships';
+import { ANY_COUNTRY } from '@/data/countries';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -14,7 +15,7 @@ export async function GET(request: Request) {
   }
 
   if (country) {
-    results = results.filter((s) => s.countries.some((c) => c.toLowerCase() === country.toLowerCase()));
+    results = results.filter((s) => s.countries.some((c) => c === ANY_COUNTRY || c.toLowerCase() === country.toLowerCase()));
   }
 
   if (query) {

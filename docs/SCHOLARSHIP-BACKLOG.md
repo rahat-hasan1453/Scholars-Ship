@@ -1,7 +1,7 @@
 # Scholarship backlog: not yet added
 
 Scholarships we looked at but could not add under the official-source rule (`docs/SCHOLARSHIP-VERIFICATION.md`).
-Last reviewed: 2026-10-29 (Step 8 PR #64, Step 9 PR #69, Step 16 batch 02a, browser reading).
+Last reviewed: 2026-11-05 (rounds read in the browser; Round 5 added).
 
 ## Read in a browser on 2026-10-29 (Option 1)
 
@@ -16,12 +16,20 @@ Last reviewed: 2026-10-29 (Step 8 PR #64, Step 9 PR #69, Step 16 batch 02a, brow
 | Marshall Scholarship | Not tried |
 | OeAD (Austria) | Not opened: `robots.txt` disallows all pages |
 
-## Blocked: schema gap
+## Round 5 (2026-11-05): international bodies and Bangladeshi funders
 
-| Scholarship | Reason | Fix |
-|---|---|---|
-| Joint Japan/World Bank Graduate Scholarship | Bangladesh eligible, but the source gives no study-country list and the schema has no "any country" value | Add an "any country" value to the schema, then add the entry |
-| Aga Khan Foundation International Scholarship Programme | Same | Same |
+The schema now has "Any country" (`ANY_COUNTRY` in `src/data/countries.ts`), so the two scholarships that were blocked by it are added.
+
+| Scholarship | Result |
+|---|---|
+| Joint Japan/World Bank (JJ/WBGSP) | **Added** (`gov-int-world-bank-jj`). Bangladesh is on the 2027 list. Window 1 closes 26 Feb 2027; Window 2 dates not read. Amounts are not in the guidelines (PDF), so funding type FULL is a classification, not a quoted figure |
+| Aga Khan Foundation ISP | **Added** (`gov-int-aga-khan-isp`). Half grant, half loan; next cycle early 2027, closing date unknown (placeholder) |
+| ADB-Japan Scholarship Program | **Added** (`gov-int-adb-japan`). Bangladesh eligible; 2 years' work, age 35 or under; no deadline on the page. Only Japan (17 of 27 institutions) is listed as a study country |
+| IsDB scholarship programmes | Not added: the page only introduces four programmes (MSP PhD, MSc, undergraduate ones) with no eligibility, coverage or dates. Open each programme's own page |
+| OPEC Fund scholarship | Not added: the URL tried returned 404. Find the current page |
+| NST Fellowship, STFT fellowships, Bangabandhu fellowship (MoST, Bangladesh) | Not added: the official pages are empty or built with scripts (`most.gov.bd` shows no text, `grant.most.gov.bd` shows only "MOST"). **You open them in a browser and share the facts** |
+| ICT Division fellowship, Prime Minister's fellowship | Not tried (budget) |
+| UNESCO fellowships | Not tried; mostly short training |
 
 ## Blocked: could not verify
 

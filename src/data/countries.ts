@@ -72,6 +72,29 @@ export const WORLD_COUNTRIES: CountryOption[] = [
   { label: 'Egypt', value: 'Egypt', code: 'EG', flag: '🇪🇬', region: 'Latin America & Africa' },
 ];
 
+/**
+ * "Study country" of a scholarship that can be used in many countries (World Bank Joint Japan, Aga Khan, ...).
+ * It is not a real country, so it is not in WORLD_COUNTRIES (no dropdown or onboarding lists it).
+ */
+export const ANY_COUNTRY = 'Any country';
+
+/**
+ * Does a scholarship's study countries fit the countries a student picked?
+ * Same loose match the Scholarship feed always used (either name contains the other); "Any country" fits every pick.
+ * An empty pick means no filter.
+ */
+export function studyCountryMatches(studyCountries: string[], picked: string[]): boolean {
+  if (picked.length === 0 || studyCountries.length === 0) return true;
+  if (studyCountries.includes(ANY_COUNTRY)) return true;
+  return studyCountries.some((c) => {
+    const sc = c.toLowerCase();
+    return picked.some((p) => {
+      const uc = p.toLowerCase();
+      return sc.includes(uc) || uc.includes(sc);
+    });
+  });
+}
+
 export const getCountryOptions = () => {
   return [
     { label: '🌐 All Countries', value: 'ALL' },

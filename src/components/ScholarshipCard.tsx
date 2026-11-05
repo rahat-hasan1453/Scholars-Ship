@@ -12,7 +12,7 @@ interface ScholarshipCardProps {
 }
 
 const getCountryFlag = (country?: string) => {
-  if (!country) return '🌐';
+  if (!country || country === 'Any country') return '🌐';
   const c = country.toLowerCase();
   if (c.includes('united kingdom') || c.includes('uk') || c.includes('britain')) return '🇬🇧';
   if (c.includes('united states') || c.includes('usa') || c.includes('us')) return '🇺🇸';
