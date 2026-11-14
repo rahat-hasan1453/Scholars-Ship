@@ -64,6 +64,7 @@ export function abstractText(index: Record<string, number[]> | null): string | n
 export const PAPER_TYPE: Record<string, string> = {
   article: 'Journal article',
   'proceedings-article': 'Conference paper',
+  'conference-paper': 'Conference paper',
   preprint: 'Preprint',
   review: 'Review',
   'book-chapter': 'Book chapter',

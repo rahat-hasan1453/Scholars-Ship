@@ -70,6 +70,17 @@ describe('workToPaper', () => {
     expect(workToPaper(work({ abstract_inverted_index: index('Too short') }), profs)).toBeNull();
   });
 
+  it('labels both the new "conference-paper" type and the old "proceedings-article" one', () => {
+    expect(workToPaper(work({ type: 'conference-paper' }), profs)!.paperType).toBe('Conference paper');
+    expect(workToPaper(work({ type: 'proceedings-article' }), profs)!.paperType).toBe('Conference paper');
+  });
+
+  it('keeps conference papers when selecting recent papers, under either type name', () => {
+    for (const type of ['conference-paper', 'proceedings-article']) {
+      expect(selectRecentPapers([work({ type })], profs)).toHaveLength(1);
+    }
+  });
+
   it('leaves unknown types and funders empty instead of guessing', () => {
     const p = workToPaper(work({ type: 'dataset' }), profs)!;
     expect(p.paperType).toBeNull();
