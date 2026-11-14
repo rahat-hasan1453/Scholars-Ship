@@ -1,0 +1,12 @@
+# Extends the built-in gitleaks rules. Only known false alarms are listed here.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Commented-out example key in .env.example (checked 2026-11-14)"
+paths = ['''\.env\.example''']
+regexes = ['''re_12345''']
+
+[[allowlists]]
+description = "Figma file key in the architecture doc: a public design-file id, not a secret"
+paths = ['''docs/ARCHITECTURE\.md''']
