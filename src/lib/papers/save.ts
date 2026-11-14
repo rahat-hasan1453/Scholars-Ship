@@ -5,7 +5,10 @@ import { workToPaper, type OpenAlexWork, type PaperData } from '@/lib/papers/ope
 // Picks the new papers the daily cron keeps and writes them to the database.
 
 /** Work types the cron keeps: journal articles, conference papers and preprints */
-export const CRON_PAPER_TYPES = ['article', 'proceedings-article', 'preprint'];
+// OpenAlex renamed the conference type: it now rejects 'proceedings-article' in a filter (HTTP 400) and calls them 'conference-paper'
+export const CRON_PAPER_TYPES = ['article', 'conference-paper', 'preprint'];
+/** Types kept when reading works back; the old label stays so papers typed before the rename still count */
+const KEPT_TYPES = [...CRON_PAPER_TYPES, 'proceedings-article'];
 /** Older work is history and already comes from the seed */
 export const MIN_YEAR = 2025;
 /** Most recent papers kept per professor in one run, so the database stays small */
@@ -26,7 +29,7 @@ export function selectRecentPapers(
   { minYear = MIN_YEAR, perProfessor = PER_PROFESSOR } = {},
 ): PaperData[] {
   const candidates = [...works]
-    .filter((w) => w.type && CRON_PAPER_TYPES.includes(w.type) && (w.publication_year ?? 0) >= minYear)
+    .filter((w) => w.type && KEPT_TYPES.includes(w.type) && (w.publication_year ?? 0) >= minYear)
     .flatMap((w) => workToPaper(w, profByAuthor) ?? [])
     .sort((a, b) => (b.publishedAt ?? '').localeCompare(a.publishedAt ?? '') || b.citationCount - a.citationCount);
 

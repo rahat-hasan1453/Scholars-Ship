@@ -96,7 +96,7 @@ describe('GET /api/cron/papers', () => {
     expect(db.papers.find((p) => p.id === 'paper_W2').authors[0]).toMatchObject({ name: 'A2', professorId: 'prof_2' });
     const url = String(vi.mocked(fetch).mock.calls[0][0]);
     expect(url).toContain('author.id:A1|A2,from_publication_date:2025-01-01');
-    expect(url).toContain('type:article|proceedings-article|preprint');
+    expect(url).toContain('type:article|conference-paper|preprint');
     expect(url).toContain('sort=publication_date:desc');
   });
 
